@@ -14,13 +14,13 @@
 </script>
 
 <section>
-	<PaletteSlots {colors} numCols={4} on:select={_onSlotSelect} />
+	<PaletteSlots {colors} numCols={5} on:select={_onSlotSelect} />
 	<PaletteInput color={selectedColor} on:change={_onInputChange} />
 </section>
 
 <style>
 	section {
-		background-color: #cccccc;
+		background-color: #fafafa;
 		display: grid;
 		grid-template-rows: auto auto;
 		grid-gap: 1rem;

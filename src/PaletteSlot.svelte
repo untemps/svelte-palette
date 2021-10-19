@@ -1,5 +1,7 @@
 <script>
 	import { createEventDispatcher } from 'svelte'
+	import { scale } from 'svelte/transition'
+	import { elasticOut } from 'svelte/easing'
 
 	export let color
 
@@ -11,7 +13,11 @@
 		})
 </script>
 
-<li style="--color:{color};" on:click|preventDefault={_onClick} />
+<li
+	style="--color:{color}"
+	in:scale={{ duration: 500, easing: elasticOut }}
+	on:click|preventDefault={_onClick}
+/>
 
 <style>
 	li {
