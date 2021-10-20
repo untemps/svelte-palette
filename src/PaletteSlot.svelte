@@ -13,15 +13,10 @@
 		})
 </script>
 
-<li
-	style="--color:{color}"
-	in:scale={{ duration: 500, easing: elasticOut }}
-	on:click|preventDefault={_onClick}
-/>
+<div style="--color:{color}" in:scale={{ duration: 500, easing: elasticOut }} on:click|preventDefault={_onClick} />
 
 <style>
-	li {
-		cursor: pointer;
+	div {
 		width: 1rem;
 		height: 1rem;
 		border-radius: 50%;
