@@ -39,7 +39,7 @@
 </script>
 
 <main style="--bgColor:{bgColor}">
-	<div class='container'>
+	<div class="container">
 		<Palette {colors} on:select={({ detail: { color } }) => (bgColor = color)} />
 		<hr />
 		<form on:submit|preventDefault={_onSubmit}>
@@ -66,7 +66,6 @@
 			</Palette>
 		</form>
 	</div>
-
 </main>
 
 <style>

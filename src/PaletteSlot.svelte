@@ -13,7 +13,7 @@
 		})
 </script>
 
-<div style="--color:{color}" in:scale={{ duration: 500, easing: elasticOut }} on:click|preventDefault={_onClick} />
+<div {...$$restProps} style="--color:{color}" in:scale={{ duration: 500, easing: elasticOut }} on:click|preventDefault={_onClick} />
 
 <style>
 	div {

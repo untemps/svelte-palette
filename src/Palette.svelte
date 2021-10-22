@@ -17,7 +17,7 @@
 
 	const _onSlotSelect = (e) => _selectColor(e.detail.color)
 
-	const _onInputChange = (e) => _addColor(e.detail.color)
+	const _onInputAdd = (e) => _addColor(e.detail.color)
 </script>
 
 <section>
@@ -31,23 +31,22 @@
 			</li>
 		{/each}
 	</ul>
-	{#if !$$slots.input}
+	<slot name="footer">
 		<slot name="input">
-			<PaletteInput color={selectedColor} on:change={_onInputChange} />
+			<PaletteInput color={selectedColor} on:add={_onInputAdd} />
 		</slot>
-	{/if}
-	<slot name="footer" />
+	</slot>
 </section>
 
 <style>
 	section {
-		background-color: #fafafa;
 		display: flex;
 		flex-direction: column;
 		row-gap: 1rem;
 		align-items: center;
 		min-width: 10rem;
 		padding: 2rem;
+        background-color: #fafafa;
 	}
 
 	ul {
