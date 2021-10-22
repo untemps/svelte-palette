@@ -6,6 +6,7 @@
 
 	export let colors = []
 	export let selectedColor = null
+	export let allowDuplicates = false
 
 	const dispatch = createEventDispatcher()
 
@@ -13,7 +14,7 @@
 		selectedColor = color
 		dispatch('select', { color })
 	}
-	const _addColor = (color) => (colors = [...colors, color])
+	const _addColor = (color) => (colors = allowDuplicates || !colors.includes(color) ? [...colors, color] : colors)
 
 	const _onSlotSelect = (e) => _selectColor(e.detail.color)
 
@@ -46,7 +47,7 @@
 		align-items: center;
 		min-width: 10rem;
 		padding: 2rem;
-        background-color: #fafafa;
+		background-color: #fafafa;
 	}
 
 	ul {

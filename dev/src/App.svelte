@@ -6,25 +6,25 @@
 	let isSubmitted = false
 
 	const colors = [
-		'#53067C',
-		'#892DDC',
-		'#BC6FF1',
-		'#3D0000',
-		'#950101',
-		'#FF0000',
-		'#1C0C5B',
-		'#3D2C8D',
-		'#916BBF',
-		'#C996CC',
-		'#345B63',
-		'#152D35',
-		'#112031',
-		'#7D1935',
-		'#B42B51',
-		'#E63E6D',
-		'#3B5249',
-		'#519872',
-		'#A4B494',
+		'#865C54',
+		'#8F5447',
+		'#A65846',
+		'#A9715E',
+		'#AD8C72',
+		'#C2B091',
+		'#172B41',
+		'#32465C',
+		'#617899',
+		'#9BA2BC',
+		'#847999',
+		'#50526A',
+		'#8B8C6B',
+		'#97A847',
+		'#5B652C',
+		'#6A6A40',
+		'#F2D9BF',
+		'#F5BAAE',
+		'#F1A191',
 	]
 
 	const _onSlotClick = (color) => () => {
@@ -40,7 +40,7 @@
 
 <main style="--bgColor:{bgColor}">
 	<div class="container">
-		<Palette {colors} on:select={({ detail: { color } }) => (bgColor = color)} />
+		<Palette {colors} allowDuplicates on:select={({ detail: { color } }) => (bgColor = color)} />
 		<hr />
 		<form on:submit|preventDefault={_onSubmit}>
 			<Palette {colors}>
