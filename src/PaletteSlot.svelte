@@ -13,13 +13,30 @@
 		})
 </script>
 
-<div {...$$restProps} style="--color:{color}" in:scale={{ duration: 500, easing: elasticOut }} on:click|preventDefault={_onClick} />
+<button
+	{...$$restProps}
+	aria-label={color}
+	style="--color:{color}"
+	in:scale={{ duration: 500, easing: elasticOut }}
+	on:click|preventDefault={_onClick}
+/>
 
 <style>
-	div {
+	button {
 		width: 1rem;
 		height: 1rem;
+		margin: 0;
+		padding: 0;
+		border: none;
 		border-radius: 50%;
 		background-color: var(--color);
+	}
+
+	button:active {
+		background-color: var(--color);
+	}
+
+	button:focus {
+		box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--color);
 	}
 </style>
