@@ -21,14 +21,15 @@
 	"module": "dist/index.es.js",
 	"svelte": "src/index.js",
 	"devDependencies": {
+		"@commitlint/cli": "^13.2.1",
+		"@commitlint/config-conventional": "^13.2.0",
 		"husky": "^7.0.2",
 		"prettier": "^2.4.1",
 		"prettier-plugin-svelte": "^2.4.0",
+		"rollup-plugin-replace": "^2.2.0",
 		"semantic-release": "^18.0.0"
 	},
 	"dependencies": {
-		"@commitlint/cli": "^13.2.1",
-		"@commitlint/config-conventional": "^13.2.0",
 		"svelte": "^3.44.0"
 	},
 	"husky": {
