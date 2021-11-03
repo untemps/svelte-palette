@@ -40,7 +40,7 @@
 
 <main style="--bgColor:{bgColor}">
 	<div class="container">
-		<Palette {colors} allowDuplicates on:select={({ detail: { color } }) => (bgColor = color)} />
+		<Palette {colors} allowDuplicates allowDeletion on:select={({ detail: { color } }) => (bgColor = color)} />
 		<hr />
 		<form on:submit|preventDefault={_onSubmit}>
 			<Palette {colors}>

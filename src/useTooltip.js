@@ -30,6 +30,11 @@ const useTooltip = (target, { template, callback }) => {
 	target.addEventListener('mouseleave', _onMouseLeave)
 
 	let tooltipTemplate = template
+	if (tooltipTemplate) {
+		if (tooltipTemplate.parentNode) {
+			tooltipTemplate.parentNode.removeChild(tooltipTemplate)
+		}
+	}
 
 	const tooltip = document.createElement('div')
 	tooltip.className = 'tooltip'
@@ -49,7 +54,7 @@ const useTooltip = (target, { template, callback }) => {
 	}).observe(target, { childList: true })
 
 	return {
-		update: ({ template, callback }) => {
+		update: ({ template }) => {
 			tooltipTemplate = template
 			if (tooltipTemplate) {
 				if (tooltipTemplate.parentNode) {
