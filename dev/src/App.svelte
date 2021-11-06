@@ -1,10 +1,6 @@
 <script>
 	import { Palette, PaletteSlot } from '../../src'
 
-	let bgColor = '#e9f1c6'
-	let selectedColor = null
-	let isSubmitted = false
-
 	const colors = [
 		'#865C54',
 		'#8F5447',
@@ -26,6 +22,10 @@
 		'#F5BAAE',
 		'#F1A191',
 	]
+
+	let bgColor = colors[0]
+	let selectedColor = null
+	let isSubmitted = false
 
 	const _onSlotClick = (color) => () => {
 		isSubmitted = false

@@ -20,6 +20,7 @@
 		selectedColor = color
 		dispatch('select', { color })
 	}
+
 	const _addColor = (color) => (colors = allowDuplicates || !colors.includes(color) ? [...colors, color] : colors)
 
 	const _removeColor = (color) => (colors = colors.filter((c) => c !== color))
@@ -34,9 +35,9 @@
 <section>
 	<slot name="header" />
 	<ul>
-		{#each colors as color, index}
+		{#each colors as color}
 			<li
-				id={index}
+				data-testid='__palette-row__'
 				use:useConditional={{
 					action: useTooltip,
 					options: { template: tooltip, callback: () => _onSlotDelete({ detail: { color } }) },
@@ -56,7 +57,7 @@
 	</slot>
 </section>
 {#if allowDeletion}
-	<button class="tooltip__button" bind:this={tooltip}>
+	<button data-testid='__palette-tooltip__' class="tooltip__button" bind:this={tooltip}>
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -256 1792 1792">
 			<g transform="matrix(1,0,0,-1,197.42373,1255.0508)">
 				<path

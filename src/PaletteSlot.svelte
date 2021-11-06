@@ -15,6 +15,7 @@
 
 <button
 	{...$$restProps}
+	data-testid='__palette-slot-root__'
 	aria-label={color}
 	style="--color:{color}"
 	in:scale={{ duration: 500, easing: elasticOut }}

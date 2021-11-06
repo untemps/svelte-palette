@@ -7,7 +7,6 @@
 	export let inputAriaLabel = 'Enter an hex color value'
 	export let inputTitle = 'The value must be a valid hex color'
 	export let buttonAriaLabel = 'Submit this hex color value'
-	export let onChange = null
 
 	const dispatch = createEventDispatcher()
 	const validationRegex = /^#?(([0-9a-f]{2}){3,4}|([0-9a-f]){3})$/gi

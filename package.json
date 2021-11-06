@@ -21,16 +21,40 @@
 	"module": "dist/index.es.js",
 	"svelte": "src/index.js",
 	"devDependencies": {
+		"@babel/core": "^7.16.0",
+		"@babel/preset-env": "^7.16.0",
 		"@commitlint/cli": "^13.2.1",
 		"@commitlint/config-conventional": "^13.2.0",
+		"@testing-library/jest-dom": "^5.15.0",
+		"@testing-library/svelte": "^3.0.3",
+		"babel-jest": "^27.3.1",
 		"husky": "^7.0.2",
+		"identity-obj-proxy": "^3.0.0",
+		"jest": "^27.3.1",
 		"prettier": "^2.4.1",
 		"prettier-plugin-svelte": "^2.4.0",
 		"rollup-plugin-replace": "^2.2.0",
-		"semantic-release": "^18.0.0"
+		"semantic-release": "^18.0.0",
+		"svelte-jester": "^2.1.5"
 	},
 	"dependencies": {
 		"svelte": "^3.44.0"
+	},
+	"jest": {
+		"transform": {
+			"^.+\\.js$": "babel-jest",
+			"^.+\\.svelte$": "svelte-jester"
+		},
+		"moduleNameMapper": {
+			"\\.(css|less|scss)$": "identity-obj-proxy"
+		},
+		"moduleFileExtensions": [
+			"js",
+			"svelte"
+		],
+		"setupFilesAfterEnv": [
+			"@testing-library/jest-dom/extend-expect"
+		]
 	},
 	"husky": {
 		"hooks": {
@@ -42,6 +66,7 @@
 		"branches": "main"
 	},
 	"scripts": {
+		"test": "jest --watch --coverage",
 		"prettier": "prettier \"*/**/*.{js,svelte}\" --ignore-path ./.prettierignore --write && git add . && git status"
 	}
 }
