@@ -4,7 +4,15 @@
 	"author": "Vincent Le Badezet <v.lebadezet@untemps.net>",
 	"license": "MIT",
 	"description": "Svelte component to display a customisable color picker",
-	"keywords": ["palette", "color", "color-picker", "svelte", "svelte-component", "component", "javascript"],
+	"keywords": [
+		"palette",
+		"color",
+		"color-picker",
+		"svelte",
+		"svelte-component",
+		"component",
+		"javascript"
+	],
 	"private": false,
 	"publishConfig": {
 		"access": "public"
@@ -13,21 +21,37 @@
 	"module": "dist/index.es.js",
 	"svelte": "src/index.js",
 	"devDependencies": {
-		"@babel/core": "^7.16.0",
-		"@babel/preset-env": "^7.16.0",
-		"@commitlint/cli": "^13.2.1",
-		"@commitlint/config-conventional": "^13.2.0",
-		"@testing-library/jest-dom": "^5.15.0",
+		"@babel/cli": "^7.12.10",
+		"@babel/core": "^7.12.10",
+		"@babel/plugin-proposal-class-properties": "^7.12.1",
+		"@babel/plugin-transform-runtime": "^7.12.10",
+		"@babel/preset-env": "^7.12.11",
+		"@commitlint/cli": "^14.1.0",
+		"@commitlint/config-conventional": "^14.1.0",
+		"@rollup/plugin-babel": "^5.2.2",
+		"@rollup/plugin-commonjs": "^21.0.1",
+		"@rollup/plugin-node-resolve": "^13.0.6",
+		"@semantic-release/changelog": "^6.0.1",
+		"@semantic-release/git": "^10.0.1",
+		"@semantic-release/github": "^8.0.2",
+		"@testing-library/dom": "^8.11.0",
+		"@testing-library/jest-dom": "^5.11.6",
 		"@testing-library/svelte": "^3.0.3",
 		"babel-jest": "^27.3.1",
-		"husky": "^7.0.2",
+		"cross-env": "^7.0.3",
+		"husky": "^7.0.4",
 		"identity-obj-proxy": "^3.0.0",
 		"jest": "^27.3.1",
 		"postcss": "^8.3.11",
-		"prettier": "^2.4.1",
+		"prettier": "^2.2.1",
 		"prettier-plugin-svelte": "^2.4.0",
+		"rollup": "^2.35.1",
+		"rollup-plugin-filesize": "^9.1.0",
 		"rollup-plugin-postcss": "^4.0.1",
 		"rollup-plugin-replace": "^2.2.0",
+		"rollup-plugin-svelte": "^7.0.0",
+		"rollup-plugin-terser": "^7.0.2",
+		"rollup-plugin-visualizer": "^5.5.2",
 		"semantic-release": "^18.0.0",
 		"svelte-jester": "^2.1.5"
 	},
@@ -42,8 +66,13 @@
 		"moduleNameMapper": {
 			"\\.(css|less|scss)$": "identity-obj-proxy"
 		},
-		"moduleFileExtensions": ["js", "svelte"],
-		"setupFilesAfterEnv": ["@testing-library/jest-dom/extend-expect"]
+		"moduleFileExtensions": [
+			"js",
+			"svelte"
+		],
+		"setupFilesAfterEnv": [
+			"@testing-library/jest-dom/extend-expect"
+		]
 	},
 	"husky": {
 		"hooks": {
@@ -52,7 +81,9 @@
 		}
 	},
 	"release": {
-		"branches": ["main"],
+		"branches": [
+			"main"
+		],
 		"plugins": [
 			"@semantic-release/commit-analyzer",
 			"@semantic-release/release-notes-generator",

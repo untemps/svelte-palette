@@ -12,7 +12,7 @@ const target = process.env.BABEL_ENV
 export default {
 	input: 'src/index.js',
 	output: {
-		name: 'svelte-readotron',
+		name: 'svelte-palette',
 		file: {
 			cjs: 'dist/index.js',
 			es: 'dist/index.es.js',
@@ -21,7 +21,6 @@ export default {
 		format: target,
 		sourcemap: 'inline',
 	},
-	external: id => !id.startsWith('\0') && !id.startsWith('.') && !id.startsWith('/'),
 	plugins: [
 		svelte(),
 		postcss({
