@@ -50,4 +50,27 @@ describe('Palette', () => {
 		await fireEvent.click(row.firstChild)
 		expect(onSelect).toHaveBeenCalledWith(new CustomEvent({ detail: { color: null } }))
 	})
+
+	it.each([
+		[['#ff0', '#0ff', '#f0f'], 99, 4],
+		[['#ff0', '#0ff', '#f0f'], -1, 4],
+		[['#ff0', '#0ff', '#f0f'], 3, 3],
+		[['#ff0', '#0ff', '#f0f'], 1, 1],
+	])('Adds or replaces color regarding maxColors value', async (colors, maxColors, expected) => {
+		const onSelect = jest.fn()
+		const { getByTestId, getAllByTestId, component } = render(Palette, {
+			colors,
+			maxColors,
+		})
+		component.$on('select', onSelect)
+		const input = getByTestId('__palette-input-input__')
+		const submit = getByTestId('__palette-input-submit__')
+		const newColor = '0f0'
+		await fireEvent.input(input, { target: { value: newColor } })
+		await fireEvent.click(submit)
+		const slots = getAllByTestId('__palette-slot__')
+		expect(slots).toHaveLength(expected)
+		await fireEvent.click(slots[slots.length - 1])
+		expect(onSelect).toHaveBeenCalledWith(new CustomEvent({ detail: { color: '#000' } }))
+	})
 })

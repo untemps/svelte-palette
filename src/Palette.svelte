@@ -12,6 +12,7 @@
 	export let allowDuplicates = false
 	export let allowDeletion = false
 	export let showTransparentSlot = false
+	export let maxColors = 30
 
 	const dispatch = createEventDispatcher()
 
@@ -22,7 +23,17 @@
 		dispatch('select', { color })
 	}
 
-	const _addColor = (color) => (colors = allowDuplicates || !colors.includes(color) ? [...colors, color] : colors)
+	const _addColor = (color) =>
+		(colors =
+			allowDuplicates || !colors.includes(color)
+				? [
+						...colors.slice(
+							0,
+							colors.length < maxColors || maxColors === -1 ? colors.length : colors.length - 1
+						),
+						color,
+				  ]
+				: colors)
 
 	const _removeColor = (_, index) => (colors = colors.filter((c, i) => i !== index))
 
@@ -53,7 +64,7 @@
 				}}
 			>
 				<slot name="slot" {color}>
-					<PaletteSlot {color} on:click={_onSlotSelect} />
+					<PaletteSlot data-testid="__palette-slot__" {color} on:click={_onSlotSelect} />
 				</slot>
 			</li>
 		{/each}
