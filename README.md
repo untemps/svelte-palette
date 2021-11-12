@@ -1,7 +1,4 @@
 <p align="center">
-<img src="assets/svelte-palette.png" alt="svelte-palette" height="200"/>
-</p>
-<p align="center">
     Svelte component to display a customisable color picker
 </p>
 
@@ -10,15 +7,6 @@
 [![npm](https://img.shields.io/npm/v/@untemps/svelte-palette?style=for-the-badge)](https://www.npmjs.com/package/@untemps/svelte-palette)
 [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/untemps/svelte-palette/deploy?style=for-the-badge)](https://github.com/untemps/svelte-palette/actions)
 [![Codecov](https://img.shields.io/codecov/c/github/untemps/svelte-palette?style=for-the-badge)](https://codecov.io/gh/untemps/svelte-palette)
-
-## Demo
-
-<p align="center">
-    :red_circle:&nbsp;&nbsp;<big><a href="https://untemps.github.io/svelte-palette" target="_blank" rel="noopener">LIVE
-    DEMO</a></big>&nbsp;:red_circle:
-    <br/><br/>
-    <img src="assets/example.png" alt="Example" style="max-width: 100%"/>
-</p>
 
 ## Installation
 
@@ -92,6 +80,7 @@ yarn add @untemps/svelte-palette
 
 	const colors = ['#865C54', '#8F5447', '#A65846', '#A9715E', '#AD8C72']
 </script>
+
 <Palette {colors}>
 	<div slot="header" class="palette__header">
 		<h1>Pick a color</h1>
