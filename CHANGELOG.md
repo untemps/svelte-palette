@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/untemps/svelte-palette/compare/v1.0.0...v1.0.1) (2021-11-13)
+
+
+### Bug Fixes
+
+* Delete slots by index instead of color ([#2](https://github.com/untemps/svelte-palette/issues/2)) ([b03c263](https://github.com/untemps/svelte-palette/commit/b03c26374e32710c2df54376584915a16018fe29))
+
 # 1.0.0 (2021-11-07)
 
 
