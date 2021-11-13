@@ -23,24 +23,24 @@
 
 	const _addColor = (color) => (colors = allowDuplicates || !colors.includes(color) ? [...colors, color] : colors)
 
-	const _removeColor = (color) => (colors = colors.filter((c) => c !== color))
+	const _removeColor = (_, index) => (colors = colors.filter((c, i) => i !== index))
 
-	const _onSlotSelect = (e) => _selectColor(e.detail.color)
+	const _onSlotSelect = ({ detail: { color } }) => _selectColor(color)
 
-	const _onSlotDelete = (e) => _removeColor(e.detail.color)
+	const _onSlotDelete = ({ detail: { color, index } }) => _removeColor(color, index)
 
-	const _onInputAdd = (e) => _addColor(e.detail.color)
+	const _onInputAdd = ({ detail: { color } }) => _addColor(color)
 </script>
 
 <section>
 	<slot name="header" />
 	<ul>
-		{#each colors as color}
+		{#each colors as color, index}
 			<li
 				data-testid='__palette-row__'
 				use:useConditional={{
 					action: useTooltip,
-					options: { template: tooltip, callback: () => _onSlotDelete({ detail: { color } }) },
+					options: { template: tooltip, callback: () => _onSlotDelete({ detail: { color, index } }) },
 					condition: allowDeletion,
 				}}
 			>
