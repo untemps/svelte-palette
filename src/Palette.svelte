@@ -54,7 +54,10 @@
 				</slot>
 			</li>
 		{/if}
-		{#each colors as color, index}
+		{#each colors.slice(
+			0,
+			colors.length < maxColors || maxColors === -1 ? colors.length : maxColors
+		) as color, index}
 			<li
 				data-testid="__palette-row__"
 				use:useConditional={{
