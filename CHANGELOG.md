@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/untemps/svelte-palette/compare/v1.0.1...v1.1.0) (2021-12-03)
+
+
+### Features
+
+* Allow to display a transparent slot at the end of the list ([#5](https://github.com/untemps/svelte-palette/issues/5)) ([90f3233](https://github.com/untemps/svelte-palette/commit/90f32336b828f0dd2933c2901ea4da3c7feb0698))
+
 ## [1.0.1](https://github.com/untemps/svelte-palette/compare/v1.0.0...v1.0.1) (2021-11-13)
 
 
