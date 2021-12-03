@@ -1,27 +1,50 @@
 import './useTooltip.css'
 
 const useTooltip = (target, { template, callback }) => {
+	const _removeTooltip = () => {
+		const tooltip = document.querySelector('.tooltip')
+		tooltip?.parentNode?.removeChild(tooltip)
+		return tooltip
+	}
+
 	const _onMouseEnter = () => {
-		target.appendChild(tooltip)
-		if (tooltipTemplate) {
-			tooltip.appendChild(
-				typeof tooltipTemplate === 'string' ? document.createTextNode(tooltipTemplate) : tooltipTemplate
-			)
+		_removeTooltip()
+
+		const tooltip = document.createElement('div')
+		tooltip.setAttribute('class', 'tooltip')
+		tooltip.addEventListener('click', _onTooltipClick)
+
+		if (template) {
+			template.setAttribute('style', `display: block; visibility: visible`)
+			tooltip.appendChild(typeof template === 'string' ? document.createTextNode(template) : template)
 		}
+
+		new MutationObserver((mutationList) => {
+			mutationList.forEach((mutation) => {
+				mutation.addedNodes.forEach((node) => {
+					if (node === tooltip) {
+						const { width: nodeWidth } = target.getBoundingClientRect()
+						const { width: tooltipWidth, height: tooltipHeight } = tooltip.getBoundingClientRect()
+						tooltip.style.left = `${-(tooltipWidth - nodeWidth) >> 1}px`
+						tooltip.style.top = `${-tooltipHeight - 6}px`
+					}
+				})
+			})
+		}).observe(target, { childList: true })
+
+		target.appendChild(tooltip)
 	}
 
 	const _onMouseLeave = () => {
-		if (target.contains(tooltip)) {
-			target.removeChild(tooltip)
-		}
+		_removeTooltip()
 	}
 
 	const _onTooltipClick = (e) => {
 		e.preventDefault()
+
+		_removeTooltip()
+
 		callback?.()
-		if (target.contains(tooltip)) {
-			target.removeChild(tooltip)
-		}
 	}
 
 	target.title = ''
@@ -29,36 +52,19 @@ const useTooltip = (target, { template, callback }) => {
 	target.addEventListener('mouseenter', _onMouseEnter)
 	target.addEventListener('mouseleave', _onMouseLeave)
 
-	let tooltipTemplate = template
-	if (document.body.contains(tooltipTemplate)) {
-		tooltipTemplate?.parentNode?.removeChild(tooltipTemplate)
-	}
-
-	const tooltip = document.createElement('div')
-	tooltip.className = 'tooltip'
-	tooltip.addEventListener('click', _onTooltipClick)
-
-	new MutationObserver((mutationList) => {
-		mutationList.forEach((mutation) => {
-			mutation.addedNodes.forEach((node) => {
-				if (node === tooltip) {
-					const { width: nodeWidth } = target.getBoundingClientRect()
-					const { width: tooltipWidth, height: tooltipHeight } = tooltip.getBoundingClientRect()
-					tooltip.style.left = `${-(tooltipWidth - nodeWidth) >> 1}px`
-					tooltip.style.top = `${-tooltipHeight - 6}px`
-				}
-			})
-		})
-	}).observe(target, { childList: true })
+	template?.parentNode?.removeChild(template)
 
 	return {
-		update: ({ template }) => {
-			if (document.body.contains(tooltipTemplate)) {
-				tooltipTemplate?.parentNode?.removeChild(tooltipTemplate)
-			}
-			tooltipTemplate = template
+		update: ({ template: newTemplate }) => {
+			newTemplate?.parentNode?.removeChild(newTemplate)
 		},
-		destroy: () => {},
+		destroy: () => {
+			const tooltip = _removeTooltip()
+			tooltip?.removeEventListener('click', _onTooltipClick)
+
+			target.removeEventListener('mouseenter', _onMouseEnter)
+			target.removeEventListener('mouseleave', _onMouseLeave)
+		},
 	}
 }
 

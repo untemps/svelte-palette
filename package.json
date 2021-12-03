@@ -71,7 +71,7 @@
 			"svelte"
 		],
 		"setupFilesAfterEnv": [
-			"@testing-library/jest-dom/extend-expect"
+			"<rootDir>/jest/jest.setup.js"
 		]
 	},
 	"husky": {
@@ -113,7 +113,7 @@
 	},
 	"scripts": {
 		"dev": "cd dev && rimraf dist && yarn && yarn start",
-		"test": "jest -u --watch",
+		"test": "jest -u --watch --coverage",
 		"test:ci": "jest -u -b --ci --coverage",
 		"build": "rimraf dist && yarn build:cjs && yarn build:es && yarn build:umd",
 		"build:cjs": "cross-env NODE_ENV=production BABEL_ENV=cjs rollup -c",
