@@ -19,8 +19,8 @@
 </script>
 
 <button
-	{...$$restProps}
 	data-testid="__palette-slot-root__"
+	{...$$restProps}
 	aria-label={color || emptyAriaLabel}
 	style="--color:{color}; --outerBorderColor:{color || '#aaa'};"
 	class={resolveClass([

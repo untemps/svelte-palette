@@ -53,12 +53,13 @@ yarn add @untemps/svelte-palette
 ### API
 
 | Props                 | Type    | Default | Description                                                              |
-| --------------------- | ------- | ------- | ------------------------------------------------------------------------ |
+|-----------------------|---------| ------- | ------------------------------------------------------------------------ |
 | `colors`              | array   | []      | Array of color strings to be displayed in the palette.                   |
 | `selectedColor`       | string  | null    | Default selected color. The color must be included in the `colors` prop. |
 | `allowDuplicates`     | boolean | false   | Flag to allow color duplication.                                         |
 | `allowDeletion`       | boolean | false   | Flag to allow color deletion.                                            |
 | `showTransparentSlot` | boolean | false   | Flag to display a transparent slot at the start of the slot list.        |
+| `maxColors`           | number  | 30      | Maximum number of slots to be displayed in the palette. Set this value to `-1` to allow infinite number of slots |
 
 ### Events
 
