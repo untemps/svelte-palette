@@ -56,4 +56,10 @@ describe('PaletteSlot', () => {
 		const { getByTestId, component } = render(PaletteSlot, { color, disabled: true })
 		expect(getByTestId('__palette-slot-root__')).toBeDisabled()
 	})
+
+	it('selects slot', () => {
+		const color = '#ff0'
+		const { getByTestId, component } = render(PaletteSlot, { color, selected: true })
+		expect(getByTestId('__palette-slot-root__')).toHaveClass('selected')
+	})
 })

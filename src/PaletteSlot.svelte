@@ -6,6 +6,7 @@
 	import { resolveClass } from './utils'
 
 	export let color = null
+	export let selected = false
 	export let disabled = false
 	export let emptyAriaLabel = 'No color'
 
@@ -25,6 +26,7 @@
 	style="--color:{color}; --outerBorderColor:{color || '#aaa'};"
 	class={resolveClass([
 		[!color, 'empty'],
+		[selected, 'selected'],
 		[!disabled, 'clickable'],
 	])}
 	{disabled}
@@ -47,7 +49,7 @@
 		background-color: var(--color);
 	}
 
-	button:focus {
+	button.selected {
 		box-shadow: 0 0 0 0.1rem #fff, 0 0 0 0.25rem var(--outerBorderColor);
 	}
 

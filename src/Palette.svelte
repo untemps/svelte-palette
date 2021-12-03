@@ -50,7 +50,7 @@
 		{#if showTransparentSlot}
 			<li data-testid="__palette-row__">
 				<slot name="transparent-slot">
-					<PaletteSlot emptyAriaLabel='transparent' on:click={_onSlotSelect} />
+					<PaletteSlot emptyAriaLabel='transparent' selected={selectedColor === null} on:click={_onSlotSelect} />
 				</slot>
 			</li>
 		{/if}
@@ -67,7 +67,7 @@
 				}}
 			>
 				<slot name="slot" {color}>
-					<PaletteSlot data-testid="__palette-slot__" {color} on:click={_onSlotSelect} />
+					<PaletteSlot data-testid="__palette-slot__" {color} selected={color === selectedColor} on:click={_onSlotSelect} />
 				</slot>
 			</li>
 		{/each}
