@@ -11,6 +11,7 @@
 	export let selectedColor = null
 	export let allowDuplicates = false
 	export let allowDeletion = false
+	export let showTransparentSlot = false
 
 	const dispatch = createEventDispatcher()
 
@@ -35,9 +36,16 @@
 <section>
 	<slot name="header" />
 	<ul>
+		{#if showTransparentSlot}
+			<li data-testid="__palette-row__">
+				<slot name="transparent-slot">
+					<PaletteSlot emptyAriaLabel='transparent' on:click={_onSlotSelect} />
+				</slot>
+			</li>
+		{/if}
 		{#each colors as color, index}
 			<li
-				data-testid='__palette-row__'
+				data-testid="__palette-row__"
 				use:useConditional={{
 					action: useTooltip,
 					options: { template: tooltip, callback: () => _onSlotDelete({ detail: { color, index } }) },
@@ -57,7 +65,7 @@
 	</slot>
 </section>
 {#if allowDeletion}
-	<button data-testid='__palette-tooltip__' class="tooltip__button" bind:this={tooltip}>
+	<button data-testid="__palette-tooltip__" class="tooltip__button" bind:this={tooltip}>
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -256 1792 1792">
 			<g transform="matrix(1,0,0,-1,197.42373,1255.0508)">
 				<path
