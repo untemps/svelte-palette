@@ -37,7 +37,7 @@ describe('Palette', () => {
 		expect(getByTestId('__palette-tooltip__')).toBeInTheDocument()
 	})
 
-	it('Displays transparent slot if allowDeletion is truthy', async () => {
+	it('Displays transparent slot if showTransparentSlot is truthy', async () => {
 		const onSelect = jest.fn()
 		const colors = ['#ff0', '#0ff', '#f0f']
 		const { getAllByTestId, component } = render(Palette, {
