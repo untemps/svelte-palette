@@ -1,4 +1,7 @@
 <p align="center">
+    <img src="assets/svelte-palette.png" alt="svelte-palette" height="200"/>
+</p>
+<p align="center">
     Svelte component to display a customisable color picker
 </p>
 
@@ -49,28 +52,30 @@ yarn add @untemps/svelte-palette
 
 ### API
 
-| Props             | Type   | Default | Description                                                              |
-| ----------------- | ------ | ------- | ------------------------------------------------------------------------ |
-| `colors`          | array  | []      | Array of color strings to be displayed in the palette.                   |
-| `selectedColor`   | String | null    | Default selected color. The color must be included in the `colors` prop. |
-| `allowDuplicates` | string | false   | Flag to allow color duplication.                                         |
-| `allowDeletion`   | string | false   | Flag to allow color deletion.                                            |
+| Props                 | Type    | Default | Description                                                              |
+| --------------------- | ------- | ------- | ------------------------------------------------------------------------ |
+| `colors`              | array   | []      | Array of color strings to be displayed in the palette.                   |
+| `selectedColor`       | string  | null    | Default selected color. The color must be included in the `colors` prop. |
+| `allowDuplicates`     | boolean | false   | Flag to allow color duplication.                                         |
+| `allowDeletion`       | boolean | false   | Flag to allow color deletion.                                            |
+| `showTransparentSlot` | boolean | false   | Flag to display a transparent slot at the start of the slot list.        |
 
 ### Events
 
 | Event    | Arguments | Type   | Description                                |
 | -------- | --------- | ------ | ------------------------------------------ |
 | `select` |           |        | **Dispatched whenever a color is clicked** |
-|          | `color`   | String | Selected color string.                     |
+|          | `color`   | string | Selected color string.                     |
 
 ### Slots
 
-| Slot     | Description                                                                           |
-| -------- | ------------------------------------------------------------------------------------- |
-| `header` | Allow to add a header to the palette. By default, it is empty.                        |
-| `footer` | Allow to add a footer to the palette. By default, it contains an input to add colors. |
-| `slot`   | Allow to replace the default color slots                                              |
-| `input`  | Allow to replace the input in the footer if the default footer slot is kept as it is  |
+| Slot               | Description                                                                           |
+| ------------------ | ------------------------------------------------------------------------------------- |
+| `header`           | Allow to add a header to the palette. By default, it is empty.                        |
+| `footer`           | Allow to add a footer to the palette. By default, it contains an input to add colors. |
+| `slot`             | Allow to replace the default color slots                                              |
+| `transparent-slot` | Allow to replace the default transparent slot                                        |
+| `input`            | Allow to replace the input in the footer if the default footer slot is kept as it is  |
 
 #### Example
 

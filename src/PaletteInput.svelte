@@ -31,7 +31,7 @@
 </script>
 
 <form on:submit|preventDefault={_onSubmit}>
-	<PaletteSlot bind:color role="presentation" tabindex="-1" />
+	<PaletteSlot bind:color role="presentation" tabindex="-1" disabled />
 	<input
 		type="text"
 		value={color}
