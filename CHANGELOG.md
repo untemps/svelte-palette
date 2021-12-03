@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/untemps/svelte-palette/compare/v1.2.0...v1.2.1) (2021-12-03)
+
+
+### Bug Fixes
+
+* Fix selected color management to preserve selection outside of slot focus ([#7](https://github.com/untemps/svelte-palette/issues/7)) ([68df37a](https://github.com/untemps/svelte-palette/commit/68df37af345d94f3a0e499da3ec6ae0aae681ed7))
+
 # [1.2.0](https://github.com/untemps/svelte-palette/compare/v1.1.0...v1.2.0) (2021-12-03)
 
 
