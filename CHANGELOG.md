@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/untemps/svelte-palette/compare/v1.1.0...v1.2.0) (2021-12-03)
+
+
+### Features
+
+* Add a maxColors prop to limit the number of slots in the palette ([#6](https://github.com/untemps/svelte-palette/issues/6)) ([48671f8](https://github.com/untemps/svelte-palette/commit/48671f8e6e09c1d165964cfd09fe1ff374fa588b))
+
 # [1.1.0](https://github.com/untemps/svelte-palette/compare/v1.0.1...v1.1.0) (2021-12-03)
 
 
