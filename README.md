@@ -70,13 +70,15 @@ yarn add @untemps/svelte-palette
 
 ### Slots
 
-| Slot               | Description                                                                           |
-| ------------------ | ------------------------------------------------------------------------------------- |
-| `header`           | Allow to add a header to the palette. By default, it is empty.                        |
-| `footer`           | Allow to add a footer to the palette. By default, it contains an input to add colors. |
-| `slot`             | Allow to replace the default color slots                                              |
-| `transparent-slot` | Allow to replace the default transparent slot                                        |
-| `input`            | Allow to replace the input in the footer if the default footer slot is kept as it is  |
+| Slot               | Description                                                                                                                                                |
+|--------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `header`           | Allow to add a header to the palette. By default, it is empty.                                                                                             |
+| `header-divider`   | Allow to add a divider between the header and the slots. This slot is added only if the header slot is set. By default, it displays a simple grey \<hr/\>. |
+| `footer`           | Allow to add a footer to the palette. By default, it contains an input to add colors.                                                                      |
+| `footer-divider`   | Allow to add a divider between the slots and the footer. By default, it displays a simple grey \<hr/\>.                                                    |
+| `slot`             | Allow to replace the default color slots                                                                                                                   |
+| `transparent-slot` | Allow to replace the default transparent slot                                                                                                              |
+| `input`            | Allow to replace the input in the footer if the default footer slot is kept as it is                                                                       |
 
 #### Example
 
@@ -91,7 +93,9 @@ yarn add @untemps/svelte-palette
 	<div slot="header" class="palette__header">
 		<h1>Pick a color</h1>
 	</div>
+	<hr slot='header-divider' class='palette__divider'/>
 	<button let:color slot="slot" class="palette__slot" style="--color:{color}" />
+	<hr slot='header-divider' class='palette__divider'/>
 	<div slot="footer" class="palette__footer">
 		<a href="https://www.untemps.net">@untemps</a>
 	</div>
@@ -118,6 +122,11 @@ yarn add @untemps/svelte-palette
 		display: flex;
 		justify-content: center;
 		padding: 0.5rem;
+	}
+
+	.palette__divider {
+		border: #ccc dashed 1px;
+		width: 50%;
 	}
 </style>
 ```
