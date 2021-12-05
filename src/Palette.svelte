@@ -7,6 +7,8 @@
 	import useTooltip from './useTooltip'
 	import useConditional from './useConditional'
 
+	import { resolveClass } from './utils'
+
 	export let colors = []
 	export let selectedColor = null
 	export let allowDuplicates = false
@@ -44,9 +46,11 @@
 	const _onInputAdd = ({ detail: { color } }) => _addColor(color)
 </script>
 
-<section>
+<section class={resolveClass([
+	[!!$$props.class, $$props.class, 'palette__root']
+])}>
 	<slot name="header" />
-	<ul>
+	<ul class='palette__list'>
 		{#if showTransparentSlot}
 			<li data-testid="__palette-row__">
 				<slot name="transparent-slot">
@@ -91,7 +95,11 @@
 {/if}
 
 <style>
-	section {
+	* {
+		box-sizing: border-box;
+	}
+
+	.palette__root {
 		display: flex;
 		flex-direction: column;
 		row-gap: 1rem;
@@ -101,7 +109,7 @@
 		background-color: #fafafa;
 	}
 
-	ul {
+    .palette__list {
 		--numCols: 4;
 		list-style: none;
 		margin: 0;
