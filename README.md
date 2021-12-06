@@ -122,6 +122,37 @@ yarn add @untemps/svelte-palette
 </style>
 ```
 
+### Styles
+
+You can style the component by passing a class down to the root tag (`section`).
+
+Notice that the class has to be global to be available in the Palette component (see example).
+
+#### Example
+
+```html
+<script>
+	import { Palette } from '@untemps/svelte-palette'
+
+	const colors = ['#865C54', '#8F5447', '#A65846', '#A9715E', '#AD8C72']
+</script>
+
+<Palette {colors} class='palette'/>
+
+<style>
+	:global(.palette) {
+		max-width: 300px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		row-gap: 1rem;
+		padding: 2rem;
+		background: white;
+		box-shadow: 0 0 10px 5px rgba(0,0,0,0.18);;
+	}
+</style>
+```
+
 ## Development
 
 The component can be served for development purpose on `http://localhost:5000/` running:

@@ -40,8 +40,7 @@
 
 <main style="--bgColor:{bgColor}">
 	<div class="container">
-		<Palette {colors} selectedColor={bgColor} allowDuplicates allowDeletion showTransparentSlot maxColors={30} on:select={({ detail: { color } }) => (bgColor = color)} />
-		<hr />
+		<Palette {colors} selectedColor={bgColor} allowDuplicates allowDeletion showTransparentSlot maxColors={30} on:select={({ detail: { color } }) => (bgColor = color)} class='palette' />
 		<form on:submit|preventDefault={_onSubmit}>
 			<Palette {colors}>
 				<div slot="header" class="palette__header">
@@ -78,14 +77,11 @@
 		background-color: var(--bgColor);
 	}
 
-	hr {
-		background-color: #fff;
-		border: none;
-		height: 1px;
-	}
-
 	.container {
 		max-width: 640px;
+		display: flex;
+		flex-direction: column;
+		row-gap: 5rem;
 	}
 
 	.form__message--success {
@@ -100,6 +96,15 @@
 	.form__button {
 		margin: 0;
 	}
+
+    :global(.palette) {
+        display: flex;
+        flex-direction: column;
+        row-gap: 1rem;
+		padding: 2rem;
+        background: white;
+        box-shadow: 0 0 10px 5px rgba(0,0,0,0.18);;
+    }
 
 	.palette__header {
 		display: flex;
