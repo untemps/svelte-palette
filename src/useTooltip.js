@@ -1,6 +1,8 @@
 import './useTooltip.css'
 
 const useTooltip = (target, { template, callback }) => {
+	template?.parentNode?.removeChild(template)
+
 	const _removeTooltip = () => {
 		const tooltip = document.querySelector('.tooltip')
 		tooltip?.parentNode?.removeChild(tooltip)
@@ -51,8 +53,6 @@ const useTooltip = (target, { template, callback }) => {
 	target.setAttribute('style', 'position: relative')
 	target.addEventListener('mouseenter', _onMouseEnter)
 	target.addEventListener('mouseleave', _onMouseLeave)
-
-	template?.parentNode?.removeChild(template)
 
 	return {
 		update: ({ template: newTemplate }) => {
