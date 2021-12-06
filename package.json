@@ -19,7 +19,7 @@
 	},
 	"main": "dist/index.js",
 	"module": "dist/index.es.js",
-	"svelte": "src/index.js",
+	"svelte": "dist/index.js",
 	"files": [
 		"dist"
 	],
