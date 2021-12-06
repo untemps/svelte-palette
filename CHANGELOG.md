@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/untemps/svelte-palette/compare/v1.4.0...v1.4.1) (2021-12-06)
+
+
+### Bug Fixes
+
+* Remove tooltip template earlier to prevent it from flashing ([#12](https://github.com/untemps/svelte-palette/issues/12)) ([dff176a](https://github.com/untemps/svelte-palette/commit/dff176a0edd54b4cc91b1a6175b81cbd330b5e59))
+
 # [1.4.0](https://github.com/untemps/svelte-palette/compare/v1.3.0...v1.4.0) (2021-12-06)
 
 
