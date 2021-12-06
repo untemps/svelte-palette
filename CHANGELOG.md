@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/untemps/svelte-palette/compare/v1.3.0...v1.4.0) (2021-12-06)
+
+
+### Features
+
+* Add slots for header and footer dividers ([#9](https://github.com/untemps/svelte-palette/issues/9)) ([04caea5](https://github.com/untemps/svelte-palette/commit/04caea57ff85ad6c806ece30382b04779be61f91))
+
 # [1.3.0](https://github.com/untemps/svelte-palette/compare/v1.2.1...v1.3.0) (2021-12-06)
 
 
