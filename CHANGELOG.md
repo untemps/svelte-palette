@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/untemps/svelte-palette/compare/v1.2.1...v1.3.0) (2021-12-06)
+
+
+### Features
+
+* Pass class down to root tag ([#10](https://github.com/untemps/svelte-palette/issues/10)) ([210ded2](https://github.com/untemps/svelte-palette/commit/210ded27e4e3724317753e746ac028eecc305544))
+
 ## [1.2.1](https://github.com/untemps/svelte-palette/compare/v1.2.0...v1.2.1) (2021-12-03)
 
 
