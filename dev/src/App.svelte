@@ -51,6 +51,7 @@
 						</div>
 					{/if}
 				</div>
+				<hr slot='header-divider' class='palette__divider'/>
 				<button
 					let:color
 					slot="slot"
@@ -58,6 +59,7 @@
 					style="--color:{color}"
 					on:click|preventDefault={_onSlotClick(color)}
 				/>
+				<hr slot='footer-divider' class='palette__divider'/>
 				<div slot="input" />
 				<div slot="footer" class="palette__footer">
 					<button class="form__button" type="submit" disabled={!selectedColor}>Submit</button>
@@ -123,6 +125,11 @@
 		border-radius: 20%;
 		border: 1px solid rgba(0, 0, 0, 0.2);
 		box-shadow: 0.1rem 0.1rem 0.3rem rgba(0, 0, 0, 0.2);
+	}
+
+	.palette__divider {
+        border: #ccc dashed 1px;
+        width: 50%;
 	}
 
 	.palette__slot.palette__slot--selected {

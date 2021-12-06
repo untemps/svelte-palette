@@ -49,7 +49,12 @@
 <section class={resolveClass([
 	[!!$$props.class, $$props.class, 'palette__root']
 ])}>
-	<slot name="header" />
+	{#if $$slots.header}
+		<slot name="header" />
+		<slot name='header-divider'>
+			<hr class='palette__divider'/>
+		</slot>
+	{/if}
 	<ul class='palette__list'>
 		{#if showTransparentSlot}
 			<li data-testid="__palette-row__">
@@ -76,6 +81,9 @@
 			</li>
 		{/each}
 	</ul>
+	<slot name='footer-divider'>
+		<hr class='palette__divider'/>
+	</slot>
 	<slot name="footer">
 		<slot name="input">
 			<PaletteInput color={selectedColor} on:add={_onInputAdd} />
@@ -119,6 +127,13 @@
 		grid-gap: 1rem;
 		align-items: center;
 		justify-items: center;
+	}
+
+	.palette__divider {
+		border: none;
+		background-color: #ccc;
+		width: 100%;
+		height: 1px;
 	}
 
 	.tooltip__button {
