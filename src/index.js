@@ -1,5 +1,3 @@
-import Palette from './Palette.svelte'
-import PaletteSlot from './PaletteSlot.svelte'
-import PaletteInput from './PaletteInput.svelte'
-
-export { Palette, PaletteSlot, PaletteInput }
+export { default as Palette } from './Palette.svelte'
+export { default as PaletteSlot } from './PaletteSlot.svelte'
+export { default as PaletteInput } from './PaletteInput.svelte'
