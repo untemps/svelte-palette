@@ -5,14 +5,6 @@
 
 * Fix first-run tooltip display ([efb115e](https://github.com/untemps/svelte-palette/commit/efb115e1daa2bb10bf2e42145e990df849c3875d))
 
-## [1.4.3](https://github.com/untemps/svelte-palette/compare/v1.4.2...v1.4.3) (2021-12-12)
-
-
-### Bug Fixes
-
-* Fix tooltip display ([a18ff80](https://github.com/untemps/svelte-palette/commit/a18ff80d2ccbb306efb9fe0e4d8d5e756b1cb2cd))
-* Fix undefined debig in test ([ae5cdf7](https://github.com/untemps/svelte-palette/commit/ae5cdf7ae09c3c6c97910e986493cf5a3dcef169))
-
 ## [1.4.2](https://github.com/untemps/svelte-palette/compare/v1.4.1...v1.4.2) (2021-12-07)
 
 ## [1.4.1](https://github.com/untemps/svelte-palette/compare/v1.4.0...v1.4.1) (2021-12-06)
