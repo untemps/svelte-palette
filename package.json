@@ -48,6 +48,7 @@
 		"postcss": "^8.3.11",
 		"prettier": "^2.2.1",
 		"prettier-plugin-svelte": "^2.4.0",
+		"rimraf": "^3.0.2",
 		"rollup": "^2.35.1",
 		"rollup-plugin-filesize": "^9.1.0",
 		"rollup-plugin-postcss": "^4.0.1",
@@ -58,6 +59,7 @@
 		"svelte-jester": "^2.1.5"
 	},
 	"dependencies": {
+		"@untemps/dom-observer": "^2.0.0-beta.6",
 		"svelte": "3.39.0"
 	},
 	"jest": {
@@ -125,7 +127,7 @@
 		]
 	},
 	"scripts": {
-		"dev": "cd dev && rimraf dist && yarn && yarn start",
+		"dev": "cd dev && rimraf dist && yarn && yarn dev",
 		"test": "jest -u --watch --coverage",
 		"test:ci": "jest -u -b --ci --coverage",
 		"build": "rimraf dist && yarn build:cjs && yarn build:es && yarn build:umd",

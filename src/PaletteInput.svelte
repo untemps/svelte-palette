@@ -11,10 +11,10 @@
 	const dispatch = createEventDispatcher()
 	const validationRegex = /^#?(([0-9a-f]{2}){3,4}|([0-9a-f]){3})$/gi
 
-	const _isValid = (value) => validationRegex.test(value)
+	const _isValid = (value) => !!value && validationRegex.test(value)
 
 	$: color = color?.replace(validationRegex, '#$1') || ''
-	$: noSubmit = !_isValid(color)
+	$: isValid = _isValid(color)
 
 	const _onChange = (e) => {
 		const {
@@ -40,7 +40,7 @@
 		title={inputTitle}
 		on:input|preventDefault={_onChange}
 	/>
-	<button data-testid='__palette-input-submit__' type="submit" disabled={noSubmit} aria-label={buttonAriaLabel}>
+	<button data-testid='__palette-input-submit__' type="submit" disabled={!isValid} aria-label={buttonAriaLabel}>
 		<svg x="0px" y="0px" width="100%" height="100%" viewBox="0 0 16 16" role="presentation">
 			<polygon points="13,7 9,7 9,3 7,3 7,7 3,7 3,9 7,9 7,13 9,13 9,9 13,9" />
 		</svg>

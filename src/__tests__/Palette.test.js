@@ -33,7 +33,10 @@ describe('Palette', () => {
 			colors,
 			allowDeletion: true,
 		})
-		await fireEvent.mouseEnter(getAllByTestId('__palette-row__')[0])
+		const row = getAllByTestId('__palette-row__')[0]
+		await fireEvent.mouseOver(row) // fireEvent.mouseEnter only works if mouseOver is triggered before
+		await fireEvent.mouseEnter(row)
+		await _sleep()
 		expect(getByTestId('__palette-tooltip__')).toBeInTheDocument()
 	})
 

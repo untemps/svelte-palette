@@ -20,6 +20,7 @@ describe('PaletteInput', () => {
 		})
 		const input = getByTitle('foo')
 		const button = getByLabelText('bar')
+		await _sleep()
 		expect(button).toBeDisabled()
 		await fireEvent.input(input, { target: { value: 'ff' } })
 		expect(button).toBeDisabled()

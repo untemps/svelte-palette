@@ -7,16 +7,16 @@ import { fireEvent } from '@testing-library/svelte'
 import useTooltip from '../useTooltip'
 
 describe('useTooltip', () => {
-	const target = _createElement('div')
-	const template = _createElement('div')
-	template.className = 'template'
+	const target = _createElement('target')
+	const template = _createElement('template')
 	const options = {
-		template,
+		templateSelector: '#template',
 		callback: jest.fn(),
 	}
 
 	it('Adds template to the DOM on mouse enter', async () => {
 		useTooltip(target, options)
+		await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
 		await fireEvent.mouseEnter(target)
 		await _sleep()
 		expect(template).toBeVisible()
@@ -24,6 +24,7 @@ describe('useTooltip', () => {
 
 	it('Removes template from the DOM on mouse leave', async () => {
 		useTooltip(target, options)
+		await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
 		await fireEvent.mouseEnter(target)
 		await fireEvent.mouseLeave(target)
 		await _sleep()
@@ -32,6 +33,7 @@ describe('useTooltip', () => {
 
 	it('Triggers callback on tooltip click', async () => {
 		useTooltip(target, options)
+		await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
 		await fireEvent.mouseEnter(target)
 		await fireEvent.click(template)
 		expect(options.callback).toHaveBeenCalled()
