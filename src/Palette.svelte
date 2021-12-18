@@ -66,10 +66,15 @@
 			<li
 				data-testid="__palette-row__"
 				use:useTooltip={{
+					contentSelector: '.tooltip__button',
+					contentActions: {
+						'*': {
+							eventType: 'click',
+							callback: _onTooltipClick,
+							callbackParams: [index],
+						}
+					},
 					disabled: !allowDeletion,
-					templateSelector: '.tooltip__button',
-					index,
-					callback: _onTooltipClick,
 				}}
 			>
 				<slot name="slot" {color}>

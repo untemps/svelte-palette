@@ -16,9 +16,14 @@ describe('useTooltip', () => {
 		target = _createElement('target')
 		template = _createElement('template')
 		options = {
-			templateSelector: '#template',
-			index: 1,
-			callback: jest.fn(),
+			contentSelector: '#template',
+			contentActions: {
+				'*': {
+					eventType: 'click',
+					callback: jest.fn(),
+					callbackParams: [1],
+				},
+			},
 			disabled: false,
 		}
 	})
@@ -70,21 +75,36 @@ describe('useTooltip', () => {
 
 	it('Triggers callback on tooltip click', async () => {
 		action = useTooltip(target, options)
+		const contentAction = options.contentActions['*']
 		await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
 		await fireEvent.mouseEnter(target)
 		await fireEvent.click(template)
-		expect(options.callback).toHaveBeenCalledWith(options.index)
+		expect(contentAction.callback).toHaveBeenCalledWith(contentAction.callbackParams[0], expect.any(Event))
 	})
 
 	it('Triggers new callback on tooltip click after update', async () => {
 		action = useTooltip(target, options)
 		const newCallback = jest.fn()
-		const newOptions = { ...options, callback: newCallback }
+		const newOptions = {
+			...options,
+			contentActions: {
+				'*': {
+					eventType: 'click',
+					callback: newCallback,
+					callbackParams: ['foo', 'bar'],
+				},
+			},
+		}
+		const contentAction = newOptions.contentActions['*']
 		action.update(newOptions)
 		await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
 		await fireEvent.mouseEnter(target)
 		await fireEvent.click(template)
-		expect(newCallback).toHaveBeenCalledWith(options.index)
+		expect(contentAction.callback).toHaveBeenCalledWith(
+			contentAction.callbackParams[0],
+			contentAction.callbackParams[1],
+			expect.any(Event)
+		)
 	})
 
 	it('Destroys tooltip', async () => {
@@ -92,6 +112,6 @@ describe('useTooltip', () => {
 		action.destroy()
 		await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
 		await fireEvent.mouseEnter(target)
-		expect(options.callback).not.toHaveBeenCalled()
+		expect(template).not.toBeVisible()
 	})
 })
