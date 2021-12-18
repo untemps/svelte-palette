@@ -1,3 +1,17 @@
+# [1.5.0](https://github.com/untemps/svelte-palette/compare/v1.4.3...v1.5.0) (2021-12-18)
+
+
+### Bug Fixes
+
+* Fix palette css ([b377ab4](https://github.com/untemps/svelte-palette/commit/b377ab4caaeaaf80f77f6b4ca5e4ad8333c46d37))
+
+
+### Features
+
+* Allow to pass custom element as deletion tooltip content ([f72cd49](https://github.com/untemps/svelte-palette/commit/f72cd490852440c4f56b2269e1d1045c8d5ad1ac))
+* Allow to set a custom class to deletion tooltip root element ([04a21a2](https://github.com/untemps/svelte-palette/commit/04a21a2dc5bfbcf40f397a1aa13aa77afff2ffa7))
+* Allow to trigger callbacks with custom params from deletion tooltip content elements ([a91b534](https://github.com/untemps/svelte-palette/commit/a91b53404e9a10b4a65cca8f1414109071e8bed5))
+
 ## [1.4.3](https://github.com/untemps/svelte-palette/compare/v1.4.2...v1.4.3) (2021-12-12)
 
 

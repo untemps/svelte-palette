@@ -1,6 +1,6 @@
 {
 	"name": "@untemps/svelte-palette",
-	"version": "1.4.3",
+	"version": "1.5.0",
 	"author": "Vincent Le Badezet <v.lebadezet@untemps.net>",
 	"license": "MIT",
 	"description": "Svelte component to display a customisable color picker",
