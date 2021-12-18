@@ -2,17 +2,17 @@ import { DOMObserver } from '@untemps/dom-observer'
 
 import './useTooltip.css'
 
-const useTooltip = (node, { templateSelector, index, callback, disabled }) => {
-	Tooltip.init(templateSelector)
+const useTooltip = (node, { contentSelector, contentActions, disabled }) => {
+	Tooltip.init(contentSelector)
 
-	const tooltip = new Tooltip(node, index, callback)
+	const tooltip = new Tooltip(node, contentActions)
 	if (disabled) {
 		tooltip.disable()
 	}
 
 	return {
-		update: ({ disabled, index, callback }) => {
-			tooltip.update(index, callback)
+		update: ({ contentActions, disabled }) => {
+			tooltip.update(contentActions)
 			disabled ? tooltip.disable() : tooltip.enable()
 		},
 		destroy: () => {
@@ -28,18 +28,16 @@ export class Tooltip {
 	static #instances = []
 
 	#target = null
-	#index = null
-	#callback = null
+	#actions = null
 	#container = null
+	#events = []
 
 	#boundEnterHandler = null
 	#boundLeaveHandler = null
-	#boundClickHandler = null
 
-	constructor(target, index, callback) {
+	constructor(target, actions) {
 		this.#target = target
-		this.#index = index
-		this.#callback = callback
+		this.#actions = actions
 		this.#container = Tooltip.#tooltip
 
 		this.#activateTarget()
@@ -47,13 +45,13 @@ export class Tooltip {
 		Tooltip.#instances.push(this)
 	}
 
-	static init(templateSelector) {
+	static init(contentSelector) {
 		if (!Tooltip.#isInitialized) {
 			Tooltip.#tooltip = document.createElement('div')
 			Tooltip.#tooltip.setAttribute('class', 'tooltip')
 
 			Tooltip.#observer = new DOMObserver()
-			Tooltip.#observer.wait(templateSelector, null, { events: [DOMObserver.ADD] }).then(({ node }) => {
+			Tooltip.#observer.wait(contentSelector, null, { events: [DOMObserver.ADD] }).then(({ node }) => {
 				Tooltip.#tooltip.appendChild(node)
 			})
 
@@ -71,14 +69,13 @@ export class Tooltip {
 		Tooltip.#isInitialized = false
 	}
 
-	update(index, callback) {
-		this.#index = index
-		this.#callback = callback
+	update(actions) {
+		this.#actions = actions
 	}
 
 	destroy() {
 		this.#deactivateTarget()
-		this.#removeTooltipFromTarget()
+		this.#removeContainerFromTarget()
 	}
 
 	enable() {
@@ -108,24 +105,32 @@ export class Tooltip {
 		this.disable()
 	}
 
-	#appendTooltipToTarget() {
+	#appendContainerToTarget() {
 		this.#target.appendChild(this.#container)
 
-		this.#boundClickHandler = this.#onTooltipClick.bind(this)
-		this.#container.addEventListener('click', this.#boundClickHandler)
+		if (this.#actions) {
+			Object.entries(this.#actions).forEach(([key, { eventType, callback, callbackParams }]) => {
+				const trigger = key === '*' ? this.#container : this.#container.querySelector(key)
+				if (trigger) {
+					const listener = (event) => callback?.apply(null, [...callbackParams, event])
+					trigger.addEventListener(eventType, listener)
+					this.#events.push({ trigger, eventType, listener })
+				}
+			})
+		}
 	}
 
-	#removeTooltipFromTarget() {
+	#removeContainerFromTarget() {
 		if (this.#target.contains(this.#container)) {
 			this.#target.removeChild(this.#container)
 		}
 
-		this.#container.removeEventListener('click', this.#boundClickHandler)
-		this.#boundClickHandler = null
+		this.#events.forEach(({ trigger, eventType, listener }) => trigger.removeEventListener(eventType, listener))
+		this.#events = []
 	}
 
 	#onTargetEnter() {
-		this.#appendTooltipToTarget()
+		this.#appendContainerToTarget()
 
 		Tooltip.#observer.wait('.tooltip', null, { events: [DOMObserver.ADD] }).then(({ node }) => {
 			const { width: targetWidth } = this.#target.getBoundingClientRect()
@@ -136,13 +141,7 @@ export class Tooltip {
 	}
 
 	#onTargetLeave() {
-		this.#removeTooltipFromTarget()
-	}
-
-	#onTooltipClick() {
-		this.#removeTooltipFromTarget()
-
-		this.#callback?.(this.#index)
+		this.#removeContainerFromTarget()
 	}
 }
 
