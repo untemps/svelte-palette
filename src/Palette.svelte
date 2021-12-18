@@ -169,7 +169,7 @@
 	}
 
 	@media (min-width: 320px) {
-		ul {
+		.palette__list {
 			--numCols: 5;
 		}
 	}
