@@ -36,36 +36,26 @@
 		console.log('submit')
 		isSubmitted = true
 	}
+
+	let allowDeletion = true
 </script>
 
 <main style="--bgColor:{bgColor}">
 	<div class="container">
-		<Palette {colors} selectedColor={bgColor} allowDuplicates allowDeletion showTransparentSlot maxColors={30} on:select={({ detail: { color } }) => (bgColor = color)} class='palette' />
-		<form on:submit|preventDefault={_onSubmit}>
-			<Palette {colors}>
-				<div slot="header" class="palette__header">
-					<h1>Pick a color</h1>
-					{#if isSubmitted}
-						<div class="form__message--success">
-							Picked Color: <PaletteSlot color={selectedColor} />
-						</div>
-					{/if}
-				</div>
-				<hr slot='header-divider' class='palette__divider'/>
-				<button
-					let:color
-					slot="slot"
-					class={`palette__slot${selectedColor === color ? ' palette__slot--selected' : ''}`}
-					style="--color:{color}"
-					on:click|preventDefault={_onSlotClick(color)}
-				/>
-				<hr slot='footer-divider' class='palette__divider'/>
-				<div slot="input" />
-				<div slot="footer" class="palette__footer">
-					<button class="form__button" type="submit" disabled={!selectedColor}>Submit</button>
-				</div>
-			</Palette>
-		</form>
+		<Palette
+			{colors}
+			selectedColor={bgColor}
+			allowDuplicates
+			{allowDeletion}
+			showTransparentSlot
+			maxColors={30}
+			on:select={({ detail: { color } }) => (bgColor = color)}
+			class="palette"
+		/>
+		<label>
+			allowDeletion:
+			<input type="checkbox" bind:checked={allowDeletion} />
+		</label>
 	</div>
 </main>
 
@@ -99,14 +89,14 @@
 		margin: 0;
 	}
 
-    :global(.palette) {
-        display: flex;
-        flex-direction: column;
-        row-gap: 1rem;
+	:global(.palette) {
+		display: flex;
+		flex-direction: column;
+		row-gap: 1rem;
 		padding: 2rem;
-        background: white;
-        box-shadow: 0 0 10px 5px rgba(0,0,0,0.18);;
-    }
+		background: white;
+		box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.18);
+	}
 
 	.palette__header {
 		display: flex;
@@ -128,8 +118,8 @@
 	}
 
 	.palette__divider {
-        border: #ccc dashed 1px;
-        width: 50%;
+		border: #ccc dashed 1px;
+		width: 50%;
 	}
 
 	.palette__slot.palette__slot--selected {
