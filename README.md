@@ -57,26 +57,27 @@ yarn add @untemps/svelte-palette
 	}
 ```
 
-### API
+## API
 
-| Props                 | Type    | Default | Description                                                                                                      |
-| --------------------- | ------- | ------- | ---------------------------------------------------------------------------------------------------------------- |
-| `colors`              | array   | []      | Array of color strings to be displayed in the palette.                                                           |
-| `selectedColor`       | string  | null    | Default selected color. The color must be included in the `colors` prop.                                         |
-| `allowDuplicates`     | boolean | false   | Flag to allow color duplication.                                                                                 |
-| `allowDeletion`       | boolean | false   | Flag to allow color deletion.                                                                                    |
-| `tooltipClassName`    | string  | null    | Class name to pass down to the deletion tooltip (see [Styles](#styles)).                                         |
-| `showTransparentSlot` | boolean | false   | Flag to display a transparent slot at the start of the slot list.                                                |
-| `maxColors`           | number  | 30      | Maximum number of slots to be displayed in the palette. Set this value to `-1` to allow infinite number of slots |
+| Props                    | Type    | Default | Description                                                                                                                                     |
+|--------------------------| ------- | ------- |-------------------------------------------------------------------------------------------------------------------------------------------------|
+| `colors`                 | array   | []      | Array of color strings to be displayed in the palette.                                                                                          |
+| `selectedColor`          | string  | null    | Default selected color. The color must be included in the `colors` prop.                                                                        |
+| `allowDuplicates`        | boolean | false   | Flag to allow color duplication.                                                                                                                |
+| `allowDeletion`          | boolean | false   | Flag to allow color deletion.                                                                                                                   |
+| `tooltipClassName`       | string  | null    | Class name to pass down to the deletion tooltip (see [Styles](#styles)).                                                                        |
+| `tooltipContentSelector` | string  | null    | Selector of the deletion tooltip content (see [Customize the Content of the Deletion Tooltip](#customize-the-content-of-the-deletion-tooltip)). |
+| `showTransparentSlot`    | boolean | false   | Flag to display a transparent slot at the start of the slot list.                                                                               |
+| `maxColors`              | number  | 30      | Maximum number of slots to be displayed in the palette. Set this value to `-1` to allow infinite number of slots                                |
 
-### Events
+## Events
 
 | Event    | Arguments | Type   | Description                                |
 | -------- | --------- | ------ | ------------------------------------------ |
 | `select` |           |        | **Dispatched whenever a color is clicked** |
 |          | `color`   | string | Selected color string.                     |
 
-### Slots
+## Slots
 
 | Slot               | Description                                                                                                                                                |
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -88,7 +89,7 @@ yarn add @untemps/svelte-palette
 | `transparent-slot` | Allow to replace the default transparent slot                                                                                                              |
 | `input`            | Allow to replace the input in the footer if the default footer slot is kept as it is                                                                       |
 
-#### Example
+## Example
 
 ```html
 <script>
@@ -139,15 +140,15 @@ yarn add @untemps/svelte-palette
 </style>
 ```
 
-### Styles
+# Styles
 
-#### Root tag class
+### Root tag class
 
 You can style the component by passing a class down to the root tag (`section`).
 
 > Note that the class has to be global to be available in the Palette component (see example).
 
-##### Example
+#### Example
 
 ```html
 <script>
@@ -172,7 +173,7 @@ You can style the component by passing a class down to the root tag (`section`).
 </style>
 ```
 
-#### Deletion tooltip class
+### Deletion tooltip class
 
 If you set `allowDeletion` to true, you can pass a class name that is set to the tooltip shown when hovering a slot.
 
@@ -183,7 +184,7 @@ If you ignore that prop, a default class is used.
 >Please note that the default class name is `__tooltip__default`.  
 Provide a different class name otherwise the default class would have the precedence over the custom one.
 
-##### Example
+#### Example
 
 ```html
 <script>
@@ -206,6 +207,37 @@ Provide a different class name otherwise the default class would have the preced
 		padding: 0.5rem;
 	}
 </style>
+```
+
+## Recipes
+
+### Customize the Content of the Deletion Tooltip
+
+By default, if `allowDeletion` is set to true, the tooltip that allows to delete a color slot displays a trash icon:
+
+<p align="center">
+    <img src="assets/trash.png" alt="trash" height="90"/>
+</p>
+
+You may want to display a different content for various purposes.  
+That is possible by defining a DOM element selector to the `tooltipContentSelector` prop.
+
+> Note the piece of DOM used ad content is deeply cloned using [cloneNode()](https://developer.mozilla.org/fr/docs/Web/API/Node/cloneNode) before appending to the tooltip container.  
+> That means the original element stays as it is but depending on element some props or behaviours may be removed from the clone.
+
+#### Example
+
+```html
+<script>
+	import { Palette } from '@untemps/svelte-palette'
+
+	const colors = ['#865C54', '#8F5447', '#A65846', '#A9715E', '#AD8C72']
+</script>
+
+<Palette {colors} allowDeletion tooltipContentSelector=".palette__tooltip__button" />
+
+<!-- The element used as tooltip content -->
+<button class="palette__tooltip__button">Delete</button>
 ```
 
 ## Development

@@ -2,8 +2,8 @@ import { DOMObserver } from '@untemps/dom-observer'
 
 import './useTooltip.css'
 
-const useTooltip = (node, { contentSelector, contentActions, contentClassName, disabled }) => {
-	Tooltip.init(contentSelector)
+const useTooltip = (node, { contentSelector, contentClone, contentActions, contentClassName, disabled }) => {
+	Tooltip.init(contentSelector, contentClone)
 
 	const tooltip = new Tooltip(node, contentActions, contentClassName)
 	if (disabled) {
@@ -11,9 +11,17 @@ const useTooltip = (node, { contentSelector, contentActions, contentClassName, d
 	}
 
 	return {
-		update: ({ contentActions, contentClassName, disabled }) => {
-			tooltip.update(contentActions, contentClassName)
-			disabled ? tooltip.disable() : tooltip.enable()
+		update: ({
+			contentSelector: newContentSelector,
+			contentClone: newContentClone,
+			contentActions: newContentActions,
+			contentClassName: newContentClassName,
+			disabled: newDisabled,
+		}) => {
+			Tooltip.update(newContentSelector, newContentClone)
+
+			tooltip.update(newContentActions, newContentClassName)
+			newDisabled ? tooltip.disable() : tooltip.enable()
 		},
 		destroy: () => {
 			tooltip.destroy()
@@ -25,6 +33,7 @@ export class Tooltip {
 	static #isInitialized = false
 	static #observer = null
 	static #tooltip = null
+	static #contentSelector = null
 	static #instances = []
 
 	#target = null
@@ -47,16 +56,30 @@ export class Tooltip {
 		Tooltip.#instances.push(this)
 	}
 
-	static init(contentSelector) {
+	static init(contentSelector, contentClone = false) {
 		if (!Tooltip.#isInitialized) {
 			Tooltip.#tooltip = document.createElement('div')
 
 			Tooltip.#observer = new DOMObserver()
 			Tooltip.#observer.wait(contentSelector, null, { events: [DOMObserver.ADD] }).then(({ node }) => {
-				Tooltip.#tooltip.appendChild(node)
+				const child = contentClone ? node.cloneNode(true) : node
+				Tooltip.#tooltip.appendChild(child)
 			})
 
+			Tooltip.#contentSelector = contentSelector
 			Tooltip.#isInitialized = true
+		}
+	}
+
+	static update(contentSelector, contentClone = false) {
+		if (Tooltip.#isInitialized && contentSelector !== Tooltip.#contentSelector) {
+			Tooltip.#contentSelector = contentSelector
+
+			Tooltip.#observer.wait(contentSelector, null, { events: [DOMObserver.ADD] }).then(({ node }) => {
+				Tooltip.#tooltip.innerHTML = ''
+				const child = contentClone ? node.cloneNode(true) : node
+				Tooltip.#tooltip.appendChild(child)
+			})
 		}
 	}
 
@@ -65,6 +88,11 @@ export class Tooltip {
 			instance.destroy()
 		})
 		Tooltip.#instances = []
+
+		Tooltip.#tooltip?.parentNode?.removeChild(Tooltip.#tooltip)
+		Tooltip.#tooltip = null
+
+		Tooltip.#contentSelector = null
 
 		Tooltip.#observer.clear()
 		Tooltip.#isInitialized = false

@@ -43,19 +43,39 @@ describe('useTooltip', () => {
 	})
 
 	describe('useTooltip interactions', () => {
-		it('Shows tooltip on mouse enter', async () => {
-			action = useTooltip(target, options)
-			await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
-			await fireEvent.mouseEnter(target)
-			expect(template).toBeVisible()
+		describe('init', () => {
+			it('Shows tooltip on mouse enter', async () => {
+				action = useTooltip(target, options)
+				await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
+				await fireEvent.mouseEnter(target)
+				expect(template).toBeVisible()
+			})
+
+			it('Hides tooltip on mouse leave', async () => {
+				action = useTooltip(target, options)
+				await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
+				await fireEvent.mouseEnter(target)
+				await fireEvent.mouseLeave(target)
+				expect(template).not.toBeVisible()
+			})
 		})
 
-		it('Hides tooltip on mouse leave', async () => {
-			action = useTooltip(target, options)
-			await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
-			await fireEvent.mouseEnter(target)
-			await fireEvent.mouseLeave(target)
-			expect(template).not.toBeVisible()
+		describe('update', () => {
+			afterEach(() => {
+				_removeElement('#new-template')
+			})
+
+			it('Shows tooltip on mouse enter', async () => {
+				action = useTooltip(target, options)
+				const newTemplate = _createElement('new-template')
+				action.update({
+					...options,
+					contentSelector: '#new-template'
+				})
+				await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
+				await fireEvent.mouseEnter(target)
+				expect(newTemplate).toBeVisible()
+			})
 		})
 	})
 
