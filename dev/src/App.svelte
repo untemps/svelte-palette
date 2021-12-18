@@ -1,5 +1,5 @@
 <script>
-	import { Palette, PaletteSlot } from '../../src'
+	import { Palette } from '../../src'
 
 	const colors = [
 		'#865C54',
@@ -24,23 +24,12 @@
 	]
 
 	let bgColor = colors[0]
-	let selectedColor = null
-	let isSubmitted = false
-
-	const _onSlotClick = (color) => () => {
-		isSubmitted = false
-		selectedColor = color
-	}
-
-	const _onSubmit = () => {
-		console.log('submit')
-		isSubmitted = true
-	}
 
 	let preselectColor = true
 	let allowDuplicates = true
 	let allowDeletion = true
 	let useCustomTooltipClass = false
+	let useCustomTooltipContent = false
 	let showTransparentSlot = true
 	let maxColors = 20
 	let useCustomClass = false
@@ -54,6 +43,7 @@
 			{allowDuplicates}
 			{allowDeletion}
 			tooltipClassName={useCustomTooltipClass ? 'tooltip' : null}
+			tooltipContentSelector={useCustomTooltipContent ? '.palette__tooltip__button' : null}
 			{showTransparentSlot}
 			{maxColors}
 			on:select={({ detail: { color } }) => (bgColor = color)}
@@ -93,6 +83,12 @@
 			</fieldset>
 			<fieldset>
 				<label>
+					Use Custom Tooltip Content:
+					<input type="checkbox" bind:checked={useCustomTooltipContent} />
+				</label>
+			</fieldset>
+			<fieldset>
+				<label>
 					Show Transparent Slot:
 					<input type="checkbox" bind:checked={showTransparentSlot} />
 				</label>
@@ -106,6 +102,8 @@
 		</form>
 	</div>
 </main>
+
+<button class="palette__tooltip__button">Delete</button>
 
 <style>
 	main {
@@ -173,7 +171,7 @@
 		padding: 0.5rem;
 	}
 	:global(.tooltip::after) {
-		content: "";
+		content: '';
 		position: absolute;
 		top: 100%;
 		left: 50%;
