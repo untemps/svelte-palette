@@ -2,81 +2,147 @@ import { DOMObserver } from '@untemps/dom-observer'
 
 import './useTooltip.css'
 
-const useTooltip = async (target, { templateSelector, callback }) => {
-	try {
-		const { node: template } = await new DOMObserver().wait(templateSelector)
-		template?.parentNode?.removeChild(template)
+const useTooltip = (node, { templateSelector, index, callback, disabled }) => {
+	Tooltip.init(templateSelector)
 
-		const _removeTooltip = () => {
-			const tooltip = document.querySelector('.tooltip')
-			tooltip?.parentNode?.removeChild(tooltip)
-			return tooltip
+	const tooltip = new Tooltip(node, index, callback)
+	if (disabled) {
+		tooltip.disable()
+	}
+
+	return {
+		update: ({ disabled, index, callback }) => {
+			tooltip.update(index, callback)
+			disabled ? tooltip.disable() : tooltip.enable()
+		},
+		destroy: () => {
+			tooltip.destroy()
+		},
+	}
+}
+
+export class Tooltip {
+	static #isInitialized = false
+	static #observer = null
+	static #tooltip = null
+	static #instances = []
+
+	#target = null
+	#index = null
+	#callback = null
+	#container = null
+
+	#boundEnterHandler = null
+	#boundLeaveHandler = null
+	#boundClickHandler = null
+
+	constructor(target, index, callback) {
+		this.#target = target
+		this.#index = index
+		this.#callback = callback
+		this.#container = Tooltip.#tooltip
+
+		this.#activateTarget()
+
+		Tooltip.#instances.push(this)
+	}
+
+	static init(templateSelector) {
+		if (!Tooltip.#isInitialized) {
+			Tooltip.#tooltip = document.createElement('div')
+			Tooltip.#tooltip.setAttribute('class', 'tooltip')
+
+			Tooltip.#observer = new DOMObserver()
+			Tooltip.#observer.wait(templateSelector, null, { events: [DOMObserver.ADD] }).then(({ node }) => {
+				Tooltip.#tooltip.appendChild(node)
+			})
+
+			Tooltip.#isInitialized = true
+		}
+	}
+
+	static destroy() {
+		Tooltip.#instances.forEach((instance) => {
+			instance.destroy()
+		})
+		Tooltip.#instances = []
+
+		Tooltip.#observer.clear()
+		Tooltip.#isInitialized = false
+	}
+
+	update(index, callback) {
+		this.#index = index
+		this.#callback = callback
+	}
+
+	destroy() {
+		this.#deactivateTarget()
+		this.#removeTooltipFromTarget()
+	}
+
+	enable() {
+		this.#boundEnterHandler = this.#onTargetEnter.bind(this)
+		this.#boundLeaveHandler = this.#onTargetLeave.bind(this)
+
+		this.#target.addEventListener('mouseenter', this.#boundEnterHandler)
+		this.#target.addEventListener('mouseleave', this.#boundLeaveHandler)
+	}
+
+	disable() {
+		this.#target.removeEventListener('mouseenter', this.#boundEnterHandler)
+		this.#target.removeEventListener('mouseleave', this.#boundLeaveHandler)
+
+		this.#boundEnterHandler = null
+		this.#boundLeaveHandler = null
+	}
+
+	#activateTarget() {
+		this.#target.title = ''
+		this.#target.setAttribute('style', 'position: relative')
+
+		this.enable()
+	}
+
+	#deactivateTarget() {
+		this.disable()
+	}
+
+	#appendTooltipToTarget() {
+		this.#target.appendChild(this.#container)
+
+		this.#boundClickHandler = this.#onTooltipClick.bind(this)
+		this.#container.addEventListener('click', this.#boundClickHandler)
+	}
+
+	#removeTooltipFromTarget() {
+		if (this.#target.contains(this.#container)) {
+			this.#target.removeChild(this.#container)
 		}
 
-		const _onMouseEnter = async () => {
-			try {
-				_removeTooltip()
+		this.#container.removeEventListener('click', this.#boundClickHandler)
+		this.#boundClickHandler = null
+	}
 
-				const tooltip = document.createElement('div')
-				tooltip.setAttribute('class', 'tooltip')
-				tooltip.addEventListener('click', _onTooltipClick)
-				
-				if (template) {
-					template.setAttribute('style', `display: block; visibility: visible`)
-					tooltip.appendChild(typeof template === 'string' ? document.createTextNode(template) : template)
-				}
+	#onTargetEnter() {
+		this.#appendTooltipToTarget()
 
-				new MutationObserver(mutationList => {
-					mutationList.forEach(mutation => {
-						mutation.addedNodes.forEach(node => {
-							if (node === tooltip) {
-								const { width: nodeWidth } = target.getBoundingClientRect()
-								const { width: tooltipWidth, height: tooltipHeight } = tooltip.getBoundingClientRect()
-								tooltip.style.left = `${-(tooltipWidth - nodeWidth) >> 1}px`
-								tooltip.style.top = `${-tooltipHeight - 6}px`
-							}
-						})
-					})
-				}).observe(target, { childList: true })
+		Tooltip.#observer.wait('.tooltip', null, { events: [DOMObserver.ADD] }).then(({ node }) => {
+			const { width: targetWidth } = this.#target.getBoundingClientRect()
+			const { width: tooltipWidth, height: tooltipHeight } = this.#container.getBoundingClientRect()
+			this.#container.style.left = `${-(tooltipWidth - targetWidth) >> 1}px`
+			this.#container.style.top = `${-tooltipHeight - 6}px`
+		})
+	}
 
-				target.appendChild(tooltip)
-			} catch (error) {
-				console.error(error)
-			}
-		}
+	#onTargetLeave() {
+		this.#removeTooltipFromTarget()
+	}
 
-		const _onMouseLeave = () => {
-			_removeTooltip()
-		}
+	#onTooltipClick() {
+		this.#removeTooltipFromTarget()
 
-		const _onTooltipClick = e => {
-			e.preventDefault()
-
-			_removeTooltip()
-
-			callback?.()
-		}
-
-		target.title = ''
-		target.setAttribute('style', 'position: relative')
-		target.addEventListener('mouseenter', _onMouseEnter)
-		target.addEventListener('mouseleave', _onMouseLeave)
-
-		return {
-			update: async ({ template: newTemplate }) => {
-				const { node: template } = await new DOMObserver().wait(templateSelector)
-				newTemplate?.parentNode?.removeChild(newTemplate)
-			},
-			destroy: () => {
-				const tooltip = _removeTooltip()
-				tooltip?.removeEventListener('click', _onTooltipClick)
-
-				target.removeEventListener('mouseenter', _onMouseEnter)
-				target.removeEventListener('mouseleave', _onMouseLeave)
-			},
-		}
-	} catch (error) {
-		console.error(error)
+		this.#callback?.(this.#index)
 	}
 }
 
