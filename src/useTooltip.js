@@ -2,17 +2,17 @@ import { DOMObserver } from '@untemps/dom-observer'
 
 import './useTooltip.css'
 
-const useTooltip = (node, { contentSelector, contentActions, disabled }) => {
+const useTooltip = (node, { contentSelector, contentActions, contentClassName, disabled }) => {
 	Tooltip.init(contentSelector)
 
-	const tooltip = new Tooltip(node, contentActions)
+	const tooltip = new Tooltip(node, contentActions, contentClassName)
 	if (disabled) {
 		tooltip.disable()
 	}
 
 	return {
-		update: ({ contentActions, disabled }) => {
-			tooltip.update(contentActions)
+		update: ({ contentActions, contentClassName, disabled }) => {
+			tooltip.update(contentActions, contentClassName)
 			disabled ? tooltip.disable() : tooltip.enable()
 		},
 		destroy: () => {
@@ -35,10 +35,12 @@ export class Tooltip {
 	#boundEnterHandler = null
 	#boundLeaveHandler = null
 
-	constructor(target, actions) {
+	constructor(target, actions, className) {
 		this.#target = target
 		this.#actions = actions
 		this.#container = Tooltip.#tooltip
+
+		this.#className = className
 
 		this.#activateTarget()
 
@@ -48,7 +50,6 @@ export class Tooltip {
 	static init(contentSelector) {
 		if (!Tooltip.#isInitialized) {
 			Tooltip.#tooltip = document.createElement('div')
-			Tooltip.#tooltip.setAttribute('class', 'tooltip')
 
 			Tooltip.#observer = new DOMObserver()
 			Tooltip.#observer.wait(contentSelector, null, { events: [DOMObserver.ADD] }).then(({ node }) => {
@@ -69,8 +70,17 @@ export class Tooltip {
 		Tooltip.#isInitialized = false
 	}
 
-	update(actions) {
+	get #className() {
+		return this.#container?.getAttribute('class')
+	}
+
+	set #className(value) {
+		this.#container?.setAttribute('class', value || '__tooltip__default')
+	}
+
+	update(actions, className) {
 		this.#actions = actions
+		this.#className = className
 	}
 
 	destroy() {
@@ -132,7 +142,7 @@ export class Tooltip {
 	#onTargetEnter() {
 		this.#appendContainerToTarget()
 
-		Tooltip.#observer.wait('.tooltip', null, { events: [DOMObserver.ADD] }).then(({ node }) => {
+		Tooltip.#observer.wait(`.${this.#className}`, null, { events: [DOMObserver.ADD] }).then(({ node }) => {
 			const { width: targetWidth } = this.#target.getBoundingClientRect()
 			const { width: tooltipWidth, height: tooltipHeight } = this.#container.getBoundingClientRect()
 			this.#container.style.left = `${-(tooltipWidth - targetWidth) >> 1}px`
