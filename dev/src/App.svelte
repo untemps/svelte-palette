@@ -38,23 +38,23 @@
 	}
 
 	let allowDeletion = true
+	let useCustomTooltipClass = true
 </script>
 
 <main style="--bgColor:{bgColor}">
 	<div class="container">
 		<Palette
 			{colors}
-			selectedColor={bgColor}
-			allowDuplicates
-			{allowDeletion}
-			showTransparentSlot
-			maxColors={30}
-			on:select={({ detail: { color } }) => (bgColor = color)}
-			class="palette"
+			allowDeletion
+			tooltipClassName={useCustomTooltipClass ? 'tooltip' : null}
 		/>
 		<label>
 			allowDeletion:
 			<input type="checkbox" bind:checked={allowDeletion} />
+		</label>
+		<label>
+			Use custom tooltip class:
+			<input type="checkbox" bind:checked={useCustomTooltipClass} />
 		</label>
 	</div>
 </main>
@@ -124,5 +124,16 @@
 
 	.palette__slot.palette__slot--selected {
 		box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--color);
+	}
+
+	:global(.tooltip) {
+		position: absolute;
+		z-index: 9999;
+		max-width: 120px;
+		background-color: #37ff00;
+		color: #fff;
+		text-align: center;
+		border-radius: 6px;
+		padding: 0.5rem;
 	}
 </style>

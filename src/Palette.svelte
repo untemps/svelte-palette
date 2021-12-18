@@ -12,6 +12,7 @@
 	export let selectedColor = null
 	export let allowDuplicates = false
 	export let allowDeletion = false
+	export let tooltipClassName = null
 	export let showTransparentSlot = false
 	export let maxColors = 30
 
@@ -74,6 +75,7 @@
 							callbackParams: [index],
 						}
 					},
+					contentClassName: tooltipClassName,
 					disabled: !allowDeletion,
 				}}
 			>

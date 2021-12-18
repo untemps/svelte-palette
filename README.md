@@ -59,13 +59,14 @@ yarn add @untemps/svelte-palette
 
 ### API
 
-| Props                 | Type    | Default | Description                                                              |
-|-----------------------|---------| ------- | ------------------------------------------------------------------------ |
-| `colors`              | array   | []      | Array of color strings to be displayed in the palette.                   |
-| `selectedColor`       | string  | null    | Default selected color. The color must be included in the `colors` prop. |
-| `allowDuplicates`     | boolean | false   | Flag to allow color duplication.                                         |
-| `allowDeletion`       | boolean | false   | Flag to allow color deletion.                                            |
-| `showTransparentSlot` | boolean | false   | Flag to display a transparent slot at the start of the slot list.        |
+| Props                 | Type    | Default | Description                                                                                                      |
+| --------------------- | ------- | ------- | ---------------------------------------------------------------------------------------------------------------- |
+| `colors`              | array   | []      | Array of color strings to be displayed in the palette.                                                           |
+| `selectedColor`       | string  | null    | Default selected color. The color must be included in the `colors` prop.                                         |
+| `allowDuplicates`     | boolean | false   | Flag to allow color duplication.                                                                                 |
+| `allowDeletion`       | boolean | false   | Flag to allow color deletion.                                                                                    |
+| `tooltipClassName`    | string  | null    | Class name to pass down to the deletion tooltip (see [Styles](#styles)).                                         |
+| `showTransparentSlot` | boolean | false   | Flag to display a transparent slot at the start of the slot list.                                                |
 | `maxColors`           | number  | 30      | Maximum number of slots to be displayed in the palette. Set this value to `-1` to allow infinite number of slots |
 
 ### Events
@@ -78,7 +79,7 @@ yarn add @untemps/svelte-palette
 ### Slots
 
 | Slot               | Description                                                                                                                                                |
-|--------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `header`           | Allow to add a header to the palette. By default, it is empty.                                                                                             |
 | `header-divider`   | Allow to add a divider between the header and the slots. This slot is added only if the header slot is set. By default, it displays a simple grey \<hr/\>. |
 | `footer`           | Allow to add a footer to the palette. By default, it contains an input to add colors.                                                                      |
@@ -100,9 +101,9 @@ yarn add @untemps/svelte-palette
 	<div slot="header" class="palette__header">
 		<h1>Pick a color</h1>
 	</div>
-	<hr slot='header-divider' class='palette__divider'/>
+	<hr slot="header-divider" class="palette__divider" />
 	<button let:color slot="slot" class="palette__slot" style="--color:{color}" />
-	<hr slot='header-divider' class='palette__divider'/>
+	<hr slot="header-divider" class="palette__divider" />
 	<div slot="footer" class="palette__footer">
 		<a href="https://www.untemps.net">@untemps</a>
 	</div>
@@ -140,11 +141,13 @@ yarn add @untemps/svelte-palette
 
 ### Styles
 
+#### Root tag class
+
 You can style the component by passing a class down to the root tag (`section`).
 
-Notice that the class has to be global to be available in the Palette component (see example).
+> Note that the class has to be global to be available in the Palette component (see example).
 
-#### Example
+##### Example
 
 ```html
 <script>
@@ -153,7 +156,7 @@ Notice that the class has to be global to be available in the Palette component 
 	const colors = ['#865C54', '#8F5447', '#A65846', '#A9715E', '#AD8C72']
 </script>
 
-<Palette {colors} class='palette'/>
+<Palette {colors} class="palette" />
 
 <style>
 	:global(.palette) {
@@ -164,7 +167,43 @@ Notice that the class has to be global to be available in the Palette component 
 		row-gap: 1rem;
 		padding: 2rem;
 		background: white;
-		box-shadow: 0 0 10px 5px rgba(0,0,0,0.18);;
+		box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.18);
+	}
+</style>
+```
+
+#### Deletion tooltip class
+
+If you set `allowDeletion` to true, you can pass a class name that is set to the tooltip shown when hovering a slot.
+
+To do so, set a **global** class name to the `tooltipClassName` prop.
+> As the tooltip is interactive, make sure you define a sufficient hover area that allow to access the content of the tooltip before the leave event is triggered.
+
+If you ignore that prop, a default class is used.  
+>Please note that the default class name is `__tooltip__default`.  
+Provide a different class name otherwise the default class would have the precedence over the custom one.
+
+##### Example
+
+```html
+<script>
+	import { Palette } from '@untemps/svelte-palette'
+
+	const colors = ['#865C54', '#8F5447', '#A65846', '#A9715E', '#AD8C72']
+</script>
+
+<Palette {colors} allowDeletion tooltipClassName="tooltip" />
+
+<style>
+	:global(.tooltip) {
+		position: absolute;
+		z-index: 9999;
+		max-width: 120px;
+		background-color: black;
+		color: #fff;
+		text-align: center;
+		border-radius: 6px;
+		padding: 0.5rem;
 	}
 </style>
 ```

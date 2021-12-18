@@ -21,7 +21,7 @@ describe('useTooltip', () => {
 				'*': {
 					eventType: 'click',
 					callback: jest.fn(),
-					callbackParams: [1],
+					callbackParams: ['foo'],
 				},
 			},
 			disabled: false,
@@ -42,76 +42,104 @@ describe('useTooltip', () => {
 		Tooltip.destroy()
 	})
 
-	it('Adds template to the DOM on mouse enter', async () => {
-		action = useTooltip(target, options)
-		await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
-		await fireEvent.mouseEnter(target)
-		expect(template).toBeVisible()
+	describe('useTooltip interactions', () => {
+		it('Shows tooltip on mouse enter', async () => {
+			action = useTooltip(target, options)
+			await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
+			await fireEvent.mouseEnter(target)
+			expect(template).toBeVisible()
+		})
+
+		it('Hides tooltip on mouse leave', async () => {
+			action = useTooltip(target, options)
+			await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
+			await fireEvent.mouseEnter(target)
+			await fireEvent.mouseLeave(target)
+			expect(template).not.toBeVisible()
+		})
 	})
 
-	it('Does not add template to the DOM on mouse enter if disabled', async () => {
-		action = useTooltip(target, { ...options, disabled: true })
-		await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
-		await fireEvent.mouseEnter(target)
-		expect(template).not.toBeVisible()
+	describe('useTooltip lifecycle', () => {
+		it('Destroys tooltip', async () => {
+			action = useTooltip(target, options)
+			action.destroy()
+			await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
+			await fireEvent.mouseEnter(target)
+			expect(template).not.toBeVisible()
+		})
 	})
 
-	it('Does not add template to the DOM on mouse enter if disabled after update', async () => {
-		action = useTooltip(target, options)
-		const newOptions = { ...options, disabled: true }
-		action.update(newOptions)
-		await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
-		await fireEvent.mouseEnter(target)
-		expect(template).not.toBeVisible()
-	})
+	describe('useTooltip props: contentActions', () => {
+		it('Triggers callback on tooltip click', async () => {
+			action = useTooltip(target, options)
+			const contentAction = options.contentActions['*']
+			await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
+			await fireEvent.mouseEnter(target)
+			await fireEvent.click(template)
+			expect(contentAction.callback).toHaveBeenCalledWith(contentAction.callbackParams[0], expect.any(Event))
+		})
 
-	it('Removes template from the DOM on mouse leave', async () => {
-		action = useTooltip(target, options)
-		await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
-		await fireEvent.mouseEnter(target)
-		await fireEvent.mouseLeave(target)
-		expect(template).not.toBeVisible()
-	})
-
-	it('Triggers callback on tooltip click', async () => {
-		action = useTooltip(target, options)
-		const contentAction = options.contentActions['*']
-		await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
-		await fireEvent.mouseEnter(target)
-		await fireEvent.click(template)
-		expect(contentAction.callback).toHaveBeenCalledWith(contentAction.callbackParams[0], expect.any(Event))
-	})
-
-	it('Triggers new callback on tooltip click after update', async () => {
-		action = useTooltip(target, options)
-		const newCallback = jest.fn()
-		const newOptions = {
-			...options,
-			contentActions: {
-				'*': {
-					eventType: 'click',
-					callback: newCallback,
-					callbackParams: ['foo', 'bar'],
+		it('Triggers new callback on tooltip click after update', async () => {
+			action = useTooltip(target, options)
+			const newCallback = jest.fn()
+			const newOptions = {
+				...options,
+				contentActions: {
+					'*': {
+						eventType: 'click',
+						callback: newCallback,
+						callbackParams: ['foo', 'bar'],
+					},
 				},
-			},
-		}
-		const contentAction = newOptions.contentActions['*']
-		action.update(newOptions)
-		await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
-		await fireEvent.mouseEnter(target)
-		await fireEvent.click(template)
-		expect(contentAction.callback).toHaveBeenCalledWith(
-			contentAction.callbackParams[0],
-			contentAction.callbackParams[1],
-			expect.any(Event)
-		)
+			}
+			const contentAction = newOptions.contentActions['*']
+			action.update(newOptions)
+			await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
+			await fireEvent.mouseEnter(target)
+			await fireEvent.click(template)
+			expect(contentAction.callback).toHaveBeenCalledWith(
+				contentAction.callbackParams[0],
+				contentAction.callbackParams[1],
+				expect.any(Event)
+			)
+		})
 	})
 
-	it('Destroys tooltip', async () => {
-		action = useTooltip(target, options)
-		action.destroy()
-		await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
-		await fireEvent.mouseEnter(target)
-		expect(template).not.toBeVisible()
+	describe('useTooltip props: contentClassName', () => {
+		it('Sets tooltip default class', async () => {
+			action = useTooltip(target, options)
+			await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
+			await fireEvent.mouseEnter(target)
+			expect(template.parentNode).toHaveClass('__tooltip__default')
+		})
+
+		it('Sets new tooltip class after update', async () => {
+			action = useTooltip(target, options)
+			await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
+			await fireEvent.mouseEnter(target)
+			expect(template.parentNode).toHaveClass('__tooltip__default')
+			action.update({
+				...options,
+				contentClassName: 'foo',
+			})
+			expect(template.parentNode).toHaveClass('foo')
+		})
+	})
+
+	describe('useTooltip props: disabled', () => {
+		it('Prevents from showing tooltip if immediately disabled', async () => {
+			action = useTooltip(target, { ...options, disabled: true })
+			await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
+			await fireEvent.mouseEnter(target)
+			expect(template).not.toBeVisible()
+		})
+
+		it('Prevents from showing tooltip if disabled after update', async () => {
+			action = useTooltip(target, options)
+			action.update({ ...options, disabled: true })
+			await fireEvent.mouseOver(target) // fireEvent.mouseEnter only works if mouseOver is triggered before
+			await fireEvent.mouseEnter(target)
+			expect(template).not.toBeVisible()
+		})
 	})
 })
