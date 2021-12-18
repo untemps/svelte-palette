@@ -130,7 +130,7 @@
 		justify-content: center;
 		align-items: center;
 		padding: 1rem;
-		background-color: white;
+		background-color: #eee;
 	}
 
 	.settings__form fieldset {

@@ -50,7 +50,8 @@
 	}
 
 	button.selected {
-		box-shadow: 0 0 0 0.1rem #fff, 0 0 0 0.25rem var(--outerBorderColor);
+		outline: 2px solid var(--outerBorderColor);
+		outline-offset: 2px;
 	}
 
 	button.clickable {
