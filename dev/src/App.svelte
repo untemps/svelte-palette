@@ -37,25 +37,73 @@
 		isSubmitted = true
 	}
 
+	let preselectColor = true
+	let allowDuplicates = true
 	let allowDeletion = true
-	let useCustomTooltipClass = true
+	let useCustomTooltipClass = false
+	let showTransparentSlot = true
+	let maxColors = 20
+	let useCustomClass = false
 </script>
 
 <main style="--bgColor:{bgColor}">
 	<div class="container">
 		<Palette
 			{colors}
-			allowDeletion
+			selectedColor={preselectColor ? bgColor : null}
+			{allowDuplicates}
+			{allowDeletion}
 			tooltipClassName={useCustomTooltipClass ? 'tooltip' : null}
+			{showTransparentSlot}
+			{maxColors}
+			on:select={({ detail: { color } }) => (bgColor = color)}
+			class={useCustomClass ? 'palette' : null}
 		/>
-		<label>
-			allowDeletion:
-			<input type="checkbox" bind:checked={allowDeletion} />
-		</label>
-		<label>
-			Use custom tooltip class:
-			<input type="checkbox" bind:checked={useCustomTooltipClass} />
-		</label>
+		<form class="settings__form">
+			<h1>Settings</h1>
+			<fieldset>
+				<label>
+					Preselect color:
+					<input type="checkbox" bind:checked={preselectColor} />
+				</label>
+			</fieldset>
+			<fieldset>
+				<label>
+					Use Custom Class:
+					<input type="checkbox" bind:checked={useCustomClass} />
+				</label>
+			</fieldset>
+			<fieldset>
+				<label>
+					Allow Duplicates:
+					<input type="checkbox" bind:checked={allowDuplicates} />
+				</label>
+			</fieldset>
+			<fieldset>
+				<label>
+					Allow Deletion:
+					<input type="checkbox" bind:checked={allowDeletion} />
+				</label>
+			</fieldset>
+			<fieldset>
+				<label>
+					Use Custom Tooltip Class:
+					<input type="checkbox" bind:checked={useCustomTooltipClass} />
+				</label>
+			</fieldset>
+			<fieldset>
+				<label>
+					Show Transparent Slot:
+					<input type="checkbox" bind:checked={showTransparentSlot} />
+				</label>
+			</fieldset>
+			<fieldset>
+				<label>
+					Max colors:
+					<input type="number" min="1" max="30" bind:value={maxColors} />
+				</label>
+			</fieldset>
+		</form>
 	</div>
 </main>
 
@@ -73,20 +121,36 @@
 		max-width: 640px;
 		display: flex;
 		flex-direction: column;
-		row-gap: 5rem;
+		row-gap: 1rem;
 	}
 
-	.form__message--success {
+	.settings__form {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		padding: 1rem;
+		background-color: white;
+	}
+
+	.settings__form fieldset {
+		width: 100%;
+		border: none;
+	}
+
+	.settings__form label {
 		display: flex;
 		align-items: center;
-		column-gap: 0.5rem;
-		padding: 1rem;
-		background-color: #e3e3e3;
-		border-radius: 0.7rem;
+		justify-content: space-between;
+		column-gap: 1rem;
 	}
 
-	.form__button {
+	.settings__form input {
 		margin: 0;
+	}
+
+	.settings__form input[type='checkbox'] {
+		padding: 0;
 	}
 
 	:global(.palette) {
@@ -94,46 +158,28 @@
 		flex-direction: column;
 		row-gap: 1rem;
 		padding: 2rem;
-		background: white;
+		background: black;
 		box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.18);
-	}
-
-	.palette__header {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		column-gap: 0.5rem;
-		border-radius: 0.7rem;
-	}
-
-	.palette__slot {
-		cursor: pointer;
-		width: 2rem;
-		height: 2rem;
-		margin: 0;
-		background-color: var(--color);
-		border-radius: 20%;
-		border: 1px solid rgba(0, 0, 0, 0.2);
-		box-shadow: 0.1rem 0.1rem 0.3rem rgba(0, 0, 0, 0.2);
-	}
-
-	.palette__divider {
-		border: #ccc dashed 1px;
-		width: 50%;
-	}
-
-	.palette__slot.palette__slot--selected {
-		box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--color);
 	}
 
 	:global(.tooltip) {
 		position: absolute;
 		z-index: 9999;
 		max-width: 120px;
-		background-color: #37ff00;
+		background-color: #ee7008;
 		color: #fff;
 		text-align: center;
 		border-radius: 6px;
 		padding: 0.5rem;
+	}
+	:global(.tooltip::after) {
+		content: "";
+		position: absolute;
+		top: 100%;
+		left: 50%;
+		margin-left: -5px;
+		border-width: 5px;
+		border-style: solid;
+		border-color: #ee7008 transparent transparent transparent;
 	}
 </style>
