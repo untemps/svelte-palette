@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/untemps/svelte-palette/compare/v1.5.0...v1.5.1) (2021-12-19)
+
+
+### Bug Fixes
+
+* Fix color addition when maxColors is updated ([9bd324e](https://github.com/untemps/svelte-palette/commit/9bd324e8382c981c46f616e7042897ef91f5a9ab))
+
 # [1.5.0](https://github.com/untemps/svelte-palette/compare/v1.4.3...v1.5.0) (2021-12-18)
 
 
