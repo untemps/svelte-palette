@@ -24,16 +24,15 @@
 		dispatch('select', { color })
 	}
 
-	const _addColor = (color) =>
-		(colors =
+	const _addColor = (color) => (colors =
 			allowDuplicates || !colors.includes(color)
 				? [
-						...colors.slice(
-							0,
-							colors.length < maxColors || maxColors === -1 ? colors.length : colors.length - 1
-						),
-						color,
-				  ]
+					...colors.slice(
+						0,
+						colors.length < maxColors || maxColors === -1 ? colors.length : maxColors - 1
+					),
+					color,
+				]
 				: colors)
 
 	const _removeColor = (index) => (colors = colors.filter((c, i) => i !== index))
@@ -42,10 +41,7 @@
 
 	const _onInputAdd = ({ detail: { color } }) => _addColor(color)
 
-	const _onTooltipClick = (index) => {
-		console.log(index)
-		_removeColor(index)
-	}
+	const _onTooltipClick = (index) => _removeColor(index)
 </script>
 
 <section class={resolveClass([[!!$$props.class, $$props.class, 'palette__root']])}>
