@@ -147,10 +147,15 @@ export class Tooltip {
 		this.#target.appendChild(this.#container)
 
 		if (this.#actions) {
-			Object.entries(this.#actions).forEach(([key, { eventType, callback, callbackParams }]) => {
+			Object.entries(this.#actions).forEach(([key, { eventType, callback, callbackParams, closeOnCallback }]) => {
 				const trigger = key === '*' ? this.#container : this.#container.querySelector(key)
 				if (trigger) {
-					const listener = (event) => callback?.apply(null, [...callbackParams, event])
+					const listener = (event) => {
+						callback?.apply(null, [...callbackParams, event])
+						if(closeOnCallback) {
+							this.#removeContainerFromTarget()
+						}
+					}
 					trigger.addEventListener(eventType, listener)
 					this.#events.push({ trigger, eventType, listener })
 				}
