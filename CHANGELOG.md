@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/untemps/svelte-palette/compare/v1.5.1...v1.6.0) (2022-01-04)
+
+
+### Features
+
+* Close tooltip after clicking content ([ec11fc0](https://github.com/untemps/svelte-palette/commit/ec11fc0d36b535f03ab98646aaeb903d782722f8))
+
 ## [1.5.1](https://github.com/untemps/svelte-palette/compare/v1.5.0...v1.5.1) (2021-12-19)
 
 
