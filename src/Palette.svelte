@@ -74,6 +74,7 @@
 							eventType: 'click',
 							callback: _onTooltipClick,
 							callbackParams: [index],
+							closeOnCallback: true
 						},
 					},
 					contentClassName: tooltipClassName,
