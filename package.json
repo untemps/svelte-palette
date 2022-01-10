@@ -59,7 +59,7 @@
 		"svelte-jester": "^2.1.5"
 	},
 	"dependencies": {
-		"@untemps/dom-observer": "^2.0.0-beta.6",
+		"@untemps/dom-observer": "^2.0.0",
 		"svelte": "3.39.0"
 	},
 	"jest": {

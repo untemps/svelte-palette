@@ -1964,10 +1964,10 @@
   dependencies:
     "@types/yargs-parser" "*"
 
-"@untemps/dom-observer@^2.0.0-beta.6":
-  version "2.0.0-beta.6"
-  resolved "https://registry.yarnpkg.com/@untemps/dom-observer/-/dom-observer-2.0.0-beta.6.tgz#4df3fc75649c431a62e3b611ffac76c59ca711a4"
-  integrity sha512-x20HQAUVTAv+DGVhXYKnfz0AyEG5jskYdbBSE7wz9D6rBlLDwJABgXh9QYoHXDRzPOnxl6z9FAJPU349aXpy4g==
+"@untemps/dom-observer@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@untemps/dom-observer/-/dom-observer-2.0.0.tgz#5b86b091f62905a6f18b0280bbf9067f2949716f"
+  integrity sha512-oZBj7j9hYSbuveNFvyPLamRfNh15KvGJC5pLGGpWVcO61EzISMESL0wudwP0UZETEu+0WfaJ16rGXtEZHsq+xw==
 
 JSONStream@^1.0.4:
   version "1.3.5"
