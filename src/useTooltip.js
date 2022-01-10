@@ -175,7 +175,7 @@ export class Tooltip {
 	#onTargetEnter() {
 		this.#appendContainerToTarget()
 
-		Tooltip.#observer.wait(`.${this.#className}`, null, { events: [DOMObserver.ADD] }).then(({ node }) => {
+		Tooltip.#observer.wait(`.${this.#className}`, null, { events: [DOMObserver.EXIST] }).then(({ node }) => {
 			const { width: targetWidth } = this.#target.getBoundingClientRect()
 			const { width: tooltipWidth, height: tooltipHeight } = this.#container.getBoundingClientRect()
 			this.#container.style.left = `${-(tooltipWidth - targetWidth) >> 1}px`
