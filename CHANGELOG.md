@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/untemps/svelte-palette/compare/v1.6.0...v1.6.1) (2022-01-11)
+
+
+### Bug Fixes
+
+* Wait for tooltip content to exist or be added ([#19](https://github.com/untemps/svelte-palette/issues/19)) ([a56714a](https://github.com/untemps/svelte-palette/commit/a56714a3516d34688b4b2cc4a55116885f4b46b7))
+
 # [1.6.0](https://github.com/untemps/svelte-palette/compare/v1.5.1...v1.6.0) (2022-01-04)
 
 
