@@ -3,7 +3,7 @@
 	import { scale } from 'svelte/transition'
 	import { elasticOut } from 'svelte/easing'
 
-	import { resolveClass } from './utils'
+	import { resolveClass } from '../utils/utils'
 
 	export let color = null
 	export let selected = false

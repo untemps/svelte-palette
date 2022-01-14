@@ -1,3 +1,3 @@
-export { default as Palette } from './Palette.svelte'
-export { default as PaletteSlot } from './PaletteSlot.svelte'
-export { default as PaletteInput } from './PaletteInput.svelte'
+export { default as Palette } from './components/Palette.svelte'
+export { default as PaletteSlot } from './components/PaletteSlot.svelte'
+export { default as PaletteInput } from './components/PaletteInput.svelte'
