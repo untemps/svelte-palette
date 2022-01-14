@@ -4,9 +4,9 @@
 	import PaletteInput from './PaletteInput.svelte'
 	import PaletteSlot from './PaletteSlot.svelte'
 
-	import useTooltip from './useTooltip'
+	import useTooltip from '../actions/useTooltip'
 
-	import { resolveClass } from './utils'
+	import { resolveClass } from '../utils/utils'
 
 	export let colors = []
 	export let selectedColor = null
