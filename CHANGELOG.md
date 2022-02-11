@@ -1,3 +1,5 @@
+## [1.6.2](https://github.com/untemps/svelte-palette/compare/v1.6.1...v1.6.2) (2022-02-11)
+
 ## [1.6.1](https://github.com/untemps/svelte-palette/compare/v1.6.0...v1.6.1) (2022-01-11)
 
 
