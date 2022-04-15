@@ -1,12 +1,11 @@
 <script>
 	import { createEventDispatcher } from 'svelte'
+    import {resolveClassName} from '@untemps/utils/dom/resolveClassName'
 
 	import PaletteInput from './PaletteInput.svelte'
 	import PaletteSlot from './PaletteSlot.svelte'
 
 	import useTooltip from '../actions/useTooltip'
-
-	import { resolveClass } from '../utils/utils'
 
 	export let colors = []
 	export let selectedColor = null
@@ -44,7 +43,7 @@
 	const _onTooltipClick = (index) => _removeColor(index)
 </script>
 
-<section class={resolveClass([[!!$$props.class, $$props.class, 'palette__root']])}>
+<section class={resolveClassName([[!!$$props.class, $$props.class, 'palette__root']])}>
 	{#if $$slots.header}
 		<slot name="header" />
 		<slot name="header-divider">
