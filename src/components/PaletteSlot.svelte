@@ -2,8 +2,7 @@
 	import { createEventDispatcher } from 'svelte'
 	import { scale } from 'svelte/transition'
 	import { elasticOut } from 'svelte/easing'
-
-	import { resolveClass } from '../utils/utils'
+	import { resolveClassName } from '@untemps/utils/dom/resolveClassName'
 
 	export let color = null
 	export let selected = false
@@ -24,7 +23,7 @@
 	{...$$restProps}
 	aria-label={color || emptyAriaLabel}
 	style="--color:{color}; --outerBorderColor:{color || '#aaa'};"
-	class={resolveClass([
+	class={resolveClassName([
 		[!color, 'empty'],
 		[selected, 'selected'],
 		[!disabled, 'clickable'],
