@@ -1,12 +1,16 @@
 <script>
 	import { createEventDispatcher } from 'svelte'
 
+	import { ADD } from '../events/PaletteEvents'
+
 	import PaletteSlot from './PaletteSlot.svelte'
+	import PaletteEyeDropper from './PaletteEyeDropper.svelte'
 
 	export let color = null
 	export let inputAriaLabel = 'Enter an hex color value'
 	export let inputTitle = 'The value must be a valid hex color'
 	export let buttonAriaLabel = 'Submit this hex color value'
+	export let eyeDropperButtonAriaLabel = 'Pick a color from the screen'
 
 	const dispatch = createEventDispatcher()
 	const validationRegex = /^#?(([0-9a-f]{2}){3,4}|([0-9a-f]){3})$/gi
@@ -16,57 +20,90 @@
 	$: color = color?.replace(validationRegex, '#$1') || ''
 	$: isValid = _isValid(color)
 
-	const _onChange = (e) => {
-		const {
-			target: { value },
-		} = e
+	const _onChange = ({ target: { value } }) => {
+		color = value
+	}
+
+	const _onEyeDropperAdd = ({ detail: { color: value } }) => {
 		color = value
 	}
 
 	const _onSubmit = () => {
-		dispatch('add', {
+		dispatch(ADD, {
 			color,
 		})
 	}
 </script>
 
-<form data-testid='__palette-input-root__' on:submit|preventDefault={_onSubmit}>
-	<PaletteSlot data-testid='__palette-input-slot__' bind:color role="presentation" tabindex="-1" disabled />
+<form data-testid="__palette-input-root__" on:submit|preventDefault={_onSubmit}>
+	<PaletteSlot data-testid="__palette-input-slot__" bind:color role="presentation" tabindex="-1" disabled />
 	<input
-		data-testid='__palette-input-input__'
+		data-testid="__palette-input-input__"
 		type="text"
 		value={color}
 		aria-label={inputAriaLabel}
 		title={inputTitle}
 		on:input|preventDefault={_onChange}
 	/>
-	<button data-testid='__palette-input-submit__' type="submit" disabled={!isValid} aria-label={buttonAriaLabel}>
-		<svg x="0px" y="0px" width="100%" height="100%" viewBox="0 0 16 16" role="presentation">
-			<polygon points="13,7 9,7 9,3 7,3 7,7 3,7 3,9 7,9 7,13 9,13 9,9 13,9" />
+	<button data-testid="__palette-input-submit__" type="submit" disabled={!isValid} aria-label={buttonAriaLabel}>
+		<svg viewBox="0 0 12 12" width="12px" height="12px">
+			<g transform="matrix(0.75, 0, 0, 0.75, 0, 0)">
+				<path
+					d="M 14.857 9.143 L 9.143 9.143 L 9.143 14.857 C 9.143 15.489 8.631 16 8 16 C 7.369 16 6.857 15.489 6.857 14.857 L 6.857 9.143 L 1.143 9.143 C 0.512 9.143 0 8.632 0 8 C 0 7.368 0.512 6.857 1.143 6.857 L 6.857 6.857 L 6.857 1.143 C 6.857 0.511 7.369 0 8 0 C 8.631 0 9.143 0.511 9.143 1.143 L 9.143 6.857 L 14.857 6.857 C 15.488 6.857 16 7.368 16 8 C 16 8.632 15.488 9.143 14.857 9.143 Z"
+				/>
+			</g>
 		</svg>
 	</button>
+	<PaletteEyeDropper on:add={_onEyeDropperAdd} buttonAriaLabel={eyeDropperButtonAriaLabel} />
 </form>
 
 <style>
 	form {
 		display: flex;
 		align-items: center;
+        justify-content: center;
 		column-gap: 0.5rem;
 	}
 
 	input {
+		font-family: Helvetica, sans-serif;
+		font-size: 0.8rem;
 		max-width: 6rem;
-		height: 2.2rem;
+		height: 2rem;
 		margin: 0;
 		padding: 0.5rem;
+		outline: none;
+		color: rgba(0, 0, 0, 0.6);
+		background: rgba(255, 255, 255, 1);
+		border-color: rgba(0, 0, 0, 0.1);
+		border-radius: 0.3rem;
+		border-top-right-radius: 0;
+		border-bottom-right-radius: 0;
+	}
+
+	input:disabled {
+		opacity: 0.5;
+	}
+
+	input:focus {
+		border-color: rgba(0, 0, 0, 0.3);
 	}
 
 	button {
-		min-width: 2.2rem;
-		height: 2.2rem;
+        position: relative;
+		width: 2rem;
+		height: 2rem;
 		margin: 0;
-		padding: 0.5rem;
-		border-color: #ccc;
+		background: rgba(0, 0, 0, 0.1);
+		border-color: rgba(0, 0, 0, 0);
+		border-radius: 0.3rem;
+		border-top-left-radius: 0;
+		border-bottom-left-radius: 0;
+		cursor: pointer;
+	}
+
+	input + button {
+		margin-left: -0.5rem;
 	}
 
 	button:disabled {
@@ -74,19 +111,16 @@
 	}
 
 	button:focus {
-		border-color: #666;
+		border-color: rgba(0, 0, 0, 0.3);
 	}
 
 	svg {
-		width: 1rem;
-		height: 1rem;
+        position: absolute;
+        top: calc(50% - 6px);
+        left: calc(50% - 6px);
 	}
 
-	svg polygon {
-		fill: #ccc;
-	}
-
-	button:focus svg polygon {
-		fill: #666;
+	svg path {
+		fill: rgba(0, 0, 0, 0.6);
 	}
 </style>
