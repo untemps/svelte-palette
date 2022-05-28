@@ -22,7 +22,7 @@
 	}
 </script>
 
-{#if window.EyeDropper}
+{#if !!window.EyeDropper}
 	<button data-testid="__palette-eyedropper-root__" type="submit" aria-label={buttonAriaLabel} on:click|preventDefault={_onClick}>
 		<svg viewBox="0 0 16 16" width="16px" height="16px">
 			<path

@@ -54,7 +54,7 @@
 			</g>
 		</svg>
 	</button>
-	<PaletteEyeDropper on:add={_onEyeDropperAdd} buttonAriaLabel={eyeDropperButtonAriaLabel} />
+	<PaletteEyeDropper buttonAriaLabel={eyeDropperButtonAriaLabel} on:add={_onEyeDropperAdd} />
 </form>
 
 <style>
