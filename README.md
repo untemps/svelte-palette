@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="assets/svelte-palette.png" alt="svelte-palette" height="200"/>
+    <img src="assets/svelte-palette.gif" alt="svelte-palette" height="400"/>
 </p>
 <p align="center">
     Svelte component to display a customisable color picker
@@ -214,9 +214,10 @@ Provide a different class name otherwise the default class would have the preced
 If supported by the browser, the default component within the `input` slot displays a button to trigger the [Web EyeDropper API](https://developer.mozilla.org/en-US/docs/Web/API/EyeDropper).  
 The tool allows to pick a color from the screen.
 
-<img src="assets/eyedropper.png" alt="eyedropper" height="90"/>
+<img src="assets/eyedropper.gif" alt="eyedropper" height="250"/>
 
-Once selected, the color is inserted in the input waiting for the user to submit and adding it to the palette.  
+Once selected, the color is inserted in the input waiting for the user to submit and adding it to the palette.
+
 If the API is not available, nothing will be rendered.
 
 > The PaletteEyeDropper component can be used on its own anywhere within a slot or in an external component as it is exported from this lib.
