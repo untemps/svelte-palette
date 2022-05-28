@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="assets/svelte-palette.png" alt="svelte-palette" height="200"/>
+    <img src="assets/svelte-palette.gif" alt="svelte-palette" height="400"/>
 </p>
 <p align="center">
     Svelte component to display a customisable color picker
@@ -14,7 +14,7 @@
 ## Demo
 
 <p align="center">
-    :red_circle:&nbsp;&nbsp;<big><a href="https://untemps.github.io/svelte-palette" target="_blank" rel="noopener">LIVE
+    :red_circle:&nbsp;<big><a href="https://untemps.github.io/svelte-palette" target="_blank" rel="noopener">LIVE
     DEMO</a></big>&nbsp;:red_circle:
 </p>
 
@@ -209,15 +209,26 @@ Provide a different class name otherwise the default class would have the preced
 </style>
 ```
 
+## EyeDropper API Support
+
+If supported by the browser, the default component within the `input` slot displays a button to trigger the [Web EyeDropper API](https://developer.mozilla.org/en-US/docs/Web/API/EyeDropper).  
+The tool allows to pick a color from the screen.
+
+<img src="assets/eyedropper.gif" alt="eyedropper" height="250"/>
+
+Once selected, the color is inserted in the input waiting for the user to submit and adding it to the palette.
+
+If the API is not available, nothing will be rendered.
+
+> The PaletteEyeDropper component can be used on its own anywhere within a slot or in an external component as it is exported from this lib.
+
 ## Recipes
 
 ### Customize the Content of the Deletion Tooltip
 
 By default, if `allowDeletion` is set to true, the tooltip that allows to delete a color slot displays a trash icon:
 
-<p align="center">
-    <img src="assets/trash.png" alt="trash" height="90"/>
-</p>
+<img src="assets/trash.png" alt="trash" height="90"/>
 
 You may want to display a different content for various purposes.  
 That is possible by defining a DOM element selector to the `tooltipContentSelector` prop.

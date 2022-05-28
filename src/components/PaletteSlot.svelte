@@ -4,6 +4,8 @@
 	import { elasticOut } from 'svelte/easing'
 	import { resolveClassName } from '@untemps/utils/dom/resolveClassName'
 
+	import { CLICK } from '../events/PaletteEvents'
+
 	export let color = null
 	export let selected = false
 	export let disabled = false
@@ -13,7 +15,7 @@
 
 	const _onClick = () =>
 		!disabled &&
-		dispatch('click', {
+		dispatch(CLICK, {
 			color,
 		})
 </script>

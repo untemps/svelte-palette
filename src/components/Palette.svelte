@@ -1,6 +1,8 @@
 <script>
 	import { createEventDispatcher } from 'svelte'
-    import {resolveClassName} from '@untemps/utils/dom/resolveClassName'
+	import { resolveClassName } from '@untemps/utils/dom/resolveClassName'
+
+	import { SELECT } from '../events/PaletteEvents'
 
 	import PaletteInput from './PaletteInput.svelte'
 	import PaletteSlot from './PaletteSlot.svelte'
@@ -20,18 +22,19 @@
 
 	const _selectColor = (color) => {
 		selectedColor = color
-		dispatch('select', { color })
+		dispatch(SELECT, { color })
 	}
 
-	const _addColor = (color) => (colors =
+	const _addColor = (color) =>
+		(colors =
 			allowDuplicates || !colors.includes(color)
 				? [
-					...colors.slice(
-						0,
-						colors.length < maxColors || maxColors === -1 ? colors.length : maxColors - 1
-					),
-					color,
-				]
+						...colors.slice(
+							0,
+							colors.length < maxColors || maxColors === -1 ? colors.length : maxColors - 1
+						),
+						color,
+				  ]
 				: colors)
 
 	const _removeColor = (index) => (colors = colors.filter((c, i) => i !== index))
@@ -73,7 +76,7 @@
 							eventType: 'click',
 							callback: _onTooltipClick,
 							callbackParams: [index],
-							closeOnCallback: true
+							closeOnCallback: true,
 						},
 					},
 					contentClassName: tooltipClassName,
@@ -143,8 +146,9 @@
 	.palette__divider {
 		border: none;
 		background-color: #ccc;
-		width: 100%;
+		width: calc(100% + 4rem);
 		height: 1px;
+        margin-left: -2rem;
 	}
 
 	.tooltip__button {
