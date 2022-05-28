@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/untemps/svelte-palette/compare/v1.6.2...v1.7.0) (2022-05-28)
+
+
+### Features
+
+* Implement EyeDropper API ([#24](https://github.com/untemps/svelte-palette/issues/24)) ([34b4751](https://github.com/untemps/svelte-palette/commit/34b47518c779f28949d70d15ca473e4a2e9a7ce3))
+
 ## [1.6.2](https://github.com/untemps/svelte-palette/compare/v1.6.1...v1.6.2) (2022-02-11)
 
 ## [1.6.1](https://github.com/untemps/svelte-palette/compare/v1.6.0...v1.6.1) (2022-01-11)
