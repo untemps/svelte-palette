@@ -26,13 +26,14 @@
 	let bgColor = colors[0]
 
 	let preselectColor = true
+	let useCustomClass = false
 	let allowDuplicates = true
 	let allowDeletion = true
 	let useCustomTooltipClass = false
 	let useCustomTooltipContent = false
 	let showTransparentSlot = true
 	let maxColors = 20
-	let useCustomClass = false
+	let inputType = 'text'
 </script>
 
 <main style="--bgColor:{bgColor}">
@@ -46,6 +47,7 @@
 			tooltipContentSelector={useCustomTooltipContent ? '.palette__tooltip__button' : null}
 			{showTransparentSlot}
 			{maxColors}
+            {inputType}
 			on:select={({ detail: { color } }) => (bgColor = color)}
 			class={useCustomClass ? 'palette' : null}
 		/>
@@ -95,8 +97,17 @@
 			</fieldset>
 			<fieldset>
 				<label>
-					Max colors:
+					Max Colors:
 					<input type="number" min="1" max="30" bind:value={maxColors} />
+				</label>
+			</fieldset>
+			<fieldset>
+				<label>
+					Input Type:
+                    <select bind:value={inputType}>
+                        <option value="text">text</option>
+                        <option value="color">color</option>
+                    </select>
 				</label>
 			</fieldset>
 		</form>
