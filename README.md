@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="assets/svelte-palette.gif" alt="svelte-palette" height="400"/>
+    <img src="assets/svelte-palette.gif" alt="svelte-palette" height="300"/>
 </p>
 <p align="center">
     Svelte component to display a customisable color picker
