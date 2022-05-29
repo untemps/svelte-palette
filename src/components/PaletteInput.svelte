@@ -57,7 +57,7 @@
 			</g>
 		</svg>
 	</button>
-    {#if inputType !== 'color'}<PaletteEyeDropper buttonAriaLabel={eyeDropperButtonAriaLabel} on:add={_onEyeDropperAdd} />{/if}
+    {#if inputType !== 'color'}<PaletteEyeDropper data-testid="__palette-input-eyedropper__" buttonAriaLabel={eyeDropperButtonAriaLabel} on:add={_onEyeDropperAdd} />{/if}
 </form>
 
 <style>
