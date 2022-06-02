@@ -29,7 +29,6 @@
 	let useCustomClass = false
 	let allowDuplicates = true
 	let allowDeletion = true
-	let useCustomTooltipClass = false
 	let useCustomTooltipContent = false
 	let showTransparentSlot = true
 	let maxColors = 20
@@ -43,8 +42,7 @@
 			selectedColor={preselectColor ? bgColor : null}
 			{allowDuplicates}
 			{allowDeletion}
-			tooltipClassName={useCustomTooltipClass ? 'tooltip' : null}
-			tooltipContentSelector={useCustomTooltipContent ? '.palette__tooltip__button' : null}
+			tooltipContentSelector={useCustomTooltipContent ? '#tooltip-custom-template' : null}
 			{showTransparentSlot}
 			{maxColors}
             {inputType}
@@ -82,12 +80,6 @@
 			</fieldset>
 			<fieldset>
 				<label>
-					Use Custom Tooltip Class:
-					<input type="checkbox" bind:checked={useCustomTooltipClass} />
-				</label>
-			</fieldset>
-			<fieldset>
-				<label>
 					Use Custom Tooltip Content:
 					<input type="checkbox" bind:checked={useCustomTooltipContent} />
 				</label>
@@ -117,7 +109,9 @@
 	</div>
 </main>
 
-<button class="palette__tooltip__button">Delete</button>
+<template id="tooltip-custom-template">
+	<button class="palette__tooltip__button">Delete</button>
+</template>
 
 <style>
 	main {
@@ -172,26 +166,5 @@
 		padding: 2rem;
 		background: black;
 		box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.18);
-	}
-
-	:global(.tooltip) {
-		position: absolute;
-		z-index: 9999;
-		max-width: 120px;
-		background-color: #ee7008;
-		color: #fff;
-		text-align: center;
-		border-radius: 6px;
-		padding: 0.5rem;
-	}
-	:global(.tooltip::after) {
-		content: '';
-		position: absolute;
-		top: 100%;
-		left: 50%;
-		margin-left: -5px;
-		border-width: 5px;
-		border-style: solid;
-		border-color: #ee7008 transparent transparent transparent;
 	}
 </style>
