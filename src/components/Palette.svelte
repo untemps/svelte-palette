@@ -149,7 +149,7 @@
 							closeOnCallback: true,
 						},
 					},
-					contentClassName: tooltipClassName,
+					containerClassName: tooltipClassName,
 					disabled: !allowDeletion,
 				}}>
 				<slot name="slot" color={color}>
