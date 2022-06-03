@@ -7,6 +7,7 @@
 	import PaletteEyeDropper from './PaletteEyeDropper.svelte'
 
 	export let color = null
+	export let inputType = 'text'
 	export let inputAriaLabel = 'Enter an hex color value'
 	export let inputTitle = 'The value must be a valid hex color'
 	export let buttonAriaLabel = 'Submit this hex color value'
@@ -18,6 +19,7 @@
 	const _isValid = (value) => !!value && validationRegex.test(value)
 
 	$: color = color?.replace(validationRegex, '#$1') || ''
+	$: inputType = inputType === 'text' || inputType === 'color' ? inputType : 'text'
 	$: isValid = _isValid(color)
 
 	const _onChange = ({ target: { value } }) => {
@@ -36,13 +38,14 @@
 </script>
 
 <form data-testid="__palette-input-root__" on:submit|preventDefault={_onSubmit}>
-	<PaletteSlot data-testid="__palette-input-slot__" bind:color role="presentation" tabindex="-1" disabled />
+    {#if inputType !== 'color'}<PaletteSlot data-testid="__palette-input-slot__" bind:color role="presentation" tabindex="-1" disabled />{/if}
 	<input
 		data-testid="__palette-input-input__"
-		type="text"
+		type={inputType}
 		value={color}
 		aria-label={inputAriaLabel}
 		title={inputTitle}
+        class:color="{inputType === 'color'}"
 		on:input|preventDefault={_onChange}
 	/>
 	<button data-testid="__palette-input-submit__" type="submit" disabled={!isValid} aria-label={buttonAriaLabel}>
@@ -54,7 +57,7 @@
 			</g>
 		</svg>
 	</button>
-	<PaletteEyeDropper buttonAriaLabel={eyeDropperButtonAriaLabel} on:add={_onEyeDropperAdd} />
+    {#if inputType !== 'color'}<PaletteEyeDropper data-testid="__palette-input-eyedropper__" buttonAriaLabel={eyeDropperButtonAriaLabel} on:add={_onEyeDropperAdd} />{/if}
 </form>
 
 <style>
@@ -88,6 +91,11 @@
 	input:focus {
 		border-color: rgba(0, 0, 0, 0.3);
 	}
+    
+    input.color {
+        width: 12rem;
+        padding: 0.1rem 0.3rem;
+    }
 
 	button {
         position: relative;
@@ -105,6 +113,10 @@
 	input + button {
 		margin-left: -0.5rem;
 	}
+
+    button:hover {
+        background: rgba(0, 0, 0, 0.15);
+    }
 
 	button:disabled {
 		opacity: 0.5;

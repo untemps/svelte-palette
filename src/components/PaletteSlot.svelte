@@ -41,7 +41,7 @@
 		height: 1rem;
 		margin: 0;
 		padding: 0;
-		border: none;
+		border: 1px solid rgba(0, 0, 0, .2);
 		border-radius: 50%;
 		background-color: var(--color);
 	}

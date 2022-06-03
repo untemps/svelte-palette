@@ -60,7 +60,7 @@ yarn add @untemps/svelte-palette
 ## API
 
 | Props                    | Type    | Default | Description                                                                                                                                     |
-|--------------------------| ------- | ------- |-------------------------------------------------------------------------------------------------------------------------------------------------|
+|--------------------------|---------|---------|-------------------------------------------------------------------------------------------------------------------------------------------------|
 | `colors`                 | array   | []      | Array of color strings to be displayed in the palette.                                                                                          |
 | `selectedColor`          | string  | null    | Default selected color. The color must be included in the `colors` prop.                                                                        |
 | `allowDuplicates`        | boolean | false   | Flag to allow color duplication.                                                                                                                |
@@ -68,7 +68,8 @@ yarn add @untemps/svelte-palette
 | `tooltipClassName`       | string  | null    | Class name to pass down to the deletion tooltip (see [Styles](#styles)).                                                                        |
 | `tooltipContentSelector` | string  | null    | Selector of the deletion tooltip content (see [Customize the Content of the Deletion Tooltip](#customize-the-content-of-the-deletion-tooltip)). |
 | `showTransparentSlot`    | boolean | false   | Flag to display a transparent slot at the start of the slot list.                                                                               |
-| `maxColors`              | number  | 30      | Maximum number of slots to be displayed in the palette. Set this value to `-1` to allow infinite number of slots                                |
+| `maxColors`              | number  | 30      | Maximum number of slots to be displayed in the palette. Set this value to `-1` to allow infinite number of slots.                               |
+| `inputType`              | string  | "text"  | Type of the input within the footer slot. Only "text" and "color" are allowed. All other value will be replaced by "text".                      |
 
 ## Events
 
@@ -214,7 +215,7 @@ Provide a different class name otherwise the default class would have the preced
 If supported by the browser, the default component within the `input` slot displays a button to trigger the [Web EyeDropper API](https://developer.mozilla.org/en-US/docs/Web/API/EyeDropper).  
 The tool allows to pick a color from the screen.
 
-<img src="assets/eyedropper.gif" alt="eyedropper" height="250"/>
+<img src="assets/eyedropper.gif" alt="eyedropper" width="250"/>
 
 Once selected, the color is inserted in the input waiting for the user to submit and adding it to the palette.
 
@@ -249,6 +250,27 @@ That is possible by defining a DOM element selector to the `tooltipContentSelect
 
 <!-- The element used as tooltip content -->
 <button class="palette__tooltip__button">Delete</button>
+```
+
+### Use a color input
+
+By default, the input that allows to add a new slot in the palette is typed as "text".
+
+Although you may use the `ìnput` slot to display a custom component, it is possible to turn the input into color mode by setting the `inputType` prop to "color".  
+That unlocks the color picker provided by the browser. Therefore the color spot and the eyedropper are hidden.
+
+<img src="assets/input-color.gif" alt="input color" width="250"/>
+
+#### Example
+
+```html
+<script>
+	import { Palette } from '@untemps/svelte-palette'
+
+	const colors = ['#865C54', '#8F5447', '#A65846', '#A9715E', '#AD8C72']
+</script>
+
+<Palette {colors} inputType="color" />
 ```
 
 ## Development

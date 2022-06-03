@@ -17,6 +17,7 @@
 	export let tooltipContentSelector = null
 	export let showTransparentSlot = false
 	export let maxColors = 30
+	export let inputType = 'text'
 
 	const dispatch = createEventDispatcher()
 
@@ -99,7 +100,7 @@
 	</slot>
 	<slot name="footer">
 		<slot name="input">
-			<PaletteInput color={selectedColor} on:add={_onInputAdd} />
+			<PaletteInput color={selectedColor} inputType={inputType} on:add={_onInputAdd} />
 		</slot>
 	</slot>
 </section>

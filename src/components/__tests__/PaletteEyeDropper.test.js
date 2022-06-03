@@ -8,7 +8,7 @@ import PaletteEyeDropper from '../PaletteEyeDropper.svelte'
 
 describe('PaletteEyeDropper', () => {
 	describe('EyeDropper API is not available', () => {
-		it('renders nothing', () => {
+		it('Renders nothing', () => {
 			const { queryByTestId } = render(PaletteEyeDropper)
 			expect(queryByTestId('__palette-eyedropper-root__')).not.toBeInTheDocument()
 		})
@@ -25,12 +25,12 @@ describe('PaletteEyeDropper', () => {
 			window.EyeDropper = undefined
 		})
 
-		it('sets button aria-label', () => {
+		it('Sets button aria-label', () => {
 			const { getByLabelText } = render(PaletteEyeDropper, { buttonAriaLabel: 'foo' })
 			expect(getByLabelText('foo')).toBeInTheDocument()
 		})
 
-		it('retrieves color from EyeDropper selection', async () => {
+		it('Retrieves color from EyeDropper selection', async () => {
 			const onAdd = jest.fn()
 			const { getByLabelText, component } = render(PaletteEyeDropper, { buttonAriaLabel: 'foo' })
 			const button = getByLabelText('foo')
@@ -49,7 +49,7 @@ describe('PaletteEyeDropper', () => {
 			window.EyeDropper = undefined
 		})
 
-		it('throws error', async () => {
+		it('Throws error', async () => {
 			const onError = jest.fn()
 			const { getByLabelText, component } = render(PaletteEyeDropper, { buttonAriaLabel: 'foo' })
 			const button = getByLabelText('foo')
