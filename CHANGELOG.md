@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/untemps/svelte-palette/compare/v1.7.0...v1.8.0) (2022-06-03)
+
+
+### Features
+
+* Add inputType prop ([#26](https://github.com/untemps/svelte-palette/issues/26)) ([d9d8179](https://github.com/untemps/svelte-palette/commit/d9d81790f4e131afc5886370268b2aa5790fe6a5))
+
 # [1.7.0](https://github.com/untemps/svelte-palette/compare/v1.6.2...v1.7.0) (2022-05-28)
 
 
