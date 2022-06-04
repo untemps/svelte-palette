@@ -76,11 +76,11 @@ describe('Palette', () => {
 		await fireEvent.click(slots[slots.length - 1])
 		expect(onSelect).toHaveBeenCalledWith(new CustomEvent({ detail: { color: '#000' } }))
 	})
-	
+
 	it.each([
 		[['#ff0', '#0ff', '#f0f'], false, 3],
 		[['#ff0', '#0ff', '#f0f', '#f0f'], false, 3],
-		[['#ff0', '#0ff', '#f0f'], true, 4]
+		[['#ff0', '#0ff', '#f0f'], true, 4],
 	])('Adds or not color regarding allowDuplicates value', async (colors, allowDuplicates, expected) => {
 		const onSelect = jest.fn()
 		const { getByTestId, getAllByTestId, component } = render(Palette, {
@@ -98,7 +98,7 @@ describe('Palette', () => {
 		await fireEvent.click(slots[slots.length - 1])
 		expect(onSelect).toHaveBeenCalledWith(new CustomEvent({ detail: { color: '#f0f' } }))
 	})
-	
+
 	it('Removes duplicates when updating allowDuplicates value', async () => {
 		const colors = ['#ff0', '#0ff', '#f0f', '#f0f', '#f0f']
 		const { getAllByTestId, rerender } = render(Palette, {

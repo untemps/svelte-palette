@@ -29,8 +29,8 @@
 		"@babel/plugin-proposal-class-properties": "^7.12.1",
 		"@babel/plugin-transform-runtime": "^7.12.10",
 		"@babel/preset-env": "^7.12.11",
-		"@commitlint/cli": "^14.1.0",
-		"@commitlint/config-conventional": "^14.1.0",
+		"@commitlint/cli": "^17.0.2",
+		"@commitlint/config-conventional": "^17.0.2",
 		"@rollup/plugin-babel": "^5.2.2",
 		"@rollup/plugin-commonjs": "^21.0.1",
 		"@rollup/plugin-node-resolve": "^13.0.6",
@@ -42,7 +42,7 @@
 		"@testing-library/svelte": "^3.0.3",
 		"babel-jest": "^28.0.0-alpha.11",
 		"cross-env": "^7.0.3",
-		"husky": "^7.0.4",
+		"husky": "^8.0.1",
 		"identity-obj-proxy": "^3.0.0",
 		"jest": "^28.0.0-alpha.11",
 		"jest-environment-jsdom": "^28.0.0-alpha.11",
@@ -79,12 +79,6 @@
 		"setupFilesAfterEnv": [
 			"<rootDir>/jest/jest.setup.js"
 		]
-	},
-	"husky": {
-		"hooks": {
-			"pre-commit": "yarn test:ci && yarn prettier",
-			"commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-		}
 	},
 	"release": {
 		"branches": [
@@ -136,6 +130,7 @@
 		"build:cjs": "cross-env NODE_ENV=production BABEL_ENV=cjs rollup -c",
 		"build:es": "cross-env NODE_ENV=production BABEL_ENV=es rollup -c",
 		"build:umd": "cross-env NODE_ENV=production BABEL_ENV=umd rollup -c",
-		"prettier": "prettier \"*/**/*.js\" --ignore-path ./.prettierignore --write && git add . && git status"
+		"prettier": "prettier \"*/**/*.js\" --ignore-path ./.prettierignore --write && git add . && git status",
+		"prepare": "husky install"
 	}
 }
