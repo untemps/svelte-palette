@@ -43,7 +43,7 @@
 			selectedColor={preselectColor ? bgColor : null}
 			{allowDuplicates}
 			{allowDeletion}
-            tooltipClassName={useCustomTooltipClass ? 'tooltip' : null}
+            tooltipClassName={useCustomTooltipClass ? 'palette__tooltip' : null}
 			tooltipContentSelector={useCustomTooltipContent ? '#tooltip-custom-template' : null}
 			{showTransparentSlot}
 			{maxColors}
@@ -167,6 +167,10 @@
 		padding: 0;
 	}
 
+    .palette__tooltip__button {
+        pointer-events: none;
+    }
+
 	:global(.palette) {
 		display: flex;
 		flex-direction: column;
@@ -176,7 +180,7 @@
 		box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.18);
 	}
 
-	:global(.tooltip) {
+	:global(.palette__tooltip) {
 		position: absolute;
 		z-index: 9999;
 		max-width: 120px;
@@ -186,7 +190,8 @@
 		border-radius: 6px;
 		padding: 0.5rem;
 	}
-	:global(.tooltip::after) {
+
+	:global(.palette__tooltip::after) {
 		content: '';
 		position: absolute;
 		top: 100%;
