@@ -121,6 +121,8 @@ export class Tooltip {
 	}
 
 	enable() {
+		if (!!this.#boundEnterHandler) return
+
 		this.#boundEnterHandler = this.#onTargetEnter.bind(this)
 		this.#boundLeaveHandler = this.#onTargetLeave.bind(this)
 
