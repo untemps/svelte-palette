@@ -76,4 +76,40 @@ describe('Palette', () => {
 		await fireEvent.click(slots[slots.length - 1])
 		expect(onSelect).toHaveBeenCalledWith(new CustomEvent({ detail: { color: '#000' } }))
 	})
+
+	it.each([
+		[['#ff0', '#0ff', '#f0f'], false, 3],
+		[['#ff0', '#0ff', '#f0f', '#f0f'], false, 3],
+		[['#ff0', '#0ff', '#f0f'], true, 4],
+	])('Adds or not color regarding allowDuplicates value', async (colors, allowDuplicates, expected) => {
+		const onSelect = jest.fn()
+		const { getByTestId, getAllByTestId, component } = render(Palette, {
+			colors,
+			allowDuplicates,
+		})
+		component.$on('select', onSelect)
+		const input = getByTestId('__palette-input-input__')
+		const submit = getByTestId('__palette-input-submit__')
+		const newColor = 'f0f'
+		await fireEvent.input(input, { target: { value: newColor } })
+		await fireEvent.click(submit)
+		const slots = getAllByTestId('__palette-slot__')
+		expect(slots).toHaveLength(expected)
+		await fireEvent.click(slots[slots.length - 1])
+		expect(onSelect).toHaveBeenCalledWith(new CustomEvent({ detail: { color: '#f0f' } }))
+	})
+
+	it('Removes duplicates when updating allowDuplicates value', async () => {
+		const colors = ['#ff0', '#0ff', '#f0f', '#f0f', '#f0f']
+		const { getAllByTestId, rerender } = render(Palette, {
+			colors,
+			allowDuplicates: true,
+		})
+		expect(getAllByTestId('__palette-slot__')).toHaveLength(colors.length)
+		rerender({
+			colors,
+			allowDuplicates: false,
+		})
+		expect(getAllByTestId('__palette-slot__')).toHaveLength(3)
+	})
 })

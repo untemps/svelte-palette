@@ -1,5 +1,5 @@
 <script>
-	import { createEventDispatcher } from 'svelte'
+	import { afterUpdate, createEventDispatcher } from 'svelte'
 	import { resolveClassName } from '@untemps/utils/dom/resolveClassName'
 
 	import { SELECT } from '../events/PaletteEvents'
@@ -20,6 +20,12 @@
 	export let inputType = 'text'
 
 	const dispatch = createEventDispatcher()
+
+	afterUpdate(() => {
+		if(!allowDuplicates) {
+			colors = colors.filter((item, index) => colors.indexOf(item) === index)
+        }
+	})
 
 	const _selectColor = (color) => {
 		selectedColor = color

@@ -61,10 +61,12 @@ export class Tooltip {
 			Tooltip.#tooltip = document.createElement('div')
 
 			Tooltip.#observer = new DOMObserver()
-			Tooltip.#observer.wait(contentSelector, null, { events: [DOMObserver.EXIST, DOMObserver.ADD] }).then(({ node }) => {
-				const child = contentClone ? node.cloneNode(true) : node
-				Tooltip.#tooltip.appendChild(child)
-			})
+			Tooltip.#observer
+				.wait(contentSelector, null, { events: [DOMObserver.EXIST, DOMObserver.ADD] })
+				.then(({ node }) => {
+					const child = contentClone ? node.cloneNode(true) : node
+					Tooltip.#tooltip.appendChild(child)
+				})
 
 			Tooltip.#contentSelector = contentSelector
 			Tooltip.#isInitialized = true
@@ -75,11 +77,13 @@ export class Tooltip {
 		if (Tooltip.#isInitialized && contentSelector !== Tooltip.#contentSelector) {
 			Tooltip.#contentSelector = contentSelector
 
-			Tooltip.#observer.wait(contentSelector, null, { events: [DOMObserver.EXIST, DOMObserver.ADD] }).then(({ node }) => {
-				Tooltip.#tooltip.innerHTML = ''
-				const child = contentClone ? node.cloneNode(true) : node
-				Tooltip.#tooltip.appendChild(child)
-			})
+			Tooltip.#observer
+				.wait(contentSelector, null, { events: [DOMObserver.EXIST, DOMObserver.ADD] })
+				.then(({ node }) => {
+					Tooltip.#tooltip.innerHTML = ''
+					const child = contentClone ? node.cloneNode(true) : node
+					Tooltip.#tooltip.appendChild(child)
+				})
 		}
 	}
 
@@ -152,7 +156,7 @@ export class Tooltip {
 				if (trigger) {
 					const listener = (event) => {
 						callback?.apply(null, [...callbackParams, event])
-						if(closeOnCallback) {
+						if (closeOnCallback) {
 							this.#removeContainerFromTarget()
 						}
 					}
