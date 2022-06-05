@@ -1,3 +1,10 @@
+## [1.8.1](https://github.com/untemps/svelte-palette/compare/v1.8.0...v1.8.1) (2022-06-05)
+
+
+### Bug Fixes
+
+* Remove duplicates on allowDuplicates update ([#29](https://github.com/untemps/svelte-palette/issues/29)) ([3fdad78](https://github.com/untemps/svelte-palette/commit/3fdad78e21da70cd92b97f1215ea97415bf532b1))
+
 # [1.8.0](https://github.com/untemps/svelte-palette/compare/v1.7.0...v1.8.0) (2022-06-03)
 
 
