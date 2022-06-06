@@ -48,7 +48,10 @@
 			{showTransparentSlot}
 			{maxColors}
             {inputType}
-			on:select={({ detail: { color } }) => (bgColor = color)}
+			on:select={({ detail: { color } }) => {
+				bgColor = color
+				preselectColor = !!color
+			}}
 			class={useCustomClass ? 'palette' : null}
 		/>
 		<form class="settings__form">
