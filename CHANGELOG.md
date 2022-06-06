@@ -1,3 +1,10 @@
+## [1.8.2](https://github.com/untemps/svelte-palette/compare/v1.8.1...v1.8.2) (2022-06-06)
+
+
+### Bug Fixes
+
+* Prevent from multiple enter event subscriptions on slots ([#31](https://github.com/untemps/svelte-palette/issues/31)) ([429d7ad](https://github.com/untemps/svelte-palette/commit/429d7add9f9b52fa1c401a061a01a93aad0393ab))
+
 ## [1.8.1](https://github.com/untemps/svelte-palette/compare/v1.8.0...v1.8.1) (2022-06-05)
 
 
