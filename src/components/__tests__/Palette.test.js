@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { fireEvent, render } from '@testing-library/svelte'
+import { fireEvent, render, waitFor } from '@testing-library/svelte'
 
 import Palette from '../Palette.svelte'
 
@@ -36,8 +36,7 @@ describe('Palette', () => {
 		const row = getAllByTestId('__palette-row__')[0]
 		await fireEvent.mouseOver(row) // fireEvent.mouseEnter only works if mouseOver is triggered before
 		await fireEvent.mouseEnter(row)
-		await _sleep()
-		expect(getByTestId('__palette-tooltip__')).toBeInTheDocument()
+		await waitFor(() => expect(getByTestId('__palette-tooltip__')).toBeInTheDocument())
 	})
 
 	it('Displays transparent slot if showTransparentSlot is truthy', async () => {

@@ -20,28 +20,13 @@
 		})
 </script>
 
-<button
-	data-testid="__palette-slot-root__"
-	{...$$restProps}
-	aria-label={color || emptyAriaLabel}
-	style="--color:{color}; --outerBorderColor:{color || '#aaa'};"
-	class={resolveClassName([
-		[!color, 'empty'],
-		[selected, 'selected'],
-		[!disabled, 'clickable'],
-	])}
-	{disabled}
-	in:scale={{ duration: 500, easing: elasticOut }}
-	on:click|preventDefault={_onClick}
-/>
-
 <style>
 	button {
 		width: 1rem;
 		height: 1rem;
 		margin: 0;
 		padding: 0;
-		border: 1px solid rgba(0, 0, 0, .2);
+		border: 1px solid rgba(0, 0, 0, 0.2);
 		border-radius: 50%;
 		background-color: var(--color);
 	}
@@ -64,3 +49,17 @@
 		background: linear-gradient(to top left, #00000000 calc(50% - 1px), #aaa 50% 50%, #00000000 calc(50% + 1px));
 	}
 </style>
+
+<button
+	data-testid="__palette-slot-root__"
+	{...$$restProps}
+	aria-label={color || emptyAriaLabel}
+	style="--color:{color}; --outerBorderColor:{color || '#aaa'};"
+	class={resolveClassName([
+		[!color, 'empty'],
+		[selected, 'selected'],
+		[!disabled, 'clickable'],
+	])}
+	disabled={disabled}
+	in:scale={{ duration: 500, easing: elasticOut }}
+	on:click|preventDefault={_onClick} />

@@ -11,7 +11,16 @@
 		{
 			"files": "./**/*.js",
 			"options": {
-				"parser": "babylon"
+				"parser": "babel"
+			}
+		},
+		{
+			"files": "./**/*.svelte",
+			"options": {
+				"svelteBracketNewLine": false,
+				"svelteAllowShorthand": false,
+				"svelteSortOrder": "options-scripts-styles-markup",
+				"plugins": ["prettier-plugin-svelte"]
 			}
 		},
 		{
