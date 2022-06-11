@@ -1,5 +1,5 @@
 <script>
-	import { createEventDispatcher } from 'svelte'
+	import { afterUpdate, createEventDispatcher } from 'svelte'
 	import { resolveClassName } from '@untemps/utils/dom/resolveClassName'
 	import { useTooltip } from '@untemps/svelte-use-tooltip'
 
@@ -173,7 +173,7 @@
 </section>
 
 <template id="tooltip-template">
-	<button data-testid="__palette-tooltip__" class="tooltip__button">
+	<div role="button" data-testid="__palette-tooltip__" class="tooltip__button">
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -256 1792 1792">
 			<g transform="matrix(1,0,0,-1,197.42373,1255.0508)">
 				<path
@@ -181,71 +181,5 @@
 				/>
 			</g>
 		</svg>
-	</button>
+	</div>
 </template>
-
-<style>
-	* {
-		box-sizing: border-box;
-	}
-
-	.palette__root {
-		display: flex;
-		flex-direction: column;
-		row-gap: 1rem;
-		align-items: center;
-		min-width: 10rem;
-		padding: 2rem;
-		background-color: #fafafa;
-	}
-
-	.palette__list {
-		--numCols: 4;
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		display: grid;
-		grid-template-columns: repeat(var(--numCols), 1fr);
-		grid-gap: 1rem;
-		align-items: center;
-		justify-items: center;
-	}
-
-	.palette__divider {
-		border: none;
-		background-color: #ccc;
-		width: calc(100% + 4rem);
-		height: 1px;
-        margin-left: -2rem;
-	}
-
-	.tooltip__button {
-		cursor: pointer;
-		margin: 0;
-		padding: 0;
-		background: none;
-		border: none;
-	}
-
-	.tooltip__button svg {
-		width: 1.5rem;
-	}
-
-	.tooltip__button svg path {
-		fill: white;
-	}
-
-	.tooltip__button:active {
-		background: none;
-	}
-
-	.tooltip__button:active svg path {
-		fill: #aaaaaa;
-	}
-
-	@media (min-width: 320px) {
-		.palette__list {
-			--numCols: 5;
-		}
-	}
-</style>

@@ -176,7 +176,8 @@
 		flex-direction: column;
 		row-gap: 1rem;
 		padding: 2rem;
-		background: black;
+		background: #ffffff;
+        border-radius: 1rem;
 		box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.18);
 	}
 
