@@ -23,12 +23,6 @@
 </script>
 
 <style>
-	form {
-		display: flex;
-		align-items: center;
-		column-gap: 0.5rem;
-	}
-
 	button {
 		position: relative;
 		width: 2rem;
