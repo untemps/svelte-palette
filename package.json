@@ -62,7 +62,7 @@
 		"@untemps/dom-observer": "^2.0.0",
 		"@untemps/svelte-use-tooltip": "^2.7.0",
 		"@untemps/utils": "^2.0.0",
-		"svelte": "3.39.0"
+		"svelte": "3.49.0"
 	},
 	"jest": {
 		"transform": {
