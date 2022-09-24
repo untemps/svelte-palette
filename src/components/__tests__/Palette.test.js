@@ -5,6 +5,7 @@
 import { fireEvent, render, waitFor } from '@testing-library/svelte'
 
 import Palette from '../Palette.svelte'
+import { TOOLTIP } from '../../enums/PaletteDeletionMode'
 
 describe('Palette', () => {
 	it('Displays as many color slots as set', async () => {
@@ -31,7 +32,7 @@ describe('Palette', () => {
 		const colors = ['#ff0', '#0ff', '#f0f']
 		const { getByTestId, getAllByTestId } = render(Palette, {
 			colors,
-			allowDeletion: true,
+			deletionMode: TOOLTIP,
 		})
 		const row = getAllByTestId('__palette-row__')[0]
 		await fireEvent.mouseOver(row) // fireEvent.mouseEnter only works if mouseOver is triggered before

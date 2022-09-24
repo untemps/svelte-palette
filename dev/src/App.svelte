@@ -28,7 +28,7 @@
 	let preselectColor = true
 	let useCustomClass = false
 	let allowDuplicates = true
-	let allowDeletion = true
+	let deletionMode = 'none'
 	let useCustomTooltipClass = false
 	let useCustomTooltipContent = false
 	let showTransparentSlot = true
@@ -42,7 +42,7 @@
 			{colors}
 			selectedColor={preselectColor ? bgColor : null}
 			{allowDuplicates}
-			{allowDeletion}
+			{deletionMode}
             tooltipClassName={useCustomTooltipClass ? 'palette__tooltip' : null}
 			tooltipContentSelector={useCustomTooltipContent ? '#tooltip-custom-template' : null}
 			{showTransparentSlot}
@@ -76,8 +76,12 @@
 			</fieldset>
 			<fieldset>
 				<label>
-					Allow Deletion:
-					<input type="checkbox" bind:checked={allowDeletion} />
+					Deletion Mode:
+                    <select bind:value={deletionMode}>
+                        <option value="none">None</option>
+                        <option value="tooltip">Tooltip</option>
+                        <option value="drop">Drop</option>
+                    </select>
 				</label>
 			</fieldset>
 			<fieldset>

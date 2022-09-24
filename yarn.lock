@@ -2313,6 +2313,15 @@
   resolved "https://registry.yarnpkg.com/@untemps/dom-observer/-/dom-observer-2.0.0.tgz#5b86b091f62905a6f18b0280bbf9067f2949716f"
   integrity sha512-oZBj7j9hYSbuveNFvyPLamRfNh15KvGJC5pLGGpWVcO61EzISMESL0wudwP0UZETEu+0WfaJ16rGXtEZHsq+xw==
 
+"@untemps/svelte-use-drop-outside@^1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@untemps/svelte-use-drop-outside/-/svelte-use-drop-outside-1.6.0.tgz#427937083d4dcb2ca9a10af52f93b475d92c28e6"
+  integrity sha512-izzpTG27DwMzx7QIIkt1S+Z5JAbzNAKn568JZWJXR1ZXWx6ZAJigj8oFlSDAVltlFjeasDPXPJSmGoXALgTw/A==
+  dependencies:
+    "@untemps/dom-observer" "^2.0.0"
+    "@untemps/utils" "^2.0.0"
+    svelte "3.49.0"
+
 "@untemps/svelte-use-tooltip@^2.7.0":
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/@untemps/svelte-use-tooltip/-/svelte-use-tooltip-2.7.0.tgz#4467f4b99becf0d8756b35d005d1a51e26ceaa7e"

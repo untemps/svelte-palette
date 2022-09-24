@@ -4,7 +4,7 @@
 	import { elasticOut } from 'svelte/easing'
 	import { resolveClassName } from '@untemps/utils/dom/resolveClassName'
 
-	import { CLICK } from '../events/PaletteEvents'
+	import { CLICK } from '../enums/PaletteEvent'
 
 	export let color = null
 	export let selected = false
