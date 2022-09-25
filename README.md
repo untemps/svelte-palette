@@ -44,7 +44,7 @@ yarn add @untemps/svelte-palette
 </script>
 
 <main style="--bgColor:{bgColor}">
-	<Palette {colors} allowDuplicates allowDeletion on:select={({ detail: { color } }) => (bgColor = color)} />
+	<Palette {colors} allowDuplicates deletionMode="tooltip" on:select={({ detail: { color } }) => (bgColor = color)} />
 </main>
 
 <style>
@@ -64,7 +64,7 @@ yarn add @untemps/svelte-palette
 | `colors`                 | array   | []      | Array of color strings to be displayed in the palette.                                                                                          |
 | `selectedColor`          | string  | null    | Default selected color. The color must be included in the `colors` prop.                                                                        |
 | `allowDuplicates`        | boolean | false   | Flag to allow color duplication.                                                                                                                |
-| `allowDeletion`          | boolean | false   | Flag to allow color deletion.                                                                                                                   |
+| `deletionMode`           | string  | "none"  | Mode of slot deletion, between `"none"` and `"tooltip"` and `"drop"` (see [Deletion Modes](#deletion-modes)).                                   |
 | `tooltipClassName`       | string  | null    | Class name to pass down to the deletion tooltip (see [Styles](#styles)).                                                                        |
 | `tooltipContentSelector` | string  | null    | Selector of the deletion tooltip content (see [Customize the Content of the Deletion Tooltip](#customize-the-content-of-the-deletion-tooltip)). |
 | `showTransparentSlot`    | boolean | false   | Flag to display a transparent slot at the start of the slot list.                                                                               |
@@ -141,6 +141,18 @@ yarn add @untemps/svelte-palette
 </style>
 ```
 
+# Deletion Modes
+
+The `deletionMode` prop allows to define the way users can delete (or not) the color slots:
+
+| Value     | Description                                                                                                                                                                                 |
+|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `none`    | (Default) Color slots cannot be deleted                                                                                                                                                     |
+| `tooltip` | A tooltip is displayed when hovering a color slot, a click within deletes the slot  <br/>(You can control tooltip display though the `tooltipClassName` and `tooltipContentSelector` props) |
+| `drop`    | Colors slots are draggable, a drop outside the palette deletes the slot                                                                                                                     |
+
+As an helper, deletion mode enums are exported in `PaletteDeletionMode`.
+
 # Styles
 
 ### Root tag class
@@ -176,7 +188,7 @@ You can style the component by passing a class down to the root tag (`section`).
 
 ### Deletion tooltip class
 
-If you set `allowDeletion` to true, you can pass a class name that is set to the tooltip shown when hovering a slot.
+If you set `deletionMode` to `"tooltip"`, you can pass a class name that is set to the tooltip shown when hovering a slot.
 
 To do so, set a **global** class name to the `tooltipClassName` prop.
 > As the tooltip is interactive, make sure you define a sufficient hover area that allow to access the content of the tooltip before the leave event is triggered.
@@ -194,7 +206,7 @@ Provide a different class name otherwise the default class would have the preced
 	const colors = ['#865C54', '#8F5447', '#A65846', '#A9715E', '#AD8C72']
 </script>
 
-<Palette {colors} allowDeletion tooltipClassName="tooltip" />
+<Palette {colors} deletionMode="tooltip" tooltipClassName="tooltip" />
 
 <style>
 	:global(.tooltip) {
@@ -227,7 +239,7 @@ If the API is not available, nothing will be rendered.
 
 ### Customize the Content of the Deletion Tooltip
 
-By default, if `allowDeletion` is set to true, the tooltip that allows to delete a color slot displays a trash icon:
+By default, if `deletionMode` is set to `"tooltip"`, the tooltip displays a trash icon:
 
 <img src="assets/trash.png" alt="trash" height="90"/>
 
@@ -246,7 +258,7 @@ That is possible by defining a DOM element selector to the `tooltipContentSelect
 	const colors = ['#865C54', '#8F5447', '#A65846', '#A9715E', '#AD8C72']
 </script>
 
-<Palette {colors} allowDeletion tooltipContentSelector=".palette__tooltip__button" />
+<Palette {colors} deletionMode="tooltip" tooltipContentSelector=".palette__tooltip__button" />
 
 <!-- The element used as tooltip content -->
 <button class="palette__tooltip__button">Delete</button>
