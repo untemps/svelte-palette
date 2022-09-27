@@ -65,6 +65,7 @@ yarn add @untemps/svelte-palette
 | `selectedColor`          | string  | null    | Default selected color. The color must be included in the `colors` prop.                                                                        |
 | `allowDuplicates`        | boolean | false   | Flag to allow color duplication.                                                                                                                |
 | `deletionMode`           | string  | "none"  | Mode of slot deletion, between `"none"` and `"tooltip"` and `"drop"` (see [Deletion Modes](#deletion-modes)).                                   |
+| `allowDeletion`          | string  | "none"  | (deprecated) Flag to allow color deletion. If false, equivalent to `deletionMode='none'`. If true, equivalent to `deletionMode='tooltip'`.        |
 | `tooltipClassName`       | string  | null    | Class name to pass down to the deletion tooltip (see [Styles](#styles)).                                                                        |
 | `tooltipContentSelector` | string  | null    | Selector of the deletion tooltip content (see [Customize the Content of the Deletion Tooltip](#customize-the-content-of-the-deletion-tooltip)). |
 | `showTransparentSlot`    | boolean | false   | Flag to display a transparent slot at the start of the slot list.                                                                               |
