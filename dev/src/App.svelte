@@ -28,7 +28,6 @@
 	let preselectColor = true
 	let useCustomClass = false
 	let allowDuplicates = true
-	let allowDeletion = true
 	let deletionMode = 'none'
 	let useCustomTooltipClass = false
 	let useCustomTooltipContent = false
@@ -43,7 +42,6 @@
 			{colors}
 			selectedColor={preselectColor ? bgColor : null}
 			{allowDuplicates}
-            {allowDeletion}
 			{deletionMode}
             tooltipClassName={useCustomTooltipClass ? 'palette__tooltip' : null}
 			tooltipContentSelector={useCustomTooltipContent ? '#tooltip-custom-template' : null}
