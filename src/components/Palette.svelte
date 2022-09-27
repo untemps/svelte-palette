@@ -3,7 +3,7 @@
 	import { resolveClassName } from '@untemps/utils/dom/resolveClassName'
 
 	import { SELECT } from '../enums/PaletteEvent'
-	import { NONE } from '../enums/PaletteDeletionMode'
+	import {NONE, TOOLTIP} from '../enums/PaletteDeletionMode'
 
 	import PaletteInput from './PaletteInput.svelte'
 	import PaletteSlot from './PaletteSlot.svelte'
@@ -13,12 +13,15 @@
 	export let colors = []
 	export let selectedColor = null
 	export let allowDuplicates = false
+	export let allowDeletion = false
 	export let deletionMode = NONE
 	export let tooltipClassName = null
 	export let tooltipContentSelector = null
 	export let showTransparentSlot = false
 	export let maxColors = 30
 	export let inputType = 'text'
+
+    $: deletionMode = (allowDeletion && deletionMode === NONE) ? TOOLTIP : deletionMode
 
 	const dispatch = createEventDispatcher()
 
