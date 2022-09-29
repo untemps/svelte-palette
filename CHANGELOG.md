@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/untemps/svelte-palette/compare/v1.8.2...v1.9.0) (2022-09-29)
+
+
+### Features
+
+* Add new deletionMode prop ([#46](https://github.com/untemps/svelte-palette/issues/46)) ([2bc0e3f](https://github.com/untemps/svelte-palette/commit/2bc0e3f263905766a550a5fd596e182023de8c7f))
+
 ## [1.8.2](https://github.com/untemps/svelte-palette/compare/v1.8.1...v1.8.2) (2022-06-06)
 
 
