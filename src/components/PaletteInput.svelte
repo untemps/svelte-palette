@@ -1,7 +1,7 @@
 <script>
 	import { createEventDispatcher } from 'svelte'
 
-	import { ADD } from '../events/PaletteEvents'
+	import { ADD } from '../enums/PaletteEvent'
 
 	import PaletteSlot from './PaletteSlot.svelte'
 	import PaletteEyeDropper from './PaletteEyeDropper.svelte'

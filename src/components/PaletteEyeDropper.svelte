@@ -1,7 +1,7 @@
 <script>
 	import { createEventDispatcher } from 'svelte'
 
-	import { ADD, ERROR } from '../events/PaletteEvents'
+	import { ADD, ERROR } from '../enums/PaletteEvent'
 
 	export let buttonAriaLabel = 'Submit this hex color value'
 

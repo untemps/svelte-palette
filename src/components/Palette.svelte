@@ -1,22 +1,27 @@
 <script>
 	import { afterUpdate, createEventDispatcher } from 'svelte'
 	import { resolveClassName } from '@untemps/utils/dom/resolveClassName'
-	import { useTooltip } from '@untemps/svelte-use-tooltip'
 
-	import { SELECT } from '../events/PaletteEvents'
+	import { SELECT } from '../enums/PaletteEvent'
+	import {NONE, TOOLTIP} from '../enums/PaletteDeletionMode'
 
 	import PaletteInput from './PaletteInput.svelte'
 	import PaletteSlot from './PaletteSlot.svelte'
+
+	import useDeletion from './useDeletion'
 
 	export let colors = []
 	export let selectedColor = null
 	export let allowDuplicates = false
 	export let allowDeletion = false
+	export let deletionMode = NONE
 	export let tooltipClassName = null
 	export let tooltipContentSelector = null
 	export let showTransparentSlot = false
 	export let maxColors = 30
 	export let inputType = 'text'
+
+    $: deletionMode = (allowDeletion && deletionMode === NONE) ? TOOLTIP : deletionMode
 
 	const dispatch = createEventDispatcher()
 
@@ -49,8 +54,71 @@
 
 	const _onInputAdd = ({ detail: { color } }) => _addColor(color)
 
-	const _onTooltipClick = (index) => _removeColor(index)
+	const _onDelete = (index) => _removeColor(index)
 </script>
+
+<section class={resolveClassName([[!!$$props.class, $$props.class, 'palette__root']])}>
+	{#if $$slots.header}
+		<slot name="header" />
+		<slot name="header-divider">
+			<hr class="palette__divider" />
+		</slot>
+	{/if}
+	<ul class="palette__list">
+		{#if showTransparentSlot}
+			<li data-testid="__palette-row__">
+				<slot name="transparent-slot">
+					<PaletteSlot
+						emptyAriaLabel="transparent"
+						selected={selectedColor === null}
+						on:click={_onSlotSelect}
+					/>
+				</slot>
+			</li>
+		{/if}
+		{#each colors.slice(0, colors.length < maxColors || maxColors === -1 ? colors.length : maxColors) as color, index (`${color}_${index}`)}
+			<li
+				data-testid="__palette-row__"
+				use:useDeletion={
+				{
+					deletionMode,
+					onDelete: () => _onDelete(index),
+					tooltipContentSelector,
+					tooltipClassName,
+				}}
+			>
+				<slot name="slot" {color}>
+					<PaletteSlot
+						data-testid="__palette-slot__"
+						{color}
+						selected={color === selectedColor}
+						on:click={_onSlotSelect}
+					/>
+				</slot>
+			</li>
+		{/each}
+	</ul>
+	<slot name="footer-divider">
+		<hr class="palette__divider" />
+	</slot>
+	<slot name="footer">
+		<slot name="input">
+			<PaletteInput color={selectedColor} {inputType} on:add={_onInputAdd} />
+		</slot>
+	</slot>
+</section>
+
+<template id="tooltip-template">
+	<div role="button" data-testid="__palette-tooltip__" class="tooltip__button">
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -256 1792 1792">
+			<g transform="matrix(1,0,0,-1,197.42373,1255.0508)">
+				<path
+					d="M 512,800 V 224 q 0,-14 -9,-23 -9,-9 -23,-9 h -64 q -14,0 -23,9 -9,9 -9,23 v 576 q 0,14 9,23 9,9 23,9 h 64 q 14,0 23,-9 9,-9 9,-23 z m 256,0 V 224 q 0,-14 -9,-23 -9,-9 -23,-9 h -64 q -14,0 -23,9 -9,9 -9,23 v 576 q 0,14 9,23 9,9 23,9 h 64 q 14,0 23,-9 9,-9 9,-23 z m 256,0 V 224 q 0,-14 -9,-23 -9,-9 -23,-9 h -64 q -14,0 -23,9 -9,9 -9,23 v 576 q 0,14 9,23 9,9 23,9 h 64 q 14,0 23,-9 9,-9 9,-23 z M 1152,76 v 948 H 256 V 76 Q 256,54 263,35.5 270,17 277.5,8.5 285,0 288,0 h 832 q 3,0 10.5,8.5 7.5,8.5 14.5,27 7,18.5 7,40.5 z M 480,1152 h 448 l -48,117 q -7,9 -17,11 H 546 q -10,-2 -17,-11 z m 928,-32 v -64 q 0,-14 -9,-23 -9,-9 -23,-9 h -96 V 76 q 0,-83 -47,-143.5 -47,-60.5 -113,-60.5 H 288 q -66,0 -113,58.5 Q 128,-11 128,72 v 952 H 32 q -14,0 -23,9 -9,9 -9,23 v 64 q 0,14 9,23 9,9 23,9 h 309 l 70,167 q 15,37 54,63 39,26 79,26 h 320 q 40,0 79,-26 39,-26 54,-63 l 70,-167 h 309 q 14,0 23,-9 9,-9 9,-23 z"
+				/>
+			</g>
+		</svg>
+	</div>
+</template>
 
 <style>
 	* {
@@ -117,69 +185,3 @@
 		}
 	}
 </style>
-
-<section class={resolveClassName([[!!$$props.class, $$props.class, 'palette__root']])}>
-	{#if $$slots.header}
-		<slot name="header" />
-		<slot name="header-divider">
-			<hr class="palette__divider" />
-		</slot>
-	{/if}
-	<ul class="palette__list">
-		{#if showTransparentSlot}
-			<li data-testid="__palette-row__">
-				<slot name="transparent-slot">
-					<PaletteSlot
-						emptyAriaLabel="transparent"
-						selected={selectedColor === null}
-						on:click={_onSlotSelect} />
-				</slot>
-			</li>
-		{/if}
-		{#each colors.slice(0, colors.length < maxColors || maxColors === -1 ? colors.length : maxColors) as color, index}
-			<li
-				data-testid="__palette-row__"
-				use:useTooltip={{
-					contentSelector: tooltipContentSelector || '#tooltip-template',
-					contentActions: {
-						'*': {
-							eventType: 'click',
-							callback: _onTooltipClick,
-							callbackParams: [index],
-							closeOnCallback: true,
-						},
-					},
-					containerClassName: tooltipClassName,
-					disabled: !allowDeletion,
-				}}>
-				<slot name="slot" color={color}>
-					<PaletteSlot
-						data-testid="__palette-slot__"
-						color={color}
-						selected={color === selectedColor}
-						on:click={_onSlotSelect} />
-				</slot>
-			</li>
-		{/each}
-	</ul>
-	<slot name="footer-divider">
-		<hr class="palette__divider" />
-	</slot>
-	<slot name="footer">
-		<slot name="input">
-			<PaletteInput color={selectedColor} {inputType} on:add={_onInputAdd} />
-		</slot>
-	</slot>
-</section>
-
-<template id="tooltip-template">
-	<div role="button" data-testid="__palette-tooltip__" class="tooltip__button">
-		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -256 1792 1792">
-			<g transform="matrix(1,0,0,-1,197.42373,1255.0508)">
-				<path
-					d="M 512,800 V 224 q 0,-14 -9,-23 -9,-9 -23,-9 h -64 q -14,0 -23,9 -9,9 -9,23 v 576 q 0,14 9,23 9,9 23,9 h 64 q 14,0 23,-9 9,-9 9,-23 z m 256,0 V 224 q 0,-14 -9,-23 -9,-9 -23,-9 h -64 q -14,0 -23,9 -9,9 -9,23 v 576 q 0,14 9,23 9,9 23,9 h 64 q 14,0 23,-9 9,-9 9,-23 z m 256,0 V 224 q 0,-14 -9,-23 -9,-9 -23,-9 h -64 q -14,0 -23,9 -9,9 -9,23 v 576 q 0,14 9,23 9,9 23,9 h 64 q 14,0 23,-9 9,-9 9,-23 z M 1152,76 v 948 H 256 V 76 Q 256,54 263,35.5 270,17 277.5,8.5 285,0 288,0 h 832 q 3,0 10.5,8.5 7.5,8.5 14.5,27 7,18.5 7,40.5 z M 480,1152 h 448 l -48,117 q -7,9 -17,11 H 546 q -10,-2 -17,-11 z m 928,-32 v -64 q 0,-14 -9,-23 -9,-9 -23,-9 h -96 V 76 q 0,-83 -47,-143.5 -47,-60.5 -113,-60.5 H 288 q -66,0 -113,58.5 Q 128,-11 128,72 v 952 H 32 q -14,0 -23,9 -9,9 -9,23 v 64 q 0,14 9,23 9,9 23,9 h 309 l 70,167 q 15,37 54,63 39,26 79,26 h 320 q 40,0 79,-26 39,-26 54,-63 l 70,-167 h 309 q 14,0 23,-9 9,-9 9,-23 z"
-				/>
-			</g>
-		</svg>
-	</div>
-</template>

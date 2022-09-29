@@ -5,6 +5,7 @@
 import { fireEvent, render, waitFor } from '@testing-library/svelte'
 
 import Palette from '../Palette.svelte'
+import { TOOLTIP, DROP } from '../../enums/PaletteDeletionMode'
 
 describe('Palette', () => {
 	it('Displays as many color slots as set', async () => {
@@ -27,16 +28,43 @@ describe('Palette', () => {
 		expect(onSelect).toHaveBeenCalledWith(new CustomEvent({ detail: { color: colors[0] } }))
 	})
 
-	it('Displays tooltip if allowDeletion is truthy', async () => {
+	it('Deletes slots if deletionMode is set to "tooltip"', async () => {
 		const colors = ['#ff0', '#0ff', '#f0f']
 		const { getByTestId, getAllByTestId } = render(Palette, {
 			colors,
-			allowDeletion: true,
+			deletionMode: TOOLTIP,
 		})
 		const row = getAllByTestId('__palette-row__')[0]
 		await fireEvent.mouseOver(row) // fireEvent.mouseEnter only works if mouseOver is triggered before
 		await fireEvent.mouseEnter(row)
 		await waitFor(() => expect(getByTestId('__palette-tooltip__')).toBeInTheDocument())
+		await fireEvent.click(getByTestId('__palette-tooltip__'))
+		await waitFor(() => expect(row).not.toBeInTheDocument())
+	})
+
+	it('Deletes slot if deletionMode is set to "drop"', async () => {
+		const colors = ['#ff0', '#0ff', '#f0f']
+		const { component, getAllByTestId } = render(Palette, {
+			accessors: true,
+			props: {
+				colors,
+			},
+		})
+		component.deletionMode = DROP
+		const row = getAllByTestId('__palette-row__')[0]
+		await fireEvent.mouseDown(row)
+		await fireEvent.mouseMove(document)
+		const drag = document.querySelector('#drag')
+		drag.getBoundingClientRect = () => ({
+			width: 20,
+			height: 20,
+			top: 2000,
+			left: 2000,
+			right: 2020,
+			bottom: 2020,
+		})
+		await fireEvent.mouseUp(document)
+		await waitFor(() => expect(row).not.toBeInTheDocument())
 	})
 
 	it('Displays transparent slot if showTransparentSlot is truthy', async () => {
