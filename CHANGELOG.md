@@ -1,3 +1,5 @@
+## [1.9.1-beta.2](https://github.com/untemps/svelte-palette/compare/v1.9.1-beta.1...v1.9.1-beta.2) (2022-10-04)
+
 ## [1.9.1-beta.1](https://github.com/untemps/svelte-palette/compare/v1.9.0...v1.9.1-beta.1) (2022-10-04)
 
 # [1.9.0](https://github.com/untemps/svelte-palette/compare/v1.8.2...v1.9.0) (2022-09-29)
