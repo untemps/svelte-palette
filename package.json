@@ -1,10 +1,18 @@
 {
 	"name": "@untemps/svelte-palette",
-	"version": "1.9.0",
+	"version": "1.9.1-beta.1",
 	"author": "Vincent Le Badezet <v.lebadezet@untemps.net>",
 	"license": "MIT",
 	"description": "Svelte component to display a customisable color picker",
-	"keywords": ["palette", "color", "color-picker", "svelte", "svelte-component", "component", "javascript"],
+	"keywords": [
+		"palette",
+		"color",
+		"color-picker",
+		"svelte",
+		"svelte-component",
+		"component",
+		"javascript"
+	],
 	"private": false,
 	"publishConfig": {
 		"access": "public"
@@ -12,7 +20,9 @@
 	"main": "dist/index.js",
 	"module": "dist/index.es.js",
 	"svelte": "src/index.js",
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"devDependencies": {
 		"@babel/cli": "^7.19.3",
 		"@babel/core": "^7.19.3",
@@ -63,8 +73,13 @@
 		"moduleNameMapper": {
 			"\\.(css|less|scss)$": "identity-obj-proxy"
 		},
-		"moduleFileExtensions": ["js", "svelte"],
-		"setupFilesAfterEnv": ["<rootDir>/jest/jest.setup.js"]
+		"moduleFileExtensions": [
+			"js",
+			"svelte"
+		],
+		"setupFilesAfterEnv": [
+			"<rootDir>/jest/jest.setup.js"
+		]
 	},
 	"release": {
 		"branches": [
