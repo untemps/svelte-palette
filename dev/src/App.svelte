@@ -231,7 +231,7 @@
                 selectedColor={preselectColor ? bgColor : null}
                 allowDuplicates={allowDuplicates}
                 deletionMode={deletionMode}
-                tooltipclass={useCustomTooltipClass ? 'tooltip' : null}
+                tooltipClassName={useCustomTooltipClass ? 'tooltip' : null}
                 tooltipContentSelector={useCustomTooltipContent ? '.palette__tooltip__button' : null}
                 showTransparentSlot={showTransparentSlot}
                 maxColors={maxColors}
