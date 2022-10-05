@@ -35,13 +35,11 @@ const useDeletion = (node, { deletionMode, ...options }) => {
 	let action = createAction(node, deletionMode, options)
 
 	return {
-		update: ({ deletionMode: newDeletionMode }) => {
-			if (newDeletionMode !== mode) {
-				node.setAttribute('style', 'position: null') // TODO: Remove when useTooltip will be upgraded
-				mode = newDeletionMode
-				action?.destroy()
-				action = createAction(node, newDeletionMode, options)
-			}
+		update: ({ deletionMode: newDeletionMode, ...newOptions }) => {
+			node.setAttribute('style', 'position: null') // TODO: Remove when useTooltip will be upgraded
+			mode = newDeletionMode
+			action?.destroy()
+			action = createAction(node, newDeletionMode || deletionMode, { ...options, ...newOptions })
 		},
 		destroy: () => action?.destroy(),
 	}
