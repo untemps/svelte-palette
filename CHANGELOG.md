@@ -1,3 +1,10 @@
+## [1.9.1](https://github.com/untemps/svelte-palette/compare/v1.9.0...v1.9.1) (2022-10-05)
+
+
+### Bug Fixes
+
+* Fix distribution config and deletionMode update ([#47](https://github.com/untemps/svelte-palette/issues/47)) ([091f437](https://github.com/untemps/svelte-palette/commit/091f4376dd32d651b9e06f59261f3e41f8e63a6a))
+
 ## [1.9.1-beta.3](https://github.com/untemps/svelte-palette/compare/v1.9.1-beta.2...v1.9.1-beta.3) (2022-10-04)
 
 
