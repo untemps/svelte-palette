@@ -8,7 +8,7 @@
 ---
 
 [![npm](https://img.shields.io/npm/v/@untemps/svelte-palette?style=for-the-badge)](https://www.npmjs.com/package/@untemps/svelte-palette)
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/untemps/svelte-palette/deploy?style=for-the-badge)](https://github.com/untemps/svelte-palette/actions)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/untemps/svelte-palette/index.yml?style=for-the-badge)](https://github.com/untemps/svelte-palette/actions)
 [![Codecov](https://img.shields.io/codecov/c/github/untemps/svelte-palette?style=for-the-badge)](https://codecov.io/gh/untemps/svelte-palette)
 
 ## Demo
