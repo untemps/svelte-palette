@@ -22,42 +22,12 @@
 	}
 </script>
 
-<style>
-	button {
-		position: relative;
-		width: 2rem;
-		height: 2rem;
-		margin: 0;
-		background: none;
-		border-color: rgba(0, 0, 0, 0);
-		border-radius: 0.3rem;
-		cursor: pointer;
-	}
-
-	button:disabled {
-		opacity: 0.5;
-	}
-
-	button:focus {
-		border-color: rgba(0, 0, 0, 0.3);
-	}
-
-	svg {
-		position: absolute;
-		top: calc(50% - 8px);
-		left: calc(50% - 8px);
-	}
-
-	svg path {
-		fill: rgba(0, 0, 0, 0.6);
-	}
-</style>
-
 {#if !!window.EyeDropper}
 	<button
 		data-testid="__palette-eyedropper-root__"
 		{...$$restProps}
 		type="submit"
+        class="icon"
 		aria-label={buttonAriaLabel}
 		on:click|preventDefault={_onClick}>
 		<svg viewBox="0 0 16 16" width="16px" height="16px">
