@@ -12,6 +12,7 @@
 	import useDeletion from './useDeletion'
 
 	export let colors = []
+	export let compactColorIndices = []
 	export let selectedColor = null
 	export let allowDuplicates = false
 	export let allowDeletion = false
@@ -21,10 +22,9 @@
 	export let showTransparentSlot = false
 	export let maxColors = 30
 	export let inputType = 'text'
-	export let compactColors = []
 
 	let _colors = []
-	let isCompact = false
+	let _isCompact = false
 
 	$: deletionMode = allowDeletion && deletionMode === NONE ? TOOLTIP : deletionMode
 
@@ -62,14 +62,14 @@
 	const _onDelete = (index) => _removeColor(index)
 
 	const _onCompactClick = () => {
-		if (isCompact) {
-			isCompact = false
+		if (_isCompact) {
+			_isCompact = false
 			colors = _colors
 			_colors = []
 		} else {
-			isCompact = true
+			_isCompact = true
 			_colors = [...colors]
-			colors = extractByIndices(colors, compactColors)
+			colors = extractByIndices(colors, compactColorIndices)
 		}
 	}
 </script>
@@ -175,7 +175,7 @@
 <section
 	class={resolveClassName([
 		[!!$$props.class, $$props.class, 'palette__root'],
-		[isCompact, 'palette__root-compact'],
+		[_isCompact, 'palette__root-compact'],
 	])}>
 	{#if $$slots.header}
 		<slot name="header" />
@@ -184,7 +184,7 @@
 		</slot>
 	{/if}
 	<ul class="palette__list">
-		{#if !!compactColors?.length}
+		{#if !!compactColorIndices?.length}
 			<li>
 				<button
 					data-testid="__palette-compact-root__"
@@ -192,7 +192,7 @@
 					class="icon"
 					aria-label="Compact"
 					on:click={_onCompactClick}>
-					{#if isCompact}
+					{#if _isCompact}
 						<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 							<path
 								d="M14.5 9.5L21 3M21 3H15M21 3V9M3 21L9.5 14.5M3 21V15M3 21H9"
@@ -214,7 +214,7 @@
 				</button>
 			</li>
 		{/if}
-		{#if showTransparentSlot && !isCompact}
+		{#if showTransparentSlot && !_isCompact}
 			<li data-testid="__palette-row__" class="palette__slot">
 				<slot name="transparent-slot">
 					<PaletteSlot
@@ -244,7 +244,7 @@
 			</li>
 		{/each}
 	</ul>
-	{#if !isCompact}
+	{#if !_isCompact}
 		<slot name="footer-divider">
 			<hr class="palette__divider" />
 		</slot>

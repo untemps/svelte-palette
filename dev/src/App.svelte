@@ -233,7 +233,7 @@
 		</button>
 		<Palette
 			colors={colors}
-            compactColors={compactIndices}
+            compactColorIndices={compactIndices}
 			selectedColor={preselectColor ? bgColor : null}
 			allowDuplicates={allowDuplicates}
 			deletionMode={deletionMode}
