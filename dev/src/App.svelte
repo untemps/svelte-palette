@@ -43,6 +43,7 @@
 	let maxColors = 23
 	let inputType = 'text'
 	let useCustomClass = false
+	let showCompactControl = true
 </script>
 
 <style>
@@ -210,7 +211,7 @@
 				</fieldset>
 				<fieldset>
 					<label>
-						Max colors:
+						Max Colors:
 						<input type="number" min="1" max="30" bind:value={maxColors} />
 					</label>
 				</fieldset>
@@ -223,6 +224,12 @@
 						</select>
 					</label>
 				</fieldset>
+				<fieldset>
+					<label>
+						Show Compact Control:
+                        <input type="checkbox" bind:checked={showCompactControl} />
+					</label>
+				</fieldset>
 			</form>
 		</div>
 	{/if}
@@ -233,7 +240,7 @@
 		</button>
 		<Palette
 			colors={colors}
-            compactColorIndices={compactIndices}
+            compactColorIndices={showCompactControl ? compactIndices : null}
 			selectedColor={preselectColor ? bgColor : null}
 			allowDuplicates={allowDuplicates}
 			deletionMode={deletionMode}
