@@ -187,7 +187,7 @@
 		{#if !!compactColorIndices?.length}
 			<li>
 				<button
-					data-testid="__palette-compact-root__"
+					data-testid="__palette-compact__"
 					type="button"
 					class="icon"
 					aria-label="Compact"

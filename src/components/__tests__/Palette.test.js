@@ -81,6 +81,36 @@ describe('Palette', () => {
 		expect(onSelect).toHaveBeenCalledWith(new CustomEvent({ detail: { color: null } }))
 	})
 
+	describe('Compact mode', () => {
+		it('Displays compact control if compactColorIndices is set', async () => {
+			const colors = ['#ff0', '#0ff', '#f0f']
+			const compactColorIndices = [0, 1]
+			const { getByTestId } = render(Palette, {
+				colors,
+				compactColorIndices,
+			})
+			expect(getByTestId('__palette-compact__')).toBeInTheDocument()
+		})
+
+		it('Displays as many slots as within the compactColorIndices array', async () => {
+			const colors = ['#ff0', '#0ff', '#f0f']
+			const compactColorIndices = [0, 1]
+			const { getByTestId, getAllByTestId } = render(Palette, {
+				colors,
+				compactColorIndices,
+			})
+			let slots = getAllByTestId('__palette-slot__')
+			expect(slots).toHaveLength(colors.length)
+			const compact = getByTestId('__palette-compact__')
+			await fireEvent.click(compact)
+			slots = getAllByTestId('__palette-slot__')
+			expect(slots).toHaveLength(compactColorIndices.length)
+			await fireEvent.click(compact)
+			slots = getAllByTestId('__palette-slot__')
+			expect(slots).toHaveLength(colors.length)
+		})
+	})
+
 	it.each([
 		[['#ff0', '#0ff', '#f0f'], 99, 4],
 		[['#ff0', '#0ff', '#f0f'], -1, 4],
