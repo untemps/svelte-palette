@@ -6,30 +6,30 @@
 
 <style>
 	:global(button.tooltip__button) {
-		cursor: pointer;
-		margin: 0;
-		padding: 0;
-		background: none;
-		border: none;
+		cursor: pointer !important;
+		margin: 0 !important;
+		padding: 0 !important;
+		background: none !important;
+		border: none !important;
 	}
 
 	:global(button.tooltip__button svg) {
-		width: 24px;
-		height: auto;
-		top: 4px;
-		left: 4px;
+		width: 24px !important;
+		height: auto !important;
+		top: 4px !important;
+		left: 4px !important;
 	}
 
 	:global(button.tooltip__button > svg path) {
-		fill: white;
+		fill: white !important;
 	}
 
 	:global(button.tooltip__button:active) {
-		background: none;
+		background: none !important;
 	}
 
 	:global(button.tooltip__button:active > svg path) {
-		fill: #aaaaaa;
+		fill: #aaaaaa !important;
 	}
 </style>
 

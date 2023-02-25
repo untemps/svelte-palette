@@ -36,7 +36,7 @@
 
 	let preselectColor = true
 	let allowDuplicates = true
-	let deletionMode = 'none'
+	let deletionMode = 'tooltip'
 	let useCustomTooltipClass = false
 	let useCustomTooltipContent = false
 	let showTransparentSlot = true

@@ -73,7 +73,7 @@
 	data-testid="__icon-button__"
 	type="button"
 	{...$$restProps}
-	class={resolveClassName([[true, 'icon_button__button'], [!!$$props.class, $$props.class]])}
+	class={resolveClassName(['icon_button__button', $$props.class])}
 	on:click|preventDefault={_onClick}>
 	<svelte:component this={_resolveIcon(icon)} />
 </button>
