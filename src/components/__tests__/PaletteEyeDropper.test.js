@@ -10,7 +10,7 @@ describe('PaletteEyeDropper', () => {
 	describe('EyeDropper API is not available', () => {
 		it('Renders nothing', () => {
 			const { queryByTestId } = render(PaletteEyeDropper)
-			expect(queryByTestId('__palette-eyedropper-root__')).not.toBeInTheDocument()
+			expect(queryByTestId('__eyedropper-icon__')).not.toBeInTheDocument()
 		})
 	})
 
@@ -26,14 +26,14 @@ describe('PaletteEyeDropper', () => {
 		})
 
 		it('Sets button aria-label', () => {
-			const { getByLabelText } = render(PaletteEyeDropper, { buttonAriaLabel: 'foo' })
+			const { getByLabelText } = render(PaletteEyeDropper, { ariaLabel: 'foo' })
 			expect(getByLabelText('foo')).toBeInTheDocument()
 		})
 
 		it('Retrieves color from EyeDropper selection', async () => {
 			const onAdd = jest.fn()
-			const { getByLabelText, component } = render(PaletteEyeDropper, { buttonAriaLabel: 'foo' })
-			const button = getByLabelText('foo')
+			const { getByTestId, component } = render(PaletteEyeDropper)
+			const button = getByTestId('__palette-eyedropper__')
 			component.$on('add', onAdd)
 			await fireEvent.click(button)
 			await waitFor(() => expect(onAdd).toHaveBeenCalledWith(new CustomEvent({ detail: { color: '#ff0' } })))
@@ -51,7 +51,7 @@ describe('PaletteEyeDropper', () => {
 
 		it('Throws error', async () => {
 			const onError = jest.fn()
-			const { getByLabelText, component } = render(PaletteEyeDropper, { buttonAriaLabel: 'foo' })
+			const { getByLabelText, component } = render(PaletteEyeDropper, { ariaLabel: 'foo' })
 			const button = getByLabelText('foo')
 			component.$on('error', onError)
 			await fireEvent.click(button)

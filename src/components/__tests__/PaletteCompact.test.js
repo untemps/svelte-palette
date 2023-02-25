@@ -4,19 +4,19 @@
 
 import { fireEvent, render } from '@testing-library/svelte'
 
-import PaletteCompact, { isCompact, isOn } from '../PaletteCompact.svelte'
+import PaletteCompact from '../PaletteCompact.svelte'
 
 describe('PaletteCompact', () => {
 	it('Displays enlarge icon', () => {
 		const isCompact = false
 		const { getByTestId } = render(PaletteCompact, { isCompact })
-		expect(getByTestId('__palette-compact-compact__')).toBeInTheDocument()
+		expect(getByTestId('__compact-icon__')).toBeInTheDocument()
 	})
 
 	it('Displays compact icon', () => {
 		const isCompact = true
 		const { getByTestId } = render(PaletteCompact, { isCompact })
-		expect(getByTestId('__palette-compact-enlarge__')).toBeInTheDocument()
+		expect(getByTestId('__enlarge-icon__')).toBeInTheDocument()
 	})
 
 	it('Sets aria-label', () => {

@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { fireEvent, getByRole, render } from '@testing-library/svelte'
+import { fireEvent, render } from '@testing-library/svelte'
 
 import PaletteInput from '../PaletteInput.svelte'
 
@@ -72,7 +72,7 @@ describe('PaletteInput', () => {
 		window.EyeDropper = undefined
 		const { queryByLabelText } = render(PaletteInput, {
 			color: 'ff',
-			eyeDropperButtonAriaLabel: 'bar',
+			eyeDropperAriaLabel: 'bar',
 		})
 		const button = queryByLabelText('bar')
 		expect(button).not.toBeInTheDocument()
@@ -92,7 +92,7 @@ describe('PaletteInput', () => {
 		it('Displays EyeDropper button if API is available', async () => {
 			const { queryByLabelText } = render(PaletteInput, {
 				color: 'ff',
-				eyeDropperButtonAriaLabel: 'bar',
+				eyeDropperAriaLabel: 'bar',
 			})
 			const button = queryByLabelText('bar')
 			expect(button).toBeInTheDocument()
@@ -102,7 +102,7 @@ describe('PaletteInput', () => {
 			const { queryByLabelText } = render(PaletteInput, {
 				color: 'ff',
 				inputType: 'color',
-				eyeDropperButtonAriaLabel: 'bar',
+				eyeDropperAriaLabel: 'bar',
 			})
 			const button = queryByLabelText('bar')
 			expect(button).not.toBeInTheDocument()
@@ -113,7 +113,7 @@ describe('PaletteInput', () => {
 			const { getByLabelText, component } = render(PaletteInput, {
 				color: 'ff',
 				buttonAriaLabel: 'foo',
-				eyeDropperButtonAriaLabel: 'bar',
+				eyeDropperAriaLabel: 'bar',
 			})
 			const submitButton = getByLabelText('foo')
 			const eyeDropperButton = getByLabelText('bar')

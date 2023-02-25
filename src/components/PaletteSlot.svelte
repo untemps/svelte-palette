@@ -51,7 +51,7 @@
 </style>
 
 <button
-	data-testid="__palette-slot-root__"
+	data-testid="__palette-slot__"
 	{...$$restProps}
 	aria-label={color || emptyAriaLabel}
 	style="--color:{color}; --outerBorderColor:{color || '#aaa'};"

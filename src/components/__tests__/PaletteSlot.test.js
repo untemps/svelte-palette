@@ -4,7 +4,7 @@
 
 import { fireEvent, render } from '@testing-library/svelte'
 
-import PaletteSlot, { emptyAriaLabel } from '../PaletteSlot.svelte'
+import PaletteSlot from '../PaletteSlot.svelte'
 
 describe('PaletteSlot', () => {
 	it('Sets color as aria-label if color is set', () => {
@@ -23,43 +23,43 @@ describe('PaletteSlot', () => {
 		const onClick = jest.fn()
 		const { getByTestId, component } = render(PaletteSlot, { color })
 		component.$on('click', onClick)
-		const slot = getByTestId('__palette-slot-root__')
+		const slot = getByTestId('__palette-slot__')
 		await fireEvent.click(slot)
 		expect(onClick).toHaveBeenCalledWith(new CustomEvent({ detail: { color } }))
 	})
 
 	it('Attaches empty class if color is not set', () => {
 		const { getByTestId } = render(PaletteSlot)
-		expect(getByTestId('__palette-slot-root__')).toHaveClass('empty')
+		expect(getByTestId('__palette-slot__')).toHaveClass('empty')
 	})
 
 	it('Does not attach empty class if color is set', () => {
 		const color = '#ff0'
 		const { getByTestId } = render(PaletteSlot, { color })
-		expect(getByTestId('__palette-slot-root__')).not.toHaveClass('empty')
+		expect(getByTestId('__palette-slot__')).not.toHaveClass('empty')
 	})
 
 	it('Attaches clickable class if slot is enabled', () => {
 		const color = '#ff0'
 		const { getByTestId, component } = render(PaletteSlot, { color })
-		expect(getByTestId('__palette-slot-root__')).toHaveClass('clickable')
+		expect(getByTestId('__palette-slot__')).toHaveClass('clickable')
 	})
 
 	it('Does not attach clickable class if slot is disabled', () => {
 		const color = '#ff0'
 		const { getByTestId, component } = render(PaletteSlot, { color, disabled: true })
-		expect(getByTestId('__palette-slot-root__')).not.toHaveClass('clickable')
+		expect(getByTestId('__palette-slot__')).not.toHaveClass('clickable')
 	})
 
 	it('Disables slot', () => {
 		const color = '#ff0'
 		const { getByTestId, component } = render(PaletteSlot, { color, disabled: true })
-		expect(getByTestId('__palette-slot-root__')).toBeDisabled()
+		expect(getByTestId('__palette-slot__')).toBeDisabled()
 	})
 
 	it('Selects slot', () => {
 		const color = '#ff0'
 		const { getByTestId, component } = render(PaletteSlot, { color, selected: true })
-		expect(getByTestId('__palette-slot-root__')).toHaveClass('selected')
+		expect(getByTestId('__palette-slot__')).toHaveClass('selected')
 	})
 })

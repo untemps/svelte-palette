@@ -5,6 +5,7 @@
 import { fireEvent, render, waitFor } from '@testing-library/svelte'
 
 import Palette from '../Palette.svelte'
+
 import { TOOLTIP, DROP } from '../../enums/PaletteDeletionMode'
 
 describe('Palette', () => {
@@ -37,8 +38,8 @@ describe('Palette', () => {
 		const row = getAllByTestId('__palette-row__')[0]
 		await fireEvent.mouseOver(row) // fireEvent.mouseEnter only works if mouseOver is triggered before
 		await fireEvent.mouseEnter(row)
-		await waitFor(() => expect(getByTestId('__palette-tooltip__')).toBeInTheDocument())
-		await fireEvent.click(getByTestId('__palette-tooltip__'))
+		await waitFor(() => expect(getByTestId('__trash-icon__')).toBeInTheDocument())
+		await fireEvent.click(getByTestId('__trash-icon__'))
 		await waitFor(() => expect(row).not.toBeInTheDocument())
 	})
 
