@@ -1,3 +1,15 @@
+# [2.0.0](https://github.com/untemps/svelte-palette/compare/v1.9.2...v2.0.0) (2023-02-27)
+
+
+### Features
+
+* Add compact mode ([#59](https://github.com/untemps/svelte-palette/issues/59)) ([966c540](https://github.com/untemps/svelte-palette/commit/966c54026c109bdbf5f9a546425597231b9510f5))
+
+
+### BREAKING CHANGES
+
+* Some imports have been renamed
+
 ## [1.9.2](https://github.com/untemps/svelte-palette/compare/v1.9.1...v1.9.2) (2022-10-07)
 
 ## [1.9.1](https://github.com/untemps/svelte-palette/compare/v1.9.0...v1.9.1) (2022-10-05)
