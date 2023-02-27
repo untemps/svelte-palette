@@ -5,6 +5,7 @@
 import { fireEvent, render, waitFor } from '@testing-library/svelte'
 
 import Palette from '../Palette.svelte'
+
 import { TOOLTIP, DROP } from '../../enums/PaletteDeletionMode'
 
 describe('Palette', () => {
@@ -37,8 +38,8 @@ describe('Palette', () => {
 		const row = getAllByTestId('__palette-row__')[0]
 		await fireEvent.mouseOver(row) // fireEvent.mouseEnter only works if mouseOver is triggered before
 		await fireEvent.mouseEnter(row)
-		await waitFor(() => expect(getByTestId('__palette-tooltip__')).toBeInTheDocument())
-		await fireEvent.click(getByTestId('__palette-tooltip__'))
+		await waitFor(() => expect(getByTestId('__trash-icon__')).toBeInTheDocument())
+		await fireEvent.click(getByTestId('__trash-icon__'))
 		await waitFor(() => expect(row).not.toBeInTheDocument())
 	})
 
@@ -79,6 +80,36 @@ describe('Palette', () => {
 		const row = getAllByTestId('__palette-row__')[0]
 		await fireEvent.click(row.firstChild)
 		expect(onSelect).toHaveBeenCalledWith(new CustomEvent({ detail: { color: null } }))
+	})
+
+	describe('Compact mode', () => {
+		it('Displays compact control if compactColorIndices is set', async () => {
+			const colors = ['#ff0', '#0ff', '#f0f']
+			const compactColorIndices = [0, 1]
+			const { getByTestId } = render(Palette, {
+				colors,
+				compactColorIndices,
+			})
+			expect(getByTestId('__palette-compact-toggle-button__')).toBeInTheDocument()
+		})
+
+		it('Displays as many slots as within the compactColorIndices array', async () => {
+			const colors = ['#ff0', '#0ff', '#f0f']
+			const compactColorIndices = [0, 1]
+			const { getByTestId, getAllByTestId } = render(Palette, {
+				colors,
+				compactColorIndices,
+			})
+			let slots = getAllByTestId('__palette-slot__')
+			expect(slots).toHaveLength(colors.length)
+			const compact = getByTestId('__palette-compact-toggle-button__')
+			await fireEvent.click(compact)
+			slots = getAllByTestId('__palette-slot__')
+			expect(slots).toHaveLength(compactColorIndices.length)
+			await fireEvent.click(compact)
+			slots = getAllByTestId('__palette-slot__')
+			expect(slots).toHaveLength(colors.length)
+		})
 	})
 
 	it.each([

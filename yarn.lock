@@ -2742,10 +2742,10 @@
   dependencies:
     "@babel/runtime" "^7.17.8"
 
-"@untemps/utils@^2.3.0":
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/@untemps/utils/-/utils-2.3.0.tgz#630da56519455ce3d5631d0e110b55a45ecd6eb1"
-  integrity sha512-iDkNBt4ZWyXyD56AXyVjEJhOEy+aad+0rDu3ASbH69m/guBZs4uFFUaM0uvkh19aV1NYiMN5WCcUKPCf8sruRw==
+"@untemps/utils@^2.6.0":
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/@untemps/utils/-/utils-2.6.0.tgz#986fe9846d664c29b5c0dca84cb4f8b4112987e3"
+  integrity sha512-3B5bb4iYkh2h86vqtY8+Mo9vdX1s/NT1cltWpS4U3/WHXFgy/4lJ9180vELJv01MbNNhjlZPtJCMtBp7Fpsb1Q==
   dependencies:
     "@babel/runtime" "^7.17.8"
 

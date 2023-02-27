@@ -1,7 +1,7 @@
 import { useTooltip } from '@untemps/svelte-use-tooltip'
 import { useDropOutside } from '@untemps/svelte-use-drop-outside'
 
-import { NONE, TOOLTIP, DROP } from '../enums/PaletteDeletionMode'
+import { TOOLTIP, DROP } from '../enums/PaletteDeletionMode'
 
 const createAction = (node, deletionMode, options) => {
 	switch (deletionMode) {

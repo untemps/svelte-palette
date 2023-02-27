@@ -9,7 +9,6 @@
 	export let color = null
 	export let selected = false
 	export let disabled = false
-	export let emptyAriaLabel = 'No color'
 
 	const dispatch = createEventDispatcher()
 
@@ -51,9 +50,9 @@
 </style>
 
 <button
-	data-testid="__palette-slot-root__"
+	data-testid="__palette-slot__"
+	aria-label={color}
 	{...$$restProps}
-	aria-label={color || emptyAriaLabel}
 	style="--color:{color}; --outerBorderColor:{color || '#aaa'};"
 	class={resolveClassName([
 		[!color, 'empty'],

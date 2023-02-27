@@ -1,0 +1,5 @@
+export const COMPACT = 'compact'
+export const ENLARGE = 'enlarge'
+export const EYE_DROPPER = 'eyeDropper'
+export const PLUS = 'plus'
+export const TRASH = 'trash'

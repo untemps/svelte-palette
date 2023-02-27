@@ -2,25 +2,17 @@
  * @jest-environment jsdom
  */
 
-import { fireEvent, getByRole, render } from '@testing-library/svelte'
+import { fireEvent, getByTestId, render } from '@testing-library/svelte'
+import { standby } from '@untemps/utils/async/standby'
 
 import PaletteInput from '../PaletteInput.svelte'
 
 describe('PaletteInput', () => {
-	it('Sets aria labels', () => {
-		const { getByLabelText } = render(PaletteInput, { inputAriaLabel: 'foo', buttonAriaLabel: 'bar' })
-		expect(getByLabelText('foo')).toBeInTheDocument()
-		expect(getByLabelText('bar')).toBeInTheDocument()
-	})
-
 	it('Enables submit button when input color is valid', async () => {
-		const { getByLabelText, getByTitle } = render(PaletteInput, {
-			inputTitle: 'foo',
-			buttonAriaLabel: 'bar',
-		})
-		const input = getByTitle('foo')
-		const button = getByLabelText('bar')
-		await _sleep()
+		const { getByTestId, getByRole } = render(PaletteInput)
+		const input = getByTestId('__palette-input-input__')
+		const button = getByRole('button')
+		await standby()
 		expect(button).toBeDisabled()
 		await fireEvent.input(input, { target: { value: 'ff' } })
 		expect(button).toBeDisabled()
@@ -29,30 +21,26 @@ describe('PaletteInput', () => {
 	})
 
 	it('Enables submit button when set color is valid', async () => {
-		const { getByRole } = render(PaletteInput, {
+		const { getByTestId } = render(PaletteInput, {
 			color: '#ff0',
 		})
-		const button = getByRole('button')
+		const button = getByTestId('__palette-input-submit__')
 		expect(button).toBeEnabled()
 	})
 
 	it('Disables submit button when set color is invalid', async () => {
-		const { getByLabelText } = render(PaletteInput, {
+		const { getByTestId } = render(PaletteInput, {
 			color: 'ff',
-			buttonAriaLabel: 'bar',
 		})
-		const button = getByLabelText('bar')
+		const button = getByTestId('__palette-input-submit__')
 		expect(button).toBeDisabled()
 	})
 
 	it('Triggers submit with color', async () => {
 		const onAdd = jest.fn()
-		const { getByLabelText, getByTitle, component } = render(PaletteInput, {
-			inputTitle: 'foo',
-			buttonAriaLabel: 'bar',
-		})
-		const input = getByTitle('foo')
-		const button = getByLabelText('bar')
+		const { getByTestId, component } = render(PaletteInput)
+		const input = getByTestId('__palette-input-input__')
+		const button = getByTestId('__palette-input-submit__')
 		component.$on('add', onAdd)
 		await fireEvent.input(input, { target: { value: 'ff0' } })
 		await fireEvent.click(button)
@@ -70,11 +58,10 @@ describe('PaletteInput', () => {
 
 	it('Does not display EyeDropper button if API is not available', async () => {
 		window.EyeDropper = undefined
-		const { queryByLabelText } = render(PaletteInput, {
+		const { queryByTestId } = render(PaletteInput, {
 			color: 'ff',
-			eyeDropperButtonAriaLabel: 'bar',
 		})
-		const button = queryByLabelText('bar')
+		const button = queryByTestId('__palette-eyedropper-button__')
 		expect(button).not.toBeInTheDocument()
 	})
 
@@ -90,33 +77,29 @@ describe('PaletteInput', () => {
 		})
 
 		it('Displays EyeDropper button if API is available', async () => {
-			const { queryByLabelText } = render(PaletteInput, {
+			const { queryByTestId } = render(PaletteInput, {
 				color: 'ff',
-				eyeDropperButtonAriaLabel: 'bar',
 			})
-			const button = queryByLabelText('bar')
+			const button = queryByTestId('__palette-eyedropper-button__')
 			expect(button).toBeInTheDocument()
 		})
 
 		it('Does not display EyeDropper button if inputType is "color"', async () => {
-			const { queryByLabelText } = render(PaletteInput, {
+			const { queryByTestId } = render(PaletteInput, {
 				color: 'ff',
 				inputType: 'color',
-				eyeDropperButtonAriaLabel: 'bar',
 			})
-			const button = queryByLabelText('bar')
+			const button = queryByTestId('__palette-eyedropper-button__')
 			expect(button).not.toBeInTheDocument()
 		})
 
 		it('retrieves color from EyeDropper selection', async () => {
 			const onAdd = jest.fn()
-			const { getByLabelText, component } = render(PaletteInput, {
+			const { getByTestId, component } = render(PaletteInput, {
 				color: 'ff',
-				buttonAriaLabel: 'foo',
-				eyeDropperButtonAriaLabel: 'bar',
 			})
-			const submitButton = getByLabelText('foo')
-			const eyeDropperButton = getByLabelText('bar')
+			const submitButton = getByTestId('__palette-input-submit__')
+			const eyeDropperButton = getByTestId('__palette-eyedropper-button__')
 			component.$on('add', onAdd)
 			await fireEvent.click(eyeDropperButton)
 			await fireEvent.click(submitButton)

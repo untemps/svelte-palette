@@ -4,13 +4,13 @@
 
 import { fireEvent, render, waitFor } from '@testing-library/svelte'
 
-import PaletteEyeDropper from '../PaletteEyeDropper.svelte'
+import PaletteEyeDropperButton from '../PaletteEyeDropperButton.svelte'
 
-describe('PaletteEyeDropper', () => {
+describe('PaletteEyeDropperButton', () => {
 	describe('EyeDropper API is not available', () => {
 		it('Renders nothing', () => {
-			const { queryByTestId } = render(PaletteEyeDropper)
-			expect(queryByTestId('__palette-eyedropper-root__')).not.toBeInTheDocument()
+			const { queryByTestId } = render(PaletteEyeDropperButton)
+			expect(queryByTestId('__palette-eyedropper-button__')).not.toBeInTheDocument()
 		})
 	})
 
@@ -25,15 +25,21 @@ describe('PaletteEyeDropper', () => {
 			window.EyeDropper = undefined
 		})
 
-		it('Sets button aria-label', () => {
-			const { getByLabelText } = render(PaletteEyeDropper, { buttonAriaLabel: 'foo' })
-			expect(getByLabelText('foo')).toBeInTheDocument()
+		it('Renders eye dropper button', () => {
+			const { getByTestId } = render(PaletteEyeDropperButton)
+			expect(getByTestId('__palette-eyedropper-button__')).toBeInTheDocument()
+		})
+
+		it('Sets eye dropper button aria-label', () => {
+			const ariaLabel = 'Foo'
+			const { getByLabelText } = render(PaletteEyeDropperButton, { ['aria-label']: ariaLabel })
+			expect(getByLabelText(ariaLabel)).toBeInTheDocument()
 		})
 
 		it('Retrieves color from EyeDropper selection', async () => {
 			const onAdd = jest.fn()
-			const { getByLabelText, component } = render(PaletteEyeDropper, { buttonAriaLabel: 'foo' })
-			const button = getByLabelText('foo')
+			const { getByTestId, component } = render(PaletteEyeDropperButton)
+			const button = getByTestId('__palette-eyedropper-button__')
 			component.$on('add', onAdd)
 			await fireEvent.click(button)
 			await waitFor(() => expect(onAdd).toHaveBeenCalledWith(new CustomEvent({ detail: { color: '#ff0' } })))
@@ -51,8 +57,9 @@ describe('PaletteEyeDropper', () => {
 
 		it('Throws error', async () => {
 			const onError = jest.fn()
-			const { getByLabelText, component } = render(PaletteEyeDropper, { buttonAriaLabel: 'foo' })
-			const button = getByLabelText('foo')
+			const ariaLabel = 'Foo'
+			const { getByLabelText, component } = render(PaletteEyeDropperButton, { ['aria-label']: ariaLabel })
+			const button = getByLabelText(ariaLabel)
 			component.$on('error', onError)
 			await fireEvent.click(button)
 			await waitFor(() => expect(onError).toHaveBeenCalled())
