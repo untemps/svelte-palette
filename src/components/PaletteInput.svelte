@@ -4,7 +4,7 @@
 	import { ADD } from '../enums/PaletteEvent'
 	import { PLUS } from '../enums/PaletteIcon'
 
-	import IconButton from './PaletteIconButton.svelte'
+	import PaletteIconButton from './PaletteIconButton.svelte'
 	import PaletteSlot from './PaletteSlot.svelte'
 	import PaletteEyeDropperButton from './PaletteEyeDropperButton.svelte'
 
@@ -103,7 +103,7 @@
 			class="palette_input__input"
 			class:palette_input__input--color={inputType === 'color'}
 			on:input|preventDefault={_onChange} />
-		<IconButton
+		<PaletteIconButton
 			data-testid="__palette-input-submit__"
 			icon={PLUS}
 			disabled={!isValid}

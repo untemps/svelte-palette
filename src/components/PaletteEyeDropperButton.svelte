@@ -4,7 +4,7 @@
 	import { ADD, ERROR } from '../enums/PaletteEvent'
 	import { EYE_DROPPER } from '../enums/PaletteIcon'
 
-	import IconButton from './PaletteIconButton.svelte'
+	import PaletteIconButton from './PaletteIconButton.svelte'
 
 	const dispatch = createEventDispatcher()
 
@@ -24,7 +24,7 @@
 </script>
 
 {#if !!window.EyeDropper}
-	<IconButton
+	<PaletteIconButton
 		data-testid="__palette-eyedropper-button__"
 		aria-label="Submit the hex color value"
 		{...$$restProps}

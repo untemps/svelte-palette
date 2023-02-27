@@ -4,7 +4,7 @@
 	import { CLICK } from '../enums/PaletteEvent'
 	import { COMPACT, ENLARGE } from '../enums/PaletteIcon'
 
-	import IconButton from './PaletteIconButton.svelte'
+	import PaletteIconButton from './PaletteIconButton.svelte'
 
 	export let isCompact = false
 
@@ -13,7 +13,7 @@
 	const _onClick = () => dispatch(CLICK, { isCompact })
 </script>
 
-<IconButton
+<PaletteIconButton
 	data-testid="__palette-compact-toggle-button__"
 	aria-label={isCompact ? 'Enlarge the palette' : 'Compact the palette'}
 	{...$$restProps}
