@@ -90,7 +90,7 @@ describe('Palette', () => {
 				colors,
 				compactColorIndices,
 			})
-			expect(getByTestId('__palette-compact__')).toBeInTheDocument()
+			expect(getByTestId('__palette-compact-toggle-button__')).toBeInTheDocument()
 		})
 
 		it('Displays as many slots as within the compactColorIndices array', async () => {
@@ -102,7 +102,7 @@ describe('Palette', () => {
 			})
 			let slots = getAllByTestId('__palette-slot__')
 			expect(slots).toHaveLength(colors.length)
-			const compact = getByTestId('__palette-compact__')
+			const compact = getByTestId('__palette-compact-toggle-button__')
 			await fireEvent.click(compact)
 			slots = getAllByTestId('__palette-slot__')
 			expect(slots).toHaveLength(compactColorIndices.length)

@@ -6,10 +6,10 @@
 	import { SELECT } from '../enums/PaletteEvent'
 	import { NONE, TOOLTIP } from '../enums/PaletteDeletionMode'
 
-	import PaletteCompact from './PaletteCompact.svelte'
+	import PaletteCompactToggleButton from './PaletteCompactToggleButton.svelte'
 	import PaletteInput from './PaletteInput.svelte'
 	import PaletteSlot from './PaletteSlot.svelte'
-	import PaletteTrash from './PaletteTrash.svelte'
+	import PaletteTrashButton from './PaletteTrashButton.svelte'
 
 	import useDeletion from './useDeletion'
 
@@ -132,14 +132,14 @@
 	<ul class="palette__list">
 		{#if !!compactColorIndices?.length}
 			<li>
-				<PaletteCompact isCompact={_isCompact} on:click={_onCompactClick} />
+				<PaletteCompactToggleButton isCompact={_isCompact} on:click={_onCompactClick} />
 			</li>
 		{/if}
 		{#if showTransparentSlot && !_isCompact}
 			<li data-testid="__palette-row__" class="palette__slot">
 				<slot name="transparent-slot">
 					<PaletteSlot
-						emptyAriaLabel="transparent"
+						aria-label="Transparent slot"
 						selected={selectedColor === null}
 						on:click={_onSlotSelect} />
 				</slot>
@@ -157,7 +157,6 @@
 				}}>
 				<slot name="slot" color={color}>
 					<PaletteSlot
-						data-testid="__palette-slot__"
 						color={color}
 						selected={color === selectedColor}
 						on:click={_onSlotSelect} />
@@ -178,5 +177,5 @@
 </section>
 
 <template id="tooltip-template">
-	<PaletteTrash />
+	<PaletteTrashButton />
 </template>

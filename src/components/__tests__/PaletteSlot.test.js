@@ -14,7 +14,7 @@ describe('PaletteSlot', () => {
 	})
 
 	it('Sets empty aria-label if color is not set', () => {
-		const { getByLabelText } = render(PaletteSlot, { emptyAriaLabel: 'foo' })
+		const { getByLabelText } = render(PaletteSlot, { ['aria-label']: 'foo' })
 		expect(getByLabelText('foo')).toBeInTheDocument()
 	})
 

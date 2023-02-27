@@ -160,7 +160,7 @@ As an helper, deletion mode enums are exported in `PaletteDeletionMode`.
 The compact mode is a way to display a minimal version of the palette with a restricted selection of the original colors and downsized spaces. 
 
 The `compactColorIndices` prop allows to define the list of the colors to be picked from the `colors` array by their indices.  
-If set, a control is added to toggle the compact mode.the way users can delete (or not) the color slots:
+If set, a control is added to toggle the compact mode.
 
 ```html
 <script>

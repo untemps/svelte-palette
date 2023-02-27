@@ -4,16 +4,12 @@
 	import { ADD } from '../enums/PaletteEvent'
 	import { PLUS } from '../enums/PaletteIcon'
 
-	import IconButton from './IconButton.svelte'
+	import IconButton from './PaletteIconButton.svelte'
 	import PaletteSlot from './PaletteSlot.svelte'
-	import PaletteEyeDropper from './PaletteEyeDropper.svelte'
+	import PaletteEyeDropperButton from './PaletteEyeDropperButton.svelte'
 
 	export let color = null
 	export let inputType = 'text'
-	export let inputAriaLabel = 'Enter an hex color value'
-	export let inputTitle = 'The value must be a valid hex color'
-	export let buttonAriaLabel = 'Submit this hex color value'
-	export let eyeDropperAriaLabel = 'Pick a color from the screen'
 
 	const dispatch = createEventDispatcher()
 	const validationRegex = /^#?(([0-9a-f]{2}){3,4}|([0-9a-f]){3})$/gi
@@ -83,10 +79,10 @@
 		padding: 0.1rem 0.3rem;
 	}
 
-	:global(button.palette_input__submit) {
-		margin-left: -1px !important;
-		border-top-left-radius: 0 !important;
-		border-bottom-left-radius: 0 !important;
+	:global(button.icon_button__button.palette_input__submit) {
+		margin-left: -1px;
+		border-top-left-radius: 0;
+		border-bottom-left-radius: 0;
 	}
 </style>
 
@@ -102,8 +98,8 @@
 			data-testid="__palette-input-input__"
 			type={inputType}
 			value={color}
-			aria-label={inputAriaLabel}
-			title={inputTitle}
+			aria-label="Enter an hex color value"
+			title="'The value must be a valid hex color'"
 			class="palette_input__input"
 			class:palette_input__input--color={inputType === 'color'}
 			on:input|preventDefault={_onChange} />
@@ -111,11 +107,11 @@
 			data-testid="__palette-input-submit__"
 			icon={PLUS}
 			disabled={!isValid}
-			aria-label={buttonAriaLabel}
+			aria-label="Submit the hex color value"
 			class="palette_input__submit"
 			on:click={_onSubmit} />
 	</span>
 	{#if inputType !== 'color'}
-		<PaletteEyeDropper ariaLabel={eyeDropperAriaLabel} on:add={_onEyeDropperAdd} />
+		<PaletteEyeDropperButton aria-label="Pick a color from the screen" on:add={_onEyeDropperAdd} />
 	{/if}
 </form>
