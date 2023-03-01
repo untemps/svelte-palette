@@ -32,7 +32,6 @@
 	const compactIndices = [2, 7, 13, 20]
 
 	let bgColor = colors[Math.round(Math.random() * (colors.length - 1))]
-	let showSettings = false
 
 	let preselectColor = true
 	let allowDuplicates = true
@@ -51,10 +50,9 @@
 	main {
 		position: relative;
 		display: flex;
-		justify-content: center;
+		justify-content: space-between;
 		align-items: center;
 		height: 100%;
-		padding: 1rem;
 		background-color: var(--bgColor);
 	}
 
@@ -67,16 +65,16 @@
 	}
 
 	.container {
+        width: 100%;
 		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
+        flex-direction: column;
+		align-items: center;
 	}
 
 	.settings__container {
 		overflow: hidden auto;
-		position: absolute;
-		z-index: 9999;
 		width: 100vw;
+        height: 100vh;
 		max-width: 320px;
 		display: flex;
 		flex-direction: column;
@@ -84,13 +82,13 @@
 	}
 
 	.settings__form {
+        height: 100%;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
 		padding: 1rem;
 		background-color: #fafafa;
-		border-radius: 1rem;
 	}
 
 	.settings__form fieldset {
@@ -156,94 +154,7 @@
 </style>
 
 <main style="--bgColor:{bgColor}">
-	{#if showSettings}
-		<div class="settings__container">
-			<button type="button" class="toggle__button" on:click={() => (showSettings = !showSettings)}>
-				<CloseIcon color={!bgColor ? '#ccc' : '#fff'} />
-			</button>
-			<form class="settings__form">
-				<fieldset>
-					<label>
-						Preselect color:
-						<input type="checkbox" bind:checked={preselectColor} />
-					</label>
-				</fieldset>
-				<fieldset>
-					<label>
-						Use Custom Class:
-						<input type="checkbox" bind:checked={useCustomClass} />
-					</label>
-				</fieldset>
-				<fieldset>
-					<label>
-						Allow Duplicates:
-						<input type="checkbox" bind:checked={allowDuplicates} />
-					</label>
-				</fieldset>
-				<fieldset>
-					<label>
-						Deletion Mode:
-						<select bind:value={deletionMode}>
-							<option value="none">none</option>
-							<option value="tooltip">tooltip</option>
-							<option value="drop">drop</option>
-						</select>
-					</label>
-				</fieldset>
-				<fieldset>
-					<label>
-						Use Custom Tooltip Class:
-						<input type="checkbox" bind:checked={useCustomTooltipClass} />
-					</label>
-				</fieldset>
-				<fieldset>
-					<label>
-						Use Custom Tooltip Content:
-						<button type="button" class="palette__tooltip__button">Delete</button>
-						<input type="checkbox" bind:checked={useCustomTooltipContent} />
-					</label>
-				</fieldset>
-				<fieldset>
-					<label>
-						Show Transparent Slot:
-						<input type="checkbox" bind:checked={showTransparentSlot} />
-					</label>
-				</fieldset>
-				<fieldset>
-					<label>
-						Max Colors:
-						<input type="number" min="1" max="30" bind:value={maxColors} />
-					</label>
-				</fieldset>
-				<fieldset>
-					<label>
-						Input Type:
-						<select bind:value={inputType}>
-							<option value="text">text</option>
-							<option value="color">color</option>
-						</select>
-					</label>
-				</fieldset>
-				<fieldset>
-					<label>
-						Show Compact Control:
-                        <input type="checkbox" bind:checked={showCompactControl} />
-					</label>
-				</fieldset>
-				<fieldset>
-					<label>
-						Number of Columns:
-                        <input type="range" min={1} max={colors.length + 2} bind:value={numColumns} />
-					</label>
-				</fieldset>
-			</form>
-		</div>
-	{/if}
-
 	<div class="container">
-		<button type="button" class="toggle__button" on:click={() => (showSettings = !showSettings)}>
-			<SettingsIcon color={!bgColor ? '#ccc' : '#fff'} />
-		</button>
 		<Palette
 			colors={colors}
             compactColorIndices={showCompactControl ? compactIndices : null}
@@ -262,4 +173,82 @@
 			}}
 			class={useCustomClass ? 'palette' : null} />
 	</div>
+    <div class="settings__container">
+        <form class="settings__form">
+            <fieldset>
+                <label>
+                    Preselect color:
+                    <input type="checkbox" bind:checked={preselectColor} />
+                </label>
+            </fieldset>
+            <fieldset>
+                <label>
+                    Use Custom Class:
+                    <input type="checkbox" bind:checked={useCustomClass} />
+                </label>
+            </fieldset>
+            <fieldset>
+                <label>
+                    Allow Duplicates:
+                    <input type="checkbox" bind:checked={allowDuplicates} />
+                </label>
+            </fieldset>
+            <fieldset>
+                <label>
+                    Deletion Mode:
+                    <select bind:value={deletionMode}>
+                        <option value="none">none</option>
+                        <option value="tooltip">tooltip</option>
+                        <option value="drop">drop</option>
+                    </select>
+                </label>
+            </fieldset>
+            <fieldset>
+                <label>
+                    Use Custom Tooltip Class:
+                    <input type="checkbox" bind:checked={useCustomTooltipClass} />
+                </label>
+            </fieldset>
+            <fieldset>
+                <label>
+                    Use Custom Tooltip Content:
+                    <button type="button" class="palette__tooltip__button">Delete</button>
+                    <input type="checkbox" bind:checked={useCustomTooltipContent} />
+                </label>
+            </fieldset>
+            <fieldset>
+                <label>
+                    Show Transparent Slot:
+                    <input type="checkbox" bind:checked={showTransparentSlot} />
+                </label>
+            </fieldset>
+            <fieldset>
+                <label>
+                    Max Colors:
+                    <input type="number" min="1" max="30" bind:value={maxColors} />
+                </label>
+            </fieldset>
+            <fieldset>
+                <label>
+                    Input Type:
+                    <select bind:value={inputType}>
+                        <option value="text">text</option>
+                        <option value="color">color</option>
+                    </select>
+                </label>
+            </fieldset>
+            <fieldset>
+                <label>
+                    Show Compact Control:
+                    <input type="checkbox" bind:checked={showCompactControl} />
+                </label>
+            </fieldset>
+            <fieldset>
+                <label>
+                    Number of Columns:
+                    <input type="range" min={1} max={colors.length + 2} bind:value={numColumns} />
+                </label>
+            </fieldset>
+        </form>
+    </div>
 </main>
