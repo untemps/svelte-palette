@@ -24,11 +24,10 @@
 	export let showTransparentSlot = false
 	export let maxColors = 30
 	export let inputType = 'text'
+    export let numColumns = 5
 
 	let _colors = []
 	let _isCompact = false
-
-	$: deletionMode = allowDeletion && deletionMode === NONE ? TOOLTIP : deletionMode
 
 	const dispatch = createEventDispatcher()
 
@@ -36,6 +35,9 @@
 		if (!allowDuplicates) {
 			colors = colors.filter((item, index) => colors.indexOf(item) === index)
 		}
+		deletionMode = allowDeletion && deletionMode === NONE ? TOOLTIP : deletionMode
+        const maxColumns = colors.length + +showTransparentSlot + (compactColorIndices?.length ? 1 : 0)
+		numColumns = numColumns > maxColumns || numColumns <= 0 ? maxColumns : numColumns
 	})
 
 	const _selectColor = (color) => {
@@ -99,7 +101,7 @@
 		margin: 0;
 		padding: 0;
 		display: grid;
-		grid-template-columns: repeat(5, 32px);
+		grid-template-columns: repeat(var(--num-columns), 32px);
 		grid-auto-rows: minmax(32px, auto);
 		align-items: center;
 		justify-items: center;
@@ -122,7 +124,8 @@
 	class={resolveClassName([
 		[!!$$props.class, $$props.class, 'palette__root'],
 		[_isCompact, 'palette__root-compact'],
-	])}>
+	])}
+    style="--num-columns: {numColumns}">
 	{#if $$slots.header}
 		<slot name="header" />
 		<slot name="header-divider">

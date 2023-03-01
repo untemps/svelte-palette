@@ -44,6 +44,7 @@
 	let inputType = 'text'
 	let useCustomClass = false
 	let showCompactControl = true
+	let numColumns = 5
 </script>
 
 <style>
@@ -66,7 +67,6 @@
 	}
 
 	.container {
-		max-width: 640px;
 		display: flex;
 		flex-direction: column;
 		align-items: flex-end;
@@ -230,6 +230,12 @@
                         <input type="checkbox" bind:checked={showCompactControl} />
 					</label>
 				</fieldset>
+				<fieldset>
+					<label>
+						Number of Columns:
+                        <input type="range" min={1} max={colors.length + 2} bind:value={numColumns} />
+					</label>
+				</fieldset>
 			</form>
 		</div>
 	{/if}
@@ -249,6 +255,7 @@
 			showTransparentSlot={showTransparentSlot}
 			maxColors={maxColors}
 			inputType={inputType}
+            numColumns={numColumns}
 			on:select={({ detail: { color } }) => {
 				bgColor = color
 				preselectColor = !!bgColor
