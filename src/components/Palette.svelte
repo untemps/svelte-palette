@@ -29,6 +29,12 @@
 	let _colors = []
 	let _isCompact = false
 
+	let _maxColumns
+	let _numColumns
+
+	$: _maxColumns = Math.min(colors.length, maxColors) + +showTransparentSlot + (compactColorIndices?.length ? 1 : 0)
+	$: _numColumns = numColumns > _maxColumns || numColumns <= 0 ? _maxColumns : numColumns 
+
 	const dispatch = createEventDispatcher()
 
 	afterUpdate(() => {
@@ -36,8 +42,6 @@
 			colors = colors.filter((item, index) => colors.indexOf(item) === index)
 		}
 		deletionMode = allowDeletion && deletionMode === NONE ? TOOLTIP : deletionMode
-        const maxColumns = colors.length + +showTransparentSlot + (compactColorIndices?.length ? 1 : 0)
-		numColumns = numColumns > maxColumns || numColumns <= 0 ? maxColumns : numColumns
 	})
 
 	const _selectColor = (color) => {
@@ -108,7 +112,7 @@
 	}
 
 	.palette__slot {
-		margin-top: 5px;
+		margin-top: 2px;
 	}
 
 	.palette__divider {
@@ -116,7 +120,6 @@
 		background-color: #ccc;
 		width: calc(100% + 4rem);
 		height: 1px;
-		margin-left: -2rem;
 	}
 </style>
 
@@ -125,7 +128,7 @@
 		[!!$$props.class, $$props.class, 'palette__root'],
 		[_isCompact, 'palette__root-compact'],
 	])}
-    style="--num-columns: {numColumns}">
+    style="--num-columns: {_numColumns}">
 	{#if $$slots.header}
 		<slot name="header" />
 		<slot name="header-divider">

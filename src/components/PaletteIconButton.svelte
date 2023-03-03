@@ -43,6 +43,7 @@
 		height: 2rem;
 		margin: 0;
 		background: none;
+		border-width: 1px;
 		border-color: rgba(0, 0, 0, 0.1);
 		border-radius: 0.3rem;
 		cursor: pointer;

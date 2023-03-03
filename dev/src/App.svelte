@@ -1,8 +1,7 @@
 <script>
-	import { Palette } from '../../src'
+	import { Button, Select, SelectItem, Slider, Toggle } from 'carbon-components-svelte'
 
-	import SettingsIcon from './SettingsIcon.svelte'
-	import CloseIcon from './CloseIcon.svelte'
+	import { Palette } from '../../src'
 
 	const colors = [
 		'#865C54',
@@ -41,13 +40,13 @@
 	let showTransparentSlot = true
 	let maxColors = 23
 	let inputType = 'text'
-	let useCustomClass = false
 	let showCompactControl = true
 	let numColumns = 5
 </script>
 
 <style>
 	main {
+		overflow: hidden;
 		position: relative;
 		display: flex;
 		justify-content: space-between;
@@ -56,72 +55,59 @@
 		background-color: var(--bgColor);
 	}
 
-	.toggle__button {
-		background: none;
-		border: none;
-		color: white;
-		cursor: pointer;
-		width: 36px;
-	}
-
 	.container {
-        width: 100%;
+		width: 100%;
+        max-width: 100%;
 		display: flex;
-        flex-direction: column;
+		flex-direction: column;
 		align-items: center;
 	}
 
 	.settings__container {
 		overflow: hidden auto;
-		width: 100vw;
-        height: 100vh;
-		max-width: 320px;
+		width: 480px;
+		height: 100vh;
 		display: flex;
 		flex-direction: column;
 		align-items: flex-end;
+        justify-content: center;
+		background-color: black;
 	}
 
 	.settings__form {
-        height: 100%;
+		width: 100%;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
-		align-items: center;
-		padding: 1rem;
-		background-color: #fafafa;
-	}
-
-	.settings__form fieldset {
-		width: 100%;
-		border: none;
-	}
-
-	.settings__form label {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		column-gap: 1rem;
-	}
-
-	.settings__form input {
-		margin: 0;
-	}
-
-	.settings__form input[type='checkbox'] {
-		padding: 0;
-	}
-
-	.palette__tooltip__button {
-		margin: 0;
-	}
-
-	:global(.palette) {
-		display: flex;
-		flex-direction: column;
-		row-gap: 1rem;
+		align-items: flex-start;
 		padding: 2rem;
-		background: black;
-		box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.18);
+	}
+
+	.settings__space {
+		border: none;
+		margin: 0.5rem 0;
+	}
+
+	.settings__preselection {
+		position: relative;
+	}
+
+	.settings__preselection__color {
+		position: absolute;
+		top: 24px;
+		left: 46px;
+		width: 50px;
+		height: 16px;
+	}
+
+	:global(.bx--toggle__switch) {
+		margin-top: 0.5rem !important;
+	}
+
+	:global(.bx--slider__range-label) {
+		font-family: 'IBM Plex Sans' !important;
+		font-size: 0.75rem !important;
+		color: #c6c6c6 !important;
 	}
 
 	:global(.tooltip) {
@@ -157,98 +143,79 @@
 	<div class="container">
 		<Palette
 			colors={colors}
-            compactColorIndices={showCompactControl ? compactIndices : null}
+			compactColorIndices={showCompactControl ? compactIndices : null}
 			selectedColor={preselectColor ? bgColor : null}
 			allowDuplicates={allowDuplicates}
 			deletionMode={deletionMode}
 			tooltipClassName={useCustomTooltipClass ? 'tooltip' : null}
-			tooltipContentSelector={useCustomTooltipContent ? '.palette__tooltip__button' : null}
+			tooltipContentSelector={useCustomTooltipContent ? '#tooltip-content' : null}
 			showTransparentSlot={showTransparentSlot}
 			maxColors={maxColors}
 			inputType={inputType}
-            numColumns={numColumns}
+			numColumns={numColumns}
 			on:select={({ detail: { color } }) => {
 				bgColor = color
 				preselectColor = !!bgColor
-			}}
-			class={useCustomClass ? 'palette' : null} />
+			}} />
 	</div>
-    <div class="settings__container">
-        <form class="settings__form">
-            <fieldset>
-                <label>
-                    Preselect color:
-                    <input type="checkbox" bind:checked={preselectColor} />
-                </label>
-            </fieldset>
-            <fieldset>
-                <label>
-                    Use Custom Class:
-                    <input type="checkbox" bind:checked={useCustomClass} />
-                </label>
-            </fieldset>
-            <fieldset>
-                <label>
-                    Allow Duplicates:
-                    <input type="checkbox" bind:checked={allowDuplicates} />
-                </label>
-            </fieldset>
-            <fieldset>
-                <label>
-                    Deletion Mode:
-                    <select bind:value={deletionMode}>
-                        <option value="none">none</option>
-                        <option value="tooltip">tooltip</option>
-                        <option value="drop">drop</option>
-                    </select>
-                </label>
-            </fieldset>
-            <fieldset>
-                <label>
-                    Use Custom Tooltip Class:
-                    <input type="checkbox" bind:checked={useCustomTooltipClass} />
-                </label>
-            </fieldset>
-            <fieldset>
-                <label>
-                    Use Custom Tooltip Content:
-                    <button type="button" class="palette__tooltip__button">Delete</button>
-                    <input type="checkbox" bind:checked={useCustomTooltipContent} />
-                </label>
-            </fieldset>
-            <fieldset>
-                <label>
-                    Show Transparent Slot:
-                    <input type="checkbox" bind:checked={showTransparentSlot} />
-                </label>
-            </fieldset>
-            <fieldset>
-                <label>
-                    Max Colors:
-                    <input type="number" min="1" max="30" bind:value={maxColors} />
-                </label>
-            </fieldset>
-            <fieldset>
-                <label>
-                    Input Type:
-                    <select bind:value={inputType}>
-                        <option value="text">text</option>
-                        <option value="color">color</option>
-                    </select>
-                </label>
-            </fieldset>
-            <fieldset>
-                <label>
-                    Show Compact Control:
-                    <input type="checkbox" bind:checked={showCompactControl} />
-                </label>
-            </fieldset>
-            <fieldset>
-                <label>
-                    Number of Columns:
-                    <input type="range" min={1} max={colors.length + 2} bind:value={numColumns} />
-                </label>
-            </fieldset>
-        </form>
-    </div>
+	<div class="settings__container">
+		<form class="settings__form">
+			<div class="settings__preselection">
+				<Toggle labelText="Preselect Color" size="sm" bind:toggled={preselectColor}>
+					<span slot="labelA" />
+					<span slot="labelB" />
+				</Toggle>
+				<span class="settings__preselection__color" style={`background-color: ${bgColor}`} />
+			</div>
+            <hr class="settings__space" />
+            <Slider
+                    labelText="Set Number of Columns"
+                    hideTextInput
+                    min={1}
+                    max={colors.length + 2}
+                    step={1}
+                    bind:value={numColumns} />
+            <hr class="settings__space" />
+            <Slider labelText="Set Max Colors" hideTextInput min={1} max={50} step={1} bind:value={maxColors} />
+			<hr class="settings__space" />
+			<Toggle labelText="Allow Duplicates" size="sm" bind:toggled={allowDuplicates}>
+				<span slot="labelA" />
+				<span slot="labelB" />
+			</Toggle>
+            <hr class="settings__space" />
+            <Select labelText="Input Type" inline bind:selected={inputType}>
+                <SelectItem value="text" />
+                <SelectItem value="color" />
+            </Select>
+			<hr class="settings__space" />
+			<Select labelText="Select Deletion Mode" inline bind:selected={deletionMode}>
+				<SelectItem value="none" />
+				<SelectItem value="tooltip" />
+				<SelectItem value="drop" />
+			</Select>
+			<hr class="settings__space" />
+			<Toggle labelText="Customize Tooltip Class" size="sm" bind:toggled={useCustomTooltipClass}>
+				<span slot="labelA" />
+				<span slot="labelB" />
+			</Toggle>
+			<hr class="settings__space" />
+			<Toggle labelText="Customize Tooltip Content" size="sm" bind:toggled={useCustomTooltipContent}>
+				<span slot="labelA" />
+				<span slot="labelB" />
+			</Toggle>
+			<div style="position: absolute; left: -200px">
+				<Button id="tooltip-content">Delete</Button>
+			</div>
+			<hr class="settings__space" />
+			<Toggle labelText="Show Transparent Slot" size="sm" bind:toggled={showTransparentSlot}>
+				<span slot="labelA" />
+				<span slot="labelB" />
+			</Toggle>
+			<hr class="settings__space" />
+            <Toggle labelText="Show Compact Control" size="sm" bind:toggled={showCompactControl}>
+                <span slot="labelA" />
+                <span slot="labelB" />
+            </Toggle>
+		</form>
+	</div>
 </main>

@@ -58,6 +58,7 @@
 		outline: none;
 		color: rgba(0, 0, 0, 0.6);
 		background: rgba(255, 255, 255, 1);
+		border-width: 1px;
 		border-color: rgba(0, 0, 0, 0.1);
 		border-radius: 0.3rem;
 		border-right-width: 0;
