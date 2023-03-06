@@ -72,6 +72,7 @@ yarn add @untemps/svelte-palette
 | `showTransparentSlot`    | boolean  | false   | Flag to display a transparent slot at the start of the slot list.                                                                                                                       |
 | `maxColors`              | number   | 30      | Maximum number of slots to be displayed in the palette. Set this value to `-1` to allow infinite number of slots.                                                                       |
 | `inputType`              | string   | "text"  | Type of the input within the footer slot. Only "text" and "color" are allowed. All other value will be replaced by "text".                                                              |
+| `numColumns`              | number   | 5  | Number of columns to display color slots. This value can't exceed the number of maximum colors defined in `maxColors` and can't be lower than 1. Set this value to `0` to display the slots on a single row.                                                              |
 
 ## Events
 

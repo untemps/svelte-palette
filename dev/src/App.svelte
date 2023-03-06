@@ -2,6 +2,7 @@
 	import { Button, Select, SelectItem, Slider, Toggle } from 'carbon-components-svelte'
 	import Settings from 'carbon-icons-svelte/lib/Settings.svelte'
 	import Close from 'carbon-icons-svelte/lib/Close.svelte'
+	import { resolveClassName } from '@untemps/utils/dom/resolveClassName'
 
 	import { Palette } from '../../src'
 
@@ -50,8 +51,9 @@
 
 <style>
 	main {
-		min-height: 100%;
 		position: relative;
+		overflow-x: hidden;
+		min-height: 100%;
 		display: flex;
 		justify-content: space-between;
 		align-items: stretch;
@@ -79,6 +81,7 @@
 		justify-content: center;
 		background-color: black;
 		padding: 2rem;
+		transition: right .1s ease-out;
 	}
 
 	.settings--expanded {
@@ -196,7 +199,7 @@
 				preselectColor = !!bgColor
 			}} />
 	</div>
-	<div class={`settings${isSettingsOpen ? ' settings--expanded' : ' settings--collapsed'}`}>
+	<div class={resolveClassName(['settings', [isSettingsOpen, 'settings--expanded', 'settings--collapsed']])}>
 		<Button
 			kind="tertiary"
 			iconDescription="Close Settings"
