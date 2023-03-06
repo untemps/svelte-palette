@@ -1,5 +1,5 @@
 <script>
-	import { afterUpdate, createEventDispatcher } from 'svelte'
+	import { createEventDispatcher } from 'svelte'
 	import { resolveClassName } from '@untemps/utils/dom/resolveClassName'
 	import { extractByIndices } from '@untemps/utils/array/extractByIndices'
 
@@ -24,25 +24,25 @@
 	export let showTransparentSlot = false
 	export let maxColors = 30
 	export let inputType = 'text'
-    export let numColumns = 5
+	export let numColumns = 5
 
-	let _colors = []
-	let _isCompact = false
+	let _colors
+	let isCompact = false
+
+	$: _colors = isCompact ? extractByIndices(colors, compactColorIndices) : colors
+	$: _colors = !allowDuplicates ? colors.filter((item, index) => colors.indexOf(item) === index) : colors
 
 	let _maxColumns
 	let _numColumns
 
 	$: _maxColumns = Math.min(colors.length, maxColors) + +showTransparentSlot + (compactColorIndices?.length ? 1 : 0)
-	$: _numColumns = numColumns > _maxColumns || numColumns <= 0 ? _maxColumns : numColumns 
+	$: _numColumns = numColumns > _maxColumns || numColumns <= 0 ? _maxColumns : numColumns
+
+	let _deletionMode
+
+	$: _deletionMode = allowDeletion && deletionMode === NONE ? TOOLTIP : deletionMode
 
 	const dispatch = createEventDispatcher()
-
-	afterUpdate(() => {
-		if (!allowDuplicates) {
-			colors = colors.filter((item, index) => colors.indexOf(item) === index)
-		}
-		deletionMode = allowDeletion && deletionMode === NONE ? TOOLTIP : deletionMode
-	})
 
 	const _selectColor = (color) => {
 		selectedColor = color
@@ -69,16 +69,7 @@
 
 	const _onDelete = (index) => _removeColor(index)
 
-	const _onCompactClick = () => {
-		if (_isCompact) {
-			colors = _colors
-			_colors = []
-		} else {
-			_colors = [...colors]
-			colors = extractByIndices(colors, compactColorIndices)
-		}
-		_isCompact = !_isCompact
-	}
+	const _onCompact = () => isCompact = !isCompact
 </script>
 
 <style>
@@ -126,9 +117,9 @@
 <section
 	class={resolveClassName([
 		[!!$$props.class, $$props.class, 'palette__root'],
-		[_isCompact, 'palette__root-compact'],
+		[isCompact, 'palette__root-compact'],
 	])}
-    style="--num-columns: {_numColumns}">
+	style="--num-columns: {_numColumns}">
 	{#if $$slots.header}
 		<slot name="header" />
 		<slot name="header-divider">
@@ -138,10 +129,10 @@
 	<ul class="palette__list">
 		{#if !!compactColorIndices?.length}
 			<li>
-				<PaletteCompactToggleButton isCompact={_isCompact} on:click={_onCompactClick} />
+				<PaletteCompactToggleButton isCompact={isCompact} on:click={_onCompact} />
 			</li>
 		{/if}
-		{#if showTransparentSlot && !_isCompact}
+		{#if showTransparentSlot && !isCompact}
 			<li data-testid="__palette-row__" class="palette__slot">
 				<slot name="transparent-slot">
 					<PaletteSlot
@@ -151,26 +142,23 @@
 				</slot>
 			</li>
 		{/if}
-		{#each colors.slice(0, colors.length < maxColors || maxColors === -1 ? colors.length : maxColors) as color, index (`${color}_${index}`)}
+		{#each _colors.slice(0, _colors.length < maxColors || maxColors === -1 ? _colors.length : maxColors) as color, index (`${color}_${index}`)}
 			<li
 				data-testid="__palette-row__"
 				class="palette__slot"
 				use:useDeletion={{
-					deletionMode,
+					deletionMode: _deletionMode,
 					onDelete: () => _onDelete(index),
 					tooltipContentSelector,
 					tooltipClassName,
 				}}>
 				<slot name="slot" color={color}>
-					<PaletteSlot
-						color={color}
-						selected={color === selectedColor}
-						on:click={_onSlotSelect} />
+					<PaletteSlot color={color} selected={color === selectedColor} on:click={_onSlotSelect} />
 				</slot>
 			</li>
 		{/each}
 	</ul>
-	{#if !_isCompact}
+	{#if !isCompact}
 		<slot name="footer-divider">
 			<hr class="palette__divider" />
 		</slot>

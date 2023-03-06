@@ -34,6 +34,11 @@
 		background-color: var(--color);
 	}
 
+	button:focus {
+		outline: 2px solid rgba(0, 0, 0, 0.3);
+		outline-offset: 2px;
+	}
+
 	button.selected {
 		outline: 2px solid var(--outerBorderColor);
 		outline-offset: 2px;

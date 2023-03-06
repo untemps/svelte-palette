@@ -3269,6 +3269,11 @@ carbon-components-svelte@^0.73.2:
   dependencies:
     flatpickr "4.6.9"
 
+carbon-icons-svelte@^11.4.0:
+  version "11.4.0"
+  resolved "https://registry.yarnpkg.com/carbon-icons-svelte/-/carbon-icons-svelte-11.4.0.tgz#1bab38ac0c8f778e0431f8df54324829c81cfd30"
+  integrity sha512-p/llZde2kP2BI9SOqM+QFKGfQnYrW+4dVxF1rAYriEADXDsjt9EYlh+KpQ5qf4JpXAq+e2+TB/r/lIG1xdUbAQ==
+
 cardinal@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/cardinal/-/cardinal-2.1.1.tgz#7cc1055d822d212954d07b085dea251cc7bc5505"

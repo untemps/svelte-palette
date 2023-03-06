@@ -1,5 +1,7 @@
 <script>
 	import { Button, Select, SelectItem, Slider, Toggle } from 'carbon-components-svelte'
+	import Settings from 'carbon-icons-svelte/lib/Settings.svelte'
+	import Close from 'carbon-icons-svelte/lib/Close.svelte'
 
 	import { Palette } from '../../src'
 
@@ -42,36 +44,71 @@
 	let inputType = 'text'
 	let showCompactControl = true
 	let numColumns = 5
+
+	let isSettingsOpen = true
 </script>
 
 <style>
 	main {
-		overflow: hidden;
+		min-height: 100%;
 		position: relative;
 		display: flex;
 		justify-content: space-between;
-		align-items: center;
-		height: 100%;
+		align-items: stretch;
 		background-color: var(--bgColor);
 	}
 
-	.container {
+	.content {
 		width: 100%;
-        max-width: 100%;
+		max-width: 100%;
+		min-height: 100%;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		justify-content: center;
 	}
 
-	.settings__container {
+	.settings {
 		overflow: hidden auto;
-		width: 480px;
-		height: 100vh;
+		width: 320px;
+		min-width: 320px;
+		min-height: 100%;
 		display: flex;
 		flex-direction: column;
 		align-items: flex-end;
-        justify-content: center;
+		justify-content: center;
 		background-color: black;
+		padding: 2rem;
+	}
+
+	.settings--expanded {
+		position: relative;
+		right: 0;
+	}
+
+	.settings--collapsed {
+		position: absolute;
+		right: -320px;
+	}
+
+	@media screen and (max-width: 700px) {
+		.settings--expanded {
+			position: absolute;
+		}
+	}
+
+	:global(.bx--btn.bx--btn--icon-only.bx--tooltip__trigger) {
+		position: absolute !important;
+		right: 20px !important;
+		top: 20px !important;
+	}
+
+	:global(.settings--collapsed > .bx--btn.bx--btn--icon-only.bx--tooltip__trigger.settings__close-button) {
+		display: none !important;
+	}
+
+	:global(.settings--expanded + .bx--btn.bx--btn--icon-only.bx--tooltip__trigger.settings__open-button) {
+		display: none !important;
 	}
 
 	.settings__form {
@@ -80,7 +117,6 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: flex-start;
-		padding: 2rem;
 	}
 
 	.settings__space {
@@ -105,9 +141,17 @@
 	}
 
 	:global(.bx--slider__range-label) {
-		font-family: 'IBM Plex Sans' !important;
+		font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif !important;
 		font-size: 0.75rem !important;
 		color: #c6c6c6 !important;
+	}
+
+	:global(.bx--slider) {
+		min-width: 6rem !important;
+	}
+
+	:global(.bx--form-item) {
+		width: 100%;
 	}
 
 	:global(.tooltip) {
@@ -131,16 +175,10 @@
 		border-style: solid;
 		border-color: #ee7008 transparent transparent transparent;
 	}
-
-	@media screen and (max-height: 700px) {
-		.settings__container {
-			max-height: 100vh;
-		}
-	}
 </style>
 
 <main style="--bgColor:{bgColor}">
-	<div class="container">
+	<div class="content">
 		<Palette
 			colors={colors}
 			compactColorIndices={showCompactControl ? compactIndices : null}
@@ -158,7 +196,14 @@
 				preselectColor = !!bgColor
 			}} />
 	</div>
-	<div class="settings__container">
+	<div class={`settings${isSettingsOpen ? ' settings--expanded' : ' settings--collapsed'}`}>
+		<Button
+			kind="tertiary"
+			iconDescription="Close Settings"
+			tooltipPosition="left"
+			icon={Close}
+			class="settings__close-button"
+			on:click={() => (isSettingsOpen = false)} />
 		<form class="settings__form">
 			<div class="settings__preselection">
 				<Toggle labelText="Preselect Color" size="sm" bind:toggled={preselectColor}>
@@ -167,39 +212,47 @@
 				</Toggle>
 				<span class="settings__preselection__color" style={`background-color: ${bgColor}`} />
 			</div>
-            <hr class="settings__space" />
-            <Slider
-                    labelText="Set Number of Columns"
-                    hideTextInput
-                    min={1}
-                    max={colors.length + 2}
-                    step={1}
-                    bind:value={numColumns} />
-            <hr class="settings__space" />
-            <Slider labelText="Set Max Colors" hideTextInput min={1} max={50} step={1} bind:value={maxColors} />
+			<hr class="settings__space" />
+			<Slider
+				labelText="Number of Columns"
+				hideTextInput
+				fullWidth
+				min={1}
+				max={colors.length + 2}
+				step={1}
+				bind:value={numColumns} />
+			<hr class="settings__space" />
+			<Slider
+				labelText="Maximum Number of Colors"
+				hideTextInput
+				fullWidth
+				min={1}
+				max={50}
+				step={1}
+				bind:value={maxColors} />
 			<hr class="settings__space" />
 			<Toggle labelText="Allow Duplicates" size="sm" bind:toggled={allowDuplicates}>
 				<span slot="labelA" />
 				<span slot="labelB" />
 			</Toggle>
-            <hr class="settings__space" />
-            <Select labelText="Input Type" inline bind:selected={inputType}>
-                <SelectItem value="text" />
-                <SelectItem value="color" />
-            </Select>
 			<hr class="settings__space" />
-			<Select labelText="Select Deletion Mode" inline bind:selected={deletionMode}>
+			<Select labelText="Input Type" inline bind:selected={inputType}>
+				<SelectItem value="text" />
+				<SelectItem value="color" />
+			</Select>
+			<hr class="settings__space" />
+			<Select labelText="Deletion Mode" inline bind:selected={deletionMode}>
 				<SelectItem value="none" />
 				<SelectItem value="tooltip" />
 				<SelectItem value="drop" />
 			</Select>
 			<hr class="settings__space" />
-			<Toggle labelText="Customize Tooltip Class" size="sm" bind:toggled={useCustomTooltipClass}>
+			<Toggle labelText="Custom Tooltip Class" size="sm" bind:toggled={useCustomTooltipClass}>
 				<span slot="labelA" />
 				<span slot="labelB" />
 			</Toggle>
 			<hr class="settings__space" />
-			<Toggle labelText="Customize Tooltip Content" size="sm" bind:toggled={useCustomTooltipContent}>
+			<Toggle labelText="Custom Tooltip Content" size="sm" bind:toggled={useCustomTooltipContent}>
 				<span slot="labelA" />
 				<span slot="labelB" />
 			</Toggle>
@@ -212,10 +265,17 @@
 				<span slot="labelB" />
 			</Toggle>
 			<hr class="settings__space" />
-            <Toggle labelText="Show Compact Control" size="sm" bind:toggled={showCompactControl}>
-                <span slot="labelA" />
-                <span slot="labelB" />
-            </Toggle>
+			<Toggle labelText="Show Compact Control" size="sm" bind:toggled={showCompactControl}>
+				<span slot="labelA" />
+				<span slot="labelB" />
+			</Toggle>
 		</form>
 	</div>
+	<Button
+		kind="tertiary"
+		iconDescription="Open Settings"
+		tooltipPosition="left"
+		icon={Settings}
+		class="settings__open-button"
+		on:click={() => (isSettingsOpen = true)} />
 </main>
