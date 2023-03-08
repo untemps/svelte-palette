@@ -4,6 +4,8 @@
 	import Close from 'carbon-icons-svelte/lib/Close.svelte'
 	import { resolveClassName } from '@untemps/utils/dom/resolveClassName'
 
+	import { blur } from 'svelte/transition'
+
 	import { Palette } from '../../src'
 
 	const colors = [
@@ -194,6 +196,7 @@
 			maxColors={maxColors}
 			inputType={inputType}
 			numColumns={numColumns}
+			transition={{ fn: blur, args: { duration: 300, amount: 10 } }}
 			on:select={({ detail: { color } }) => {
 				bgColor = color
 				preselectColor = !!bgColor

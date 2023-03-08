@@ -25,6 +25,7 @@
 	export let maxColors = 30
 	export let inputType = 'text'
 	export let numColumns = 5
+	export let transition = null
 
 	let _colors
 	let _isCompact = false
@@ -162,7 +163,7 @@
 						tooltipClassName,
 					}}>
 					<slot name="slot" color={color}>
-						<PaletteSlot color={color} selected={color === selectedColor} on:click={_onSlotSelect} />
+						<PaletteSlot color={color} selected={color === selectedColor} transition={transition} on:click={_onSlotSelect} />
 					</slot>
 				</li>
 			{/each}
