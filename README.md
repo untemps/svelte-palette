@@ -73,6 +73,7 @@ yarn add @untemps/svelte-palette
 | `maxColors`              | number   | 30      | Maximum number of slots to be displayed in the palette. Set this value to `-1` to allow infinite number of slots.                                                                                         |
 | `inputType`              | string   | "text"  | Type of the input within the footer slot. Only "text" and "color" are allowed. All other value will be replaced by "text".                                                                                |
 | `numColumns`             | number   | 5       | Number of columns of the palette grid. This value can't exceed the number of maximum colors defined in `maxColors` and can't be lower than 1. Set this value to `0` to display the slots on a single row. |
+| `transition`             | object   | null    | Animation when a slot is rendered (see [Transition](#transition))                                                                               |
 
 ## Events
 
@@ -255,6 +256,45 @@ Once selected, the color is inserted in the input waiting for the user to submit
 If the API is not available, nothing will be rendered.
 
 > The PaletteEyeDropper component can be used on its own anywhere within a slot or in an external component as it is exported from this lib.
+
+## Transition
+
+<img src="assets/svelte-palette-transition.gif" alt="svelte-palette-transition" height="300"/>
+
+You can customize the way slots appear into the palette by using the `transition` prop.
+
+This prop works the same way as the [in/out action](https://svelte.dev/docs#template-syntax-element-directives-in-fn-out-fn) and accepts an object with two properties :
+
+| Value  | Description                                                                                      |
+|--------|--------------------------------------------------------------------------------------------------|
+| `fn`   | Transition function (See [Svelte Transitions](https://svelte.dev/docs#run-time-svelte-transition)) |
+| `args` | Parameters to pass  the transition function                                                      |
+
+`fn` may be one of the [Svelte exported functions](https://svelte.dev/docs#run-time-svelte-transition) or a custom one as described in the [docs](https://svelte.dev/docs#template-syntax-element-directives-transition-fn-custom-transition-functions).
+
+### Example
+
+```html
+<script>
+    import { Palette } from '@untemps/svelte-palette'
+    import { elasticOut } from 'svelte/easing'
+
+    const colors = ['#865C54', '#8F5447', '#A65846', '#A9715E', '#AD8C72']
+
+    const whoosh = (node, params) => {
+        const existingTransform = getComputedStyle(node).transform.replace('none', '');
+
+        return {
+            delay: params.delay || 0,
+            duration: params.duration || 400,
+            easing: params.easing || elasticOut,
+            css: (t, u) => `transform: ${existingTransform} scale(${t})`
+        };
+    }
+</script>
+
+<Palette colors={colors} transition={{ fn: whoosh, args: { duration: 300 } }} />
+```
 
 ## Recipes
 
