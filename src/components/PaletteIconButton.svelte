@@ -42,8 +42,11 @@
 		width: 2rem;
 		height: 2rem;
 		margin: 0;
+		padding: 0;
 		background: none;
-		border-color: rgba(0, 0, 0, 0.1);
+		border-width: 1px;
+		border-color: #e5e5e5;
+		border-style: solid;
 		border-radius: 0.3rem;
 		cursor: pointer;
 	}
@@ -53,7 +56,8 @@
 	}
 
 	.icon_button__button:focus {
-		border-color: rgba(0, 0, 0, 0.3);
+		border-color: #bdbdbd;
+		outline: none;
 	}
 
 	:global(.icon_button__button > svg) {
@@ -65,7 +69,7 @@
 	}
 
 	:global(.icon_button__button > svg path) {
-		fill: rgba(0, 0, 0, 0.6);
+		fill: #646464;
 	}
 </style>
 

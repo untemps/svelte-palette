@@ -20,7 +20,7 @@ const createAction = (node, deletionMode, options) => {
 		}
 		case DROP: {
 			return useDropOutside(node, {
-				areaSelector: '.palette__root',
+				areaSelector: '.palette',
 				animate: true,
 				onDropOutside: options.onDelete,
 			})

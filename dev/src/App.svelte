@@ -1,8 +1,10 @@
 <script>
-	import { Palette } from '../../src'
+	import { Button, Select, SelectItem, Slider, Toggle } from 'carbon-components-svelte'
+	import Settings from 'carbon-icons-svelte/lib/Settings.svelte'
+	import Close from 'carbon-icons-svelte/lib/Close.svelte'
+	import { resolveClassName } from '@untemps/utils/dom/resolveClassName'
 
-	import SettingsIcon from './SettingsIcon.svelte'
-	import CloseIcon from './CloseIcon.svelte'
+	import { Palette } from '../../src'
 
 	const colors = [
 		'#865C54',
@@ -32,7 +34,6 @@
 	const compactIndices = [2, 7, 13, 20]
 
 	let bgColor = colors[Math.round(Math.random() * (colors.length - 1))]
-	let showSettings = false
 
 	let preselectColor = true
 	let allowDuplicates = true
@@ -42,88 +43,118 @@
 	let showTransparentSlot = true
 	let maxColors = 23
 	let inputType = 'text'
-	let useCustomClass = false
 	let showCompactControl = true
+	let numColumns = 5
+
+	let isSettingsOpen = true
 </script>
 
 <style>
 	main {
 		position: relative;
+		overflow-x: hidden;
+		min-height: 100%;
 		display: flex;
-		justify-content: center;
-		align-items: center;
-		height: 100%;
-		padding: 1rem;
+		justify-content: space-between;
+		align-items: stretch;
 		background-color: var(--bgColor);
 	}
 
-	.toggle__button {
-		background: none;
-		border: none;
-		color: white;
-		cursor: pointer;
-		width: 36px;
-	}
-
-	.container {
-		max-width: 640px;
+	.content {
+		width: 100%;
+		max-width: 100%;
+		min-height: 100%;
 		display: flex;
 		flex-direction: column;
-		align-items: flex-end;
+		align-items: center;
+		justify-content: center;
 	}
 
-	.settings__container {
+	.settings {
 		overflow: hidden auto;
-		position: absolute;
-		z-index: 9999;
-		width: 100vw;
-		max-width: 320px;
+		width: 320px;
+		min-width: 320px;
+		min-height: 100%;
 		display: flex;
 		flex-direction: column;
 		align-items: flex-end;
+		justify-content: center;
+		background-color: black;
+		padding: 2rem;
+		transition: right .1s ease-out;
+	}
+
+	.settings--expanded {
+		position: relative;
+		right: 0;
+	}
+
+	.settings--collapsed {
+		position: absolute;
+		right: -320px;
+	}
+
+	@media screen and (max-width: 700px) {
+		.settings--expanded {
+			position: absolute;
+		}
+	}
+
+	:global(.bx--btn.bx--btn--icon-only.bx--tooltip__trigger) {
+		position: absolute !important;
+		right: 20px !important;
+		top: 20px !important;
+	}
+
+	:global(.settings--collapsed > .bx--btn.bx--btn--icon-only.bx--tooltip__trigger.settings__close-button) {
+		display: none !important;
+	}
+
+	:global(.settings--expanded + .bx--btn.bx--btn--icon-only.bx--tooltip__trigger.settings__open-button) {
+		display: none !important;
 	}
 
 	.settings__form {
+		width: 100%;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
-		align-items: center;
-		padding: 1rem;
-		background-color: #fafafa;
-		border-radius: 1rem;
+		align-items: flex-start;
 	}
 
-	.settings__form fieldset {
-		width: 100%;
+	.settings__space {
 		border: none;
+		margin: 0.5rem 0;
 	}
 
-	.settings__form label {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		column-gap: 1rem;
+	.settings__preselection {
+		position: relative;
 	}
 
-	.settings__form input {
-		margin: 0;
+	.settings__preselection__color {
+		position: absolute;
+		top: 24px;
+		left: 46px;
+		width: 50px;
+		height: 16px;
 	}
 
-	.settings__form input[type='checkbox'] {
-		padding: 0;
+	:global(.bx--toggle__switch) {
+		margin-top: 0.5rem !important;
 	}
 
-	.palette__tooltip__button {
-		margin: 0;
+	:global(.bx--slider__range-label) {
+		font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif !important;
+		font-size: 0.75rem !important;
+		color: #c6c6c6 !important;
 	}
 
-	:global(.palette) {
-		display: flex;
-		flex-direction: column;
-		row-gap: 1rem;
-		padding: 2rem;
-		background: black;
-		box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.18);
+	:global(.bx--slider) {
+		min-width: 6rem !important;
+	}
+
+	:global(.bx--form-item) {
+		width: 100%;
 	}
 
 	:global(.tooltip) {
@@ -147,112 +178,107 @@
 		border-style: solid;
 		border-color: #ee7008 transparent transparent transparent;
 	}
-
-	@media screen and (max-height: 700px) {
-		.settings__container {
-			max-height: 100vh;
-		}
-	}
 </style>
 
 <main style="--bgColor:{bgColor}">
-	{#if showSettings}
-		<div class="settings__container">
-			<button type="button" class="toggle__button" on:click={() => (showSettings = !showSettings)}>
-				<CloseIcon color={!bgColor ? '#ccc' : '#fff'} />
-			</button>
-			<form class="settings__form">
-				<fieldset>
-					<label>
-						Preselect color:
-						<input type="checkbox" bind:checked={preselectColor} />
-					</label>
-				</fieldset>
-				<fieldset>
-					<label>
-						Use Custom Class:
-						<input type="checkbox" bind:checked={useCustomClass} />
-					</label>
-				</fieldset>
-				<fieldset>
-					<label>
-						Allow Duplicates:
-						<input type="checkbox" bind:checked={allowDuplicates} />
-					</label>
-				</fieldset>
-				<fieldset>
-					<label>
-						Deletion Mode:
-						<select bind:value={deletionMode}>
-							<option value="none">none</option>
-							<option value="tooltip">tooltip</option>
-							<option value="drop">drop</option>
-						</select>
-					</label>
-				</fieldset>
-				<fieldset>
-					<label>
-						Use Custom Tooltip Class:
-						<input type="checkbox" bind:checked={useCustomTooltipClass} />
-					</label>
-				</fieldset>
-				<fieldset>
-					<label>
-						Use Custom Tooltip Content:
-						<button type="button" class="palette__tooltip__button">Delete</button>
-						<input type="checkbox" bind:checked={useCustomTooltipContent} />
-					</label>
-				</fieldset>
-				<fieldset>
-					<label>
-						Show Transparent Slot:
-						<input type="checkbox" bind:checked={showTransparentSlot} />
-					</label>
-				</fieldset>
-				<fieldset>
-					<label>
-						Max Colors:
-						<input type="number" min="1" max="30" bind:value={maxColors} />
-					</label>
-				</fieldset>
-				<fieldset>
-					<label>
-						Input Type:
-						<select bind:value={inputType}>
-							<option value="text">text</option>
-							<option value="color">color</option>
-						</select>
-					</label>
-				</fieldset>
-				<fieldset>
-					<label>
-						Show Compact Control:
-                        <input type="checkbox" bind:checked={showCompactControl} />
-					</label>
-				</fieldset>
-			</form>
-		</div>
-	{/if}
-
-	<div class="container">
-		<button type="button" class="toggle__button" on:click={() => (showSettings = !showSettings)}>
-			<SettingsIcon color={!bgColor ? '#ccc' : '#fff'} />
-		</button>
+	<div class="content">
 		<Palette
 			colors={colors}
-            compactColorIndices={showCompactControl ? compactIndices : null}
+			compactColorIndices={showCompactControl ? compactIndices : null}
 			selectedColor={preselectColor ? bgColor : null}
 			allowDuplicates={allowDuplicates}
 			deletionMode={deletionMode}
 			tooltipClassName={useCustomTooltipClass ? 'tooltip' : null}
-			tooltipContentSelector={useCustomTooltipContent ? '.palette__tooltip__button' : null}
+			tooltipContentSelector={useCustomTooltipContent ? '#tooltip-content' : null}
 			showTransparentSlot={showTransparentSlot}
 			maxColors={maxColors}
 			inputType={inputType}
+			numColumns={numColumns}
 			on:select={({ detail: { color } }) => {
 				bgColor = color
 				preselectColor = !!bgColor
-			}}
-			class={useCustomClass ? 'palette' : null} />
+			}} />
 	</div>
+	<div class={resolveClassName(['settings', [isSettingsOpen, 'settings--expanded', 'settings--collapsed']])}>
+		<Button
+			kind="tertiary"
+			iconDescription="Close Settings"
+			tooltipPosition="left"
+			icon={Close}
+			class="settings__close-button"
+			on:click={() => (isSettingsOpen = false)} />
+		<form class="settings__form">
+			<div class="settings__preselection">
+				<Toggle labelText="Preselect Color" size="sm" bind:toggled={preselectColor}>
+					<span slot="labelA" />
+					<span slot="labelB" />
+				</Toggle>
+				<span class="settings__preselection__color" style={`background-color: ${bgColor}`} />
+			</div>
+			<hr class="settings__space" />
+			<Slider
+				labelText="Number of Columns"
+				hideTextInput
+				fullWidth
+				min={1}
+				max={colors.length + 2}
+				step={1}
+				bind:value={numColumns} />
+			<hr class="settings__space" />
+			<Slider
+				labelText="Maximum Number of Colors"
+				hideTextInput
+				fullWidth
+				min={1}
+				max={50}
+				step={1}
+				bind:value={maxColors} />
+			<hr class="settings__space" />
+			<Toggle labelText="Allow Duplicates" size="sm" bind:toggled={allowDuplicates}>
+				<span slot="labelA" />
+				<span slot="labelB" />
+			</Toggle>
+			<hr class="settings__space" />
+			<Select labelText="Input Type" inline bind:selected={inputType}>
+				<SelectItem value="text" />
+				<SelectItem value="color" />
+			</Select>
+			<hr class="settings__space" />
+			<Select labelText="Deletion Mode" inline bind:selected={deletionMode}>
+				<SelectItem value="none" />
+				<SelectItem value="tooltip" />
+				<SelectItem value="drop" />
+			</Select>
+			<hr class="settings__space" />
+			<Toggle labelText="Custom Tooltip Class" size="sm" bind:toggled={useCustomTooltipClass}>
+				<span slot="labelA" />
+				<span slot="labelB" />
+			</Toggle>
+			<hr class="settings__space" />
+			<Toggle labelText="Custom Tooltip Content" size="sm" bind:toggled={useCustomTooltipContent}>
+				<span slot="labelA" />
+				<span slot="labelB" />
+			</Toggle>
+			<div style="position: absolute; left: -200px">
+				<Button id="tooltip-content">Delete</Button>
+			</div>
+			<hr class="settings__space" />
+			<Toggle labelText="Show Transparent Slot" size="sm" bind:toggled={showTransparentSlot}>
+				<span slot="labelA" />
+				<span slot="labelB" />
+			</Toggle>
+			<hr class="settings__space" />
+			<Toggle labelText="Show Compact Control" size="sm" bind:toggled={showCompactControl}>
+				<span slot="labelA" />
+				<span slot="labelB" />
+			</Toggle>
+		</form>
+	</div>
+	<Button
+		kind="tertiary"
+		iconDescription="Open Settings"
+		tooltipPosition="left"
+		icon={Settings}
+		class="settings__open-button"
+		on:click={() => (isSettingsOpen = true)} />
 </main>
