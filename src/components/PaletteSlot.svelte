@@ -11,9 +11,7 @@
 
 	const dispatch = createEventDispatcher()
 
-	const enter = (node) => {
-		return transition?.fn(node, transition?.args)
-	}
+	const enter = (node) => transition?.fn(node, transition?.args)
 
 	const _onClick = () =>
 		!disabled &&
