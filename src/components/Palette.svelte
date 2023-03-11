@@ -27,9 +27,9 @@
 	export let numColumns = 5
 
 	let _colors
-	let isCompact = false
+	let _isCompact = false
 
-	$: _colors = isCompact ? extractByIndices(colors, compactColorIndices) : colors
+	$: _colors = _isCompact ? extractByIndices(colors, compactColorIndices) : colors
 	$: _colors = !allowDuplicates ? colors.filter((item, index) => colors.indexOf(item) === index) : colors
 
 	let _maxColumns
@@ -69,7 +69,7 @@
 
 	const _onDelete = (index) => _removeColor(index)
 
-	const _onCompact = () => (isCompact = !isCompact)
+	const _onCompact = () => (_isCompact = !_isCompact)
 </script>
 
 <style>
@@ -125,7 +125,7 @@
 	class={resolveClassName([
 		'palette',
 		$$props.class,
-		[isCompact, 'palette--compact'],
+		[_isCompact, 'palette--compact'],
 	])}
 	style="--num-columns: {_numColumns}">
 	{#if $$slots.header}
@@ -138,10 +138,10 @@
 		<ul class="palette__slots__list">
 			{#if !!compactColorIndices?.length}
 				<li>
-					<PaletteCompactToggleButton isCompact={isCompact} on:click={_onCompact} />
+					<PaletteCompactToggleButton isCompact={_isCompact} on:click={_onCompact} />
 				</li>
 			{/if}
-			{#if showTransparentSlot && !isCompact}
+			{#if showTransparentSlot && !_isCompact}
 				<li data-testid="__palette-row__" class="palette__slot">
 					<slot name="transparent-slot">
 						<PaletteSlot
@@ -168,7 +168,7 @@
 			{/each}
 		</ul>
 	</div>
-	{#if !isCompact}
+	{#if !_isCompact}
 		<slot name="footer-divider">
 			<hr class="palette__divider" />
 		</slot>
