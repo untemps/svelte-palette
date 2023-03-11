@@ -263,7 +263,7 @@ If the API is not available, nothing will be rendered.
 
 You can customize the way slots appear into the palette by using the `transition` prop.
 
-This prop works the same way as the [in/out action](https://svelte.dev/docs#template-syntax-element-directives-in-fn-out-fn) and accepts an object with two properties :
+This prop works the same way as the [in/out directive](https://svelte.dev/docs#template-syntax-element-directives-in-fn-out-fn) and accepts an object with two properties :
 
 | Value  | Description                                                                                        |
 |--------|----------------------------------------------------------------------------------------------------|
