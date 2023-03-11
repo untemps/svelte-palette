@@ -5,8 +5,6 @@
 	import Close from 'carbon-icons-svelte/lib/Close.svelte'
 	import { resolveClassName } from '@untemps/utils/dom/resolveClassName'
 
-	import { blur } from 'svelte/transition'
-
 	import { Palette } from '../../src'
 
 	const colors = [
