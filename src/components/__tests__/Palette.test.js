@@ -14,7 +14,7 @@ describe('Palette', () => {
 		const { getAllByTestId } = render(Palette, {
 			colors,
 		})
-		expect(getAllByTestId('__palette-row__')).toHaveLength(colors.length)
+		expect(getAllByTestId('__palette-cell__')).toHaveLength(colors.length)
 	})
 
 	it('Triggers select with color', async () => {
@@ -24,8 +24,8 @@ describe('Palette', () => {
 			colors,
 		})
 		component.$on('select', onSelect)
-		const slot = getAllByTestId('__palette-row__')[0]
-		await fireEvent.click(slot.firstChild)
+		const cell = getAllByTestId('__palette-cell__')[0]
+		await fireEvent.click(cell.firstChild)
 		expect(onSelect).toHaveBeenCalledWith(new CustomEvent({ detail: { color: colors[0] } }))
 	})
 
@@ -35,12 +35,12 @@ describe('Palette', () => {
 			colors,
 			deletionMode: TOOLTIP,
 		})
-		const slot = getAllByTestId('__palette-row__')[0]
-		await fireEvent.mouseOver(slot) // fireEvent.mouseEnter only works if mouseOver is triggered before
-		await fireEvent.mouseEnter(slot)
+		const cell = getAllByTestId('__palette-cell__')[0]
+		await fireEvent.mouseOver(cell) // fireEvent.mouseEnter only works if mouseOver is triggered before
+		await fireEvent.mouseEnter(cell)
 		await waitFor(() => expect(getByTestId('__trash-icon__')).toBeInTheDocument())
 		await fireEvent.click(getByTestId('__trash-icon__'))
-		await waitFor(() => expect(slot).not.toBeInTheDocument())
+		await waitFor(() => expect(cell).not.toBeInTheDocument())
 	})
 
 	it('Deletes slot if deletionMode is set to "drop"', async () => {
@@ -52,8 +52,8 @@ describe('Palette', () => {
 			},
 		})
 		component.deletionMode = DROP
-		const slot = getAllByTestId('__palette-row__')[0]
-		await fireEvent.mouseDown(slot)
+		const cell = getAllByTestId('__palette-cell__')[0]
+		await fireEvent.mouseDown(cell)
 		await fireEvent.mouseMove(document)
 		const drag = document.querySelector('#drag')
 		drag.getBoundingClientRect = () => ({
@@ -65,7 +65,7 @@ describe('Palette', () => {
 			bottom: 2020,
 		})
 		await fireEvent.mouseUp(document)
-		await waitFor(() => expect(slot).not.toBeInTheDocument())
+		await waitFor(() => expect(cell).not.toBeInTheDocument())
 	})
 
 	it('Displays transparent slot if showTransparentSlot is truthy', async () => {
@@ -76,9 +76,9 @@ describe('Palette', () => {
 			showTransparentSlot: true,
 		})
 		component.$on('select', onSelect)
-		expect(getAllByTestId('__palette-row__')).toHaveLength(colors.length + 1)
-		const slot = getAllByTestId('__palette-row__')[0]
-		await fireEvent.click(slot.firstChild)
+		expect(getAllByTestId('__palette-cell__')).toHaveLength(colors.length + 1)
+		const cell = getAllByTestId('__palette-cell__')[0]
+		await fireEvent.click(cell.firstChild)
 		expect(onSelect).toHaveBeenCalledWith(new CustomEvent({ detail: { color: null } }))
 	})
 

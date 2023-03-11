@@ -142,7 +142,7 @@
 				</li>
 			{/if}
 			{#if showTransparentSlot && !_isCompact}
-				<li data-testid="__palette-row__" class="palette__slot">
+				<li data-testid="__palette-cell__" class="palette__slot">
 					<slot name="transparent-slot">
 						<PaletteSlot
 							aria-label="Transparent slot"
@@ -153,7 +153,7 @@
 			{/if}
 			{#each _colors.slice(0, _colors.length < maxColors || maxColors === -1 ? _colors.length : maxColors) as color, index (`${color}_${index}`)}
 				<li
-					data-testid="__palette-row__"
+					data-testid="__palette-cell__"
 					class="palette__slot"
 					use:useDeletion={{
 						deletionMode: _deletionMode,
