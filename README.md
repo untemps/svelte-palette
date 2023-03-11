@@ -265,10 +265,10 @@ You can customize the way slots appear into the palette by using the `transition
 
 This prop works the same way as the [in/out action](https://svelte.dev/docs#template-syntax-element-directives-in-fn-out-fn) and accepts an object with two properties :
 
-| Value  | Description                                                                                      |
-|--------|--------------------------------------------------------------------------------------------------|
+| Value  | Description                                                                                        |
+|--------|----------------------------------------------------------------------------------------------------|
 | `fn`   | Transition function (See [Svelte Transitions](https://svelte.dev/docs#run-time-svelte-transition)) |
-| `args` | Parameters to pass  the transition function                                                      |
+| `args` | Parameters to pass to the transition function                                                      |
 
 `fn` may be one of the [Svelte exported functions](https://svelte.dev/docs#run-time-svelte-transition) or a custom one as described in the [docs](https://svelte.dev/docs#template-syntax-element-directives-transition-fn-custom-transition-functions).
 
@@ -293,7 +293,7 @@ This prop works the same way as the [in/out action](https://svelte.dev/docs#temp
     }
 </script>
 
-<Palette colors={colors} transition={{ fn: whoosh, args: { duration: 300 } }} />
+<Palette colors={colors} transition={{ fn: whoosh, args: { duration: 3000 } }} />
 ```
 
 ## Recipes
