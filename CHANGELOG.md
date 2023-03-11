@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/untemps/svelte-palette/compare/v2.0.0...v2.1.0) (2023-03-11)
+
+
+### Features
+
+* Add numColumns prop ([#60](https://github.com/untemps/svelte-palette/issues/60)) ([b2f6dd9](https://github.com/untemps/svelte-palette/commit/b2f6dd99c7bcf2af358a89dc76a2e2af9391aed4))
+
 # [2.0.0](https://github.com/untemps/svelte-palette/compare/v1.9.2...v2.0.0) (2023-02-27)
 
 
