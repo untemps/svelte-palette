@@ -35,7 +35,7 @@
 	}
 
 	button:focus {
-		outline: 2px solid rgba(0, 0, 0, 0.3);
+		outline: 2px solid #bdbdbd;
 		outline-offset: 2px;
 	}
 
