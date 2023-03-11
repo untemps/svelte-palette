@@ -59,11 +59,13 @@
 		color: rgba(0, 0, 0, 0.6);
 		background: rgba(255, 255, 255, 1);
 		border-width: 1px;
-		border-color: rgba(0, 0, 0, 0.1);
+		border-color: #e5e5e5;
+		border-style: solid;
 		border-radius: 0.3rem;
 		border-right-width: 0;
 		border-top-right-radius: 0;
 		border-bottom-right-radius: 0;
+		z-index: 97;
 	}
 
 	.palette_input__input:disabled {
@@ -72,7 +74,9 @@
 
 	.palette_input__input:focus {
 		border-right-width: 1px;
-		border-color: rgba(0, 0, 0, 0.3);
+		border-color: #bdbdbd;
+		outline: none;
+		z-index: 99;
 	}
 
 	.palette_input__input--color {
@@ -84,6 +88,7 @@
 		margin-left: -1px;
 		border-top-left-radius: 0;
 		border-bottom-left-radius: 0;
+		z-index: 98;
 	}
 </style>
 

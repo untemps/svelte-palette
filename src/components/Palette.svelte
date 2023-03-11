@@ -69,35 +69,41 @@
 
 	const _onDelete = (index) => _removeColor(index)
 
-	const _onCompact = () => isCompact = !isCompact
+	const _onCompact = () => (isCompact = !isCompact)
 </script>
 
 <style>
-	* {
+	:global(*) {
 		box-sizing: border-box;
 	}
 
-	.palette__root {
+	.palette {
+		min-width: 10rem;
+		background-color: #fafafa;
 		display: flex;
 		flex-direction: column;
-		row-gap: 1rem;
 		align-items: center;
-		min-width: 10rem;
+	}
+
+	.palette__content {
+		width: 100%;
 		padding: 2rem;
-		background-color: #fafafa;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 	}
 
-	.palette__root.palette__root-compact {
-		padding: 0.5rem;
-	}
+    .palette.palette--compact .palette__content {
+        padding: 0.3rem;
+    }
 
-	.palette__list {
+	.palette__slots__list {
 		list-style: none;
 		margin: 0;
 		padding: 0;
 		display: grid;
-		grid-template-columns: repeat(var(--num-columns), 32px);
-		grid-auto-rows: minmax(32px, auto);
+		grid-template-columns: repeat(var(--num-columns), 2rem);
+		grid-auto-rows: minmax(2rem, auto);
 		align-items: center;
 		justify-items: center;
 	}
@@ -109,15 +115,17 @@
 	.palette__divider {
 		border: none;
 		background-color: #ccc;
-		width: calc(100% + 4rem);
+		width: 100%;
 		height: 1px;
+		margin: 0;
 	}
 </style>
 
 <section
 	class={resolveClassName([
-		[!!$$props.class, $$props.class, 'palette__root'],
-		[isCompact, 'palette__root-compact'],
+		'palette',
+		$$props.class,
+		[isCompact, 'palette--compact'],
 	])}
 	style="--num-columns: {_numColumns}">
 	{#if $$slots.header}
@@ -126,45 +134,49 @@
 			<hr class="palette__divider" />
 		</slot>
 	{/if}
-	<ul class="palette__list">
-		{#if !!compactColorIndices?.length}
-			<li>
-				<PaletteCompactToggleButton isCompact={isCompact} on:click={_onCompact} />
-			</li>
-		{/if}
-		{#if showTransparentSlot && !isCompact}
-			<li data-testid="__palette-row__" class="palette__slot">
-				<slot name="transparent-slot">
-					<PaletteSlot
-						aria-label="Transparent slot"
-						selected={selectedColor === null}
-						on:click={_onSlotSelect} />
-				</slot>
-			</li>
-		{/if}
-		{#each _colors.slice(0, _colors.length < maxColors || maxColors === -1 ? _colors.length : maxColors) as color, index (`${color}_${index}`)}
-			<li
-				data-testid="__palette-row__"
-				class="palette__slot"
-				use:useDeletion={{
-					deletionMode: _deletionMode,
-					onDelete: () => _onDelete(index),
-					tooltipContentSelector,
-					tooltipClassName,
-				}}>
-				<slot name="slot" color={color}>
-					<PaletteSlot color={color} selected={color === selectedColor} on:click={_onSlotSelect} />
-				</slot>
-			</li>
-		{/each}
-	</ul>
+	<div class="palette__content">
+		<ul class="palette__slots__list">
+			{#if !!compactColorIndices?.length}
+				<li>
+					<PaletteCompactToggleButton isCompact={isCompact} on:click={_onCompact} />
+				</li>
+			{/if}
+			{#if showTransparentSlot && !isCompact}
+				<li data-testid="__palette-row__" class="palette__slot">
+					<slot name="transparent-slot">
+						<PaletteSlot
+							aria-label="Transparent slot"
+							selected={selectedColor === null}
+							on:click={_onSlotSelect} />
+					</slot>
+				</li>
+			{/if}
+			{#each _colors.slice(0, _colors.length < maxColors || maxColors === -1 ? _colors.length : maxColors) as color, index (`${color}_${index}`)}
+				<li
+					data-testid="__palette-row__"
+					class="palette__slot"
+					use:useDeletion={{
+						deletionMode: _deletionMode,
+						onDelete: () => _onDelete(index),
+						tooltipContentSelector,
+						tooltipClassName,
+					}}>
+					<slot name="slot" color={color}>
+						<PaletteSlot color={color} selected={color === selectedColor} on:click={_onSlotSelect} />
+					</slot>
+				</li>
+			{/each}
+		</ul>
+	</div>
 	{#if !isCompact}
 		<slot name="footer-divider">
 			<hr class="palette__divider" />
 		</slot>
-		<slot name="footer">
+		<slot name="footer" {selectedColor}>
 			<slot name="input">
-				<PaletteInput color={selectedColor} inputType={inputType} on:add={_onInputAdd} />
+				<div class="palette__content">
+					<PaletteInput color={selectedColor} inputType={inputType} on:add={_onInputAdd} />
+				</div>
 			</slot>
 		</slot>
 	{/if}

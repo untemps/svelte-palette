@@ -24,8 +24,8 @@ describe('Palette', () => {
 			colors,
 		})
 		component.$on('select', onSelect)
-		const row = getAllByTestId('__palette-row__')[0]
-		await fireEvent.click(row.firstChild)
+		const slot = getAllByTestId('__palette-row__')[0]
+		await fireEvent.click(slot.firstChild)
 		expect(onSelect).toHaveBeenCalledWith(new CustomEvent({ detail: { color: colors[0] } }))
 	})
 
@@ -35,12 +35,12 @@ describe('Palette', () => {
 			colors,
 			deletionMode: TOOLTIP,
 		})
-		const row = getAllByTestId('__palette-row__')[0]
-		await fireEvent.mouseOver(row) // fireEvent.mouseEnter only works if mouseOver is triggered before
-		await fireEvent.mouseEnter(row)
+		const slot = getAllByTestId('__palette-row__')[0]
+		await fireEvent.mouseOver(slot) // fireEvent.mouseEnter only works if mouseOver is triggered before
+		await fireEvent.mouseEnter(slot)
 		await waitFor(() => expect(getByTestId('__trash-icon__')).toBeInTheDocument())
 		await fireEvent.click(getByTestId('__trash-icon__'))
-		await waitFor(() => expect(row).not.toBeInTheDocument())
+		await waitFor(() => expect(slot).not.toBeInTheDocument())
 	})
 
 	it('Deletes slot if deletionMode is set to "drop"', async () => {
@@ -52,8 +52,8 @@ describe('Palette', () => {
 			},
 		})
 		component.deletionMode = DROP
-		const row = getAllByTestId('__palette-row__')[0]
-		await fireEvent.mouseDown(row)
+		const slot = getAllByTestId('__palette-row__')[0]
+		await fireEvent.mouseDown(slot)
 		await fireEvent.mouseMove(document)
 		const drag = document.querySelector('#drag')
 		drag.getBoundingClientRect = () => ({
@@ -65,7 +65,7 @@ describe('Palette', () => {
 			bottom: 2020,
 		})
 		await fireEvent.mouseUp(document)
-		await waitFor(() => expect(row).not.toBeInTheDocument())
+		await waitFor(() => expect(slot).not.toBeInTheDocument())
 	})
 
 	it('Displays transparent slot if showTransparentSlot is truthy', async () => {
@@ -77,8 +77,8 @@ describe('Palette', () => {
 		})
 		component.$on('select', onSelect)
 		expect(getAllByTestId('__palette-row__')).toHaveLength(colors.length + 1)
-		const row = getAllByTestId('__palette-row__')[0]
-		await fireEvent.click(row.firstChild)
+		const slot = getAllByTestId('__palette-row__')[0]
+		await fireEvent.click(slot.firstChild)
 		expect(onSelect).toHaveBeenCalledWith(new CustomEvent({ detail: { color: null } }))
 	})
 
