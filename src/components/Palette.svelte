@@ -163,7 +163,7 @@
 						tooltipClassName,
 					}}>
 					<slot name="slot" color={color}>
-						<PaletteSlot color={color} selected={color === selectedColor} transition={transition} on:click={_onSlotSelect} />
+						<PaletteSlot color={color} selected={color === selectedColor} {transition} on:click={_onSlotSelect} />
 					</slot>
 				</li>
 			{/each}
