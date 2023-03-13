@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/untemps/svelte-palette/compare/v2.1.0...v2.2.0) (2023-03-13)
+
+
+### Features
+
+* Add transition prop ([#61](https://github.com/untemps/svelte-palette/issues/61)) ([345fdcc](https://github.com/untemps/svelte-palette/commit/345fdcce1486200cc5b3f550da47cb2b64738c11))
+
 # [2.1.0](https://github.com/untemps/svelte-palette/compare/v2.0.0...v2.1.0) (2023-03-11)
 
 
