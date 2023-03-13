@@ -84,15 +84,15 @@ yarn add @untemps/svelte-palette
 
 ## Slots
 
-| Slot               | Description                                                                                                                                                |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `header`           | Allow to add a header to the palette. By default, it is empty.                                                                                             |
-| `header-divider`   | Allow to add a divider between the header and the slots. This slot is added only if the header slot is set. By default, it displays a simple grey \<hr/\>. |
-| `footer`           | Allow to add a footer to the palette. By default, it contains an input to add colors.                                                                      |
-| `footer-divider`   | Allow to add a divider between the slots and the footer. By default, it displays a simple grey \<hr/\>.                                                    |
-| `slot`             | Allow to replace the default color slots                                                                                                                   |
-| `transparent-slot` | Allow to replace the default transparent slot                                                                                                              |
-| `input`            | Allow to replace the input in the footer if the default footer slot is kept as it is                                                                       |
+| Slot               | Description                                                                                                                                                | Available Props                                     |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |-----------------------------------------------------|
+| `header`           | Allow to add a header to the palette. By default, it is empty.                                                                                             | `selectedColor`                                     |
+| `header-divider`   | Allow to add a divider between the header and the slots. This slot is added only if the header slot is set. By default, it displays a simple grey \<hr/\>. | -                                                   |
+| `footer`           | Allow to add a footer to the palette. By default, it contains an input to add colors.                                                                      | `selectedColor`                                     |
+| `footer-divider`   | Allow to add a divider between the slots and the footer. By default, it displays a simple grey \<hr/\>.                                                    | -                                                   |
+| `slot`             | Allow to replace the default color slots                                                                                                                   | `color`, `selectedColor`, `transition`, `isCompact` |
+| `transparent-slot` | Allow to replace the default transparent slot                                                                                                              | -                                                   |
+| `input`            | Allow to replace the input in the footer if the default footer slot is kept as it is                                                                       | `selectedColor`, `inputType`                        |
 
 ## Example
 
