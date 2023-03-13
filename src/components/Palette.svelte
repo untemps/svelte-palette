@@ -25,6 +25,7 @@
 	export let maxColors = 30
 	export let inputType = 'text'
 	export let numColumns = 5
+	export let transition = null
 
 	let _colors
 	let _isCompact = false
@@ -97,7 +98,7 @@
         padding: 0.3rem;
     }
 
-	.palette__slots__list {
+	.palette__cells {
 		list-style: none;
 		margin: 0;
 		padding: 0;
@@ -108,7 +109,7 @@
 		justify-items: center;
 	}
 
-	.palette__slot {
+	.palette__cells__cell {
 		margin-top: 2px;
 	}
 
@@ -135,14 +136,14 @@
 		</slot>
 	{/if}
 	<div class="palette__content">
-		<ul class="palette__slots__list">
+		<ul class="palette__cells">
 			{#if !!compactColorIndices?.length}
 				<li>
 					<PaletteCompactToggleButton isCompact={_isCompact} on:click={_onCompact} />
 				</li>
 			{/if}
 			{#if showTransparentSlot && !_isCompact}
-				<li data-testid="__palette-cell__" class="palette__slot">
+				<li data-testid="__palette-cell__" class="palette__cells__cell">
 					<slot name="transparent-slot">
 						<PaletteSlot
 							aria-label="Transparent slot"
@@ -154,7 +155,7 @@
 			{#each _colors.slice(0, _colors.length < maxColors || maxColors === -1 ? _colors.length : maxColors) as color, index (`${color}_${index}`)}
 				<li
 					data-testid="__palette-cell__"
-					class="palette__slot"
+					class="palette__cells__cell"
 					use:useDeletion={{
 						deletionMode: _deletionMode,
 						onDelete: () => _onDelete(index),
@@ -162,7 +163,7 @@
 						tooltipClassName,
 					}}>
 					<slot name="slot" color={color}>
-						<PaletteSlot color={color} selected={color === selectedColor} on:click={_onSlotSelect} />
+						<PaletteSlot color={color} selected={color === selectedColor} {transition} on:click={_onSlotSelect} />
 					</slot>
 				</li>
 			{/each}

@@ -1,7 +1,5 @@
 <script>
 	import { createEventDispatcher } from 'svelte'
-	import { scale } from 'svelte/transition'
-	import { elasticOut } from 'svelte/easing'
 	import { resolveClassName } from '@untemps/utils/dom/resolveClassName'
 
 	import { CLICK } from '../enums/PaletteEvent'
@@ -9,8 +7,11 @@
 	export let color = null
 	export let selected = false
 	export let disabled = false
+	export let transition = null
 
 	const dispatch = createEventDispatcher()
+
+	const enter = (node) => transition?.fn(node, transition?.args)
 
 	const _onClick = () =>
 		!disabled &&
@@ -65,5 +66,5 @@
 		[!disabled, 'clickable'],
 	])}
 	disabled={disabled}
-	in:scale={{ duration: 500, easing: elasticOut }}
+	in:enter
 	on:click|preventDefault={_onClick} />

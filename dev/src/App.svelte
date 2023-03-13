@@ -1,4 +1,5 @@
 <script>
+	import { elasticOut } from 'svelte/easing'
 	import { Button, Select, SelectItem, Slider, Toggle } from 'carbon-components-svelte'
 	import Settings from 'carbon-icons-svelte/lib/Settings.svelte'
 	import Close from 'carbon-icons-svelte/lib/Close.svelte'
@@ -47,6 +48,17 @@
 	let numColumns = 5
 
 	let isSettingsOpen = true
+
+	const whoosh = (node, params) => {
+		const existingTransform = getComputedStyle(node).transform.replace('none', '');
+
+		return {
+			delay: params.delay || 0,
+			duration: params.duration || 400,
+			easing: params.easing || elasticOut,
+			css: (t, u) => `transform: ${existingTransform} scale(${t})`
+		};
+	}
 </script>
 
 <style>
@@ -194,6 +206,7 @@
 			maxColors={maxColors}
 			inputType={inputType}
 			numColumns={numColumns}
+			transition={{ fn: whoosh, args: { duration: 3000 } }}
 			on:select={({ detail: { color } }) => {
 				bgColor = color
 				preselectColor = !!bgColor
