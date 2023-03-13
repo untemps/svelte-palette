@@ -130,7 +130,7 @@
 	])}
 	style="--num-columns: {_numColumns}">
 	{#if $$slots.header}
-		<slot name="header" />
+		<slot name="header" {selectedColor}/>
 		<slot name="header-divider">
 			<hr class="palette__divider" />
 		</slot>
@@ -162,7 +162,7 @@
 						tooltipContentSelector,
 						tooltipClassName,
 					}}>
-					<slot name="slot" color={color}>
+					<slot name="slot" {color} {selectedColor} {transition} isCompact={_isCompact}>
 						<PaletteSlot color={color} selected={color === selectedColor} {transition} on:click={_onSlotSelect} />
 					</slot>
 				</li>
@@ -174,7 +174,7 @@
 			<hr class="palette__divider" />
 		</slot>
 		<slot name="footer" {selectedColor}>
-			<slot name="input">
+			<slot name="input" {selectedColor} {inputType}>
 				<div class="palette__content">
 					<PaletteInput color={selectedColor} inputType={inputType} on:add={_onInputAdd} />
 				</div>
