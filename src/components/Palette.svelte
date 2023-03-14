@@ -133,7 +133,7 @@
 		[_isCompact, 'palette--compact'],
 	])}
 	style="--num-columns: {_numColumns}">
-	{#if $$slots.header}
+	{#if $$slots.header && !_isCompact}
 		<slot name="header" {selectedColor}/>
 		<slot name="header-divider">
 			<hr class="palette__divider" />
