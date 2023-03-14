@@ -62,7 +62,8 @@ yarn add @untemps/svelte-palette
 | Props                    | Type     | Default | Description                                                                                                                                                                                               |
 |--------------------------|----------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `colors`                 | string[] | []      | Array of color strings to be displayed in the palette.                                                                                                                                                    |
-| `compactColorIndices`    | number[] | []      | Array of indices to pick from the `colors` array to be displayed in the compacted palette (see [Compact Mode](#compact-mode))                                                                             |
+| `compactColorIndices`    | number[] | []      | Array of indices to pick from the `colors` array to be displayed in the compacted palette (see [Compact Mode](#compact-mode)).                                                                            |
+| `isCompact`              | boolean  | false   | Flag to display the palette in compact mode.                                                                                                                                                              |
 | `selectedColor`          | string   | null    | Default selected color. The color must be included in the `colors` prop.                                                                                                                                  |
 | `allowDuplicates`        | boolean  | false   | Flag to allow color duplication.                                                                                                                                                                          |
 | `deletionMode`           | string   | "none"  | Mode of slot deletion, between `"none"` and `"tooltip"` and `"drop"` (see [Deletion Modes](#deletion-modes)).                                                                                             |
@@ -73,26 +74,27 @@ yarn add @untemps/svelte-palette
 | `maxColors`              | number   | 30      | Maximum number of slots to be displayed in the palette. Set this value to `-1` to allow infinite number of slots.                                                                                         |
 | `inputType`              | string   | "text"  | Type of the input within the footer slot. Only "text" and "color" are allowed. All other value will be replaced by "text".                                                                                |
 | `numColumns`             | number   | 5       | Number of columns of the palette grid. This value can't exceed the number of maximum colors defined in `maxColors` and can't be lower than 1. Set this value to `0` to display the slots on a single row. |
-| `transition`             | object   | null    | Animation when a slot is rendered (see [Transition](#transition))                                                                               |
+| `transition`             | object   | null    | Animation when a slot is rendered (see [Transition](#transition)).                                                                                                                                        |
 
 ## Events
 
-| Event    | Arguments | Type   | Description                                |
-| -------- | --------- | ------ | ------------------------------------------ |
-| `select` |           |        | **Dispatched whenever a color is clicked** |
-|          | `color`   | string | Selected color string.                     |
+| Event     | Arguments   | Type   | Description                                 |
+|-----------|-------------|--------|---------------------------------------------|
+| `select`  |             |        | **Dispatched whenever a color is clicked.** |
+|           | `color`     | string | Selected color string.                      |
 
 ## Slots
 
-| Slot               | Description                                                                                                                                                | Available Props                                     |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |-----------------------------------------------------|
-| `header`           | Allow to add a header to the palette. By default, it is empty.                                                                                             | `selectedColor`                                     |
-| `header-divider`   | Allow to add a divider between the header and the slots. This slot is added only if the header slot is set. By default, it displays a simple grey \<hr/\>. | -                                                   |
-| `footer`           | Allow to add a footer to the palette. By default, it contains an input to add colors.                                                                      | `selectedColor`                                     |
-| `footer-divider`   | Allow to add a divider between the slots and the footer. By default, it displays a simple grey \<hr/\>.                                                    | -                                                   |
-| `slot`             | Allow to replace the default color slots                                                                                                                   | `color`, `selectedColor`, `transition`, `isCompact` |
-| `transparent-slot` | Allow to replace the default transparent slot                                                                                                              | -                                                   |
-| `input`            | Allow to replace the input in the footer if the default footer slot is kept as it is                                                                       | `selectedColor`, `inputType`                        |
+| Slot                | Description                                                                                                                                                | Available Props                                     |
+|---------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|
+| `header`            | Allow to add a header to the palette. By default, it is empty.                                                                                             | `selectedColor`                                     |
+| `header-divider`    | Allow to add a divider between the header and the slots. This slot is added only if the header slot is set. By default, it displays a simple grey \<hr/\>. | -                                                   |
+| `footer`            | Allow to add a footer to the palette. By default, it contains an input to add colors.                                                                      | `selectedColor`                                     |
+| `footer-divider`    | Allow to add a divider between the slots and the footer. By default, it displays a simple grey \<hr/\>.                                                    | -                                                   |
+| `slot`              | Allow to replace the default color slots.                                                                                                                  | `color`, `selectedColor`, `transition`, `isCompact` |
+| `transparent-slot`  | Allow to replace the default transparent slot.                                                                                                             | -                                                   |
+| `input`             | Allow to replace the input in the footer if the default footer slot is kept as it is.                                                                      | `selectedColor`, `inputType`                        |
+| `compact-control`   | Allow to replace the control to toggle the compact mode. You may use the `isCompact` prop to control the current mode.                                     | `isCompact`                                         |
 
 ## Example
 
@@ -344,6 +346,38 @@ That unlocks the color picker provided by the browser. Therefore the color spot 
 </script>
 
 <Palette {colors} inputType="color" />
+```
+
+### Customize the compact control
+
+When setting a list of indices in the `compactColorIndices` prop, you can customize the compact toggle control with the `compact-control` slot.
+
+#### Example
+
+```html
+<script>
+	import { Palette } from '@untemps/svelte-palette'
+
+	const colors = ['#865C54', '#8F5447', '#A65846', '#A9715E', '#AD8C72']
+    
+    let isPaletteCompact = false
+    
+    const _onPaletteCompactControlClick = () => isPaletteCompact = !isPaletteCompact
+</script>
+
+<style>
+    .palette__compact-control {
+        color: black;
+        background-color: #e3e3e3;
+        border: 1px solid #c1c1c1;
+        border-radius: .3rem;
+        padding: .4rem
+    }
+</style>
+
+<Palette {colors} compactColorIndices={[0, 1, 2, 3]} isCompact={isPaletteCompact}>
+    <button slot="compact-control" class="palette__compact-control" on:click={_onPaletteCompactControlClick}>{isPaletteCompact ? '⯅' : '⯆'}</button>
+</Palette>
 ```
 
 ## Development

@@ -14,7 +14,6 @@
 	import useDeletion from './useDeletion'
 
 	export let colors = []
-	export let compactColorIndices = []
 	export let selectedColor = null
 	export let allowDuplicates = false
 	export let allowDeletion = false
@@ -26,9 +25,14 @@
 	export let inputType = 'text'
 	export let numColumns = 5
 	export let transition = null
+	export let compactColorIndices = []
+	export let isCompact = false
+
+	let _isCompact = false
+
+    $: _isCompact = isCompact
 
 	let _colors
-	let _isCompact = false
 
 	$: _colors = _isCompact ? extractByIndices(colors, compactColorIndices) : colors
 	$: _colors = !allowDuplicates ? colors.filter((item, index) => colors.indexOf(item) === index) : colors
@@ -70,7 +74,7 @@
 
 	const _onDelete = (index) => _removeColor(index)
 
-	const _onCompact = () => (_isCompact = !_isCompact)
+	const _onCompact = ({ detail: { isCompact } }) => _isCompact = !_isCompact
 </script>
 
 <style>
@@ -139,7 +143,9 @@
 		<ul class="palette__cells">
 			{#if !!compactColorIndices?.length}
 				<li>
-					<PaletteCompactToggleButton isCompact={_isCompact} on:click={_onCompact} />
+                    <slot name="compact-control" isCompact={_isCompact}>
+					    <PaletteCompactToggleButton isCompact={_isCompact} on:click={_onCompact} />
+                    </slot>
 				</li>
 			{/if}
 			{#if showTransparentSlot && !_isCompact}
