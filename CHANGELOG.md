@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/untemps/svelte-palette/compare/v2.2.0...v2.3.0) (2023-03-17)
+
+
+### Features
+
+* Drill component values into slots ([#64](https://github.com/untemps/svelte-palette/issues/64)) ([de41cc6](https://github.com/untemps/svelte-palette/commit/de41cc6ce4d63c32ef58978c98a79b95fd0253dd))
+
 # [2.2.0](https://github.com/untemps/svelte-palette/compare/v2.1.0...v2.2.0) (2023-03-13)
 
 
