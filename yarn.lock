@@ -2742,12 +2742,10 @@
   dependencies:
     "@babel/runtime" "^7.17.8"
 
-"@untemps/utils@^2.6.0":
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/@untemps/utils/-/utils-2.6.0.tgz#986fe9846d664c29b5c0dca84cb4f8b4112987e3"
-  integrity sha512-3B5bb4iYkh2h86vqtY8+Mo9vdX1s/NT1cltWpS4U3/WHXFgy/4lJ9180vELJv01MbNNhjlZPtJCMtBp7Fpsb1Q==
-  dependencies:
-    "@babel/runtime" "^7.17.8"
+"@untemps/utils@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@untemps/utils/-/utils-3.0.0.tgz#0f1968be1c2b079b2425e945e42bc7d61f0d776e"
+  integrity sha512-Iv7a1nvbTzk7ho8bry5iN/RYtns4dwNRuTqD49ixq0N3dOpoMIdSlhvVanbxEmRBqtV7MirCBEfScpTjDbo0ag==
 
 JSONStream@^1.0.4:
   version "1.3.5"
@@ -7860,11 +7858,6 @@ svelte@3.49.0:
   version "3.49.0"
   resolved "https://registry.yarnpkg.com/svelte/-/svelte-3.49.0.tgz#5baee3c672306de1070c3b7888fc2204e36a4029"
   integrity sha512-+lmjic1pApJWDfPCpUUTc1m8azDqYCG1JN9YEngrx/hUyIcFJo6VZhj0A1Ai0wqoHcEIuQy+e9tk+4uDgdtsFA==
-
-svelte@^3.50.1:
-  version "3.50.1"
-  resolved "https://registry.yarnpkg.com/svelte/-/svelte-3.50.1.tgz#b35fbc5e79ddd71e8bb27c3149ee6ff903841239"
-  integrity sha512-bS4odcsdj5D5jEg6riZuMg5NKelzPtmsCbD9RG+8umU03TeNkdWnP6pqbCm0s8UQNBkqk29w/Bdubn3C+HWSwA==
 
 svgo@^2.7.0:
   version "2.8.0"
