@@ -1,10 +1,16 @@
 <script>
-	import { createEventDispatcher } from 'svelte'
+	import { createEventDispatcher, onMount } from 'svelte'
 
 	import { ADD, ERROR } from '../enums/PaletteEvent'
 	import { EYE_DROPPER } from '../enums/PaletteIcon'
 
 	import PaletteIconButton from './PaletteIconButton.svelte'
+
+    let isAvailable = false
+
+	onMount(async () => {
+		isAvailable = !!window.EyeDropper
+    })
 
 	const dispatch = createEventDispatcher()
 
@@ -23,7 +29,7 @@
 	}
 </script>
 
-{#if !!window.EyeDropper}
+{#if isAvailable}
 	<PaletteIconButton
 		data-testid="__palette-eyedropper-button__"
 		aria-label="Submit the hex color value"
