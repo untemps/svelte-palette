@@ -1,6 +1,6 @@
 {
 	"name": "@untemps/svelte-palette",
-	"version": "2.3.0",
+	"version": "2.3.1",
 	"author": "Vincent Le Badezet <v.lebadezet@untemps.net>",
 	"license": "MIT",
 	"description": "Svelte component to display a customisable color picker",
@@ -61,9 +61,9 @@
 		"semantic-release": "^19.0.5",
 		"svelte-jester": "^2.3.2"
 	},
-    "peerDependencies": {
-      "svelte": "^3.50.1"
-    },
+	"peerDependencies": {
+		"svelte": "^3.50.1"
+	},
 	"dependencies": {
 		"@untemps/dom-observer": "^2.0.0",
 		"@untemps/svelte-use-drop-outside": "^1.6.0",

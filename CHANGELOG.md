@@ -1,3 +1,10 @@
+## [2.3.1](https://github.com/untemps/svelte-palette/compare/v2.3.0...v2.3.1) (2023-03-19)
+
+
+### Bug Fixes
+
+* Fix SvelteKit support ([#65](https://github.com/untemps/svelte-palette/issues/65)) ([5c25993](https://github.com/untemps/svelte-palette/commit/5c259932f9c293a32a6ee2856b4da1e649aa4ee9))
+
 # [2.3.0](https://github.com/untemps/svelte-palette/compare/v2.2.0...v2.3.0) (2023-03-17)
 
 
