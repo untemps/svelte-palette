@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { fireEvent, render, waitFor } from '@testing-library/svelte'
+import { fireEvent, render, screen, waitFor } from '@testing-library/svelte'
 
 import Palette from '../Palette.svelte'
 
@@ -10,51 +10,92 @@ import { TOOLTIP, DROP } from '../../enums/PaletteDeletionMode'
 
 describe('Palette', () => {
 	it('Displays as many color slots as set', async () => {
+		let cells = null
 		const colors = ['#ff0', '#0ff', '#f0f']
-		const { getAllByTestId } = render(Palette, {
+		render(Palette, {
 			colors,
 		})
-		expect(getAllByTestId('__palette-cell__')).toHaveLength(colors.length)
+
+		cells = await screen.findAllByTestId('__palette-cell__')
+		expect(cells).toHaveLength(colors.length)
+	})
+
+	it('Displays as many color slots as set in async mode', async () => {
+		let cells = null
+		const colors = Promise.resolve(['#ff0', '#0ff', '#f0f'])
+		render(Palette, {
+			colors,
+		})
+
+		cells = await screen.findAllByTestId('__palette-cell__')
+		waitFor(() => expect(cells).toHaveLength(colors.length))
 	})
 
 	it('Triggers select with color', async () => {
+		let cells,
+			cell = null
 		const onSelect = jest.fn()
 		const colors = ['#ff0', '#0ff', '#f0f']
-		const { getAllByTestId, component } = render(Palette, {
+
+		const { component } = render(Palette, {
 			colors,
 		})
+
 		component.$on('select', onSelect)
-		const cell = getAllByTestId('__palette-cell__')[0]
+
+		cells = await screen.findAllByTestId('__palette-cell__')
+		cell = cells[0]
 		await fireEvent.click(cell.firstChild)
+
 		expect(onSelect).toHaveBeenCalledWith(new CustomEvent({ detail: { color: colors[0] } }))
 	})
 
 	it('Deletes slots if deletionMode is set to "tooltip"', async () => {
+		let cells,
+			cell,
+			trash = null
 		const colors = ['#ff0', '#0ff', '#f0f']
-		const { getByTestId, getAllByTestId } = render(Palette, {
+
+		render(Palette, {
 			colors,
 			deletionMode: TOOLTIP,
 		})
-		const cell = getAllByTestId('__palette-cell__')[0]
+
+		cells = await screen.findAllByTestId('__palette-cell__')
+		cell = cells[0]
+
 		await fireEvent.mouseOver(cell) // fireEvent.mouseEnter only works if mouseOver is triggered before
 		await fireEvent.mouseEnter(cell)
-		await waitFor(() => expect(getByTestId('__trash-icon__')).toBeInTheDocument())
-		await fireEvent.click(getByTestId('__trash-icon__'))
-		await waitFor(() => expect(cell).not.toBeInTheDocument())
+
+		trash = await screen.findByTestId('__trash-icon__')
+		expect(trash).toBeInTheDocument()
+
+		await fireEvent.click(trash)
+
+		expect(cell).not.toBeInTheDocument()
 	})
 
 	it('Deletes slot if deletionMode is set to "drop"', async () => {
+		let cells,
+			cell = null
 		const colors = ['#ff0', '#0ff', '#f0f']
-		const { component, getAllByTestId } = render(Palette, {
+
+		const { component } = render(Palette, {
 			accessors: true,
 			props: {
 				colors,
 			},
 		})
+
+		cells = await screen.findAllByTestId('__palette-cell__')
+
 		component.deletionMode = DROP
-		const cell = getAllByTestId('__palette-cell__')[0]
+
+		cell = cells[0]
+
 		await fireEvent.mouseDown(cell)
 		await fireEvent.mouseMove(document)
+
 		const drag = document.querySelector('#drag')
 		drag.getBoundingClientRect = () => ({
 			width: 20,
@@ -65,50 +106,75 @@ describe('Palette', () => {
 			bottom: 2020,
 		})
 		await fireEvent.mouseUp(document)
-		await waitFor(() => expect(cell).not.toBeInTheDocument())
+
+		expect(cell).not.toBeInTheDocument()
 	})
 
 	it('Displays transparent slot if showTransparentSlot is truthy', async () => {
+		let cells,
+			cell = null
 		const onSelect = jest.fn()
 		const colors = ['#ff0', '#0ff', '#f0f']
-		const { getAllByTestId, component } = render(Palette, {
+
+		const { component } = render(Palette, {
 			colors,
 			showTransparentSlot: true,
 		})
+
 		component.$on('select', onSelect)
-		expect(getAllByTestId('__palette-cell__')).toHaveLength(colors.length + 1)
-		const cell = getAllByTestId('__palette-cell__')[0]
+		cells = await screen.findAllByTestId('__palette-cell__')
+		expect(cells).toHaveLength(colors.length + 1)
+
+		cell = cells[0]
 		await fireEvent.click(cell.firstChild)
+
 		expect(onSelect).toHaveBeenCalledWith(new CustomEvent({ detail: { color: null } }))
 	})
 
 	describe('Compact mode', () => {
 		it('Displays compact control if compactColorIndices is set', async () => {
+			let compact = null
 			const colors = ['#ff0', '#0ff', '#f0f']
 			const compactColorIndices = [0, 1]
-			const { getByTestId } = render(Palette, {
+
+			render(Palette, {
 				colors,
 				compactColorIndices,
 			})
-			expect(getByTestId('__palette-compact-toggle-button__')).toBeInTheDocument()
+
+			compact = await screen.findByTestId('__palette-compact-toggle-button__')
+			expect(compact).toBeInTheDocument()
 		})
 
 		it('Displays as many slots as within the compactColorIndices array', async () => {
-			const colors = ['#ff0', '#0ff', '#f0f']
+			let slots,
+				compact = null
+			const colors = ['#000', '#0ff', '#f0f']
 			const compactColorIndices = [0, 1]
-			const { getByTestId, getAllByTestId } = render(Palette, {
+
+			render(Palette, {
 				colors,
 				compactColorIndices,
 			})
-			let slots = getAllByTestId('__palette-slot__')
+
+			slots = await screen.findAllByTestId('__palette-slot__')
 			expect(slots).toHaveLength(colors.length)
-			const compact = getByTestId('__palette-compact-toggle-button__')
+
+			compact = await screen.findByTestId('__palette-compact-toggle-button__')
 			await fireEvent.click(compact)
-			slots = getAllByTestId('__palette-slot__')
-			expect(slots).toHaveLength(compactColorIndices.length)
+
+			await waitFor(async () => {
+				slots = await screen.findAllByTestId('__palette-slot__')
+				expect(slots).toHaveLength(colors.length)
+			})
+
+			compact = await screen.findByTestId('__palette-compact-toggle-button__')
 			await fireEvent.click(compact)
-			slots = getAllByTestId('__palette-slot__')
-			expect(slots).toHaveLength(colors.length)
+
+			await waitFor(async () => {
+				slots = await screen.findAllByTestId('__palette-slot__')
+				expect(slots).toHaveLength(colors.length)
+			})
 		})
 	})
 
@@ -118,20 +184,30 @@ describe('Palette', () => {
 		[['#ff0', '#0ff', '#f0f'], 3, 3],
 		[['#ff0', '#0ff', '#f0f'], 1, 1],
 	])('Adds or replaces color regarding maxColors value', async (colors, maxColors, expected) => {
+		let input,
+			submit,
+			slots = null
+		const newColor = '0f0'
 		const onSelect = jest.fn()
-		const { getByTestId, getAllByTestId, component } = render(Palette, {
+
+		const { component } = render(Palette, {
 			colors,
 			maxColors,
 		})
+
 		component.$on('select', onSelect)
-		const input = getByTestId('__palette-input-input__')
-		const submit = getByTestId('__palette-input-submit__')
-		const newColor = '0f0'
+
+		input = await screen.findByTestId('__palette-input-input__')
 		await fireEvent.input(input, { target: { value: newColor } })
+
+		submit = await screen.findByTestId('__palette-input-submit__')
 		await fireEvent.click(submit)
-		const slots = getAllByTestId('__palette-slot__')
+
+		slots = await screen.findAllByTestId('__palette-slot__')
 		expect(slots).toHaveLength(expected)
+
 		await fireEvent.click(slots[slots.length - 1])
+
 		expect(onSelect).toHaveBeenCalledWith(new CustomEvent({ detail: { color: '#000' } }))
 	})
 
@@ -140,34 +216,50 @@ describe('Palette', () => {
 		[['#ff0', '#0ff', '#f0f', '#f0f'], false, 3],
 		[['#ff0', '#0ff', '#f0f'], true, 4],
 	])('Adds or not color regarding allowDuplicates value', async (colors, allowDuplicates, expected) => {
+		let input,
+			submit,
+			slots = null
+		const newColor = 'f0f'
 		const onSelect = jest.fn()
-		const { getByTestId, getAllByTestId, component } = render(Palette, {
+
+		const { component } = render(Palette, {
 			colors,
 			allowDuplicates,
 		})
 		component.$on('select', onSelect)
-		const input = getByTestId('__palette-input-input__')
-		const submit = getByTestId('__palette-input-submit__')
-		const newColor = 'f0f'
+
+		input = await screen.findByTestId('__palette-input-input__')
 		await fireEvent.input(input, { target: { value: newColor } })
+
+		submit = await screen.findByTestId('__palette-input-submit__')
 		await fireEvent.click(submit)
-		const slots = getAllByTestId('__palette-slot__')
+
+		slots = await screen.findAllByTestId('__palette-slot__')
 		expect(slots).toHaveLength(expected)
+
 		await fireEvent.click(slots[slots.length - 1])
+
 		expect(onSelect).toHaveBeenCalledWith(new CustomEvent({ detail: { color: '#f0f' } }))
 	})
 
 	it('Removes duplicates when updating allowDuplicates value', async () => {
+		let slots = null
 		const colors = ['#ff0', '#0ff', '#f0f', '#f0f', '#f0f']
-		const { getAllByTestId, rerender } = render(Palette, {
+
+		const { rerender } = render(Palette, {
 			colors,
 			allowDuplicates: true,
 		})
-		expect(getAllByTestId('__palette-slot__')).toHaveLength(colors.length)
+
+		slots = await screen.findAllByTestId('__palette-slot__')
+		expect(slots).toHaveLength(colors.length)
+
 		rerender({
 			colors,
 			allowDuplicates: false,
 		})
-		expect(getAllByTestId('__palette-slot__')).toHaveLength(3)
+
+		slots = await screen.findAllByTestId('__palette-slot__')
+		expect(slots).toHaveLength(3)
 	})
 })

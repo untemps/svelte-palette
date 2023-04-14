@@ -59,22 +59,22 @@ yarn add @untemps/svelte-palette
 
 ## API
 
-| Props                    | Type     | Default | Description                                                                                                                                                                                               |
-|--------------------------|----------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `colors`                 | string[] | []      | Array of color strings to be displayed in the palette.                                                                                                                                                    |
-| `compactColorIndices`    | number[] | []      | Array of indices to pick from the `colors` array to be displayed in the compacted palette (see [Compact Mode](#compact-mode)).                                                                            |
-| `isCompact`              | boolean  | false   | Flag to display the palette in compact mode.                                                                                                                                                              |
-| `selectedColor`          | string   | null    | Default selected color. The color must be included in the `colors` prop.                                                                                                                                  |
-| `allowDuplicates`        | boolean  | false   | Flag to allow color duplication.                                                                                                                                                                          |
-| `deletionMode`           | string   | "none"  | Mode of slot deletion, between `"none"` and `"tooltip"` and `"drop"` (see [Deletion Modes](#deletion-modes)).                                                                                             |
-| `allowDeletion`          | string   | "none"  | (deprecated) Flag to allow color deletion. If false, equivalent to `deletionMode='none'`. If true, equivalent to `deletionMode='tooltip'`.                                                                |
-| `tooltipClassName`       | string   | null    | Class name to pass down to the deletion tooltip (see [Styles](#styles)).                                                                                                                                  |
-| `tooltipContentSelector` | string   | null    | Selector of the deletion tooltip content (see [Customize the Content of the Deletion Tooltip](#customize-the-content-of-the-deletion-tooltip)).                                                           |
-| `showTransparentSlot`    | boolean  | false   | Flag to display a transparent slot at the start of the slot list.                                                                                                                                         |
-| `maxColors`              | number   | 30      | Maximum number of slots to be displayed in the palette. Set this value to `-1` to allow infinite number of slots.                                                                                         |
-| `inputType`              | string   | "text"  | Type of the input within the footer slot. Only "text" and "color" are allowed. All other value will be replaced by "text".                                                                                |
-| `numColumns`             | number   | 5       | Number of columns of the palette grid. This value can't exceed the number of maximum colors defined in `maxColors` and can't be lower than 1. Set this value to `0` to display the slots on a single row. |
-| `transition`             | object   | null    | Animation when a slot is rendered (see [Transition](#transition)).                                                                                                                                        |
+| Props                    | Type                       | Default | Description                                                                                                                                                                                               |
+|--------------------------|----------------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `colors`                 | string[]/Promise<string[]> | []      | Array of color strings to be displayed in the palette. A promise to be resolved with an array of color strings can be passed as well (see []).                                                            |
+| `compactColorIndices`    | number[]                   | []      | Array of indices to pick from the `colors` array to be displayed in the compacted palette (see [Compact Mode](#compact-mode)).                                                                            |
+| `isCompact`              | boolean                    | false   | Flag to display the palette in compact mode.                                                                                                                                                              |
+| `selectedColor`          | string                     | null    | Default selected color. The color must be included in the `colors` prop.                                                                                                                                  |
+| `allowDuplicates`        | boolean                    | false   | Flag to allow color duplication.                                                                                                                                                                          |
+| `deletionMode`           | string                     | "none"  | Mode of slot deletion, between `"none"` and `"tooltip"` and `"drop"` (see [Deletion Modes](#deletion-modes)).                                                                                             |
+| `allowDeletion`          | string                     | "none"  | (deprecated) Flag to allow color deletion. If false, equivalent to `deletionMode='none'`. If true, equivalent to `deletionMode='tooltip'`.                                                                |
+| `tooltipClassName`       | string                     | null    | Class name to pass down to the deletion tooltip (see [Styles](#styles)).                                                                                                                                  |
+| `tooltipContentSelector` | string                     | null    | Selector of the deletion tooltip content (see [Customize the Content of the Deletion Tooltip](#customize-the-content-of-the-deletion-tooltip)).                                                           |
+| `showTransparentSlot`    | boolean                    | false   | Flag to display a transparent slot at the start of the slot list.                                                                                                                                         |
+| `maxColors`              | number                     | 30      | Maximum number of slots to be displayed in the palette. Set this value to `-1` to allow infinite number of slots.                                                                                         |
+| `inputType`              | string                     | "text"  | Type of the input within the footer slot. Only "text" and "color" are allowed. All other value will be replaced by "text".                                                                                |
+| `numColumns`             | number                     | 5       | Number of columns of the palette grid. This value can't exceed the number of maximum colors defined in `maxColors` and can't be lower than 1. Set this value to `0` to display the slots on a single row. |
+| `transition`             | object                     | null    | Animation when a slot is rendered (see [Transition](#transition)).                                                                                                                                        |
 
 ## Events
 
@@ -95,6 +95,7 @@ yarn add @untemps/svelte-palette
 | `transparent-slot`  | Allow to replace the default transparent slot.                                                                                                             | -                                                   |
 | `input`             | Allow to replace the input in the footer if the default footer slot is kept as it is.                                                                      | `selectedColor`, `inputType`                        |
 | `compact-control`   | Allow to replace the control to toggle the compact mode. You may use the `isCompact` prop to control the current mode.                                     | `isCompact`                                         |
+| `loader`            | Allow to replace the loader displayed during the colors async retrieving.                                                                                  | -                                                   |
 
 ## Example
 
@@ -300,7 +301,29 @@ This prop works the same way as the [in/out directive](https://svelte.dev/docs#t
 
 ## Recipes
 
-### Customize the Content of the Deletion Tooltip
+### Use an API to fill the palette
+
+In case you want to call an API to fetch the palette colors, you may pass a promise in the `colors` prop.
+
+The component displays a customizable loader waiting to the promise to be resolved. Be aware that the result of the promise must be an array of color strings as well.
+
+#### Example
+
+```html
+<script>
+	import { Palette } from '@untemps/svelte-palette'
+
+	const colors = fetch('https://www.colr.org/json/colors/random/30')
+	.then(result => result.json())
+    .then(result => result.colors.filter(c => c.hex?.length).map(c => `#${c.hex}`))
+</script>
+
+<Palette {colors}>
+	<p slot="loader">Loading...</p>
+</Palette>
+```
+
+### Customize the content of the Deletion Tooltip
 
 By default, if `deletionMode` is set to `"tooltip"`, the tooltip displays a trash icon:
 
