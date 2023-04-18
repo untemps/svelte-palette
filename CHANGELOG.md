@@ -1,3 +1,10 @@
+# [2.4.0](https://github.com/untemps/svelte-palette/compare/v2.3.1...v2.4.0) (2023-04-18)
+
+
+### Features
+
+* Add support for async colors prop ([#67](https://github.com/untemps/svelte-palette/issues/67)) ([6415080](https://github.com/untemps/svelte-palette/commit/64150800dadac4d251b8afa269d752ec22b3c24c))
+
 ## [2.3.1](https://github.com/untemps/svelte-palette/compare/v2.3.0...v2.3.1) (2023-03-19)
 
 
