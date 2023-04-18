@@ -10,8 +10,21 @@
 
 	let unique = {}
 
-	const colors = [
-		'#865C54',
+	const colors = fetch('https://www.colr.org/json/colors/random/30').then(result => {
+        return result.json()
+    }).then(result => {
+		const colorList = result.colors.filter(c => c.hex?.length).map(c => `#${c.hex}`)
+		bgColor = colorList[Math.round(Math.random() * (colorList.length - 1))]
+        return colorList
+    }).then(result => {
+
+        return new Promise(resolve => setTimeout(() => resolve(result), 2000))
+    }).then(result => {
+		maxNumColumns = result.length + 2
+        return result
+    })
+    /*const colors = [
+        '#865C54',
 		'#8F5447',
 		'#A65846',
 		'#A9715E',
@@ -34,10 +47,10 @@
 		'#E43F6F',
 		'#BE3E82',
 		'#5E4352',
-	]
+    ]*/
 	const compactIndices = [2, 7, 13, 20]
 
-	let bgColor = colors[Math.round(Math.random() * (colors.length - 1))]
+	let bgColor = null
 
 	let preselectColor = true
 	let allowDuplicates = true
@@ -49,12 +62,12 @@
 	let inputType = 'text'
 	let showCompactControl = true
 	let numColumns = 5
+	let maxNumColumns = 5
 	let transitionType = 'custom'
 
 	let isSettingsOpen = true
 
 	$: {
-		console.log(transitionType);
 		unique = {}
 	}
 
@@ -256,16 +269,14 @@
             <hr class="settings__space" />
             <Slider
                     labelText="Number of Columns"
-                    hideTextInput
                     fullWidth
                     min={1}
-                    max={colors.length + 2}
+                    max={maxNumColumns}
                     step={1}
                     bind:value={numColumns} />
             <hr class="settings__space" />
             <Slider
                     labelText="Maximum Number of Colors"
-                    hideTextInput
                     fullWidth
                     min={1}
                     max={50}
