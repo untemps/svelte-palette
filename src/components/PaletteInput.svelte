@@ -37,6 +37,7 @@
 
 <style>
 	form {
+        position: relative;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -65,7 +66,6 @@
 		border-right-width: 0;
 		border-top-right-radius: 0;
 		border-bottom-right-radius: 0;
-		z-index: 97;
 	}
 
 	.palette_input__input:disabled {
@@ -76,7 +76,6 @@
 		border-right-width: 1px;
 		border-color: #bdbdbd;
 		outline: none;
-		z-index: 99;
 	}
 
 	.palette_input__input--color {
@@ -88,7 +87,6 @@
 		margin-left: -1px;
 		border-top-left-radius: 0;
 		border-bottom-left-radius: 0;
-		z-index: 98;
 	}
 </style>
 
