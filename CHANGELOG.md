@@ -1,3 +1,10 @@
+## [2.4.1](https://github.com/untemps/svelte-palette/compare/v2.4.0...v2.4.1) (2023-04-26)
+
+
+### Bug Fixes
+
+* Remove useless z-index ([#68](https://github.com/untemps/svelte-palette/issues/68)) ([4516172](https://github.com/untemps/svelte-palette/commit/451617225f239138eebe4acb242cf578effca961))
+
 # [2.4.0](https://github.com/untemps/svelte-palette/compare/v2.3.1...v2.4.0) (2023-04-18)
 
 
