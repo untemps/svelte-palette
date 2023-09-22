@@ -67,9 +67,7 @@
 
 	let isSettingsOpen = true
 
-	$: {
-		unique = {}
-	}
+	$: unique = {}
 
 	const whoosh = (node, params) => {
 		const existingTransform = getComputedStyle(node).transform.replace('none', '')
@@ -262,7 +260,7 @@
                 <span class="settings__preselection__color" style={`background-color: ${bgColor}`} />
             </div>
             <hr class="settings__space" />
-            <Select labelText="Input Type" inline bind:selected={inputType}>
+            <Select labelText="Input Type" inline selected={inputType} on:change={(e) => inputType = e.target.value}>
                 <SelectItem value="text" />
                 <SelectItem value="color" />
             </Select>
@@ -288,7 +286,7 @@
                 <span slot="labelB" />
             </Toggle>
             <hr class="settings__space" />
-            <Select labelText="Deletion Mode" inline bind:selected={deletionMode}>
+            <Select labelText="Deletion Mode" inline selected={deletionMode}  on:change={(e) => deletionMode = e.target.value}>
                 <SelectItem value="none" />
                 <SelectItem value="tooltip" />
                 <SelectItem value="drop" />
@@ -317,7 +315,7 @@
                 <span slot="labelB" />
             </Toggle>
             <hr class="settings__space" />
-            <Select labelText="Transition Type" inline bind:selected={transitionType}>
+            <Select labelText="Transition Type" inline bind:selected={transitionType} on:change={(e) => transitionType = e.target.value}>
                 <SelectItem value="none" />
                 <SelectItem value="custom" />
                 <SelectItem value="fade" />
