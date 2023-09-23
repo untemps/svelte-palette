@@ -4,26 +4,15 @@
 	"author": "Vincent Le Badezet <v.lebadezet@untemps.net>",
 	"license": "MIT",
 	"description": "Svelte component to display a customisable color picker",
-	"keywords": [
-		"palette",
-		"color",
-		"color-picker",
-		"svelte",
-		"svelte-component",
-		"component",
-		"javascript"
-	],
+	"keywords": ["palette", "color", "color-picker", "svelte", "svelte-component", "component", "javascript"],
 	"private": false,
 	"publishConfig": {
 		"access": "public"
 	},
+	"type": "module",
 	"main": "dist/index.js",
-	"module": "dist/index.es.js",
 	"svelte": "src/index.js",
-	"files": [
-		"src",
-		"dist"
-	],
+	"files": ["src", "dist"],
 	"devDependencies": {
 		"@babel/cli": "^7.19.3",
 		"@babel/core": "^7.19.3",
@@ -76,13 +65,10 @@
 		"moduleNameMapper": {
 			"\\.(css|less|scss)$": "identity-obj-proxy"
 		},
-		"moduleFileExtensions": [
-			"js",
-			"svelte"
-		],
-		"setupFilesAfterEnv": [
-			"<rootDir>/jest/jest.setup.js"
-		]
+		"moduleFileExtensions": ["js", "svelte"],
+		"extensionsToTreatAsEsm": [".svelte"],
+		"testEnvironment": "jsdom",
+		"setupFilesAfterEnv": ["@testing-library/jest-dom/extend-expect"]
 	},
 	"release": {
 		"branches": [
@@ -132,12 +118,9 @@
 	},
 	"scripts": {
 		"dev": "cd dev && rimraf dist && yarn && yarn dev",
-		"test": "jest -u --watch --coverage",
+		"test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest -u --watch --coverage",
 		"test:ci": "jest -u -b --ci --coverage",
-		"build": "rimraf dist && yarn build:cjs && yarn build:es && yarn build:umd",
-		"build:cjs": "cross-env NODE_ENV=production BABEL_ENV=cjs rollup -c",
-		"build:es": "cross-env NODE_ENV=production BABEL_ENV=es rollup -c",
-		"build:umd": "cross-env NODE_ENV=production BABEL_ENV=umd rollup -c",
+		"build": "rimraf dist && cross-env NODE_ENV=production rollup -c",
 		"prettier": "prettier \"*/**/*.js\" --ignore-path ./.prettierignore --write && git add . && git status",
 		"prepare": "husky install"
 	}

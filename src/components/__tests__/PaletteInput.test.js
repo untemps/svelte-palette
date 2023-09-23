@@ -1,8 +1,5 @@
-/**
- * @jest-environment jsdom
- */
-
-import { fireEvent, getByTestId, render } from '@testing-library/svelte'
+import { jest } from '@jest/globals'
+import { fireEvent, render } from '@testing-library/svelte'
 import { standby } from '@untemps/utils/async/standby'
 
 import PaletteInput from '../PaletteInput.svelte'

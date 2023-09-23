@@ -1,7 +1,4 @@
-/**
- * @jest-environment jsdom
- */
-
+import { jest } from '@jest/globals'
 import { fireEvent, render } from '@testing-library/svelte'
 
 import PaletteSlot from '../PaletteSlot.svelte'

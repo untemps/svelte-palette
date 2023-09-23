@@ -7,18 +7,13 @@ import { terser } from 'rollup-plugin-terser'
 import visualizer from 'rollup-plugin-visualizer'
 
 const production = process.env.NODE_ENV === 'production'
-const target = process.env.BABEL_ENV
 
 export default {
 	input: 'src/index.js',
 	output: {
 		name: 'svelte-palette',
-		file: {
-			cjs: 'dist/index.js',
-			es: 'dist/index.es.js',
-			umd: 'dist/index.umd.js',
-		}[target],
-		format: target,
+		file: 'dist/index.js',
+		format: 'es',
 		sourcemap: 'inline',
 	},
 	plugins: [
