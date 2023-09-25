@@ -4,15 +4,33 @@
 	"author": "Vincent Le Badezet <v.lebadezet@untemps.net>",
 	"license": "MIT",
 	"description": "Svelte component to display a customisable color picker",
-	"keywords": ["palette", "color", "color-picker", "svelte", "svelte-component", "component", "javascript"],
+	"keywords": [
+		"palette",
+		"color",
+		"color-picker",
+		"svelte",
+		"svelte-component",
+		"component",
+		"javascript"
+	],
 	"private": false,
 	"publishConfig": {
 		"access": "public"
 	},
 	"type": "module",
 	"main": "dist/index.js",
+	"module": "dist/index.umd.cjs",
 	"svelte": "src/index.js",
-	"files": ["src", "dist"],
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"require": "./dist/index.umd.cjs"
+		}
+	},
+	"files": [
+		"src",
+		"dist"
+	],
 	"devDependencies": {
 		"@babel/cli": "^7.19.3",
 		"@babel/core": "^7.19.3",
@@ -21,12 +39,10 @@
 		"@babel/preset-env": "^7.19.3",
 		"@commitlint/cli": "^17.1.2",
 		"@commitlint/config-conventional": "^17.1.0",
-		"@rollup/plugin-babel": "^5.3.1",
-		"@rollup/plugin-commonjs": "^22.0.2",
-		"@rollup/plugin-node-resolve": "^14.1.0",
 		"@semantic-release/changelog": "^6.0.1",
 		"@semantic-release/git": "^10.0.1",
 		"@semantic-release/github": "^8.0.6",
+		"@sveltejs/vite-plugin-svelte": "^2.4.6",
 		"@testing-library/dom": "^8.18.1",
 		"@testing-library/jest-dom": "^5.16.5",
 		"@testing-library/svelte": "^4.0.3",
@@ -36,17 +52,12 @@
 		"identity-obj-proxy": "^3.0.0",
 		"jest": "^29.1.2",
 		"jest-environment-jsdom": "^29.1.2",
-		"postcss": "^8.4.17",
 		"prettier": "^2.7.1",
 		"prettier-plugin-svelte": "^2.10.1",
 		"rimraf": "^3.0.2",
-		"rollup": "^2.79.1",
-		"rollup-plugin-postcss": "^4.0.2",
-		"rollup-plugin-svelte": "^7.1.6",
-		"rollup-plugin-terser": "^7.0.2",
-		"rollup-plugin-visualizer": "^5.8.2",
 		"semantic-release": "^19.0.5",
-		"svelte-jester": "^3.0.0"
+		"svelte-jester": "^3.0.0",
+		"vite": "^4.4.9"
 	},
 	"peerDependencies": {
 		"svelte": "^4.0.0"
@@ -65,10 +76,17 @@
 		"moduleNameMapper": {
 			"\\.(css|less|scss)$": "identity-obj-proxy"
 		},
-		"moduleFileExtensions": ["js", "svelte"],
-		"extensionsToTreatAsEsm": [".svelte"],
+		"moduleFileExtensions": [
+			"js",
+			"svelte"
+		],
+		"extensionsToTreatAsEsm": [
+			".svelte"
+		],
 		"testEnvironment": "jsdom",
-		"setupFilesAfterEnv": ["@testing-library/jest-dom/extend-expect"]
+		"setupFilesAfterEnv": [
+			"@testing-library/jest-dom/extend-expect"
+		]
 	},
 	"release": {
 		"branches": [
@@ -101,14 +119,10 @@
 					"assets": [
 						{
 							"path": "dist/index.js",
-							"label": "CJS distribution"
-						},
-						{
-							"path": "dist/index.es.js",
 							"label": "ES distribution"
 						},
 						{
-							"path": "dist/index.umd.js",
+							"path": "dist/index.umd.cjs",
 							"label": "UMD distribution"
 						}
 					]
@@ -120,7 +134,7 @@
 		"dev": "cd dev && rimraf dist && yarn && yarn dev",
 		"test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest -u --watch --coverage",
 		"test:ci": "jest -u -b --ci --coverage",
-		"build": "rimraf dist && cross-env NODE_ENV=production rollup -c",
+		"build": "rimraf dist && vite build",
 		"prettier": "prettier \"*/**/*.js\" --ignore-path ./.prettierignore --write && git add . && git status",
 		"prepare": "husky install"
 	}
