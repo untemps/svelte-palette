@@ -205,11 +205,12 @@
 		position: absolute;
 		z-index: 9999;
 		max-width: initial;
-		background-color: #ee7008;
+		background-color: #fff;
 		color: #fff;
 		text-align: center;
-		border-radius: 6px;
+		border-radius: 0;
 		padding: 0.5rem;
+		filter: drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.3));
 	}
 
 	:global(.tooltip::after) {
@@ -220,7 +221,7 @@
 		margin-left: -5px;
 		border-width: 5px;
 		border-style: solid;
-		border-color: #ee7008 transparent transparent transparent;
+		border-color: #fff transparent transparent transparent;
 	}
 </style>
 

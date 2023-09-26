@@ -1126,18 +1126,26 @@
     "@untemps/utils" "^2.0.0"
     svelte "3.49.0"
 
-"@untemps/svelte-use-tooltip@^2.7.4":
-  version "2.7.4"
-  resolved "https://registry.yarnpkg.com/@untemps/svelte-use-tooltip/-/svelte-use-tooltip-2.7.4.tgz#3d39b27a406f2a3a634e46817192d5e5b8e645d0"
-  integrity sha512-C21pWxovPsUDijRvN5tLEBiNdt6oDUy4nYSWV26xUWvC4tdMt/7S4mJnk7YIEFnou1QcwzgPcghO0Q45HQyWWQ==
+"@untemps/svelte-use-tooltip@^2.8.0":
+  version "2.8.0"
+  resolved "https://registry.yarnpkg.com/@untemps/svelte-use-tooltip/-/svelte-use-tooltip-2.8.0.tgz#e2c167a9397fa364f3ddd029e29adafa68c2f29c"
+  integrity sha512-rXzYyU1JzKucyjAr4J+byrDUk0eFhwC8ggiitJE/v945OJDjjA29dA2d+DTjyppqlm2ZQZzGHYKY5hrdRKdrAg==
   dependencies:
     "@untemps/dom-observer" "^2.0.0"
+    "@untemps/utils" "^2.4.0"
     svelte "3.49.0"
 
 "@untemps/utils@^2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@untemps/utils/-/utils-2.0.0.tgz#85a4cc6f819fbf0a4f396d374be5921c75f9d2bf"
   integrity sha512-yeBxxhPinbl77FE9+cBB0oOzX0/YGp2hd34auWrLwn8CtXb08PX13Xr+yQMZTEWcDu0CMEbWW+wFTd2LmGkSow==
+  dependencies:
+    "@babel/runtime" "^7.17.8"
+
+"@untemps/utils@^2.4.0":
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/@untemps/utils/-/utils-2.6.0.tgz#986fe9846d664c29b5c0dca84cb4f8b4112987e3"
+  integrity sha512-3B5bb4iYkh2h86vqtY8+Mo9vdX1s/NT1cltWpS4U3/WHXFgy/4lJ9180vELJv01MbNNhjlZPtJCMtBp7Fpsb1Q==
   dependencies:
     "@babel/runtime" "^7.17.8"
 

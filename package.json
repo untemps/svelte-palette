@@ -49,7 +49,7 @@
 	"dependencies": {
 		"@untemps/dom-observer": "^2.0.0",
 		"@untemps/svelte-use-drop-outside": "^1.6.0",
-		"@untemps/svelte-use-tooltip": "^2.7.4",
+		"@untemps/svelte-use-tooltip": "^2.8.0",
 		"@untemps/utils": "^3.0.0"
 	},
 	"release": {
