@@ -8,7 +8,7 @@ export default defineConfig({
 		coverage: {
 			reporter: ['text', 'json', 'html'],
 		},
-		setupFiles: ['./vitest.setup.js']
+		setupFiles: ['./vitest.setup.js'],
 	},
 	plugins: [svelte({ hot: !process.env.VITEST })],
 })

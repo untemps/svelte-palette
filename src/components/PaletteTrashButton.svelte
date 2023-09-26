@@ -33,4 +33,9 @@
 	}
 </style>
 
-<PaletteIconButton data-testid="__palette-trash-button__" aria-label="Delete the slot" icon={TRASH} class="tooltip__button" />
+<PaletteIconButton
+	data-testid="__palette-trash-button__"
+	aria-label="Delete the slot"
+	icon={TRASH}
+	class="tooltip__button"
+/>

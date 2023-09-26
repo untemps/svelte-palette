@@ -67,4 +67,5 @@
 	])}
 	disabled={disabled}
 	in:enter
-	on:click|preventDefault={_onClick} />
+	on:click|preventDefault={_onClick}
+/>

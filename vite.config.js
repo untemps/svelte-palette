@@ -10,7 +10,5 @@ export default defineConfig({
 			fileName: 'index',
 		},
 	},
-	plugins: [
-		svelte()
-	],
+	plugins: [svelte()],
 })

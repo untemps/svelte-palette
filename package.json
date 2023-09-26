@@ -4,15 +4,7 @@
 	"author": "Vincent Le Badezet <v.lebadezet@untemps.net>",
 	"license": "MIT",
 	"description": "Svelte component to display a customisable color picker",
-	"keywords": [
-		"palette",
-		"color",
-		"color-picker",
-		"svelte",
-		"svelte-component",
-		"component",
-		"javascript"
-	],
+	"keywords": ["palette", "color", "color-picker", "svelte", "svelte-component", "component", "javascript"],
 	"private": false,
 	"publishConfig": {
 		"access": "public"
@@ -27,27 +19,27 @@
 			"require": "./dist/index.umd.cjs"
 		}
 	},
-	"files": [
-		"src",
-		"dist"
-	],
+	"files": ["src", "dist"],
+	"engines": {
+		"node": ">=18"
+	},
 	"devDependencies": {
 		"@commitlint/cli": "^17.7.1",
 		"@commitlint/config-conventional": "^17.7.0",
-		"@semantic-release/changelog": "^6.0.1",
+		"@semantic-release/changelog": "^6.0.3",
 		"@semantic-release/git": "^10.0.1",
-		"@semantic-release/github": "^8.0.6",
+		"@semantic-release/github": "^9.1.0",
 		"@sveltejs/vite-plugin-svelte": "^2.4.6",
 		"@testing-library/jest-dom": "^6.1.3",
 		"@testing-library/svelte": "^4.0.3",
 		"@vitest/coverage-v8": "^0.34.5",
 		"cross-env": "^7.0.3",
-		"husky": "^8.0.1",
+		"husky": "^8.0.3",
 		"jsdom": "^22.1.0",
-		"prettier": "^2.7.1",
-		"prettier-plugin-svelte": "^2.10.1",
-		"rimraf": "^3.0.2",
-		"semantic-release": "^19.0.5",
+		"prettier": "^3.0.3",
+		"prettier-plugin-svelte": "^3.0.3",
+		"rimraf": "^5.0.4",
+		"semantic-release": "^22.0.5",
 		"vite": "^4.4.9",
 		"vitest": "^0.34.5"
 	},
@@ -107,7 +99,7 @@
 		"test": "vitest watch --coverage",
 		"test:ci": "vitest run",
 		"build": "rimraf dist && vite build",
-		"prettier": "prettier \"*/**/*.js\" --ignore-path ./.prettierignore --write && git add . && git status",
+		"prettier": "prettier --write --plugin prettier-plugin-svelte . && git add . && git status",
 		"prepare": "husky install"
 	}
 }

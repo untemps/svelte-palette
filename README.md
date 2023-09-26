@@ -60,7 +60,7 @@ yarn add @untemps/svelte-palette
 ## API
 
 | Props                    | Type                          | Default | Description                                                                                                                                                                                                   |
-|--------------------------|-------------------------------|---------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ------------------------ | ----------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `colors`                 | string[] or Promise<string[]> | []      | Array of color strings to be displayed in the palette. A promise to be resolved with an array of color strings can be passed as well (see [Use an API to fill the palette](#use-an-api-to-fill-the-palette)). |
 | `compactColorIndices`    | number[]                      | []      | Array of indices to pick from the `colors` array to be displayed in the compacted palette (see [Compact Mode](#compact-mode)).                                                                                |
 | `isCompact`              | boolean                       | false   | Flag to display the palette in compact mode.                                                                                                                                                                  |
@@ -78,24 +78,24 @@ yarn add @untemps/svelte-palette
 
 ## Events
 
-| Event     | Arguments   | Type   | Description                                 |
-|-----------|-------------|--------|---------------------------------------------|
-| `select`  |             |        | **Dispatched whenever a color is clicked.** |
-|           | `color`     | string | Selected color string.                      |
+| Event    | Arguments | Type   | Description                                 |
+| -------- | --------- | ------ | ------------------------------------------- |
+| `select` |           |        | **Dispatched whenever a color is clicked.** |
+|          | `color`   | string | Selected color string.                      |
 
 ## Slots
 
-| Slot                | Description                                                                                                                                                | Available Props                                     |
-|---------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|
-| `header`            | Allow to add a header to the palette. By default, it is empty.                                                                                             | `selectedColor`                                     |
-| `header-divider`    | Allow to add a divider between the header and the slots. This slot is added only if the header slot is set. By default, it displays a simple grey \<hr/\>. | -                                                   |
-| `footer`            | Allow to add a footer to the palette. By default, it contains an input to add colors.                                                                      | `selectedColor`                                     |
-| `footer-divider`    | Allow to add a divider between the slots and the footer. By default, it displays a simple grey \<hr/\>.                                                    | -                                                   |
-| `slot`              | Allow to replace the default color slots.                                                                                                                  | `color`, `selectedColor`, `transition`, `isCompact` |
-| `transparent-slot`  | Allow to replace the default transparent slot.                                                                                                             | -                                                   |
-| `input`             | Allow to replace the input in the footer if the default footer slot is kept as it is.                                                                      | `selectedColor`, `inputType`                        |
-| `compact-control`   | Allow to replace the control to toggle the compact mode. You may use the `isCompact` prop to control the current mode.                                     | `isCompact`                                         |
-| `loader`            | Allow to replace the loader displayed during the colors async retrieving.                                                                                  | -                                                   |
+| Slot               | Description                                                                                                                                                | Available Props                                     |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| `header`           | Allow to add a header to the palette. By default, it is empty.                                                                                             | `selectedColor`                                     |
+| `header-divider`   | Allow to add a divider between the header and the slots. This slot is added only if the header slot is set. By default, it displays a simple grey \<hr/\>. | -                                                   |
+| `footer`           | Allow to add a footer to the palette. By default, it contains an input to add colors.                                                                      | `selectedColor`                                     |
+| `footer-divider`   | Allow to add a divider between the slots and the footer. By default, it displays a simple grey \<hr/\>.                                                    | -                                                   |
+| `slot`             | Allow to replace the default color slots.                                                                                                                  | `color`, `selectedColor`, `transition`, `isCompact` |
+| `transparent-slot` | Allow to replace the default transparent slot.                                                                                                             | -                                                   |
+| `input`            | Allow to replace the input in the footer if the default footer slot is kept as it is.                                                                      | `selectedColor`, `inputType`                        |
+| `compact-control`  | Allow to replace the control to toggle the compact mode. You may use the `isCompact` prop to control the current mode.                                     | `isCompact`                                         |
+| `loader`           | Allow to replace the loader displayed during the colors async retrieving.                                                                                  | -                                                   |
 
 ## Example
 
@@ -152,17 +152,17 @@ yarn add @untemps/svelte-palette
 
 The `deletionMode` prop allows to define the way users can delete (or not) the color slots:
 
-| Value     | Description                                                                                                                                                                                 |
-|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `none`    | (Default) Color slots cannot be deleted                                                                                                                                                     |
-| `tooltip` | A tooltip is displayed when hovering a color slot, a click within deletes the slot  <br/>(You can control tooltip display though the `tooltipClassName` and `tooltipContentSelector` props) |
-| `drop`    | Colors slots are draggable, a drop outside the palette deletes the slot                                                                                                                     |
+| Value     | Description                                                                                                                                                                                |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `none`    | (Default) Color slots cannot be deleted                                                                                                                                                    |
+| `tooltip` | A tooltip is displayed when hovering a color slot, a click within deletes the slot <br/>(You can control tooltip display though the `tooltipClassName` and `tooltipContentSelector` props) |
+| `drop`    | Colors slots are draggable, a drop outside the palette deletes the slot                                                                                                                    |
 
 As an helper, deletion mode enums are exported in `PaletteDeletionMode`.
 
 # Compact Mode
 
-The compact mode is a way to display a minimal version of the palette with a restricted selection of the original colors and downsized spaces. 
+The compact mode is a way to display a minimal version of the palette with a restricted selection of the original colors and downsized spaces.
 
 The `compactColorIndices` prop allows to define the list of the colors to be picked from the `colors` array by their indices.  
 If set, a control is added to toggle the compact mode.
@@ -216,11 +216,13 @@ You can style the component by passing a class down to the root tag (`section`).
 If you set `deletionMode` to `"tooltip"`, you can pass a class name that is set to the tooltip shown when hovering a slot.
 
 To do so, set a **global** class name to the `tooltipClassName` prop.
+
 > As the tooltip is interactive, make sure you define a sufficient hover area that allow to access the content of the tooltip before the leave event is triggered.
 
-If you ignore that prop, a default class is used.  
->Please note that the default class name is `__tooltip__default`.  
-Provide a different class name otherwise the default class would have the precedence over the custom one.
+If you ignore that prop, a default class is used.
+
+> Please note that the default class name is `__tooltip__default`.  
+> Provide a different class name otherwise the default class would have the precedence over the custom one.
 
 #### Example
 
@@ -269,7 +271,7 @@ You can customize the way slots appear into the palette by using the `transition
 This prop works the same way as the [in/out directive](https://svelte.dev/docs#template-syntax-element-directives-in-fn-out-fn) and accepts an object with two properties :
 
 | Value  | Description                                                                                        |
-|--------|----------------------------------------------------------------------------------------------------|
+| ------ | -------------------------------------------------------------------------------------------------- |
 | `fn`   | Transition function (See [Svelte Transitions](https://svelte.dev/docs#run-time-svelte-transition)) |
 | `args` | Parameters to pass to the transition function                                                      |
 
@@ -279,21 +281,21 @@ This prop works the same way as the [in/out directive](https://svelte.dev/docs#t
 
 ```html
 <script>
-    import { Palette } from '@untemps/svelte-palette'
-    import { elasticOut } from 'svelte/easing'
+	import { Palette } from '@untemps/svelte-palette'
+	import { elasticOut } from 'svelte/easing'
 
-    const colors = ['#865C54', '#8F5447', '#A65846', '#A9715E', '#AD8C72']
+	const colors = ['#865C54', '#8F5447', '#A65846', '#A9715E', '#AD8C72']
 
-    const whoosh = (node, params) => {
-        const existingTransform = getComputedStyle(node).transform.replace('none', '');
+	const whoosh = (node, params) => {
+		const existingTransform = getComputedStyle(node).transform.replace('none', '')
 
-        return {
-            delay: params.delay || 0,
-            duration: params.duration || 400,
-            easing: params.easing || elasticOut,
-            css: (t, u) => `transform: ${existingTransform} scale(${t})`
-        };
-    }
+		return {
+			delay: params.delay || 0,
+			duration: params.duration || 400,
+			easing: params.easing || elasticOut,
+			css: (t, u) => `transform: ${existingTransform} scale(${t})`,
+		}
+	}
 </script>
 
 <Palette {colors} transition={{ fn: whoosh, args: { duration: 3000 } }} />
@@ -314,8 +316,8 @@ The component displays a customizable loader waiting to the promise to be resolv
 	import { Palette } from '@untemps/svelte-palette'
 
 	const colors = fetch('https://www.colr.org/json/colors/random/30')
-		.then(result => result.json())
-		.then(result => result.colors.filter(c => c.hex?.length).map(c => `#${c.hex}`))
+		.then((result) => result.json())
+		.then((result) => result.colors.filter((c) => c.hex?.length).map((c) => `#${c.hex}`))
 </script>
 
 <Palette {colors}>
@@ -382,24 +384,26 @@ Besides setting a list of indices in the `compactColorIndices` prop, you can cus
 	import { Palette } from '@untemps/svelte-palette'
 
 	const colors = ['#865C54', '#8F5447', '#A65846', '#A9715E', '#AD8C72']
-    
-    let isPaletteCompact = false
-    
-    const _onPaletteCompactControlClick = () => isPaletteCompact = !isPaletteCompact
+
+	let isPaletteCompact = false
+
+	const _onPaletteCompactControlClick = () => (isPaletteCompact = !isPaletteCompact)
 </script>
 
 <style>
-    .palette__compact-control {
-        color: black;
-        background-color: #e3e3e3;
-        border: 1px solid #c1c1c1;
-        border-radius: .3rem;
-        padding: .4rem
-    }
+	.palette__compact-control {
+		color: black;
+		background-color: #e3e3e3;
+		border: 1px solid #c1c1c1;
+		border-radius: 0.3rem;
+		padding: 0.4rem;
+	}
 </style>
 
-<Palette {colors} compactColorIndices={[0, 1, 2, 3]} isCompact={isPaletteCompact}>
-    <button slot="compact-control" class="palette__compact-control" on:click={_onPaletteCompactControlClick}>{isPaletteCompact ? '⯅' : '⯆'}</button>
+<Palette {colors} compactColorIndices="{[0," 1, 2, 3]} isCompact="{isPaletteCompact}">
+	<button slot="compact-control" class="palette__compact-control" on:click="{_onPaletteCompactControlClick}">
+		{isPaletteCompact ? '⯅' : '⯆'}
+	</button>
 </Palette>
 ```
 

@@ -1,7 +1,7 @@
 <script>
 	import { createEventDispatcher } from 'svelte'
 	import { resolveClassName } from '@untemps/utils/dom/resolveClassName'
-	
+
 	import { CLICK } from '../enums/PaletteEvent'
 
 	import { COMPACT, ENLARGE, EYE_DROPPER, PLUS, TRASH } from '../enums/PaletteIcon'
@@ -78,6 +78,7 @@
 	type="button"
 	{...$$restProps}
 	class={resolveClassName(['icon_button__button', $$props.class])}
-	on:click|preventDefault={_onClick}>
+	on:click|preventDefault={_onClick}
+>
 	<svelte:component this={_resolveIcon(icon)} />
 </button>

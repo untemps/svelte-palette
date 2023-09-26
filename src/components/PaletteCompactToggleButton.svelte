@@ -18,4 +18,5 @@
 	aria-label={isCompact ? 'Enlarge the palette' : 'Compact the palette'}
 	{...$$restProps}
 	icon={isCompact ? ENLARGE : COMPACT}
-	on:click={_onClick} />
+	on:click={_onClick}
+/>

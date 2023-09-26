@@ -6,7 +6,7 @@
 
 	import PaletteIconButton from './PaletteIconButton.svelte'
 
-    $: isAvailable = !!window.EyeDropper
+	$: isAvailable = !!window.EyeDropper
 
 	const dispatch = createEventDispatcher()
 
@@ -32,5 +32,6 @@
 		{...$$restProps}
 		icon={EYE_DROPPER}
 		type="submit"
-		on:click={_onClick} />
+		on:click={_onClick}
+	/>
 {/if}
