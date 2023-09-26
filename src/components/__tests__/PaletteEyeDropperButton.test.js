@@ -34,7 +34,9 @@ test('Retrieves color from EyeDropper selection', async () => {
 // EyeDropper API is invalid
 test('Throws error', async () => {
 	window.EyeDropper = function () {
-		this.open = () => {throw new Error('Error')}
+		this.open = () => {
+			throw new Error('Error')
+		}
 	}
 
 	const onError = vi.fn(() => 0)
@@ -52,7 +54,7 @@ test('Renders nothing', async () => {
 	render(PaletteEyeDropperButton)
 	try {
 		await screen.findByTestId('__palette-eyedropper-button__')
-	} catch(e) {
+	} catch (e) {
 		expect(e).not.toBeUndefined()
 	}
 })
