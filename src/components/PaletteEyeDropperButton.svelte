@@ -1,16 +1,12 @@
 <script>
-	import { createEventDispatcher, onMount } from 'svelte'
+	import { createEventDispatcher } from 'svelte'
 
 	import { ADD, ERROR } from '../enums/PaletteEvent'
 	import { EYE_DROPPER } from '../enums/PaletteIcon'
 
 	import PaletteIconButton from './PaletteIconButton.svelte'
 
-    let isAvailable = false
-
-	onMount(async () => {
-		isAvailable = !!window.EyeDropper
-    })
+    $: isAvailable = !!window.EyeDropper
 
 	const dispatch = createEventDispatcher()
 
