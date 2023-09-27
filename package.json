@@ -1,6 +1,6 @@
 {
 	"name": "@untemps/svelte-palette",
-	"version": "2.4.1",
+	"version": "3.0.0",
 	"author": "Vincent Le Badezet <v.lebadezet@untemps.net>",
 	"license": "MIT",
 	"homepage": "https://untemps.github.io/svelte-palette",

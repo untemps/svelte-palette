@@ -1,3 +1,13 @@
+# [3.0.0](https://github.com/untemps/svelte-palette/compare/v2.4.1...v3.0.0) (2023-09-27)
+
+### chore
+
+-   Upgrade to Svelte 4 ([#75](https://github.com/untemps/svelte-palette/issues/75)) ([4fab7aa](https://github.com/untemps/svelte-palette/commit/4fab7aa5eec09ce1b7a783bcdc7759c4bd802c98))
+
+### BREAKING CHANGES
+
+-   No more cjs build and Node 18+ upgrade
+
 ## [2.4.1](https://github.com/untemps/svelte-palette/compare/v2.4.0...v2.4.1) (2023-04-26)
 
 ### Bug Fixes
