@@ -1,5 +1,4 @@
 {
-	"pluginSearchDirs": ["."],
 	"printWidth": 120,
 	"useTabs": true,
 	"tabWidth": 4,
@@ -7,6 +6,7 @@
 	"semi": false,
 	"trailingComma": "es5",
 	"bracketSpacing": true,
+	"bracketSameLine": false,
 	"overrides": [
 		{
 			"files": "./**/*.js",
@@ -17,7 +17,6 @@
 		{
 			"files": "./**/*.svelte",
 			"options": {
-				"svelteBracketNewLine": false,
 				"svelteAllowShorthand": false,
 				"svelteSortOrder": "options-scripts-styles-markup",
 				"plugins": ["prettier-plugin-svelte"]

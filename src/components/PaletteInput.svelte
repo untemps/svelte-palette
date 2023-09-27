@@ -37,7 +37,7 @@
 
 <style>
 	form {
-        position: relative;
+		position: relative;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -93,10 +93,11 @@
 <form data-testid="__palette-input__">
 	{#if inputType !== 'color'}<PaletteSlot
 			data-testid="__palette-input-slot__"
-			bind:color
+			bind:color={color}
 			role="presentation"
 			tabindex="-1"
-			disabled />{/if}
+			disabled
+		/>{/if}
 	<span class="palette_input__adder">
 		<input
 			data-testid="__palette-input-input__"
@@ -106,14 +107,16 @@
 			title="'The value must be a valid hex color'"
 			class="palette_input__input"
 			class:palette_input__input--color={inputType === 'color'}
-			on:input|preventDefault={_onChange} />
+			on:input|preventDefault={_onChange}
+		/>
 		<PaletteIconButton
 			data-testid="__palette-input-submit__"
 			icon={PLUS}
 			disabled={!isValid}
 			aria-label="Submit the hex color value"
 			class="palette_input__submit"
-			on:click={_onSubmit} />
+			on:click={_onSubmit}
+		/>
 	</span>
 	{#if inputType !== 'color'}
 		<PaletteEyeDropperButton aria-label="Pick a color from the screen" on:add={_onEyeDropperAdd} />
