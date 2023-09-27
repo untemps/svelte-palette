@@ -409,7 +409,7 @@ Besides setting a list of indices in the `compactColorIndices` prop, you can cus
 
 ## Development
 
-The component can be served for development purpose on `http://localhost:5000/` running:
+The component can be served for development purpose on `http://localhost:5001/` running:
 
 ```
 yarn dev
