@@ -139,7 +139,8 @@
 
 <div
 	class={resolveClassName(['palette', $$props.class, [_isCompact, 'palette--compact']])}
-	style="--num-columns: {_numColumns}">
+	style="--num-columns: {_numColumns}"
+>
 	{#if _colors?.length}
 		{#if $$slots.header && !_isCompact}
 			<slot name="header" selectedColor={selectedColor} />
@@ -162,7 +163,8 @@
 							<PaletteSlot
 								aria-label="Transparent slot"
 								selected={selectedColor === null}
-								on:click={_onSlotSelect} />
+								on:click={_onSlotSelect}
+							/>
 						</slot>
 					</li>
 				{/if}
@@ -175,18 +177,21 @@
 							onDelete: () => _onDelete(index),
 							tooltipContentSelector,
 							tooltipClassName,
-						}}>
+						}}
+					>
 						<slot
 							name="slot"
 							color={color}
 							selectedColor={selectedColor}
 							transition={transition}
-							isCompact={_isCompact}>
+							isCompact={_isCompact}
+						>
 							<PaletteSlot
 								color={color}
 								selected={color === selectedColor}
 								transition={transition}
-								on:click={_onSlotSelect} />
+								on:click={_onSlotSelect}
+							/>
 						</slot>
 					</li>
 				{/each}

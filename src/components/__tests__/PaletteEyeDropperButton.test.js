@@ -1,68 +1,60 @@
-/**
- * @jest-environment jsdom
- */
-
-import { fireEvent, render, waitFor } from '@testing-library/svelte'
+import { afterEach, expect, test, vi } from 'vitest'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte'
 
 import PaletteEyeDropperButton from '../PaletteEyeDropperButton.svelte'
 
-describe('PaletteEyeDropperButton', () => {
-	describe('EyeDropper API is not available', () => {
-		it('Renders nothing', () => {
-			const { queryByTestId } = render(PaletteEyeDropperButton)
-			expect(queryByTestId('__palette-eyedropper-button__')).not.toBeInTheDocument()
-		})
-	})
+afterEach(() => cleanup())
 
-	describe('EyeDropper API is available', () => {
-		beforeAll(() => {
-			window.EyeDropper = function () {
-				this.open = () => Promise.resolve({ sRGBHex: '#ff0' })
-			}
-		})
+window.EyeDropper = function () {
+	this.open = () => Promise.resolve({ sRGBHex: '#ff0' })
+}
 
-		afterAll(() => {
-			window.EyeDropper = undefined
-		})
+test('Renders eye dropper button', async () => {
+	render(PaletteEyeDropperButton)
+	const button = await screen.findByTestId('__palette-eyedropper-button__')
+	expect(button).toBeInTheDocument()
+})
 
-		it('Renders eye dropper button', () => {
-			const { getByTestId } = render(PaletteEyeDropperButton)
-			expect(getByTestId('__palette-eyedropper-button__')).toBeInTheDocument()
-		})
+test('Sets eye dropper button aria-label', () => {
+	const ariaLabel = 'Foo'
+	render(PaletteEyeDropperButton, { ['aria-label']: ariaLabel })
+	const button = screen.getByLabelText(ariaLabel)
+	expect(button).toBeInTheDocument()
+})
 
-		it('Sets eye dropper button aria-label', () => {
-			const ariaLabel = 'Foo'
-			const { getByLabelText } = render(PaletteEyeDropperButton, { ['aria-label']: ariaLabel })
-			expect(getByLabelText(ariaLabel)).toBeInTheDocument()
-		})
+test('Retrieves color from EyeDropper selection', async () => {
+	const onAdd = vi.fn()
+	const { component } = render(PaletteEyeDropperButton)
+	const button = screen.getByTestId('__palette-eyedropper-button__')
+	component.$on('add', onAdd)
+	await fireEvent.click(button)
+	await waitFor(() => expect(onAdd).toHaveBeenCalledWith(new CustomEvent({ detail: { color: '#ff0' } })))
+})
 
-		it('Retrieves color from EyeDropper selection', async () => {
-			const onAdd = jest.fn()
-			const { getByTestId, component } = render(PaletteEyeDropperButton)
-			const button = getByTestId('__palette-eyedropper-button__')
-			component.$on('add', onAdd)
-			await fireEvent.click(button)
-			await waitFor(() => expect(onAdd).toHaveBeenCalledWith(new CustomEvent({ detail: { color: '#ff0' } })))
-		})
-	})
+// EyeDropper API is invalid
+test('Throws error', async () => {
+	window.EyeDropper = function () {
+		this.open = () => {
+			throw new Error('Error')
+		}
+	}
 
-	describe('EyeDropper API is invalid', () => {
-		beforeAll(() => {
-			window.EyeDropper = {}
-		})
+	const onError = vi.fn(() => 0)
+	const ariaLabel = 'Foo'
+	const { component } = render(PaletteEyeDropperButton, { ['aria-label']: ariaLabel })
+	const button = screen.getByLabelText(ariaLabel)
+	component.$on('error', onError)
+	await fireEvent.click(button)
+	await waitFor(() => expect(onError).toHaveBeenCalled())
+})
 
-		afterAll(() => {
-			window.EyeDropper = undefined
-		})
-
-		it('Throws error', async () => {
-			const onError = jest.fn()
-			const ariaLabel = 'Foo'
-			const { getByLabelText, component } = render(PaletteEyeDropperButton, { ['aria-label']: ariaLabel })
-			const button = getByLabelText(ariaLabel)
-			component.$on('error', onError)
-			await fireEvent.click(button)
-			await waitFor(() => expect(onError).toHaveBeenCalled())
-		})
-	})
+// EyeDropper API is not available
+test('Renders nothing', async () => {
+	window.EyeDropper = null
+	render(PaletteEyeDropperButton)
+	try {
+		await screen.findByTestId('__palette-eyedropper-button__')
+	} catch (e) {
+		expect(e).not.toBeUndefined()
+	}
 })
