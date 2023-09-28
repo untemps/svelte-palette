@@ -6,7 +6,7 @@ export default defineConfig({
 		global: true,
 		environment: 'jsdom',
 		coverage: {
-			reporter: ['text', 'json', 'html'],
+			reporter: ['text', 'lcov'],
 		},
 		setupFiles: ['./vitest.setup.js'],
 	},
