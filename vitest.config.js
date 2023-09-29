@@ -1,5 +1,5 @@
+import { sveltekit } from '@sveltejs/kit/vite'
 import { defineConfig } from 'vitest/config'
-import { svelte } from '@sveltejs/vite-plugin-svelte'
 
 export default defineConfig({
 	test: {
@@ -10,5 +10,5 @@ export default defineConfig({
 		},
 		setupFiles: ['./vitest.setup.js'],
 	},
-	plugins: [svelte({ hot: !process.env.VITEST })],
+	plugins: [sveltekit()],
 })

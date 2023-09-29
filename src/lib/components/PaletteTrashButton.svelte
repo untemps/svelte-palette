@@ -4,6 +4,13 @@
 	import PaletteIconButton from './PaletteIconButton.svelte'
 </script>
 
+<PaletteIconButton
+	data-testid="__palette-trash-button__"
+	aria-label="Delete the slot"
+	icon={TRASH}
+	class="tooltip__button"
+/>
+
 <style>
 	:global(button.icon_button__button.tooltip__button) {
 		cursor: pointer;
@@ -32,10 +39,3 @@
 		fill: #aaaaaa;
 	}
 </style>
-
-<PaletteIconButton
-	data-testid="__palette-trash-button__"
-	aria-label="Delete the slot"
-	icon={TRASH}
-	class="tooltip__button"
-/>

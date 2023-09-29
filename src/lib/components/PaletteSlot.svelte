@@ -20,6 +20,21 @@
 		})
 </script>
 
+<button
+	data-testid="__palette-slot__"
+	aria-label={color}
+	{...$$restProps}
+	style="--color:{color}; --outerBorderColor:{color || '#aaa'};"
+	class={resolveClassName([
+		[!color, 'empty'],
+		[selected, 'selected'],
+		[!disabled, 'clickable'],
+	])}
+	{disabled}
+	in:enter
+	on:click|preventDefault={_onClick}
+/>
+
 <style>
 	button {
 		width: 1rem;
@@ -54,18 +69,3 @@
 		background: linear-gradient(to top left, #00000000 calc(50% - 1px), #aaa 50% 50%, #00000000 calc(50% + 1px));
 	}
 </style>
-
-<button
-	data-testid="__palette-slot__"
-	aria-label={color}
-	{...$$restProps}
-	style="--color:{color}; --outerBorderColor:{color || '#aaa'};"
-	class={resolveClassName([
-		[!color, 'empty'],
-		[selected, 'selected'],
-		[!disabled, 'clickable'],
-	])}
-	disabled={disabled}
-	in:enter
-	on:click|preventDefault={_onClick}
-/>

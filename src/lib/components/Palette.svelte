@@ -81,6 +81,83 @@
 	const _onCompact = ({ detail: { isCompact } }) => (_isCompact = !_isCompact)
 </script>
 
+<div
+	class={resolveClassName(['palette', $$props.class, [_isCompact, 'palette--compact']])}
+	style="--num-columns: {_numColumns}"
+>
+	{#if _colors?.length}
+		{#if $$slots.header && !_isCompact}
+			<slot name="header" {selectedColor} />
+			<slot name="header-divider">
+				<hr class="palette__divider" />
+			</slot>
+		{/if}
+		<article class="palette__content">
+			<ul class="palette__cells">
+				{#if !!compactColorIndices?.length}
+					<li>
+						<slot name="compact-control" isCompact={_isCompact}>
+							<PaletteCompactToggleButton isCompact={_isCompact} on:click={_onCompact} />
+						</slot>
+					</li>
+				{/if}
+				{#if showTransparentSlot && !_isCompact}
+					<li data-testid="__palette-cell__" class="palette__cells__cell">
+						<slot name="transparent-slot">
+							<PaletteSlot
+								aria-label="Transparent slot"
+								selected={selectedColor === null}
+								on:click={_onSlotSelect}
+							/>
+						</slot>
+					</li>
+				{/if}
+				{#each _colors as color, index (`${color}_${index}`)}
+					<li
+						data-testid="__palette-cell__"
+						class="palette__cells__cell"
+						use:useDeletion={{
+							deletionMode: _deletionMode,
+							onDelete: () => _onDelete(index),
+							tooltipContentSelector,
+							tooltipClassName,
+						}}
+					>
+						<slot name="slot" {color} {selectedColor} {transition} isCompact={_isCompact}>
+							<PaletteSlot
+								{color}
+								selected={color === selectedColor}
+								{transition}
+								on:click={_onSlotSelect}
+							/>
+						</slot>
+					</li>
+				{/each}
+			</ul>
+		</article>
+		{#if !_isCompact}
+			<slot name="footer-divider">
+				<hr class="palette__divider" />
+			</slot>
+			<slot name="footer" {selectedColor}>
+				<slot name="input" {selectedColor} {inputType}>
+					<article class="palette__content">
+						<PaletteInput color={selectedColor} {inputType} on:add={_onInputAdd} />
+					</article>
+				</slot>
+			</slot>
+		{/if}
+	{:else}
+		<slot name="loader">
+			<PaletteLoader />
+		</slot>
+	{/if}
+</div>
+
+<template id="tooltip-template">
+	<PaletteTrashButton />
+</template>
+
 <style>
 	:global(*) {
 		box-sizing: border-box;
@@ -136,86 +213,3 @@
 		margin: 0;
 	}
 </style>
-
-<div
-	class={resolveClassName(['palette', $$props.class, [_isCompact, 'palette--compact']])}
-	style="--num-columns: {_numColumns}"
->
-	{#if _colors?.length}
-		{#if $$slots.header && !_isCompact}
-			<slot name="header" selectedColor={selectedColor} />
-			<slot name="header-divider">
-				<hr class="palette__divider" />
-			</slot>
-		{/if}
-		<article class="palette__content">
-			<ul class="palette__cells">
-				{#if !!compactColorIndices?.length}
-					<li>
-						<slot name="compact-control" isCompact={_isCompact}>
-							<PaletteCompactToggleButton isCompact={_isCompact} on:click={_onCompact} />
-						</slot>
-					</li>
-				{/if}
-				{#if showTransparentSlot && !_isCompact}
-					<li data-testid="__palette-cell__" class="palette__cells__cell">
-						<slot name="transparent-slot">
-							<PaletteSlot
-								aria-label="Transparent slot"
-								selected={selectedColor === null}
-								on:click={_onSlotSelect}
-							/>
-						</slot>
-					</li>
-				{/if}
-				{#each _colors as color, index (`${color}_${index}`)}
-					<li
-						data-testid="__palette-cell__"
-						class="palette__cells__cell"
-						use:useDeletion={{
-							deletionMode: _deletionMode,
-							onDelete: () => _onDelete(index),
-							tooltipContentSelector,
-							tooltipClassName,
-						}}
-					>
-						<slot
-							name="slot"
-							color={color}
-							selectedColor={selectedColor}
-							transition={transition}
-							isCompact={_isCompact}
-						>
-							<PaletteSlot
-								color={color}
-								selected={color === selectedColor}
-								transition={transition}
-								on:click={_onSlotSelect}
-							/>
-						</slot>
-					</li>
-				{/each}
-			</ul>
-		</article>
-		{#if !_isCompact}
-			<slot name="footer-divider">
-				<hr class="palette__divider" />
-			</slot>
-			<slot name="footer" selectedColor={selectedColor}>
-				<slot name="input" selectedColor={selectedColor} inputType={inputType}>
-					<article class="palette__content">
-						<PaletteInput color={selectedColor} inputType={inputType} on:add={_onInputAdd} />
-					</article>
-				</slot>
-			</slot>
-		{/if}
-	{:else}
-		<slot name="loader">
-			<PaletteLoader />
-		</slot>
-	{/if}
-</div>
-
-<template id="tooltip-template">
-	<PaletteTrashButton />
-</template>

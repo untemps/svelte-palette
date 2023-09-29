@@ -36,6 +36,16 @@
 	const _onClick = (e) => dispatch(CLICK, { event: e })
 </script>
 
+<button
+	data-testid="__palette-icon-button__"
+	type="button"
+	{...$$restProps}
+	class={resolveClassName(['icon_button__button', $$props.class])}
+	on:click|preventDefault={_onClick}
+>
+	<svelte:component this={_resolveIcon(icon)} />
+</button>
+
 <style>
 	.icon_button__button {
 		position: relative;
@@ -72,13 +82,3 @@
 		fill: #646464;
 	}
 </style>
-
-<button
-	data-testid="__palette-icon-button__"
-	type="button"
-	{...$$restProps}
-	class={resolveClassName(['icon_button__button', $$props.class])}
-	on:click|preventDefault={_onClick}
->
-	<svelte:component this={_resolveIcon(icon)} />
-</button>
