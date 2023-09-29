@@ -35,6 +35,39 @@
 	}
 </script>
 
+<form data-testid="__palette-input__">
+	{#if inputType !== 'color'}<PaletteSlot
+			data-testid="__palette-input-slot__"
+			bind:color
+			role="presentation"
+			tabindex="-1"
+			disabled
+		/>{/if}
+	<span class="palette_input__adder">
+		<input
+			data-testid="__palette-input-input__"
+			type={inputType}
+			value={color}
+			aria-label="Enter an hex color value"
+			title="'The value must be a valid hex color'"
+			class="palette_input__input"
+			class:palette_input__input--color={inputType === 'color'}
+			on:input|preventDefault={_onChange}
+		/>
+		<PaletteIconButton
+			data-testid="__palette-input-submit__"
+			icon={PLUS}
+			disabled={!isValid}
+			aria-label="Submit the hex color value"
+			class="palette_input__submit"
+			on:click={_onSubmit}
+		/>
+	</span>
+	{#if inputType !== 'color'}
+		<PaletteEyeDropperButton aria-label="Pick a color from the screen" on:add={_onEyeDropperAdd} />
+	{/if}
+</form>
+
 <style>
 	form {
 		position: relative;
@@ -89,36 +122,3 @@
 		border-bottom-left-radius: 0;
 	}
 </style>
-
-<form data-testid="__palette-input__">
-	{#if inputType !== 'color'}<PaletteSlot
-			data-testid="__palette-input-slot__"
-			bind:color={color}
-			role="presentation"
-			tabindex="-1"
-			disabled
-		/>{/if}
-	<span class="palette_input__adder">
-		<input
-			data-testid="__palette-input-input__"
-			type={inputType}
-			value={color}
-			aria-label="Enter an hex color value"
-			title="'The value must be a valid hex color'"
-			class="palette_input__input"
-			class:palette_input__input--color={inputType === 'color'}
-			on:input|preventDefault={_onChange}
-		/>
-		<PaletteIconButton
-			data-testid="__palette-input-submit__"
-			icon={PLUS}
-			disabled={!isValid}
-			aria-label="Submit the hex color value"
-			class="palette_input__submit"
-			on:click={_onSubmit}
-		/>
-	</span>
-	{#if inputType !== 'color'}
-		<PaletteEyeDropperButton aria-label="Pick a color from the screen" on:add={_onEyeDropperAdd} />
-	{/if}
-</form>
