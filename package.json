@@ -3,7 +3,7 @@
 	"version": "3.0.1",
 	"author": "Vincent Le Badezet <v.lebadezet@untemps.net>",
 	"license": "MIT",
-	"homepage": "https://untemps.github.io/svelte-palette",
+	"homepage": "https://svelte-palette.vercel.app",
 	"repository": "https://github.com/untemps/svelte-palette",
 	"bugs": "https://github.com/untemps/svelte-palette/issues",
 	"description": "Svelte component to display a customisable color picker",
