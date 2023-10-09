@@ -6,8 +6,6 @@
 
 	import PaletteIconButton from './PaletteIconButton.svelte'
 
-	$: isAvailable = !!window.EyeDropper
-
 	const dispatch = createEventDispatcher()
 
 	const _onClick = async () => {
@@ -25,13 +23,11 @@
 	}
 </script>
 
-{#if isAvailable}
-	<PaletteIconButton
-		data-testid="__palette-eyedropper-button__"
-		aria-label="Submit the hex color value"
-		{...$$restProps}
-		icon={EYE_DROPPER}
-		type="submit"
-		on:click={_onClick}
-	/>
-{/if}
+<PaletteIconButton
+	data-testid="__palette-eyedropper-button__"
+	aria-label="Submit the hex color value"
+	{...$$restProps}
+	icon={EYE_DROPPER}
+	type="submit"
+	on:click={_onClick}
+/>

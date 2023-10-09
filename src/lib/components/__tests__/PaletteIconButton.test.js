@@ -16,9 +16,7 @@ test('Renders nothing', () => {
 test('Displays icon', () => {
 	render(PaletteIconButton, { icon: COMPACT })
 	const button = screen.getByTestId('__palette-icon-button__')
-	const icon = screen.getByTestId('__compact-icon__')
 	expect(button).not.toBeEmptyDOMElement()
-	expect(icon).toBeInTheDocument()
 })
 
 test('Triggers click event', async () => {

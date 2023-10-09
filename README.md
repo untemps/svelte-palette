@@ -85,17 +85,16 @@ yarn add @untemps/svelte-palette
 
 ## Slots
 
-| Slot               | Description                                                                                                                                                | Available Props                                     |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| `header`           | Allow to add a header to the palette. By default, it is empty.                                                                                             | `selectedColor`                                     |
-| `header-divider`   | Allow to add a divider between the header and the slots. This slot is added only if the header slot is set. By default, it displays a simple grey \<hr/\>. | -                                                   |
-| `footer`           | Allow to add a footer to the palette. By default, it contains an input to add colors.                                                                      | `selectedColor`                                     |
-| `footer-divider`   | Allow to add a divider between the slots and the footer. By default, it displays a simple grey \<hr/\>.                                                    | -                                                   |
-| `slot`             | Allow to replace the default color slots.                                                                                                                  | `color`, `selectedColor`, `transition`, `isCompact` |
-| `transparent-slot` | Allow to replace the default transparent slot.                                                                                                             | -                                                   |
-| `input`            | Allow to replace the input in the footer if the default footer slot is kept as it is.                                                                      | `selectedColor`, `inputType`                        |
-| `compact-control`  | Allow to replace the control to toggle the compact mode. You may use the `isCompact` prop to control the current mode.                                     | `isCompact`                                         |
-| `loader`           | Allow to replace the loader displayed during the colors async retrieving.                                                                                  | -                                                   |
+| Slot               | Description                                                                                                            | Available Props                                     |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| `header`           | Allow to add a header to the palette. By default, it is empty.                                                         | `selectedColor`                                     |
+| `footer`           | Allow to add a footer to the palette. By default, it contains an input to add colors.                                  | `selectedColor`                                     |
+| `slot`             | Allow to replace the default color slots.                                                                              | `color`, `selectedColor`, `transition`, `isCompact` |
+| `transparent-slot` | Allow to replace the default transparent slot.                                                                         | -                                                   |
+| `input`            | Allow to replace the input in the footer if the default footer slot is kept as it is.                                  | `selectedColor`, `inputType`                        |
+| `settings`         | TODO                                                                                                                   |                                                     |
+| `compact-control`  | Allow to replace the control to toggle the compact mode. You may use the `isCompact` prop to control the current mode. | `isCompact`                                         |
+| `loader`           | Allow to replace the loader displayed during the colors async retrieving.                                              | -                                                   |
 
 ## Example
 
@@ -182,9 +181,10 @@ If set, a control is added to toggle the compact mode.
 
 ### Root tag class
 
-You can style the component by passing a class down to the root tag (`section`).
+You can style the component by passing a class down to the root tag (`div`).
 
-> Note that the class has to be global to be available in the Palette component (see example).
+-   Flag the class as global to make it available in the Palette component
+-   Prefix your class with `.palette` to give precedence over the default one
 
 #### Example
 
@@ -195,18 +195,11 @@ You can style the component by passing a class down to the root tag (`section`).
 	const colors = ['#865C54', '#8F5447', '#A65846', '#A9715E', '#AD8C72']
 </script>
 
-<Palette {colors} class="palette" />
+<Palette {colors} class="palette__custom" />
 
 <style>
-	:global(.palette) {
-		max-width: 300px;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		row-gap: 1rem;
-		padding: 2rem;
-		background: white;
-		box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.18);
+	:global(.palette.palette__custom) {
+		background: yellow;
 	}
 </style>
 ```

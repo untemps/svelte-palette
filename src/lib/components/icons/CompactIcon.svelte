@@ -1,5 +1,37 @@
-<svg data-testid="__compact-icon__" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-	<path
-		d="M213.7 53.7L187.3 80l18.4 18.3a8.4 8.4 0 011.7 8.8 8 8 0 01-7.4 4.9h-48a8 8 0 01-8-8V56a8 8 0 014.9-7.4 8.4 8.4 0 018.8 1.7L176 68.7l26.3-26.4a8.1 8.1 0 0111.4 11.4zM104 144H56a8 8 0 00-7.4 4.9 8.4 8.4 0 001.7 8.8L68.7 176l-26.4 26.3a8.1 8.1 0 000 11.4 8.2 8.2 0 0011.4 0L80 187.3l18.3 18.4a8.3 8.3 0 005.7 2.3 8.5 8.5 0 003.1-.6 8 8 0 004.9-7.4v-48a8 8 0 00-8-8z"
-	/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" data-testid="__compact-icon__"
+	><rect width="256" height="256" fill="none" /><polyline
+		points="144 64 144 112 192 112"
+		fill="none"
+		stroke="currentColor"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+		stroke-width="16"
+	/><line
+		x1="208"
+		y1="48"
+		x2="144"
+		y2="112"
+		fill="none"
+		stroke="currentColor"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+		stroke-width="16"
+	/><polyline
+		points="64 144 112 144 112 192"
+		fill="none"
+		stroke="currentColor"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+		stroke-width="16"
+	/><line
+		x1="48"
+		y1="208"
+		x2="112"
+		y2="144"
+		fill="none"
+		stroke="currentColor"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+		stroke-width="16"
+	/></svg
+>

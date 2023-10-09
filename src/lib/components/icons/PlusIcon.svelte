@@ -1,3 +1,23 @@
-<svg data-testid="__plus-icon__" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-	<path d="M216 120h-80V40a8 8 0 00-16 0v80H40a8 8 0 000 16h80v80a8 8 0 0016 0v-80h80a8 8 0 000-16z" />
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" data-testid="__plus-icon__"
+	><rect width="256" height="256" fill="none" /><line
+		x1="40"
+		y1="128"
+		x2="216"
+		y2="128"
+		fill="none"
+		stroke="currentColor"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+		stroke-width="16"
+	/><line
+		x1="128"
+		y1="40"
+		x2="128"
+		y2="216"
+		fill="none"
+		stroke="currentColor"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+		stroke-width="16"
+	/></svg
+>

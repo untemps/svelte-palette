@@ -27,8 +27,8 @@
 		left: 4px;
 	}
 
-	:global(button.icon_button__button.tooltip__button > svg path) {
-		fill: white;
+	:global(button.icon_button__button.tooltip__button > svg path, button.icon_button__button.tooltip__button > svg line) {
+		stroke: white;
 	}
 
 	:global(button.icon_button__button.tooltip__button:active) {
@@ -36,6 +36,6 @@
 	}
 
 	:global(button.icon_button__button.tooltip__button:active > svg path) {
-		fill: #aaaaaa;
+		stroke: #aaaaaa;
 	}
 </style>

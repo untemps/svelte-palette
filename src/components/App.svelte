@@ -12,7 +12,7 @@
 	let unique = {}
 	let colors = []
 
-	onMount(() => {
+	/*onMount(() => {
 		colors = fetch('https://www.colr.org/json/colors/random/30')
 			.then((result) => {
 				return result.json()
@@ -29,10 +29,10 @@
 				maxNumColumns = result.length + 2
 				return result
 			})
-	})
+	})*/
 
-	/*const colors = [
-        '#865C54',
+	colors = [
+		'#865C54',
 		'#8F5447',
 		'#A65846',
 		'#A9715E',
@@ -55,10 +55,10 @@
 		'#E43F6F',
 		'#BE3E82',
 		'#5E4352',
-    ]*/
+	]
 	const compactIndices = [2, 7, 13, 20]
 
-	let bgColor = null
+	let bgColor = colors[Math.round(Math.random() * (colors.length - 1))]
 
 	let preselectColor = true
 	let allowDuplicates = true
@@ -100,26 +100,31 @@
 
 <main style="--bgColor:{bgColor}">
 	<div class="content">
-		{#key unique}
-			<Palette
-				{colors}
-				compactColorIndices={showCompactControl ? compactIndices : null}
-				selectedColor={preselectColor ? bgColor : null}
-				{allowDuplicates}
-				{deletionMode}
-				tooltipClassName={useCustomTooltipClass ? 'tooltip' : null}
-				tooltipContentSelector={useCustomTooltipContent ? '#tooltip-content' : null}
-				{showTransparentSlot}
-				{maxColors}
-				{inputType}
-				{numColumns}
-				transition={transitions[transitionType]}
-				on:select={({ detail: { color } }) => {
-					bgColor = color
-					preselectColor = !!bgColor
-				}}
-			/>
-		{/key}
+		<div>
+			{#key unique}
+				<Palette
+					class="palette__custom"
+					{colors}
+					compactColorIndices={showCompactControl ? compactIndices : null}
+					selectedColor={preselectColor ? bgColor : null}
+					{allowDuplicates}
+					{deletionMode}
+					tooltipClassName={useCustomTooltipClass ? 'tooltip' : null}
+					tooltipContentSelector={useCustomTooltipContent ? '#tooltip-content' : null}
+					{showTransparentSlot}
+					{maxColors}
+					{inputType}
+					{numColumns}
+					transition={transitions[transitionType]}
+					on:select={({ detail: { color } }) => {
+						bgColor = color
+						preselectColor = !!bgColor
+					}}
+				>
+					<div slot="header" class="palette__header">Your Custom Palette</div>
+				</Palette>
+			{/key}
+		</div>
 	</div>
 	<div class={resolveClassName(['settings', [isSettingsOpen, 'settings--expanded', 'settings--collapsed']])}>
 		<Button
@@ -220,6 +225,10 @@
 </main>
 
 <style>
+	:global(.palette.palette__custom) {
+		background-color: white;
+	}
+
 	main {
 		position: relative;
 		overflow-x: hidden;
@@ -238,6 +247,13 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
+	}
+
+	.palette__header {
+		width: 100%;
+		font-weight: 700;
+		margin-bottom: 1rem;
+		text-align: center;
 	}
 
 	.settings {

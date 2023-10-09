@@ -4,13 +4,14 @@
 
 	import { CLICK } from '../enums/PaletteEvent'
 
-	import { COMPACT, ENLARGE, EYE_DROPPER, PLUS, TRASH } from '../enums/PaletteIcon'
+	import { COMPACT, ENLARGE, EYE_DROPPER, PLUS, SETTINGS, TRASH } from '../enums/PaletteIcon'
 
 	import CompactIcon from './icons/CompactIcon.svelte'
 	import EnlargeIcon from './icons/EnlargeIcon.svelte'
 	import EyeDropperIcon from './icons/EyeDropperIcon.svelte'
 	import PlusIcon from './icons/PlusIcon.svelte'
 	import TrashIcon from './icons/TrashIcon.svelte'
+	import SettingsIcon from './icons/SettingsIcon.svelte'
 
 	const dispatch = createEventDispatcher()
 
@@ -28,6 +29,8 @@
 				return PlusIcon
 			case TRASH:
 				return TrashIcon
+			case SETTINGS:
+				return SettingsIcon
 			default:
 				return null
 		}
@@ -49,7 +52,7 @@
 <style>
 	.icon_button__button {
 		position: relative;
-		width: 2rem;
+		min-width: 2rem;
 		height: 2rem;
 		margin: 0;
 		padding: 0;
@@ -78,7 +81,7 @@
 		height: 16px;
 	}
 
-	:global(.icon_button__button > svg path) {
-		fill: #646464;
+	:global(.icon_button__button > svg path, .icon_button__button > svg circle, .icon_button__button > svg line, .icon_button__button > svg polyline) {
+		stroke: #646464;
 	}
 </style>

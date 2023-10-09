@@ -11,6 +11,7 @@
 	import PaletteSlot from './PaletteSlot.svelte'
 	import PaletteTrashButton from './PaletteTrashButton.svelte'
 	import PaletteLoader from './PaletteLoader.svelte'
+	import PaletteTools from './PaletteTools.svelte'
 
 	import useDeletion from './useDeletion'
 
@@ -81,26 +82,13 @@
 	const _onCompact = ({ detail: { isCompact } }) => (_isCompact = !_isCompact)
 </script>
 
-<div
-	class={resolveClassName(['palette', $$props.class, [_isCompact, 'palette--compact']])}
-	style="--num-columns: {_numColumns}"
->
-	{#if _colors?.length}
+<div class={resolveClassName(['palette', $$props.class, [_isCompact, 'palette--compact']])}>
+	<section class="palette__content" style="--num-columns: {_numColumns}">
 		{#if $$slots.header && !_isCompact}
 			<slot name="header" {selectedColor} />
-			<slot name="header-divider">
-				<hr class="palette__divider" />
-			</slot>
 		{/if}
-		<article class="palette__content">
+		{#if _colors?.length}
 			<ul class="palette__cells">
-				{#if !!compactColorIndices?.length}
-					<li>
-						<slot name="compact-control" isCompact={_isCompact}>
-							<PaletteCompactToggleButton isCompact={_isCompact} on:click={_onCompact} />
-						</slot>
-					</li>
-				{/if}
 				{#if showTransparentSlot && !_isCompact}
 					<li data-testid="__palette-cell__" class="palette__cells__cell">
 						<slot name="transparent-slot">
@@ -134,24 +122,23 @@
 					</li>
 				{/each}
 			</ul>
-		</article>
-		{#if !_isCompact}
-			<slot name="footer-divider">
-				<hr class="palette__divider" />
-			</slot>
-			<slot name="footer" {selectedColor}>
-				<slot name="input" {selectedColor} {inputType}>
-					<article class="palette__content">
-						<PaletteInput color={selectedColor} {inputType} on:add={_onInputAdd} />
-					</article>
-				</slot>
+		{:else}
+			<slot name="loader">
+				<div class="palette__content">
+					<PaletteLoader />
+				</div>
 			</slot>
 		{/if}
-	{:else}
-		<slot name="loader">
-			<PaletteLoader />
-		</slot>
-	{/if}
+		{#if $$slots.footer && !_isCompact}
+			<slot name="footer" {selectedColor} />
+		{/if}
+	</section>
+	<slot name="input" {selectedColor} {inputType}>
+		<PaletteInput color={selectedColor} {inputType} on:add={_onInputAdd} />
+	</slot>
+	<slot name="tools" {compactColorIndices}>
+		<PaletteTools hasCompactMode={!!compactColorIndices?.length} />
+	</slot>
 </div>
 
 <template id="tooltip-template">
@@ -164,14 +151,12 @@
 	}
 
 	.palette {
+		width: 100%;
 		color: black;
-		min-width: 10rem;
-		background-color: #fafafa;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		padding: 2rem;
-		row-gap: 1rem;
+		background-color: #fafafa;
 	}
 
 	.palette.palette--compact {
@@ -183,6 +168,7 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		padding: 1rem;
 	}
 
 	.palette__content_loading {
@@ -191,14 +177,16 @@
 	}
 
 	.palette__cells {
-		list-style: none;
-		margin: 0;
-		padding: 0;
+		width: 100%;
 		display: grid;
-		grid-template-columns: repeat(var(--num-columns), 2rem);
-		grid-auto-rows: minmax(2rem, auto);
+		grid-template-columns: repeat(var(--num-columns), minmax(2rem, 1fr));
+		grid-auto-rows: minmax(2rem, 1fr);
+		column-gap: 0.3rem;
 		align-items: center;
 		justify-items: center;
+		margin: 0;
+		padding: 0;
+		list-style: none;
 	}
 
 	.palette__cells__cell {
@@ -207,8 +195,8 @@
 
 	.palette__divider {
 		border: none;
-		background-color: #ccc;
-		width: calc(100% + 4rem);
+		background-color: #fff;
+		width: 100%;
 		height: 1px;
 		margin: 0;
 	}
