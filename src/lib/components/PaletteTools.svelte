@@ -1,17 +1,34 @@
 <script>
+	import { createEventDispatcher } from 'svelte'
+	import { COMPACT, SETTINGS } from '../enums/PaletteTool.js'
+	import { CLICK } from '../enums/PaletteEvent.js'
 	import PaletteCompactToggleButton from './PaletteCompactToggleButton.svelte'
 	import PaletteSettingsButton from './PaletteSettingsButton.svelte'
 
 	export let hasCompactMode = false
 	export let isCompact = false
+
+	const dispatch = createEventDispatcher()
+
+	const _onCompactClick = () => {
+		dispatch(CLICK, {
+			tool: COMPACT,
+		})
+	}
+
+	const _onSettingsClick = () => {
+		dispatch(CLICK, {
+			tool: SETTINGS,
+		})
+	}
 </script>
 
 <hr class="palette__divider" />
 <section data-testid="__palette-tools__" aria-label="Palette tools" class="palette__tools">
 	{#if hasCompactMode}
-		<PaletteCompactToggleButton {isCompact} />
+		<PaletteCompactToggleButton {isCompact} on:click={_onCompactClick} />
 	{/if}
-	<PaletteSettingsButton />
+	<PaletteSettingsButton on:click={_onSettingsClick} />
 </section>
 
 <style>

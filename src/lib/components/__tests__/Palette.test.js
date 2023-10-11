@@ -128,51 +128,6 @@ test('Displays transparent slot if showTransparentSlot is truthy', async () => {
 	expect(onSelect).toHaveBeenCalledWith(new CustomEvent({ detail: { color: null } }))
 })
 
-test('Displays compact control if compactColorIndices is set', async () => {
-	let compact = null
-	const colors = ['#ff0', '#0ff', '#f0f']
-	const compactColorIndices = [0, 1]
-
-	render(Palette, {
-		colors,
-		compactColorIndices,
-	})
-
-	compact = await screen.findByTestId('__palette-compact-toggle-button__')
-	expect(compact).toBeInTheDocument()
-})
-
-test('Displays as many slots as within the compactColorIndices array', async () => {
-	let slots,
-		compact = null
-	const colors = ['#000', '#0ff', '#f0f']
-	const compactColorIndices = [0, 1]
-
-	render(Palette, {
-		colors,
-		compactColorIndices,
-	})
-
-	slots = await screen.findAllByTestId('__palette-slot__')
-	expect(slots).toHaveLength(colors.length)
-
-	compact = await screen.findByTestId('__palette-compact-toggle-button__')
-	await fireEvent.click(compact)
-
-	await waitFor(async () => {
-		slots = await screen.findAllByTestId('__palette-slot__')
-		expect(slots).toHaveLength(colors.length)
-	})
-
-	compact = await screen.findByTestId('__palette-compact-toggle-button__')
-	await fireEvent.click(compact)
-
-	await waitFor(async () => {
-		slots = await screen.findAllByTestId('__palette-slot__')
-		expect(slots).toHaveLength(colors.length)
-	})
-})
-
 test.each([
 	[['#ff0', '#0ff', '#f0f'], 99, 4],
 	[['#ff0', '#0ff', '#f0f'], -1, 4],

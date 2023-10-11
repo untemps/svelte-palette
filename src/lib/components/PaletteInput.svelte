@@ -44,8 +44,8 @@
 </script>
 
 <hr class="palette__divider" />
-<section class="palette__input" style="--grid-column-end: {gridColumnEnd}">
-	<form data-testid="__palette-input__">
+<section data-testid="__palette-input__" class="palette__input" style="--grid-column-end: {gridColumnEnd}">
+	<form>
 		{#if inputType !== 'color'}<PaletteSlot
 				data-testid="__palette-input-slot__"
 				bind:color
@@ -107,7 +107,6 @@
 		font-family: Helvetica, sans-serif;
 		font-size: 0.8rem;
 		width: 100%;
-		min-width: 5rem;
 		height: 2rem;
 		margin: 0;
 		padding: 0.4rem;

@@ -5,8 +5,8 @@
 
 	import { SELECT } from '../enums/PaletteEvent'
 	import { NONE, TOOLTIP } from '../enums/PaletteDeletionMode'
+	import { COMPACT, SETTINGS } from '$lib/enums/PaletteTool.js'
 
-	import PaletteCompactToggleButton from './PaletteCompactToggleButton.svelte'
 	import PaletteInput from './PaletteInput.svelte'
 	import PaletteSlot from './PaletteSlot.svelte'
 	import PaletteTrashButton from './PaletteTrashButton.svelte'
@@ -14,6 +14,7 @@
 	import PaletteTools from './PaletteTools.svelte'
 
 	import useDeletion from './useDeletion'
+	import PaletteCompactToggleButton from './PaletteCompactToggleButton.svelte'
 
 	export let colors = []
 	export let selectedColor = null
@@ -41,7 +42,7 @@
 	$: Promise.resolve(colors).then((result) => {
 		let c = _isCompact ? extractByIndices(result, compactColorIndices) : result
 		c = !allowDuplicates ? c.filter((item, index) => c.indexOf(item) === index) : c
-		c = result.slice(0, c.length < maxColors || maxColors === -1 ? c.length : maxColors)
+		c = c.slice(0, c.length < maxColors || maxColors === -1 ? c.length : maxColors)
 		_colors = c
 
 		_maxColumns = Math.min(result.length, maxColors) + +showTransparentSlot + (compactColorIndices?.length ? 1 : 0)
@@ -79,12 +80,24 @@
 
 	const _onDelete = (index) => _removeColor(index)
 
-	const _onCompact = ({ detail: { isCompact } }) => (_isCompact = !_isCompact)
+	const _onToolClick = ({ detail: { tool } }) => {
+		switch (tool) {
+			case SETTINGS:
+				break
+			case COMPACT:
+				_isCompact = !_isCompact
+				numColumns = _isCompact ? compactColorIndices.length : _numColumns
+				break
+		}
+	}
 </script>
 
-<div class={resolveClassName(['palette', $$props.class, [_isCompact, 'palette--compact']])}>
-	<section class="palette__content" style="--num-columns: {_numColumns}">
-		{#if $$slots.header && !_isCompact}
+<div class={resolveClassName(['palette', $$props.class])}>
+	<section
+		class={resolveClassName(['palette__content', [_isCompact, 'palette__content--compact']])}
+		style="--num-columns: {_numColumns}"
+	>
+		{#if !_isCompact}
 			<slot name="header" {selectedColor} />
 		{/if}
 		{#if _colors?.length}
@@ -103,7 +116,6 @@
 				{#each _colors as color, index (`${color}_${index}`)}
 					<li
 						data-testid="__palette-cell__"
-						class="palette__cells__cell"
 						use:useDeletion={{
 							deletionMode: _deletionMode,
 							onDelete: () => _onDelete(index),
@@ -129,16 +141,20 @@
 				</div>
 			</slot>
 		{/if}
-		{#if $$slots.footer && !_isCompact}
+		{#if !_isCompact}
 			<slot name="footer" {selectedColor} />
 		{/if}
 	</section>
-	<slot name="input" {selectedColor} {inputType}>
-		<PaletteInput color={selectedColor} {inputType} on:add={_onInputAdd} />
-	</slot>
-	<slot name="tools" {compactColorIndices}>
-		<PaletteTools hasCompactMode={!!compactColorIndices?.length} />
-	</slot>
+	{#if !_isCompact}
+		<slot name="input" {selectedColor} {inputType}>
+			<PaletteInput color={selectedColor} {inputType} on:add={_onInputAdd} />
+		</slot>
+	{/if}
+	{#if !_isCompact}
+		<slot name="tools" {compactColorIndices}>
+			<PaletteTools hasCompactMode={!!compactColorIndices?.length} on:click={_onToolClick} />
+		</slot>
+	{/if}
 </div>
 
 <template id="tooltip-template">
@@ -159,10 +175,6 @@
 		background-color: #fafafa;
 	}
 
-	.palette.palette--compact {
-		padding: 0.3rem;
-	}
-
 	.palette__content {
 		width: 100%;
 		display: flex;
@@ -171,12 +183,16 @@
 		padding: 1rem;
 	}
 
-	.palette__content_loading {
+	.palette__content.palette__content--compact {
+		padding: 0 0.3rem;
+	}
+
+	.palette__content > .palette__content_loading {
 		font-size: 0.8rem;
 		color: #ccc;
 	}
 
-	.palette__cells {
+	.palette__content > .palette__cells {
 		width: 100%;
 		display: grid;
 		grid-template-columns: repeat(var(--num-columns), minmax(2rem, 1fr));
@@ -189,8 +205,13 @@
 		list-style: none;
 	}
 
-	.palette__cells__cell {
-		margin-top: 2px;
+	.palette__content.palette__content--compact > .palette__cells {
+		grid-template-columns: repeat(var(--num-columns), minmax(1.5rem, 1fr));
+		column-gap: 0;
+	}
+
+	.palette__content > .palette__cells > .palette__cells__cell {
+		margin-top: 1px;
 	}
 
 	.palette__divider {
