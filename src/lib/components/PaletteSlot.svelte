@@ -1,8 +1,7 @@
 <script>
 	import { createEventDispatcher } from 'svelte'
-	import { resolveClassName } from '@untemps/utils/dom/resolveClassName'
 
-	import { CLICK } from '../enums/PaletteEvent'
+	import { SELECT } from '../enums/PaletteEvent'
 
 	export let color = null
 	export let selected = false
@@ -13,23 +12,22 @@
 
 	const enter = (node) => transition?.fn(node, transition?.args)
 
-	const _onClick = () =>
+	const _onClick = () => {
 		!disabled &&
-		dispatch(CLICK, {
-			color,
-		})
+			dispatch(SELECT, {
+				color,
+			})
+	}
 </script>
 
 <button
 	data-testid="__palette-slot__"
 	aria-label={color}
 	{...$$restProps}
+	class:empty={!color}
+	class:selected
+	class:clickable={!disabled}
 	style="--color:{color}; --outerBorderColor:{color || '#aaa'};"
-	class={resolveClassName([
-		[!color, 'empty'],
-		[selected, 'selected'],
-		[!disabled, 'clickable'],
-	])}
 	{disabled}
 	in:enter
 	on:click|preventDefault={_onClick}

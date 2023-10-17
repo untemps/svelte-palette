@@ -34,7 +34,7 @@ test('Disables submit button when set color is invalid', async () => {
 })
 
 test('Triggers submit with color', async () => {
-	const onAdd = vi.fn()
+	const onAdd = vi.fn(() => 0)
 	const { component } = render(PaletteInput)
 	const input = screen.getByTestId('__palette-input-input__')
 	const button = screen.getByTestId('__palette-input-submit__')

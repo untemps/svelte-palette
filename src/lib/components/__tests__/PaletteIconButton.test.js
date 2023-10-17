@@ -20,7 +20,7 @@ test('Displays icon', () => {
 })
 
 test('Triggers click event', async () => {
-	const onClick = vi.fn()
+	const onClick = vi.fn(() => 0)
 	const { component } = render(PaletteIconButton, { icon: COMPACT })
 	component.$on('click', onClick)
 	const button = screen.getByTestId('__palette-icon-button__')

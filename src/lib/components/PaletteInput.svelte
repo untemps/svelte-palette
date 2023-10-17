@@ -83,7 +83,7 @@
 	.palette__input {
 		width: 100%;
 		max-width: 14rem;
-		padding: 0.5rem 1rem;
+		padding: 1rem 1rem;
 	}
 
 	form {

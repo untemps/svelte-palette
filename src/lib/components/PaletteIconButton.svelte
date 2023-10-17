@@ -1,9 +1,4 @@
 <script>
-	import { createEventDispatcher } from 'svelte'
-	import { resolveClassName } from '@untemps/utils/dom/resolveClassName'
-
-	import { CLICK } from '../enums/PaletteEvent'
-
 	import { COMPACT, ENLARGE, EYE_DROPPER, PLUS, SETTINGS, TRASH } from '../enums/PaletteIcon'
 
 	import CompactIcon from './icons/CompactIcon.svelte'
@@ -13,40 +8,32 @@
 	import TrashIcon from './icons/TrashIcon.svelte'
 	import SettingsIcon from './icons/SettingsIcon.svelte'
 
-	const dispatch = createEventDispatcher()
-
 	export let icon = null
+	export let isActive = false
 
-	const _resolveIcon = (name) => {
-		switch (name) {
-			case COMPACT:
-				return CompactIcon
-			case ENLARGE:
-				return EnlargeIcon
-			case EYE_DROPPER:
-				return EyeDropperIcon
-			case PLUS:
-				return PlusIcon
-			case TRASH:
-				return TrashIcon
-			case SETTINGS:
-				return SettingsIcon
-			default:
-				return null
-		}
+	const ICONS = {
+		[COMPACT]: CompactIcon,
+		[ENLARGE]: EnlargeIcon,
+		[EYE_DROPPER]: EyeDropperIcon,
+		[PLUS]: PlusIcon,
+		[TRASH]: TrashIcon,
+		[SETTINGS]: SettingsIcon,
 	}
 
-	const _onClick = (e) => dispatch(CLICK, { event: e })
+	const _renderIcon = (name) => {
+		return ICONS[name]
+	}
 </script>
 
 <button
 	data-testid="__palette-icon-button__"
 	type="button"
 	{...$$restProps}
-	class={resolveClassName(['icon_button__button', $$props.class])}
-	on:click|preventDefault={_onClick}
+	class="icon_button__button {$$props.class}"
+	class:icon_button__button--active={isActive}
+	on:click
 >
-	<svelte:component this={_resolveIcon(icon)} />
+	<svelte:component this={_renderIcon(icon)} />
 </button>
 
 <style>
@@ -73,6 +60,11 @@
 		outline: none;
 	}
 
+	.icon_button__button--active {
+		background-color: #e5e5e5;
+		outline: none;
+	}
+
 	:global(.icon_button__button > svg) {
 		position: absolute;
 		top: calc(50% - 8px);
@@ -81,7 +73,12 @@
 		height: 16px;
 	}
 
-	:global(.icon_button__button > svg path, .icon_button__button > svg circle, .icon_button__button > svg line, .icon_button__button > svg polyline) {
+	:global(
+			.icon_button__button > svg path,
+			.icon_button__button > svg circle,
+			.icon_button__button > svg line,
+			.icon_button__button > svg polyline
+		) {
 		stroke: #646464;
 	}
 </style>

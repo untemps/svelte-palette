@@ -1,7 +1,6 @@
 <script>
 	import { createEventDispatcher } from 'svelte'
 
-	import { CLICK } from '../enums/PaletteEvent'
 	import { COMPACT, ENLARGE } from '../enums/PaletteIcon'
 
 	import PaletteIconButton from './PaletteIconButton.svelte'
@@ -10,7 +9,7 @@
 
 	const dispatch = createEventDispatcher()
 
-	const _onClick = () => dispatch(CLICK, { isCompact })
+	const _onClick = () => dispatch('click', { isCompact })
 </script>
 
 <PaletteIconButton

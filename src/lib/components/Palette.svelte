@@ -1,6 +1,5 @@
 <script>
 	import { createEventDispatcher } from 'svelte'
-	import { resolveClassName } from '@untemps/utils/dom/resolveClassName'
 	import { extractByIndices } from '@untemps/utils/array/extractByIndices'
 
 	import { SELECT } from '../enums/PaletteEvent'
@@ -12,9 +11,9 @@
 	import PaletteTrashButton from './PaletteTrashButton.svelte'
 	import PaletteLoader from './PaletteLoader.svelte'
 	import PaletteTools from './PaletteTools.svelte'
+	import PaletteSettingsPanel from './PaletteSettingsPanel.svelte'
 
 	import useDeletion from './useDeletion'
-	import PaletteCompactToggleButton from './PaletteCompactToggleButton.svelte'
 
 	export let colors = []
 	export let selectedColor = null
@@ -30,8 +29,6 @@
 	export let transition = null
 	export let compactColorIndices = []
 	export let isCompact = false
-
-	let _isCompact = false
 
 	$: _isCompact = isCompact
 
@@ -49,9 +46,10 @@
 		_numColumns = numColumns > _maxColumns || numColumns <= 0 ? _maxColumns : numColumns
 	})
 
-	let _deletionMode = deletionMode
-
 	$: _deletionMode = allowDeletion && deletionMode === NONE ? TOOLTIP : deletionMode
+
+	$: _tools = [...(compactColorIndices?.length ? [COMPACT] : []), ...($$slots.settings ? [SETTINGS] : [])]
+	let isSettingsVisible = false
 
 	const dispatch = createEventDispatcher()
 
@@ -80,9 +78,10 @@
 
 	const _onDelete = (index) => _removeColor(index)
 
-	const _onToolClick = ({ detail: { tool } }) => {
+	const _onToolSelect = ({ detail: { tool } }) => {
 		switch (tool) {
 			case SETTINGS:
+				isSettingsVisible = true
 				break
 			case COMPACT:
 				_isCompact = !_isCompact
@@ -90,13 +89,14 @@
 				break
 		}
 	}
+
+	const _onSettingsClose = () => {
+		isSettingsVisible = false
+	}
 </script>
 
-<div class={resolveClassName(['palette', $$props.class])}>
-	<section
-		class={resolveClassName(['palette__content', [_isCompact, 'palette__content--compact']])}
-		style="--num-columns: {_numColumns}"
-	>
+<div class="palette {$$props.class}">
+	<section class="palette__content" class:palette__content--compact={_isCompact} style="--num-columns: {_numColumns}">
 		{#if !_isCompact}
 			<slot name="header" {selectedColor} />
 		{/if}
@@ -108,7 +108,7 @@
 							<PaletteSlot
 								aria-label="Transparent slot"
 								selected={selectedColor === null}
-								on:click={_onSlotSelect}
+								on:select={_onSlotSelect}
 							/>
 						</slot>
 					</li>
@@ -128,7 +128,7 @@
 								{color}
 								selected={color === selectedColor}
 								{transition}
-								on:click={_onSlotSelect}
+								on:select={_onSlotSelect}
 							/>
 						</slot>
 					</li>
@@ -150,12 +150,17 @@
 			<PaletteInput color={selectedColor} {inputType} on:add={_onInputAdd} />
 		</slot>
 	{/if}
-	{#if !_isCompact}
+	{#if !_isCompact && !!_tools?.length}
 		<slot name="tools" {compactColorIndices}>
-			<PaletteTools hasCompactMode={!!compactColorIndices?.length} on:click={_onToolClick} />
+			<PaletteTools tools={_tools} on:select={_onToolSelect} />
 		</slot>
 	{/if}
 </div>
+{#if $$slots.settings}
+	<PaletteSettingsPanel isVisible={isSettingsVisible} on:close={_onSettingsClose}>
+		<slot name="settings" onClose={_onSettingsClose} />
+	</PaletteSettingsPanel>
+{/if}
 
 <template id="tooltip-template">
 	<PaletteTrashButton />
