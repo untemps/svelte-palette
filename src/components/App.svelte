@@ -1,4 +1,5 @@
 <script>
+	import { onMount } from 'svelte'
 	import { fade, blur, fly, scale } from 'svelte/transition'
 	import { elasticOut } from 'svelte/easing'
 	import { Button, Select, SelectItem, Slider, Toggle } from 'carbon-components-svelte'
@@ -9,14 +10,13 @@
 	let unique = {}
 	let colors = []
 
-	/*onMount(() => {
+	onMount(() => {
 		colors = fetch('https://www.colr.org/json/colors/random/30')
 			.then((result) => {
 				return result.json()
 			})
 			.then((result) => {
 				const colorList = result.colors.filter((c) => c.hex?.length).map((c) => `#${c.hex}`)
-				bgColor = colorList[Math.round(Math.random() * (colorList.length - 1))]
 				return colorList
 			})
 			.then((result) => {
@@ -24,11 +24,12 @@
 			})
 			.then((result) => {
 				maxNumColumns = result.length + 2
+				bgColor = result[Math.round(Math.random() * (result.length - 1))]
 				return result
 			})
-	})*/
+	})
 
-	colors = [
+	/*colors = [
 		'#865C54',
 		'#8F5447',
 		'#A65846',
@@ -52,7 +53,7 @@
 		'#E43F6F',
 		'#BE3E82',
 		'#5E4352',
-	]
+	]*/
 	const compactIndices = [2, 7, 13, 20]
 
 	let bgColor = colors[Math.round(Math.random() * (colors.length - 1))]

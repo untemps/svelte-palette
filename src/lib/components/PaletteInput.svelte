@@ -106,7 +106,7 @@
 	.palette_input__input {
 		font-family: Helvetica, sans-serif;
 		font-size: 0.8rem;
-		width: 100%;
+		width: 71%;
 		height: 2rem;
 		margin: 0;
 		padding: 0.4rem;

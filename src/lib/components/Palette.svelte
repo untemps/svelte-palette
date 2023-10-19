@@ -30,20 +30,24 @@
 	export let compactColorIndices = []
 	export let isCompact = false
 
-	$: _isCompact = isCompact
-
 	let _colors = []
-	let _maxColumns = 0
 	let _numColumns = 0
 
-	$: Promise.resolve(colors).then((result) => {
-		let c = _isCompact ? extractByIndices(result, compactColorIndices) : result
-		c = !allowDuplicates ? c.filter((item, index) => c.indexOf(item) === index) : c
-		c = c.slice(0, c.length < maxColors || maxColors === -1 ? c.length : maxColors)
-		_colors = c
+	$: Promise.resolve(colors).then((results) => {
+		const calculateColors = (colors) => {
+			let c = isCompact ? extractByIndices(colors, compactColorIndices) : colors
+			c = !allowDuplicates ? c.filter((item, index) => c.indexOf(item) === index) : c
+			c = c.slice(0, c.length < maxColors || maxColors === -1 ? c.length : maxColors)
+			return c
+		}
 
-		_maxColumns = Math.min(result.length, maxColors) + +showTransparentSlot + (compactColorIndices?.length ? 1 : 0)
-		_numColumns = numColumns > _maxColumns || numColumns <= 0 ? _maxColumns : numColumns
+		const calculateNumColumns = (length) => {
+			let maxColumns = Math.min(length, maxColors) + +showTransparentSlot + (compactColorIndices?.length ? 1 : 0)
+			return numColumns > maxColumns || numColumns <= 0 ? maxColumns : numColumns
+		}
+
+		_colors = calculateColors(results)
+		_numColumns = calculateNumColumns(results.length)
 	})
 
 	$: _deletionMode = allowDeletion && deletionMode === NONE ? TOOLTIP : deletionMode
@@ -84,8 +88,8 @@
 				isSettingsVisible = true
 				break
 			case COMPACT:
-				_isCompact = !_isCompact
-				numColumns = _isCompact ? compactColorIndices.length : _numColumns
+				isCompact = !isCompact
+				numColumns = isCompact ? compactColorIndices.length : _numColumns
 				break
 		}
 	}
@@ -96,13 +100,13 @@
 </script>
 
 <div class="palette {$$props.class}">
-	<section class="palette__content" class:palette__content--compact={_isCompact} style="--num-columns: {_numColumns}">
-		{#if !_isCompact}
+	<section class="palette__content" class:palette__content--compact={isCompact} style="--num-columns: {_numColumns}">
+		{#if !isCompact}
 			<slot name="header" {selectedColor} />
 		{/if}
 		{#if _colors?.length}
 			<ul class="palette__cells">
-				{#if showTransparentSlot && !_isCompact}
+				{#if showTransparentSlot && !isCompact}
 					<li data-testid="__palette-cell__" class="palette__cells__cell">
 						<slot name="transparent-slot">
 							<PaletteSlot
@@ -123,7 +127,7 @@
 							tooltipClassName,
 						}}
 					>
-						<slot name="slot" {color} {selectedColor} {transition} isCompact={_isCompact}>
+						<slot name="slot" {color} {selectedColor} {transition} isCompact={isCompact}>
 							<PaletteSlot
 								{color}
 								selected={color === selectedColor}
@@ -141,16 +145,16 @@
 				</div>
 			</slot>
 		{/if}
-		{#if !_isCompact}
+		{#if !isCompact}
 			<slot name="footer" {selectedColor} />
 		{/if}
 	</section>
-	{#if !_isCompact}
+	{#if !isCompact}
 		<slot name="input" {selectedColor} {inputType}>
 			<PaletteInput color={selectedColor} {inputType} on:add={_onInputAdd} />
 		</slot>
 	{/if}
-	{#if !_isCompact && !!_tools?.length}
+	{#if !isCompact && !!_tools?.length}
 		<slot name="tools" {compactColorIndices}>
 			<PaletteTools tools={_tools} on:select={_onToolSelect} />
 		</slot>
@@ -190,11 +194,6 @@
 
 	.palette__content.palette__content--compact {
 		padding: 0 0.3rem;
-	}
-
-	.palette__content > .palette__content_loading {
-		font-size: 0.8rem;
-		color: #ccc;
 	}
 
 	.palette__content > .palette__cells {
