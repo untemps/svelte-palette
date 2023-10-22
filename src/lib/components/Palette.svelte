@@ -32,9 +32,11 @@
 	export let isCompact = false
 
 	let _colors = []
-	let _numColumns = 0
+	let _numColumns = numColumns
 
 	$: Promise.resolve(colors).then((results) => {
+		if(!results?.length) return
+
 		const calculateColors = (colors) => {
 			let c = isCompact ? extractByIndices(colors, compactColorIndices) : colors
 			c = !allowDuplicates ? c.filter((item, index) => c.indexOf(item) === index) : c
@@ -43,7 +45,7 @@
 		}
 
 		const calculateNumColumns = (length) => {
-			let maxColumns = Math.min(length, maxColors) + +showTransparentSlot + (compactColorIndices?.length ? 1 : 0)
+			let maxColumns = Math.min(length, maxColors) + (+showTransparentSlot)
 			return _numColumns > maxColumns || _numColumns <= 0 ? maxColumns : (isCompact ? compactColorIndices.length : _numColumns)
 		}
 
