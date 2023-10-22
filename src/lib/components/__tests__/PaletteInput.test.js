@@ -5,6 +5,7 @@ import { standby } from '@untemps/utils/async/standby'
 import PaletteInput from '../PaletteInput.svelte'
 
 afterEach(() => cleanup())
+
 test('Enables submit button when input color is valid', async () => {
 	render(PaletteInput)
 	const input = screen.getByTestId('__palette-input-input__')
@@ -57,6 +58,7 @@ test('Does not display EyeDropper button if API is not available', async () => {
 	window.EyeDropper = undefined
 	render(PaletteInput, {
 		color: 'ff',
+		inputType: 'foo',
 	})
 	const button = screen.queryByTestId('__palette-eyedropper-button__')
 	expect(button).not.toBeInTheDocument()

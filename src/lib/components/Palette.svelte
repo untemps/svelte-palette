@@ -12,6 +12,7 @@
 	import PaletteLoader from './PaletteLoader.svelte'
 	import PaletteTools from './PaletteTools.svelte'
 	import PaletteSettingsPanel from './PaletteSettingsPanel.svelte'
+	import PaletteCompactToggleButton from './PaletteCompactToggleButton.svelte'
 
 	import useDeletion from './useDeletion'
 
@@ -43,7 +44,7 @@
 
 		const calculateNumColumns = (length) => {
 			let maxColumns = Math.min(length, maxColors) + +showTransparentSlot + (compactColorIndices?.length ? 1 : 0)
-			return numColumns > maxColumns || numColumns <= 0 ? maxColumns : numColumns
+			return _numColumns > maxColumns || _numColumns <= 0 ? maxColumns : (isCompact ? compactColorIndices.length : _numColumns)
 		}
 
 		_colors = calculateColors(results)
@@ -94,6 +95,11 @@
 		}
 	}
 
+	const _onExpand = () => {
+		isCompact = !isCompact
+		numColumns = isCompact ? compactColorIndices.length : _numColumns
+	}
+
 	const _onSettingsClose = () => {
 		isSettingsVisible = false
 	}
@@ -127,7 +133,7 @@
 							tooltipClassName,
 						}}
 					>
-						<slot name="slot" {color} {selectedColor} {transition} isCompact={isCompact}>
+						<slot name="slot" {color} {selectedColor} {transition} {isCompact}>
 							<PaletteSlot
 								{color}
 								selected={color === selectedColor}
@@ -148,6 +154,9 @@
 		{#if !isCompact}
 			<slot name="footer" {selectedColor} />
 		{/if}
+		{#if isCompact}
+		<PaletteCompactToggleButton isCompact={true} on:click={_onExpand} />
+	{/if}
 	</section>
 	{#if !isCompact}
 		<slot name="input" {selectedColor} {inputType}>
@@ -193,7 +202,9 @@
 	}
 
 	.palette__content.palette__content--compact {
-		padding: 0 0.3rem;
+		padding: 0.3rem 0.6rem;
+		flex-direction: row;
+		column-gap: 0.7rem;
 	}
 
 	.palette__content > .palette__cells {
