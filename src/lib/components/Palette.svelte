@@ -1,6 +1,7 @@
 <script>
 	import { createEventDispatcher } from 'svelte'
-	import { extractByIndices } from '@untemps/utils/array/extractByIndices'
+
+	import { calculateColors, calculateNumColumns } from '../utils/utils.js'
 
 	import { SELECT } from '../enums/PaletteEvent'
 	import { NONE, TOOLTIP } from '../enums/PaletteDeletionMode'
@@ -31,32 +32,30 @@
 	export let compactColorIndices = []
 	export let isCompact = false
 
-	let _colors = []
-	let _numColumns = numColumns
+	let _colors = null
+	let _numColumns = 5
+	let _isSettingsOn = false
+
+	$: _isCompact = isCompact
 
 	$: Promise.resolve(colors).then((results) => {
-		if(!results?.length) return
-
-		const calculateColors = (colors) => {
-			let c = isCompact ? extractByIndices(colors, compactColorIndices) : colors
-			c = !allowDuplicates ? c.filter((item, index) => c.indexOf(item) === index) : c
-			c = c.slice(0, c.length < maxColors || maxColors === -1 ? c.length : maxColors)
-			return c
-		}
-
-		const calculateNumColumns = (length) => {
-			let maxColumns = Math.min(length, maxColors) + (+showTransparentSlot)
-			return _numColumns > maxColumns || _numColumns <= 0 ? maxColumns : (isCompact ? compactColorIndices.length : _numColumns)
-		}
-
-		_colors = calculateColors(results)
-		_numColumns = calculateNumColumns(results.length)
+		_colors = calculateColors(results, {
+			isCompact: _isCompact,
+			compactColorIndices,
+			allowDuplicates,
+			maxColors,
+		})
+		_numColumns = calculateNumColumns(results.length, {
+			isCompact: _isCompact,
+			compactColorIndices,
+			showTransparentSlot,
+			numColumns,
+		})
 	})
 
 	$: _deletionMode = allowDeletion && deletionMode === NONE ? TOOLTIP : deletionMode
 
 	$: _tools = [...(compactColorIndices?.length ? [COMPACT] : []), ...($$slots.settings ? [SETTINGS] : [])]
-	let isSettingsVisible = false
 
 	const dispatch = createEventDispatcher()
 
@@ -88,34 +87,34 @@
 	const _onToolSelect = ({ detail: { tool } }) => {
 		switch (tool) {
 			case SETTINGS:
-				isSettingsVisible = true
+				_isSettingsOn = true
 				break
 			case COMPACT:
-				isCompact = !isCompact
-				numColumns = isCompact ? compactColorIndices.length : _numColumns
+				_isCompact = !_isCompact
+				_numColumns = _isCompact ? compactColorIndices.length : _numColumns
 				break
 		}
 	}
 
 	const _onExpand = () => {
-		isCompact = !isCompact
-		numColumns = isCompact ? compactColorIndices.length : _numColumns
+		_isCompact = !_isCompact
+		_numColumns = _isCompact ? compactColorIndices.length : _numColumns
 	}
 
 	const _onSettingsClose = () => {
-		isSettingsVisible = false
+		_isSettingsOn = false
 	}
 </script>
 
 <div class="palette {$$props.class}">
-	<section class="palette__content" class:palette__content--compact={isCompact} style="--num-columns: {_numColumns}">
-		{#if !isCompact}
+	<section class="palette__content" class:palette__content--compact={_isCompact} style="--num-columns: {_numColumns}">
+		{#if !_isCompact}
 			<slot name="header" {selectedColor} />
 		{/if}
-		{#if _colors?.length}
+		{#if !!_colors}
 			<ul class="palette__cells">
-				{#if showTransparentSlot && !isCompact}
-					<li data-testid="__palette-cell__" class="palette__cells__cell">
+				{#if showTransparentSlot}
+					<li data-testid="__palette-cell__">
 						<slot name="transparent-slot">
 							<PaletteSlot
 								aria-label="Transparent slot"
@@ -135,7 +134,7 @@
 							tooltipClassName,
 						}}
 					>
-						<slot name="slot" {color} {selectedColor} {transition} {isCompact}>
+						<slot name="slot" {color} {selectedColor} {transition} isCompact={_isCompact}>
 							<PaletteSlot
 								{color}
 								selected={color === selectedColor}
@@ -153,26 +152,26 @@
 				</div>
 			</slot>
 		{/if}
-		{#if !isCompact}
+		{#if !_isCompact}
 			<slot name="footer" {selectedColor} />
 		{/if}
-		{#if isCompact}
-		<PaletteCompactToggleButton isCompact={true} on:click={_onExpand} />
-	{/if}
+		{#if _isCompact}
+			<PaletteCompactToggleButton isCompact={true} on:click={_onExpand} />
+		{/if}
 	</section>
-	{#if !isCompact}
+	{#if !_isCompact}
 		<slot name="input" {selectedColor} {inputType}>
 			<PaletteInput color={selectedColor} {inputType} on:add={_onInputAdd} />
 		</slot>
 	{/if}
-	{#if !isCompact && !!_tools?.length}
+	{#if !_isCompact && !!_tools?.length}
 		<slot name="tools" {compactColorIndices}>
 			<PaletteTools tools={_tools} on:select={_onToolSelect} />
 		</slot>
 	{/if}
 </div>
 {#if $$slots.settings}
-	<PaletteSettingsPanel isVisible={isSettingsVisible} on:close={_onSettingsClose}>
+	<PaletteSettingsPanel isVisible={_isSettingsOn} on:close={_onSettingsClose}>
 		<slot name="settings" onClose={_onSettingsClose} />
 	</PaletteSettingsPanel>
 {/if}
@@ -225,10 +224,6 @@
 	.palette__content.palette__content--compact > .palette__cells {
 		grid-template-columns: repeat(var(--num-columns), minmax(1.5rem, 1fr));
 		column-gap: 0;
-	}
-
-	.palette__content > .palette__cells > .palette__cells__cell {
-		margin-top: 1px;
 	}
 
 	.palette__divider {
