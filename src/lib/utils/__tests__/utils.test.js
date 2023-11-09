@@ -63,7 +63,7 @@ describe('utils', () => {
 			[0, params, 1],
 			[colorLength, null, 1],
 			[-1, null, 1],
-			[colorLength, { ...params, numColumns: -1 }, 1],
+			[colorLength, { ...params, numColumns: -1 }, colorLength],
 		])('colorLength:%j, params:%j, expected:%j', (colorLength, params, expected) => {
 			expect(calculateNumColumns(colorLength, params)).toBe(expected)
 		})

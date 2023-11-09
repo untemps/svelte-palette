@@ -67,7 +67,7 @@
 	let maxColors = 23
 	let inputType = 'text'
 	let showCompactControl = true
-	let numColumns = 5
+	let numColumns = 0
 	let maxNumColumns = 10
 	let transitionType = 'custom'
 
@@ -144,7 +144,7 @@
 								<Slider
 									labelText="Number of Columns"
 									fullWidth
-									min={1}
+									min={0}
 									max={maxNumColumns}
 									step={1}
 									bind:value={numColumns}
@@ -214,8 +214,8 @@
 </main>
 
 <style>
-	:global(.palette.palette__custom) {
-		background-color: white;
+	:global(.palette[role="main"].palette__custom) {
+		background-color: #fff;
 	}
 
 	main {

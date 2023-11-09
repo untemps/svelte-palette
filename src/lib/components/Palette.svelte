@@ -33,7 +33,7 @@
 	export let isCompact = false
 
 	let _colors = null
-	let _numColumns = 5
+	let _numColumns = numColumns
 	let _isSettingsOn = false
 
 	$: _isCompact = isCompact
@@ -45,6 +45,7 @@
 			allowDuplicates,
 			maxColors,
 		})
+		//TODO: Fix column count calculation when colors is empty
 		_numColumns = calculateNumColumns(results.length, {
 			isCompact: _isCompact,
 			compactColorIndices,
@@ -53,6 +54,7 @@
 		})
 	})
 
+	//TODO: Remove allowDeletion from props
 	$: _deletionMode = allowDeletion && deletionMode === NONE ? TOOLTIP : deletionMode
 
 	$: _tools = [...(compactColorIndices?.length ? [COMPACT] : []), ...($$slots.settings ? [SETTINGS] : [])]
@@ -84,7 +86,8 @@
 
 	const _onDelete = (index) => _removeColor(index)
 
-	const _onToolSelect = ({ detail: { tool } }) => {
+	const _onToolSelect = (args) => {
+		const tool = args?.detail?.tool ?? args
 		switch (tool) {
 			case SETTINGS:
 				_isSettingsOn = true
@@ -106,7 +109,7 @@
 	}
 </script>
 
-<div class="palette {$$props.class}">
+<div class="palette {$$props.class}" role="main">
 	<section class="palette__content" class:palette__content--compact={_isCompact} style="--num-columns: {_numColumns}">
 		{#if !_isCompact}
 			<slot name="header" {selectedColor} />
@@ -165,7 +168,7 @@
 		</slot>
 	{/if}
 	{#if !_isCompact && !!_tools?.length}
-		<slot name="tools" {compactColorIndices}>
+		<slot name="tools" {compactColorIndices} isCompact={_isCompact} onSelect={_onToolSelect}>
 			<PaletteTools tools={_tools} on:select={_onToolSelect} />
 		</slot>
 	{/if}

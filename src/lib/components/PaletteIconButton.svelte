@@ -43,7 +43,7 @@
 		height: 2rem;
 		margin: 0;
 		padding: 0;
-		background: none;
+		background-color: #fafafa;
 		border-width: 1px;
 		border-color: #e5e5e5;
 		border-style: solid;

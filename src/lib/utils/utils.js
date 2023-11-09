@@ -33,15 +33,14 @@ export const calculateNumColumns = ($colorLength, $params) => {
 	if (!$params) {
 		$params = { isCompact: false, compactColorIndices: [], showTransparentSlot: false, numColumns: 1 }
 	}
-	if ($params.numColumns <= 0) {
-		$params = { ...$params, numColumns: 1 }
-	}
-
-	if (!!$params.isCompact) {
-		$colorLength = Math.min($colorLength, +$params.compactColorIndices?.length)
-	}
 	if (!!$params.showTransparentSlot) {
 		$colorLength = $colorLength + 1
+	}
+	if ($params.numColumns <= 0) {
+		$params = { ...$params, numColumns: $colorLength }
+	}
+	if (!!$params.isCompact) {
+		$colorLength = Math.min($colorLength, +$params.compactColorIndices?.length + +$params.showTransparentSlot)
 	}
 	return Math.min($colorLength, $params.numColumns)
 }
