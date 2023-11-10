@@ -4,7 +4,7 @@
 	import { calculateColors, calculateNumColumns } from '../utils/utils.js'
 
 	import { SELECT } from '../enums/PaletteEvent'
-	import { NONE, TOOLTIP } from '../enums/PaletteDeletionMode'
+	import { NONE } from '../enums/PaletteDeletionMode'
 	import { COMPACT, SETTINGS } from '$lib/enums/PaletteTool.js'
 
 	import PaletteInput from './PaletteInput.svelte'
@@ -19,8 +19,9 @@
 
 	export let colors = []
 	export let selectedColor = null
+	export let isCompact = false
+	export let compactColorIndices = []
 	export let allowDuplicates = false
-	export let allowDeletion = false
 	export let deletionMode = NONE
 	export let tooltipClassName = null
 	export let tooltipContentSelector = null
@@ -29,8 +30,6 @@
 	export let inputType = 'text'
 	export let numColumns = 5
 	export let transition = null
-	export let compactColorIndices = []
-	export let isCompact = false
 
 	let _colors = null
 	let _numColumns = numColumns
@@ -54,9 +53,6 @@
 			numColumns,
 		})
 	})
-
-	//TODO: Remove allowDeletion from props
-	$: _deletionMode = allowDeletion && deletionMode === NONE ? TOOLTIP : deletionMode
 
 	$: _tools = [...(compactColorIndices?.length ? [COMPACT] : []), ...($$slots.settings ? [SETTINGS] : [])]
 
@@ -135,7 +131,7 @@
 					<li
 						data-testid="__palette-cell__"
 						use:useDeletion={{
-							deletionMode: _deletionMode,
+							deletionMode,
 							onDelete: () => _onDelete(index),
 							tooltipContentSelector,
 							tooltipClassName,
