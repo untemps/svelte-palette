@@ -24,10 +24,13 @@
 	$: isValid = _isValid(color)
 
 	$: {
-		isEyeDropperAvailable = !!window?.EyeDropper
 		gridColumnStart = 2 - +(inputType === 'color')
 		gridColumnEnd = (isEyeDropperAvailable ? 5 : 6) + +(inputType === 'color')
 	}
+
+	onMount(() => {
+		isEyeDropperAvailable = !!window?.EyeDropper
+	})
 
 	const _onChange = ({ target: { value } }) => {
 		color = value
@@ -45,7 +48,11 @@
 </script>
 
 <hr class="palette__divider" />
-<section data-testid="__palette-input__" class="palette__input" style="--grid-column-start: {gridColumnStart}; --grid-column-end: {gridColumnEnd}">
+<section
+	data-testid="__palette-input__"
+	class="palette__input"
+	style="--grid-column-start: {gridColumnStart}; --grid-column-end: {gridColumnEnd}"
+>
 	<form on:submit={_onSubmit}>
 		{#if inputType !== 'color'}<PaletteSlot
 				data-testid="__palette-input-slot__"
