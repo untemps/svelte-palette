@@ -12,6 +12,7 @@
 	export let inputType = 'text'
 
 	let isEyeDropperAvailable = false
+	let gridColumnStart = 2
 	let gridColumnEnd = 5
 
 	const dispatch = createEventDispatcher()
@@ -20,13 +21,13 @@
 	const _isValid = (value) => !!value && VALIDATION_REGEX.test(value)
 
 	$: color = color?.replace(VALIDATION_REGEX, '#$1') || ''
-	$: inputType = inputType === 'text' || inputType === 'color' ? inputType : 'text'
 	$: isValid = _isValid(color)
 
-	onMount(() => {
+	$: {
 		isEyeDropperAvailable = !!window?.EyeDropper
-		gridColumnEnd = isEyeDropperAvailable ? 5 : 6
-	})
+		gridColumnStart = 2 - +(inputType === 'color')
+		gridColumnEnd = (isEyeDropperAvailable ? 5 : 6) + +(inputType === 'color')
+	}
 
 	const _onChange = ({ target: { value } }) => {
 		color = value
@@ -44,8 +45,8 @@
 </script>
 
 <hr class="palette__divider" />
-<section data-testid="__palette-input__" class="palette__input" style="--grid-column-end: {gridColumnEnd}">
-	<form>
+<section data-testid="__palette-input__" class="palette__input" style="--grid-column-start: {gridColumnStart}; --grid-column-end: {gridColumnEnd}">
+	<form on:submit={_onSubmit}>
 		{#if inputType !== 'color'}<PaletteSlot
 				data-testid="__palette-input-slot__"
 				bind:color
@@ -66,11 +67,11 @@
 			/>
 			<PaletteIconButton
 				data-testid="__palette-input-submit__"
+				type="submit"
 				icon={PLUS}
 				disabled={!isValid}
 				aria-label="Submit the hex color value"
 				class="palette_input__submit"
-				on:click={_onSubmit}
 			/>
 		</span>
 		{#if isEyeDropperAvailable && inputType !== 'color'}
@@ -98,7 +99,7 @@
 
 	.palette_input__adder {
 		width: 100%;
-		grid-column: 2 / var(--grid-column-end);
+		grid-column: var(--grid-column-start) / var(--grid-column-end);
 		display: flex;
 		align-items: center;
 	}

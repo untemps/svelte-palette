@@ -52,7 +52,7 @@
 	}
 
 	.icon_button__button:disabled {
-		opacity: 0.5;
+		cursor: auto;
 	}
 
 	.icon_button__button:focus {
@@ -80,5 +80,14 @@
 			.icon_button__button > svg polyline
 		) {
 		stroke: #646464;
+	}
+
+	:global(
+			.icon_button__button:disabled > svg path,
+			.icon_button__button:disabled > svg circle,
+			.icon_button__button:disabled > svg line,
+			.icon_button__button:disabled > svg polyline
+		) {
+		stroke: #bdbdbd;
 	}
 </style>
