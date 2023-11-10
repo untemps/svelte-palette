@@ -38,15 +38,16 @@
 
 	$: _isCompact = isCompact
 
+	// TODO: Fix slots spreading
 	$: Promise.resolve(colors).then((results) => {
-		_colors = calculateColors(results, {
+		const newColors = calculateColors(results, {
 			isCompact: _isCompact,
 			compactColorIndices,
 			allowDuplicates,
 			maxColors,
 		})
-		//TODO: Fix column count calculation when colors is empty
-		_numColumns = calculateNumColumns(results.length, {
+		_colors = newColors
+		_numColumns = calculateNumColumns(newColors.length, {
 			isCompact: _isCompact,
 			compactColorIndices,
 			showTransparentSlot,
@@ -66,17 +67,20 @@
 		dispatch(SELECT, { color })
 	}
 
-	const _addColor = (color) =>
-		(_colors =
-			allowDuplicates || !_colors.includes(color)
-				? [
-						..._colors.slice(
-							0,
-							_colors.length < maxColors || maxColors === -1 ? _colors.length : maxColors - 1
-						),
-						color,
-				  ]
-				: _colors)
+	const _addColor = (color) => {
+		_colors = calculateColors([..._colors, color], {
+			isCompact: _isCompact,
+			compactColorIndices,
+			allowDuplicates,
+			maxColors,
+		})
+		_numColumns = calculateNumColumns(_colors.length, {
+			isCompact: _isCompact,
+			compactColorIndices,
+			showTransparentSlot,
+			numColumns,
+		})
+	}
 
 	const _removeColor = (index) => (_colors = _colors.filter((c, i) => i !== index))
 
@@ -150,9 +154,7 @@
 			</ul>
 		{:else}
 			<slot name="loader">
-				<div class="palette__content">
-					<PaletteLoader />
-				</div>
+				<PaletteLoader />
 			</slot>
 		{/if}
 		{#if !_isCompact}
@@ -199,9 +201,11 @@
 
 	.palette__content {
 		width: 100%;
+		min-height: 70px;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		justify-content: center;
 		padding: 1rem;
 	}
 

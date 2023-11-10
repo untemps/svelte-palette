@@ -28,7 +28,7 @@ export const calculateColors = ($colors, $params) => {
 
 export const calculateNumColumns = ($colorLength, $params) => {
 	if ($colorLength <= 0) {
-		$colorLength = 1
+		$colorLength = 0
 	}
 	if (!$params) {
 		$params = { isCompact: false, compactColorIndices: [], showTransparentSlot: false, numColumns: 1 }

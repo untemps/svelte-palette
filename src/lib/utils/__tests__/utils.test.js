@@ -59,10 +59,11 @@ describe('utils', () => {
 			],
 			[2, { ...params, isCompact: true, compactColorIndices: [0, 1, 2] }, 2],
 			[colorLength, { ...params, compactColorIndices: [0, 1] }, params.numColumns],
-			[-1, params, 1],
-			[0, params, 1],
+			[-1, params, 0],
+			[0, params, 0],
+			[0, { ...params, showTransparentSlot: true }, 1],
 			[colorLength, null, 1],
-			[-1, null, 1],
+			[-1, null, 0],
 			[colorLength, { ...params, numColumns: -1 }, colorLength],
 		])('colorLength:%j, params:%j, expected:%j', (colorLength, params, expected) => {
 			expect(calculateNumColumns(colorLength, params)).toBe(expected)

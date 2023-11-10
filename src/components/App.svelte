@@ -67,7 +67,7 @@
 	let maxColors = 23
 	let inputType = 'text'
 	let showCompactControl = true
-	let numColumns = 0
+	let numColumns = 5
 	let maxNumColumns = 10
 	let transitionType = 'custom'
 
