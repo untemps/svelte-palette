@@ -133,10 +133,18 @@
 										<span slot="labelA" />
 										<span slot="labelB" />
 									</Toggle>
-									<span class="settings__preselection__color" style={`background-color: ${bgColor}`} />
+									<span
+										class="settings__preselection__color"
+										style={`background-color: ${bgColor}`}
+									/>
 								</div>
 								<hr class="settings__space" />
-								<Select labelText="Input Type" inline selected={inputType} on:change={(e) => (inputType = e.target.value)}>
+								<Select
+									labelText="Input Type"
+									inline
+									selected={inputType}
+									on:change={(e) => (inputType = e.target.value)}
+								>
 									<SelectItem value="text" />
 									<SelectItem value="color" />
 								</Select>
@@ -150,7 +158,14 @@
 									bind:value={numColumns}
 								/>
 								<hr class="settings__space" />
-								<Slider labelText="Maximum Number of Colors" fullWidth min={1} max={50} step={1} bind:value={maxColors} />
+								<Slider
+									labelText="Maximum Number of Colors"
+									fullWidth
+									min={1}
+									max={50}
+									step={1}
+									bind:value={maxColors}
+								/>
 								<hr class="settings__space" />
 								<Toggle labelText="Allow Duplicates" size="sm" bind:toggled={allowDuplicates}>
 									<span slot="labelA" />
@@ -173,7 +188,11 @@
 									<span slot="labelB" />
 								</Toggle>
 								<hr class="settings__space" />
-								<Toggle labelText="Custom Tooltip Content" size="sm" bind:toggled={useCustomTooltipContent}>
+								<Toggle
+									labelText="Custom Tooltip Content"
+									size="sm"
+									bind:toggled={useCustomTooltipContent}
+								>
 									<span slot="labelA" />
 									<span slot="labelB" />
 								</Toggle>
@@ -214,7 +233,7 @@
 </main>
 
 <style>
-	:global(.palette[role="main"].palette__custom) {
+	:global(.palette[role='main'].palette__custom) {
 		background-color: #fff;
 	}
 

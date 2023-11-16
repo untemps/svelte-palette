@@ -1,4 +1,5 @@
 <script>
+	// TODO: Manage maxNumColumns
 	import { createEventDispatcher } from 'svelte'
 
 	import { calculateColors, calculateNumColumns } from '../utils/utils.js'
@@ -37,7 +38,6 @@
 
 	$: _isCompact = isCompact
 
-	// TODO: Fix slots spreading
 	$: Promise.resolve(colors).then((results) => {
 		const newColors = calculateColors(results, {
 			isCompact: _isCompact,
@@ -206,6 +206,7 @@
 	}
 
 	.palette__content.palette__content--compact {
+		min-height: auto;
 		padding: 0.3rem 0.6rem;
 		flex-direction: row;
 		column-gap: 0.7rem;

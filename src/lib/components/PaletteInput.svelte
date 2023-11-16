@@ -1,4 +1,5 @@
 <script>
+	// TODO: Manage submit from input
 	import { createEventDispatcher, onMount } from 'svelte'
 
 	import { ADD } from '../enums/PaletteEvent'
@@ -53,7 +54,7 @@
 	class="palette__input"
 	style="--grid-column-start: {gridColumnStart}; --grid-column-end: {gridColumnEnd}"
 >
-	<form on:submit={_onSubmit}>
+	<form>
 		{#if inputType !== 'color'}<PaletteSlot
 				data-testid="__palette-input-slot__"
 				bind:color
@@ -79,6 +80,7 @@
 				disabled={!isValid}
 				aria-label="Submit the hex color value"
 				class="palette_input__submit"
+				on:click={_onSubmit}
 			/>
 		</span>
 		{#if isEyeDropperAvailable && inputType !== 'color'}

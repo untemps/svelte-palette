@@ -26,7 +26,8 @@ export const calculateColors = ($colors, $params) => {
 	return $colors
 }
 
-export const calculateNumColumns = ($colorLength, $params) => {
+// TODO: Refactor calculateNumColumns
+export const calculateNumColumns = ($colorLength, $params, $options) => {
 	if ($colorLength <= 0) {
 		$colorLength = 0
 	}
@@ -36,11 +37,18 @@ export const calculateNumColumns = ($colorLength, $params) => {
 	if (!!$params.showTransparentSlot) {
 		$colorLength = $colorLength + 1
 	}
+	const originalNumColumns = $params.numColumns
 	if ($params.numColumns <= 0) {
 		$params = { ...$params, numColumns: $colorLength }
 	}
 	if (!!$params.isCompact) {
 		$colorLength = Math.min($colorLength, +$params.compactColorIndices?.length + +$params.showTransparentSlot)
 	}
-	return Math.min($colorLength, $params.numColumns)
+	if (!$options) {
+		$options = { minNumColumns: 5 }
+	}
+	if (!!$params.isCompact) {
+		return $colorLength
+	}
+	return originalNumColumns > 0 ? $params.numColumns : Math.max($colorLength, $options.minNumColumns)
 }
