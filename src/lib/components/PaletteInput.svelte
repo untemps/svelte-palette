@@ -1,6 +1,5 @@
 <script>
-	// TODO: Manage submit from input
-	import { createEventDispatcher, onMount } from 'svelte'
+	import { createEventDispatcher, onDestroy, onMount } from 'svelte'
 
 	import { ADD } from '../enums/PaletteEvent'
 	import { PLUS } from '../enums/PaletteIcon'
@@ -9,32 +8,44 @@
 	import PaletteSlot from './PaletteSlot.svelte'
 	import PaletteEyeDropperButton from './PaletteEyeDropperButton.svelte'
 
+	import { COLOR_REGEX, isColorValid } from '../utils/utils'
+
 	export let color = null
 	export let inputType = 'text'
 
-	let isEyeDropperAvailable = false
-	let gridColumnStart = 2
-	let gridColumnEnd = 5
-
 	const dispatch = createEventDispatcher()
-	const VALIDATION_REGEX = /^#?(([0-9a-f]{2}){3,4}|([0-9a-f]){3})$/gi
 
-	const _isValid = (value) => !!value && VALIDATION_REGEX.test(value)
+	let _isEyeDropperAvailable = false
+	let _gridColumnStart = 2
+	let _gridColumnEnd = 5
 
-	$: color = color?.replace(VALIDATION_REGEX, '#$1') || ''
-	$: isValid = _isValid(color)
+	$: color = color?.replace(COLOR_REGEX, '#$1') || ''
+	$: isValid = isColorValid(color)
 
 	$: {
-		gridColumnStart = 2 - +(inputType === 'color')
-		gridColumnEnd = (isEyeDropperAvailable ? 5 : 6) + +(inputType === 'color')
+		_gridColumnStart = 2 - +(inputType === 'color')
+		_gridColumnEnd = (_isEyeDropperAvailable ? 5 : 6) + +(inputType === 'color')
 	}
 
 	onMount(() => {
-		isEyeDropperAvailable = !!window?.EyeDropper
+		_isEyeDropperAvailable = !!window?.EyeDropper
+		return () => document.removeEventListener('keypress', _onKeyPress)
 	})
 
-	const _onChange = ({ target: { value } }) => {
+	const _onInputChange = ({ target: { value } }) => {
 		color = value
+	}
+
+	const _onKeyPress = (e) => {
+		e.code === 'Enter' && _onSubmit()
+	}
+
+	const _onInputFocus = () => {
+		document?.addEventListener('keypress', _onKeyPress)
+	}
+
+	const _onInputBlur = () => {
+		document?.removeEventListener('keypress', _onKeyPress)
 	}
 
 	const _onEyeDropperAdd = ({ detail: { color: value } }) => {
@@ -52,7 +63,7 @@
 <section
 	data-testid="__palette-input__"
 	class="palette__input"
-	style="--grid-column-start: {gridColumnStart}; --grid-column-end: {gridColumnEnd}"
+	style="--grid-column-start: {_gridColumnStart}; --grid-column-end: {_gridColumnEnd}"
 >
 	<form>
 		{#if inputType !== 'color'}<PaletteSlot
@@ -71,7 +82,9 @@
 				title="'The value must be a valid hex color'"
 				class="palette_input__input"
 				class:palette_input__input--color={inputType === 'color'}
-				on:input|preventDefault={_onChange}
+				on:focus={_onInputFocus}
+				on:blur={_onInputBlur}
+				on:input|preventDefault={_onInputChange}
 			/>
 			<PaletteIconButton
 				data-testid="__palette-input-submit__"
@@ -83,7 +96,7 @@
 				on:click={_onSubmit}
 			/>
 		</span>
-		{#if isEyeDropperAvailable && inputType !== 'color'}
+		{#if _isEyeDropperAvailable && inputType !== 'color'}
 			<PaletteEyeDropperButton aria-label="Pick a color from the screen" on:add={_onEyeDropperAdd} />
 		{/if}
 	</form>

@@ -37,3 +37,9 @@ export const calculateNumColumns = ($colorLength, $params, $options) => {
 	}
 	return $params.numColumns > 0 ? Math.max($params.numColumns, 0) : Math.max($colorLength, $options?.minNumColumns ?? MIN_NUM_COLUMNS)
 }
+
+export const COLOR_REGEX = /^#?(([0-9a-f]{2}){3,4}|([0-9a-f]){3})$/i
+
+export const isColorValid = ($color) => {
+	return COLOR_REGEX.test($color)
+}

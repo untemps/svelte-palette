@@ -1,16 +1,24 @@
 import { afterEach, expect, test, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte'
+import userEvent from '@testing-library/user-event'
 
 import Palette from '../Palette.svelte'
 
 import { TOOLTIP, DROP } from '../../enums/PaletteDeletionMode'
+
+const setup = (component, options) => {
+	return {
+		user: userEvent.setup(),
+		...render(component, options),
+	}
+}
 
 afterEach(() => cleanup())
 
 test('Displays as many color slots as set', async () => {
 	let cells = null
 	const colors = ['#ff0', '#0ff', '#f0f']
-	render(Palette, {
+	setup(Palette, {
 		colors,
 	})
 
@@ -21,7 +29,7 @@ test('Displays as many color slots as set', async () => {
 test('Displays as many color slots as set in async mode', async () => {
 	let cells = null
 	const colors = Promise.resolve(['#ff0', '#0ff', '#f0f'])
-	render(Palette, {
+	setup(Palette, {
 		colors,
 	})
 
@@ -35,7 +43,7 @@ test('Triggers select with color', async () => {
 	const onSelect = vi.fn(() => 0)
 	const colors = ['#ff0', '#0ff', '#f0f']
 
-	const { component } = render(Palette, {
+	const { component, user } = setup(Palette, {
 		colors,
 	})
 
@@ -43,7 +51,7 @@ test('Triggers select with color', async () => {
 
 	cells = await screen.findAllByTestId('__palette-cell__')
 	cell = cells[0]
-	await fireEvent.click(cell.firstChild)
+	await user.click(cell.firstChild)
 
 	expect(onSelect).toHaveBeenCalledWith(new CustomEvent({ detail: { color: colors[0] } }))
 })
@@ -54,7 +62,7 @@ test('Deletes slots if deletionMode is set to "tooltip"', async () => {
 		trash = null
 	const colors = ['#ff0', '#0ff', '#f0f']
 
-	render(Palette, {
+	const { user } = setup(Palette, {
 		colors,
 		deletionMode: TOOLTIP,
 	})
@@ -62,13 +70,12 @@ test('Deletes slots if deletionMode is set to "tooltip"', async () => {
 	cells = await screen.findAllByTestId('__palette-cell__')
 	cell = cells[0]
 
-	await fireEvent.mouseOver(cell) // fireEvent.mouseEnter only works if mouseOver is triggered before
-	await fireEvent.mouseEnter(cell)
+	await user.hover(cell)
 
 	trash = await screen.findByTestId('__trash-icon__')
 	expect(trash).toBeInTheDocument()
 
-	await fireEvent.click(trash)
+	await user.click(trash)
 
 	expect(cell).not.toBeInTheDocument()
 })
@@ -78,7 +85,7 @@ test('Deletes slot if deletionMode is set to "drop"', async () => {
 		cell = null
 	const colors = ['#ff0', '#0ff', '#f0f']
 
-	const { component } = render(Palette, {
+	const { user } = setup(Palette, {
 		accessors: true,
 		props: {
 			colors,
@@ -90,8 +97,7 @@ test('Deletes slot if deletionMode is set to "drop"', async () => {
 
 	cell = cells[0]
 
-	await fireEvent.mouseDown(cell)
-	await fireEvent.mouseMove(document)
+	await user.pointer({ keys: '[MouseLeft>]', target: cell })
 
 	const drag = document.querySelector('#drag')
 	drag.getBoundingClientRect = () => ({
@@ -102,7 +108,7 @@ test('Deletes slot if deletionMode is set to "drop"', async () => {
 		right: 2020,
 		bottom: 2020,
 	})
-	await fireEvent.mouseUp(document)
+	await user.pointer('[/MouseLeft]')
 
 	expect(cell).not.toBeInTheDocument()
 })
@@ -113,7 +119,7 @@ test('Displays transparent slot if showTransparentSlot is truthy', async () => {
 	const onSelect = vi.fn(() => 0)
 	const colors = ['#ff0', '#0ff', '#f0f']
 
-	const { component } = render(Palette, {
+	const { component, user } = setup(Palette, {
 		colors,
 		showTransparentSlot: true,
 	})
@@ -123,7 +129,7 @@ test('Displays transparent slot if showTransparentSlot is truthy', async () => {
 	expect(cells).toHaveLength(colors.length + 1)
 
 	cell = cells[0]
-	await fireEvent.click(cell.firstChild)
+	await user.click(cell.firstChild)
 
 	expect(onSelect).toHaveBeenCalledWith(new CustomEvent({ detail: { color: null } }))
 })
@@ -140,7 +146,7 @@ test.each([
 	const newColor = '0f0'
 	const onSelect = vi.fn(() => 0)
 
-	const { component } = render(Palette, {
+	const { component, user } = setup(Palette, {
 		colors,
 		maxColors,
 	})
@@ -148,15 +154,15 @@ test.each([
 	component.$on('select', onSelect)
 
 	input = await screen.findByTestId('__palette-input-input__')
-	await fireEvent.input(input, { target: { value: newColor } })
+	await user.type(input, newColor)
 
 	submit = await screen.findByTestId('__palette-input-submit__')
-	await fireEvent.click(submit)
+	await user.click(submit)
 
 	slots = await screen.findAllByTestId('__palette-slot__')
 	expect(slots).toHaveLength(expected)
 
-	await fireEvent.click(slots[slots.length - 1])
+	await user.click(slots[slots.length - 1])
 
 	expect(onSelect).toHaveBeenCalledWith(new CustomEvent({ detail: { color: '#000' } }))
 })
@@ -172,22 +178,22 @@ test.each([
 	const newColor = 'f0f'
 	const onSelect = vi.fn(() => 0)
 
-	const { component } = render(Palette, {
+	const { component, user } = setup(Palette, {
 		colors,
 		allowDuplicates,
 	})
 	component.$on('select', onSelect)
 
 	input = await screen.findByTestId('__palette-input-input__')
-	await fireEvent.input(input, { target: { value: newColor } })
+	await user.type(input, newColor)
 
 	submit = await screen.findByTestId('__palette-input-submit__')
-	await fireEvent.click(submit)
+	await user.click(submit)
 
 	slots = await screen.findAllByTestId('__palette-slot__')
 	expect(slots).toHaveLength(expected)
 
-	await fireEvent.click(slots[slots.length - 1])
+	await user.click(slots[slots.length - 1])
 
 	expect(onSelect).toHaveBeenCalledWith(new CustomEvent({ detail: { color: '#f0f' } }))
 })
@@ -196,7 +202,7 @@ test('Removes duplicates when updating allowDuplicates value', async () => {
 	let slots = null
 	const colors = ['#ff0', '#0ff', '#f0f', '#f0f', '#f0f']
 
-	const { rerender } = render(Palette, {
+	const { rerender } = setup(Palette, {
 		colors,
 		allowDuplicates: true,
 	})

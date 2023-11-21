@@ -64,7 +64,7 @@
 	let useCustomTooltipClass = false
 	let useCustomTooltipContent = false
 	let showTransparentSlot = true
-	let maxColors = 23
+	let maxColors = 30
 	let inputType = 'text'
 	let showCompactControl = true
 	let numColumns = 5
