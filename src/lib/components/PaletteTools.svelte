@@ -1,6 +1,6 @@
 <script>
 	import { createEventDispatcher } from 'svelte'
-	
+
 	import { COMPACT, SETTINGS } from '../enums/PaletteTool.js'
 	import { SELECT } from '../enums/PaletteEvent.js'
 
@@ -11,7 +11,7 @@
 
 	const TOOL_BUTTONS = {
 		[COMPACT]: PaletteCompactToggleButton,
-		[SETTINGS]: PaletteSettingsButton
+		[SETTINGS]: PaletteSettingsButton,
 	}
 
 	const dispatch = createEventDispatcher()

@@ -12,7 +12,7 @@
 	class:icon_button__button--active={isActive}
 	on:click
 >
-	<TrashIcon/>
+	<TrashIcon />
 </button>
 
 <style>
