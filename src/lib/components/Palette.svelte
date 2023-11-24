@@ -18,7 +18,7 @@
 
 	import useDeletion from './useDeletion'
 
-	export let colors = []
+	export let colors = null
 	export let selectedColor = null
 	export let isCompact = false
 	export let compactColorIndices = []
@@ -39,19 +39,21 @@
 	$: _isCompact = isCompact
 
 	$: Promise.resolve(colors).then((results) => {
-		const newColors = calculateColors(results, {
-			isCompact: _isCompact,
-			compactColorIndices,
-			allowDuplicates,
-			maxColors,
-		})
-		_colors = newColors
-		_numColumns = calculateNumColumns(newColors.length, {
-			isCompact: _isCompact,
-			compactColorIndices,
-			showTransparentSlot,
-			numColumns,
-		})
+		if (!!results) {
+			const newColors = calculateColors(results, {
+				isCompact: _isCompact,
+				compactColorIndices,
+				allowDuplicates,
+				maxColors,
+			})
+			_colors = newColors
+			_numColumns = calculateNumColumns(newColors.length, {
+				isCompact: _isCompact,
+				compactColorIndices,
+				showTransparentSlot,
+				numColumns,
+			})
+		}
 	})
 
 	$: _tools = [...(compactColorIndices?.length ? [COMPACT] : []), ...($$slots.settings ? [SETTINGS] : [])]
@@ -117,7 +119,7 @@
 		{#if !!_colors}
 			<ul class="palette__cells">
 				{#if showTransparentSlot}
-					<li data-testid="__palette-cell__">
+					<li data-testid="__palette-cell__" class="palette__cells__cell">
 						<slot name="transparent-slot">
 							<PaletteSlot
 								aria-label="Transparent slot"
@@ -130,6 +132,7 @@
 				{#each _colors as color, index (`${color}_${index}`)}
 					<li
 						data-testid="__palette-cell__"
+						class="palette__cells__cell"
 						use:useDeletion={{
 							deletionMode,
 							onDelete: () => _onDelete(index),
@@ -225,16 +228,15 @@
 		list-style: none;
 	}
 
+	.palette__content > .palette__cells > .palette__cells__cell {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
 	.palette__content.palette__content--compact > .palette__cells {
 		grid-template-columns: repeat(var(--num-columns), minmax(1.5rem, 1fr));
 		column-gap: 0;
-	}
-
-	.palette__divider {
-		border: none;
-		background-color: #fff;
-		width: 100%;
-		height: 1px;
-		margin: 0;
 	}
 </style>

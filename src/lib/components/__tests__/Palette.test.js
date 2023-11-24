@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 
 import Palette from '../Palette.svelte'
 
+// TODO: Fix "Error: Not implemented: HTMLFormElement.prototype.requestSubmit"
 import { TOOLTIP, DROP } from '../../enums/PaletteDeletionMode'
 
 const setup = (component, options) => {
@@ -34,7 +35,7 @@ test('Displays as many color slots as set in async mode', async () => {
 	})
 
 	cells = await screen.findAllByTestId('__palette-cell__')
-	waitFor(() => expect(cells).toHaveLength(colors.length))
+	waitFor(() => expect(cells).toHaveLength(3))
 })
 
 test('Triggers select with color', async () => {

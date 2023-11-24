@@ -8,7 +8,7 @@
 	import { Palette } from '../lib'
 
 	let unique = {}
-	let colors = []
+	let colors = null
 
 	/*onMount(() => {
 		colors = fetch('https://www.colr.org/json/colors/random/30')
@@ -56,7 +56,7 @@
 	]
 	const compactIndices = [2, 7, 13, 20]
 
-	let bgColor = colors[Math.round(Math.random() * (colors.length - 1))]
+	let bgColor = colors?.[Math.round(Math.random() * (colors?.length - 1))]
 
 	let preselectColor = true
 	let allowDuplicates = true
