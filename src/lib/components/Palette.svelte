@@ -140,7 +140,7 @@
 							tooltipClassName,
 						}}
 					>
-						<slot name="slot" {color} {selectedColor} {transition} isCompact={_isCompact}>
+						<slot name="slot" {color} {selectedColor} {transition} isCompact={_isCompact} {index}>
 							<PaletteSlot
 								{color}
 								selected={color === selectedColor}

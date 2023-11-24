@@ -26,7 +26,7 @@ yarn add @untemps/svelte-palette
 
 ## Usage
 
-### Basic usage
+### Basic Usage
 
 ```html
 <script>
@@ -84,16 +84,16 @@ yarn add @untemps/svelte-palette
 
 ## Slots
 
-| Slot               | Description                                                                           | Available Props                                     |
-| ------------------ | ------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| `header`           | Allow to add a header to the palette. By default, it is empty.                        | `selectedColor`                                     |
-| `footer`           | Allow to add a footer to the palette. By default, it contains an input to add colors. | `selectedColor`                                     |
-| `slot`             | Allow to replace the default color slots.                                             | `color`, `selectedColor`, `transition`, `isCompact` |
-| `transparent-slot` | Allow to replace the default transparent slot.                                        | -                                                   |
-| `input`            | Allow to replace the input in the footer if the default footer slot is kept as it is. | `selectedColor`, `inputType`                        |
-| `settings`         | Allow to replace the settings panel. See the demo to grab a usage example.            | `onClose`                                           |
-| `tools`            | Allow to replace the tools panel.                                                     | `isCompact`, `compactColorIndices`, `onSelect`      |
-| `loader`           | Allow to replace the loader displayed during the colors async retrieving.             | -                                                   |
+| Slot               | Description                                                                           | Available Properties Props                                   |
+| ------------------ | ------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `header`           | Allow to add a header to the palette. By default, it is empty.                        | `selectedColor`                                              |
+| `footer`           | Allow to add a footer to the palette. By default, it contains an input to add colors. | `selectedColor`                                              |
+| `slot`             | Allow to replace the default color slots.                                             | `index`, `color`, `selectedColor`, `transition`, `isCompact` |
+| `transparent-slot` | Allow to replace the default transparent slot.                                        | -                                                            |
+| `input`            | Allow to replace the input in the footer if the default footer slot is kept as it is. | `selectedColor`, `inputType`                                 |
+| `settings`         | Allow to replace the settings panel. See the demo to grab a usage example.            | `onClose`                                                    |
+| `tools`            | Allow to replace the tools panel.                                                     | `isCompact`, `compactColorIndices`, `onSelect`               |
+| `loader`           | Allow to replace the loader displayed during the colors async retrieving.             | -                                                            |
 
 ## Example
 
@@ -173,7 +173,7 @@ You may also specified whether the palette has to use the compact mode by defaul
 
 # Styles
 
-### Root tag class
+### Root Tag Class
 
 You can style the component by passing a class down to the root tag (`div`).
 
@@ -198,7 +198,7 @@ You can style the component by passing a class down to the root tag (`div`).
 </style>
 ```
 
-### Deletion tooltip class
+### Deletion Tooltip Class
 
 If you set `deletionMode` to `"tooltip"`, you can pass a class name that is set to the tooltip shown when hovering a slot.
 
@@ -290,7 +290,7 @@ This prop works the same way as the [in/out directive](https://svelte.dev/docs#t
 
 ## Recipes
 
-### Use an API to fill the palette
+### Use an API to Fill the Palette
 
 In case you want to call an API to fetch the palette colors, you may pass a promise to the `colors` prop.
 
@@ -312,7 +312,7 @@ The component displays a customizable loader waiting to the promise to be resolv
 </Palette>
 ```
 
-### Customize the content of the Deletion Tooltip
+### Customize the Content of the Deletion Tooltip
 
 By default, if `deletionMode` is set to `"tooltip"`, the tooltip displays a trash icon:
 
@@ -339,7 +339,7 @@ That is possible by defining a DOM element selector to the `tooltipContentSelect
 <button class="palette__tooltip__button">Delete</button>
 ```
 
-### Use a color input
+### Use a Color Input
 
 By default, the input that allows to add a new slot in the palette is typed as "text".
 
