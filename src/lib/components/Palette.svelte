@@ -28,6 +28,7 @@
 	export let tooltipContentSelector = null
 	export let showTransparentSlot = false
 	export let maxColors = 30
+	export let showInput = false
 	export let inputType = 'text'
 	export let numColumns = 5
 	export let transition = null
@@ -111,16 +112,19 @@
 	}
 </script>
 
-<div class="palette {$$props.class}" role="main">
+<div class="palette {$$props.class ?? ''}" role="main">
 	<section class="palette__content" class:palette__content--compact={_isCompact} style="--num-columns: {_numColumns}">
 		{#if !_isCompact}
 			<slot name="header" {selectedColor} />
 		{/if}
 		{#if !!_colors}
 			<ul class="palette__cells">
+				{#if $$slots.before_slot}
+					<slot name="before_slot" {selectedColor} {transition} isCompact={_isCompact} />
+				{/if}
 				{#if showTransparentSlot}
 					<li data-testid="__palette-cell__" class="palette__cells__cell">
-						<slot name="transparent-slot">
+						<slot name="transparent_slot">
 							<PaletteSlot
 								aria-label="Transparent slot"
 								selected={selectedColor === null}
@@ -150,6 +154,9 @@
 						</slot>
 					</li>
 				{/each}
+				{#if $$slots.after_slot}
+					<slot name="after_slot" {selectedColor} {transition} isCompact={_isCompact} />
+				{/if}
 			</ul>
 		{:else}
 			<slot name="loader">
@@ -163,7 +170,7 @@
 			<PaletteCompactToggleButton isCompact={true} on:click={_onExpand} />
 		{/if}
 	</section>
-	{#if !_isCompact}
+	{#if !_isCompact && showInput}
 		<slot name="input" {selectedColor} {inputType}>
 			<PaletteInput color={selectedColor} {inputType} on:add={_onInputAdd} />
 		</slot>
@@ -221,6 +228,7 @@
 		grid-template-columns: repeat(var(--num-columns), minmax(2rem, 1fr));
 		grid-auto-rows: minmax(2rem, 1fr);
 		column-gap: 0.3rem;
+		row-gap: 0.6rem;
 		align-items: center;
 		justify-items: center;
 		margin: 0;

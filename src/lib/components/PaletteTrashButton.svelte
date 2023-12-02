@@ -8,7 +8,7 @@
 	data-testid="__palette-trash-button__"
 	type="button"
 	{...$$restProps}
-	class="trash_button__button {$$props.class}"
+	class="trash_button__button {$$props.class ?? ''}"
 	class:icon_button__button--active={isActive}
 	on:click
 >

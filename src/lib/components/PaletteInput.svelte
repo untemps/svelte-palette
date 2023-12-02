@@ -62,7 +62,7 @@
 <hr class="palette__divider" />
 <section
 	data-testid="__palette-input__"
-	class="palette__input"
+	class="palette__input {$$props.class ?? ''}"
 	style="--grid-column-start: {_gridColumnStart}; --grid-column-end: {_gridColumnEnd}"
 >
 	<form>

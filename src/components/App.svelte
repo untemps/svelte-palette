@@ -65,6 +65,7 @@
 	let useCustomTooltipContent = false
 	let showTransparentSlot = true
 	let maxColors = 30
+	let showInput = true
 	let inputType = 'text'
 	let showCompactControl = true
 	let numColumns = 5
@@ -109,6 +110,7 @@
 					tooltipContentSelector={useCustomTooltipContent ? '#tooltip-content' : null}
 					{showTransparentSlot}
 					{maxColors}
+					{showInput}
 					{inputType}
 					{numColumns}
 					transition={transitions[transitionType]}
@@ -206,6 +208,11 @@
 								</Toggle>
 								<hr class="settings__space" />
 								<Toggle labelText="Show Compact Control" size="sm" bind:toggled={showCompactControl}>
+									<span slot="labelA" />
+									<span slot="labelB" />
+								</Toggle>
+								<hr class="settings__space" />
+								<Toggle labelText="Show Input" size="sm" bind:toggled={showInput}>
 									<span slot="labelA" />
 									<span slot="labelB" />
 								</Toggle>

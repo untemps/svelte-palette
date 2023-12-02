@@ -150,6 +150,7 @@ test.each([
 	const { component, user } = setup(Palette, {
 		colors,
 		maxColors,
+		showInput: true,
 	})
 
 	component.$on('select', onSelect)
@@ -182,6 +183,7 @@ test.each([
 	const { component, user } = setup(Palette, {
 		colors,
 		allowDuplicates,
+		showInput: true,
 	})
 	component.$on('select', onSelect)
 

@@ -29,7 +29,7 @@
 	data-testid="__palette-icon-button__"
 	type="button"
 	{...$$restProps}
-	class="icon_button__button {$$props.class}"
+	class="icon_button__button {$$props.class ?? ''}"
 	class:icon_button__button--active={isActive}
 	on:click
 >
