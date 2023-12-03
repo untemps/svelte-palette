@@ -1,7 +1,15 @@
 import { afterEach, expect, test, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte'
+import { cleanup, render, screen, waitFor } from '@testing-library/svelte'
+import userEvent from '@testing-library/user-event'
 
 import PaletteEyeDropperButton from '../PaletteEyeDropperButton.svelte'
+
+const setup = (component, options) => {
+	return {
+		user: userEvent.setup(),
+		...render(component, options),
+	}
+}
 
 afterEach(() => cleanup())
 
@@ -10,24 +18,24 @@ window.EyeDropper = function () {
 }
 
 test('Renders eye dropper button', async () => {
-	render(PaletteEyeDropperButton)
+	setup(PaletteEyeDropperButton)
 	const button = await screen.findByTestId('__palette-eyedropper-button__')
 	expect(button).toBeInTheDocument()
 })
 
 test('Sets eye dropper button aria-label', () => {
 	const ariaLabel = 'Foo'
-	render(PaletteEyeDropperButton, { ['aria-label']: ariaLabel })
+	setup(PaletteEyeDropperButton, { ['aria-label']: ariaLabel })
 	const button = screen.getByLabelText(ariaLabel)
 	expect(button).toBeInTheDocument()
 })
 
 test('Retrieves color from EyeDropper selection', async () => {
 	const onAdd = vi.fn()
-	const { component } = render(PaletteEyeDropperButton)
+	const { component, user } = setup(PaletteEyeDropperButton)
 	const button = screen.getByTestId('__palette-eyedropper-button__')
 	component.$on('add', onAdd)
-	await fireEvent.click(button)
+	await user.click(button)
 	await waitFor(() => expect(onAdd).toHaveBeenCalledWith(new CustomEvent({ detail: { color: '#ff0' } })))
 })
 
@@ -41,17 +49,17 @@ test('Throws error', async () => {
 
 	const onError = vi.fn(() => 0)
 	const ariaLabel = 'Foo'
-	const { component } = render(PaletteEyeDropperButton, { ['aria-label']: ariaLabel })
+	const { component, user } = setup(PaletteEyeDropperButton, { ['aria-label']: ariaLabel })
 	const button = screen.getByLabelText(ariaLabel)
 	component.$on('error', onError)
-	await fireEvent.click(button)
+	await user.click(button)
 	await waitFor(() => expect(onError).toHaveBeenCalled())
 })
 
 // EyeDropper API is not available
 test('Renders nothing', async () => {
 	window.EyeDropper = null
-	render(PaletteEyeDropperButton)
+	setup(PaletteEyeDropperButton)
 	try {
 		await screen.findByTestId('__palette-eyedropper-button__')
 	} catch (e) {
