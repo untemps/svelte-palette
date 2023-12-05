@@ -1,7 +1,7 @@
 import { extractByIndices } from '@untemps/utils/array/extractByIndices'
 
 export const calculateColors = ($colors, $params) => {
-	if (!$colors) {
+	if (!$colors || !Array.isArray($colors)) {
 		$colors = []
 	}
 	if (!$params) {

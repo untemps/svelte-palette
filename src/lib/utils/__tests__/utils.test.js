@@ -29,6 +29,8 @@ describe('utils', () => {
 			[null, params, []],
 			[null, null, []],
 			[[], params, []],
+			['[]', params, []],
+			[1, params, []],
 		])('colors:%j, params:%j, expected: %j', (colors, params, expected) => {
 			expect(calculateColors(colors, params)).toEqual(expected)
 		})
