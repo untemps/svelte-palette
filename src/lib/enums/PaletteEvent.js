@@ -1,4 +1,5 @@
 export const ADD = 'add'
-export const CLICK = 'click'
+export const CLOSE = 'close'
 export const ERROR = 'error'
 export const SELECT = 'select'
+export const SUBMIT = 'submit'

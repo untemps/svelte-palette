@@ -1,59 +1,49 @@
 <script>
-	import { createEventDispatcher } from 'svelte'
-	import { resolveClassName } from '@untemps/utils/dom/resolveClassName'
-
-	import { CLICK } from '../enums/PaletteEvent'
-
-	import { COMPACT, ENLARGE, EYE_DROPPER, PLUS, TRASH } from '../enums/PaletteIcon'
+	import { COMPACT, ENLARGE, EYE_DROPPER, PLUS, SETTINGS, TRASH } from '../enums/PaletteIcon'
 
 	import CompactIcon from './icons/CompactIcon.svelte'
 	import EnlargeIcon from './icons/EnlargeIcon.svelte'
 	import EyeDropperIcon from './icons/EyeDropperIcon.svelte'
 	import PlusIcon from './icons/PlusIcon.svelte'
 	import TrashIcon from './icons/TrashIcon.svelte'
-
-	const dispatch = createEventDispatcher()
+	import SettingsIcon from './icons/SettingsIcon.svelte'
 
 	export let icon = null
+	export let isActive = false
 
-	const _resolveIcon = (name) => {
-		switch (name) {
-			case COMPACT:
-				return CompactIcon
-			case ENLARGE:
-				return EnlargeIcon
-			case EYE_DROPPER:
-				return EyeDropperIcon
-			case PLUS:
-				return PlusIcon
-			case TRASH:
-				return TrashIcon
-			default:
-				return null
-		}
+	const ICONS = {
+		[COMPACT]: CompactIcon,
+		[ENLARGE]: EnlargeIcon,
+		[EYE_DROPPER]: EyeDropperIcon,
+		[PLUS]: PlusIcon,
+		[TRASH]: TrashIcon,
+		[SETTINGS]: SettingsIcon,
 	}
 
-	const _onClick = (e) => dispatch(CLICK, { event: e })
+	const _renderIcon = (name) => {
+		return ICONS[name]
+	}
 </script>
 
 <button
 	data-testid="__palette-icon-button__"
 	type="button"
 	{...$$restProps}
-	class={resolveClassName(['icon_button__button', $$props.class])}
-	on:click|preventDefault={_onClick}
+	class="icon_button__button {$$props.class ?? ''}"
+	class:icon_button__button--active={isActive}
+	on:click
 >
-	<svelte:component this={_resolveIcon(icon)} />
+	<svelte:component this={_renderIcon(icon)} />
 </button>
 
 <style>
 	.icon_button__button {
 		position: relative;
-		width: 2rem;
+		min-width: 2rem;
 		height: 2rem;
 		margin: 0;
 		padding: 0;
-		background: none;
+		background-color: #fafafa;
 		border-width: 1px;
 		border-color: #e5e5e5;
 		border-style: solid;
@@ -62,11 +52,16 @@
 	}
 
 	.icon_button__button:disabled {
-		opacity: 0.5;
+		cursor: auto;
 	}
 
 	.icon_button__button:focus {
 		border-color: #bdbdbd;
+		outline: none;
+	}
+
+	.icon_button__button--active {
+		background-color: #e5e5e5;
 		outline: none;
 	}
 
@@ -78,7 +73,21 @@
 		height: 16px;
 	}
 
-	:global(.icon_button__button > svg path) {
-		fill: #646464;
+	:global(
+			.icon_button__button > svg path,
+			.icon_button__button > svg circle,
+			.icon_button__button > svg line,
+			.icon_button__button > svg polyline
+		) {
+		stroke: #646464;
+	}
+
+	:global(
+			.icon_button__button:disabled > svg path,
+			.icon_button__button:disabled > svg circle,
+			.icon_button__button:disabled > svg line,
+			.icon_button__button:disabled > svg polyline
+		) {
+		stroke: #bdbdbd;
 	}
 </style>

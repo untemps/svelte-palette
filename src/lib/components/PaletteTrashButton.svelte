@@ -1,41 +1,60 @@
 <script>
-	import { TRASH } from '../enums/PaletteIcon'
+	import TrashIcon from './icons/TrashIcon.svelte'
 
-	import PaletteIconButton from './PaletteIconButton.svelte'
+	export let isActive = false
 </script>
 
-<PaletteIconButton
+<button
 	data-testid="__palette-trash-button__"
-	aria-label="Delete the slot"
-	icon={TRASH}
-	class="tooltip__button"
-/>
+	type="button"
+	{...$$restProps}
+	class="trash_button__button {$$props.class ?? ''}"
+	class:icon_button__button--active={isActive}
+	on:click
+>
+	<TrashIcon />
+</button>
 
 <style>
-	:global(button.icon_button__button.tooltip__button) {
-		cursor: pointer;
+	.trash_button__button {
+		position: relative;
+		min-width: 1.6rem;
+		height: 1.6rem;
 		margin: 0;
 		padding: 0;
 		background: none;
 		border: none;
+		cursor: pointer;
 	}
 
-	:global(button.icon_button__button.tooltip__button > svg) {
+	.trash_button__button:disabled {
+		opacity: 0.5;
+	}
+
+	.trash_button__button:focus {
+		border-color: #bdbdbd;
+		outline: none;
+	}
+
+	.trash_button__button--active {
+		background-color: #e5e5e5;
+		outline: none;
+	}
+
+	:global(.trash_button__button > svg) {
+		position: absolute;
+		top: calc(50% - 12px);
+		left: calc(50% - 12px);
 		width: 24px;
-		height: auto;
-		top: 4px;
-		left: 4px;
+		height: 24px;
 	}
 
-	:global(button.icon_button__button.tooltip__button > svg path) {
-		fill: white;
-	}
-
-	:global(button.icon_button__button.tooltip__button:active) {
-		background: none;
-	}
-
-	:global(button.icon_button__button.tooltip__button:active > svg path) {
-		fill: #aaaaaa;
+	:global(
+			.trash_button__button > svg path,
+			.trash_button__button > svg circle,
+			.trash_button__button > svg line,
+			.trash_button__button > svg polyline
+		) {
+		stroke: #fff;
 	}
 </style>

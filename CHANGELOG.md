@@ -1,3 +1,21 @@
+# [4.0.0-beta.2](https://github.com/untemps/svelte-palette/compare/v4.0.0-beta.1...v4.0.0-beta.2) (2023-12-05)
+
+### Bug Fixes
+
+-   Fix colors calculation with non-array input ([#83](https://github.com/untemps/svelte-palette/issues/83)) ([ed24a36](https://github.com/untemps/svelte-palette/commit/ed24a36f8e5c26088cdecc2b957dab168111d0db))
+
+# [4.0.0-beta.1](https://github.com/untemps/svelte-palette/compare/v3.0.1...v4.0.0-beta.1) (2023-12-03)
+
+### Features
+
+-   Refactor codebase and add cool new features ([#83](https://github.com/untemps/svelte-palette/issues/83)) ([2d9dcdc](https://github.com/untemps/svelte-palette/commit/2d9dcdc6ea815a487f816e5fd824bfd2313ac0bb))
+
+### BREAKING CHANGES
+
+-   -   Chang default layout
+-   Rename transparent slot
+-   Remove allowDeletion prop
+
 ## [3.0.1](https://github.com/untemps/svelte-palette/compare/v3.0.0...v3.0.1) (2023-09-29)
 
 # [3.0.0](https://github.com/untemps/svelte-palette/compare/v2.4.1...v3.0.0) (2023-09-27)

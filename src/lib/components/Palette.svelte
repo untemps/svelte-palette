@@ -1,55 +1,63 @@
 <script>
+	// TODO: Manage maxNumColumns
 	import { createEventDispatcher } from 'svelte'
-	import { resolveClassName } from '@untemps/utils/dom/resolveClassName'
-	import { extractByIndices } from '@untemps/utils/array/extractByIndices'
+
+	import { calculateColors, calculateNumColumns } from '../utils/utils.js'
 
 	import { SELECT } from '../enums/PaletteEvent'
-	import { NONE, TOOLTIP } from '../enums/PaletteDeletionMode'
+	import { NONE } from '../enums/PaletteDeletionMode'
+	import { COMPACT, SETTINGS } from '$lib/enums/PaletteTool.js'
 
-	import PaletteCompactToggleButton from './PaletteCompactToggleButton.svelte'
 	import PaletteInput from './PaletteInput.svelte'
 	import PaletteSlot from './PaletteSlot.svelte'
 	import PaletteTrashButton from './PaletteTrashButton.svelte'
 	import PaletteLoader from './PaletteLoader.svelte'
+	import PaletteTools from './PaletteTools.svelte'
+	import PaletteSettingsPanel from './PaletteSettingsPanel.svelte'
+	import PaletteCompactToggleButton from './PaletteCompactToggleButton.svelte'
 
 	import useDeletion from './useDeletion'
 
-	export let colors = []
+	export let colors = null
 	export let selectedColor = null
+	export let isCompact = false
+	export let compactColorIndices = []
 	export let allowDuplicates = false
-	export let allowDeletion = false
 	export let deletionMode = NONE
 	export let tooltipClassName = null
 	export let tooltipContentSelector = null
 	export let showTransparentSlot = false
 	export let maxColors = 30
+	export let showInput = false
 	export let inputType = 'text'
 	export let numColumns = 5
 	export let transition = null
-	export let compactColorIndices = []
-	export let isCompact = false
 
-	let _isCompact = false
+	let _colors = null
+	let _numColumns = numColumns
+	let _isSettingsOn = false
 
 	$: _isCompact = isCompact
 
-	let _colors = []
-	let _maxColumns = 0
-	let _numColumns = 0
-
-	$: Promise.resolve(colors).then((result) => {
-		let c = _isCompact ? extractByIndices(result, compactColorIndices) : result
-		c = !allowDuplicates ? c.filter((item, index) => c.indexOf(item) === index) : c
-		c = result.slice(0, c.length < maxColors || maxColors === -1 ? c.length : maxColors)
-		_colors = c
-
-		_maxColumns = Math.min(result.length, maxColors) + +showTransparentSlot + (compactColorIndices?.length ? 1 : 0)
-		_numColumns = numColumns > _maxColumns || numColumns <= 0 ? _maxColumns : numColumns
+	$: Promise.resolve(colors).then((results) => {
+		if (!!results) {
+			const newColors = calculateColors(results, {
+				isCompact: _isCompact,
+				compactColorIndices,
+				allowDuplicates,
+				maxColors,
+			})
+			_colors = newColors
+			_numColumns = calculateNumColumns(newColors.length, {
+				isCompact: _isCompact,
+				compactColorIndices,
+				showTransparentSlot,
+				numColumns,
+			})
+		}
 	})
 
-	let _deletionMode = deletionMode
-
-	$: _deletionMode = allowDeletion && deletionMode === NONE ? TOOLTIP : deletionMode
+	$: _tools = [...(compactColorIndices?.length ? [COMPACT] : []), ...($$slots.settings ? [SETTINGS] : [])]
 
 	const dispatch = createEventDispatcher()
 
@@ -58,17 +66,20 @@
 		dispatch(SELECT, { color })
 	}
 
-	const _addColor = (color) =>
-		(_colors =
-			allowDuplicates || !_colors.includes(color)
-				? [
-						..._colors.slice(
-							0,
-							_colors.length < maxColors || maxColors === -1 ? _colors.length : maxColors - 1
-						),
-						color,
-				  ]
-				: _colors)
+	const _addColor = (color) => {
+		_colors = calculateColors([..._colors, color], {
+			isCompact: _isCompact,
+			compactColorIndices,
+			allowDuplicates,
+			maxColors,
+		})
+		_numColumns = calculateNumColumns(_colors.length, {
+			isCompact: _isCompact,
+			compactColorIndices,
+			showTransparentSlot,
+			numColumns,
+		})
+	}
 
 	const _removeColor = (index) => (_colors = _colors.filter((c, i) => i !== index))
 
@@ -78,36 +89,46 @@
 
 	const _onDelete = (index) => _removeColor(index)
 
-	const _onCompact = ({ detail: { isCompact } }) => (_isCompact = !_isCompact)
+	const _onToolSelect = (args) => {
+		const tool = args?.detail?.tool ?? args
+		switch (tool) {
+			case SETTINGS:
+				_isSettingsOn = true
+				break
+			case COMPACT:
+				_isCompact = !_isCompact
+				_numColumns = _isCompact ? compactColorIndices.length : _numColumns
+				break
+		}
+	}
+
+	const _onExpand = () => {
+		_isCompact = !_isCompact
+		_numColumns = _isCompact ? compactColorIndices.length : _numColumns
+	}
+
+	const _onSettingsClose = () => {
+		_isSettingsOn = false
+	}
 </script>
 
-<div
-	class={resolveClassName(['palette', $$props.class, [_isCompact, 'palette--compact']])}
-	style="--num-columns: {_numColumns}"
->
-	{#if _colors?.length}
-		{#if $$slots.header && !_isCompact}
+<div class="palette {$$props.class ?? ''}" role="main">
+	<section class="palette__content" class:palette__content--compact={_isCompact} style="--num-columns: {_numColumns}">
+		{#if !_isCompact}
 			<slot name="header" {selectedColor} />
-			<slot name="header-divider">
-				<hr class="palette__divider" />
-			</slot>
 		{/if}
-		<article class="palette__content">
+		{#if !!_colors}
 			<ul class="palette__cells">
-				{#if !!compactColorIndices?.length}
-					<li>
-						<slot name="compact-control" isCompact={_isCompact}>
-							<PaletteCompactToggleButton isCompact={_isCompact} on:click={_onCompact} />
-						</slot>
-					</li>
+				{#if $$slots.before_slot}
+					<slot name="before_slot" {selectedColor} {transition} isCompact={_isCompact} />
 				{/if}
-				{#if showTransparentSlot && !_isCompact}
+				{#if showTransparentSlot}
 					<li data-testid="__palette-cell__" class="palette__cells__cell">
-						<slot name="transparent-slot">
+						<slot name="transparent_slot">
 							<PaletteSlot
 								aria-label="Transparent slot"
 								selected={selectedColor === null}
-								on:click={_onSlotSelect}
+								on:select={_onSlotSelect}
 							/>
 						</slot>
 					</li>
@@ -117,42 +138,54 @@
 						data-testid="__palette-cell__"
 						class="palette__cells__cell"
 						use:useDeletion={{
-							deletionMode: _deletionMode,
+							deletionMode,
 							onDelete: () => _onDelete(index),
 							tooltipContentSelector,
 							tooltipClassName,
 						}}
 					>
-						<slot name="slot" {color} {selectedColor} {transition} isCompact={_isCompact}>
+						<slot name="slot" {color} {selectedColor} {transition} isCompact={_isCompact} {index}>
 							<PaletteSlot
 								{color}
 								selected={color === selectedColor}
 								{transition}
-								on:click={_onSlotSelect}
+								on:select={_onSlotSelect}
 							/>
 						</slot>
 					</li>
 				{/each}
+				{#if $$slots.after_slot}
+					<slot name="after_slot" {selectedColor} {transition} isCompact={_isCompact} />
+				{/if}
 			</ul>
-		</article>
-		{#if !_isCompact}
-			<slot name="footer-divider">
-				<hr class="palette__divider" />
-			</slot>
-			<slot name="footer" {selectedColor}>
-				<slot name="input" {selectedColor} {inputType}>
-					<article class="palette__content">
-						<PaletteInput color={selectedColor} {inputType} on:add={_onInputAdd} />
-					</article>
-				</slot>
+		{:else}
+			<slot name="loader">
+				<PaletteLoader />
 			</slot>
 		{/if}
-	{:else}
-		<slot name="loader">
-			<PaletteLoader />
+		{#if !_isCompact}
+			<slot name="footer" {selectedColor} />
+		{/if}
+		{#if _isCompact}
+			<PaletteCompactToggleButton isCompact={true} on:click={_onExpand} />
+		{/if}
+	</section>
+	{#if !_isCompact && showInput}
+		<slot name="input" {selectedColor} {inputType}>
+			<PaletteInput color={selectedColor} {inputType} on:add={_onInputAdd} />
+		</slot>
+	{/if}
+	{#if !_isCompact && !!_tools?.length}
+		<slot name="tools" {compactColorIndices} isCompact={_isCompact} onSelect={_onToolSelect}>
+			<PaletteTools tools={_tools} on:select={_onToolSelect} />
 		</slot>
 	{/if}
 </div>
+{#if $$slots.settings}
+	<PaletteSettingsPanel isVisible={_isSettingsOn} on:close={_onSettingsClose}>
+		<slot name="settings" onClose={_onSettingsClose} />
+	</PaletteSettingsPanel>
+{/if}
 
 <template id="tooltip-template">
 	<PaletteTrashButton />
@@ -164,52 +197,54 @@
 	}
 
 	.palette {
+		width: 100%;
 		color: black;
-		min-width: 10rem;
-		background-color: #fafafa;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		padding: 2rem;
-		row-gap: 1rem;
-	}
-
-	.palette.palette--compact {
-		padding: 0.3rem;
+		background-color: #fafafa;
 	}
 
 	.palette__content {
 		width: 100%;
+		min-height: 70px;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		justify-content: center;
+		padding: 1rem;
 	}
 
-	.palette__content_loading {
-		font-size: 0.8rem;
-		color: #ccc;
+	.palette__content.palette__content--compact {
+		min-height: auto;
+		padding: 0.3rem 0.6rem;
+		flex-direction: row;
+		column-gap: 0.7rem;
 	}
 
-	.palette__cells {
-		list-style: none;
-		margin: 0;
-		padding: 0;
+	.palette__content > .palette__cells {
+		width: 100%;
 		display: grid;
-		grid-template-columns: repeat(var(--num-columns), 2rem);
-		grid-auto-rows: minmax(2rem, auto);
+		grid-template-columns: repeat(var(--num-columns), minmax(2rem, 1fr));
+		grid-auto-rows: minmax(2rem, 1fr);
+		column-gap: 0.3rem;
+		row-gap: 0.6rem;
 		align-items: center;
 		justify-items: center;
-	}
-
-	.palette__cells__cell {
-		margin-top: 2px;
-	}
-
-	.palette__divider {
-		border: none;
-		background-color: #ccc;
-		width: calc(100% + 4rem);
-		height: 1px;
 		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.palette__content > .palette__cells > .palette__cells__cell {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.palette__content.palette__content--compact > .palette__cells {
+		grid-template-columns: repeat(var(--num-columns), minmax(1.5rem, 1fr));
+		column-gap: 0;
 	}
 </style>

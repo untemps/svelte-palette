@@ -1,5 +1,47 @@
-<svg data-testid="__trash-icon__" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-	<path
-		d="M216 48h-40v-8a24.1 24.1 0 00-24-24h-48a24.1 24.1 0 00-24 24v8H40a8 8 0 000 16h8v144a16 16 0 0016 16h128a16 16 0 0016-16V64h8a8 8 0 000-16zM112 168a8 8 0 01-16 0v-64a8 8 0 0116 0zm48 0a8 8 0 01-16 0v-64a8 8 0 0116 0zm0-120H96v-8a8 8 0 018-8h48a8 8 0 018 8z"
-	/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" data-testid="__trash-icon__"
+	><rect width="256" height="256" fill="none" /><line
+		x1="216"
+		y1="56"
+		x2="40"
+		y2="56"
+		fill="none"
+		stroke="currentColor"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+		stroke-width="16"
+	/><line
+		x1="104"
+		y1="104"
+		x2="104"
+		y2="168"
+		fill="none"
+		stroke="currentColor"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+		stroke-width="16"
+	/><line
+		x1="152"
+		y1="104"
+		x2="152"
+		y2="168"
+		fill="none"
+		stroke="currentColor"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+		stroke-width="16"
+	/><path
+		d="M200,56V208a8,8,0,0,1-8,8H64a8,8,0,0,1-8-8V56"
+		fill="none"
+		stroke="currentColor"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+		stroke-width="16"
+	/><path
+		d="M168,56V40a16,16,0,0,0-16-16H104A16,16,0,0,0,88,40V56"
+		fill="none"
+		stroke="currentColor"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+		stroke-width="16"
+	/></svg
+>
