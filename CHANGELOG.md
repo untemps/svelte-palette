@@ -1,3 +1,15 @@
+# [4.0.0](https://github.com/untemps/svelte-palette/compare/v3.0.1...v4.0.0) (2023-12-09)
+
+### Features
+
+-   Refactor codebase and add cool new features ([9c40860](https://github.com/untemps/svelte-palette/commit/9c40860de2457d61bc58a135a3524e0c4734eb37))
+
+### BREAKING CHANGES
+
+-   -   Change default layout
+-   Rename transparent slot
+-   Remove allowDeletion prop
+
 # [4.0.0-beta.2](https://github.com/untemps/svelte-palette/compare/v4.0.0-beta.1...v4.0.0-beta.2) (2023-12-05)
 
 ### Bug Fixes
