@@ -87,8 +87,37 @@
 </main>
 
 <style>
+	.example3 {
+		position: relative;
+		overflow-x: hidden;
+		min-height: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: stretch;
+		background-color: var(--bgColor);
+		padding: 1rem;
+	}
+
+	.example3 .content {
+		width: 100%;
+		max-width: 600px;
+		min-height: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		row-gap: 1px;
+	}
+
 	.example3 :global(.palette[role='main'].palette__custom) {
 		background-color: #fff;
+	}
+
+	@media screen and (max-width: 640px) {
+		.example3 :global(.palette[role='main'].palette__custom .palette__cells) {
+			grid-template-columns: repeat(var(--num-columns), minmax(1rem, 1fr));
+			column-gap: 0;
+		}
 	}
 
 	.example3 .header {
@@ -102,13 +131,21 @@
 	}
 
 	.example3 .slot {
+		width: 100%;
 		display: flex;
 		flex-direction: column;
 		row-gap: 0.5rem;
 	}
 
+	@media screen and (max-width: 320px) {
+		.example3 .slot {
+			row-gap: 0;
+		}
+	}
+
 	.example3 .slot__color {
-		width: 50px;
+		width: 100%;
+		max-width: 50px;
 		height: 50px;
 		background-color: var(--color);
 	}
@@ -118,29 +155,20 @@
 		font-weight: 700;
 	}
 
+	@media screen and (max-width: 320px) {
+		.example3 .slot__color-rank {
+			display: none;
+		}
+	}
+
 	.example3 .slot__color-label {
 		font-size: 0.6rem;
 		font-weight: 400;
 	}
 
-	.example3 {
-		position: relative;
-		overflow-x: hidden;
-		min-height: 100%;
-		display: flex;
-		justify-content: center;
-		align-items: stretch;
-		background-color: var(--bgColor);
-	}
-
-	.example3 .content {
-		width: 100%;
-		max-width: 600px;
-		min-height: 100%;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		row-gap: 1px;
+	@media screen and (max-width: 640px) {
+		.example3 .slot__color-label {
+			display: none;
+		}
 	}
 </style>

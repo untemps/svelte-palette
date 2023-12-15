@@ -81,6 +81,12 @@
 		grid-row-gap: 1rem;
 	}
 
+	@media screen and (max-width: 640px) {
+		.example2 .content .content__grid {
+			grid-template-columns: repeat(1, 1fr);
+		}
+	}
+
 	.example2 :global(.palette[role='main'].palette__custom) {
 		background-color: #fff;
 		border-radius: 1rem;
