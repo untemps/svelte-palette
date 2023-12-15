@@ -52,6 +52,7 @@
 		"carbon-components-svelte": "^0.82.2",
 		"carbon-icons-svelte": "^12.4.0",
 		"cross-env": "^7.0.3",
+		"font-color-contrast": "^11.1.0",
 		"husky": "^8.0.3",
 		"jsdom": "^23.0.1",
 		"prettier": "^3.1.0",

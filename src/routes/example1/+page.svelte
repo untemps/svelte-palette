@@ -5,7 +5,7 @@
 	import { Button, Select, SelectItem, Slider, Toggle } from 'carbon-components-svelte'
 	import Close from 'carbon-icons-svelte/lib/Close.svelte'
 
-	import { Palette } from '../lib'
+	import { Palette } from '$lib'
 
 	let unique = {}
 	let colors = null
@@ -95,7 +95,7 @@
 	}
 </script>
 
-<main style="--bgColor:{bgColor}">
+<main class="example1" style="--bgColor:{bgColor}">
 	<div class="content">
 		<div>
 			{#key unique}
@@ -240,11 +240,7 @@
 </main>
 
 <style>
-	:global(.palette[role='main'].palette__custom) {
-		background-color: #fff;
-	}
-
-	main {
+	.example1 {
 		position: relative;
 		overflow-x: hidden;
 		min-height: 100%;
@@ -254,7 +250,7 @@
 		background-color: var(--bgColor);
 	}
 
-	.content {
+	.example1 .content {
 		width: 100%;
 		max-width: 100%;
 		min-height: 100%;
@@ -264,7 +260,11 @@
 		justify-content: center;
 	}
 
-	.palette__settings {
+	.example1 :global(.palette[role='main'].palette__custom) {
+		background-color: #fff;
+	}
+
+	.example1 .palette__settings {
 		position: absolute;
 		right: 0;
 		top: 0;
@@ -272,7 +272,7 @@
 		z-index: 999;
 	}
 
-	.settings {
+	.example1 .settings {
 		overflow: hidden auto;
 		width: 320px;
 		min-width: 320px;
@@ -285,21 +285,21 @@
 		padding: 2rem;
 	}
 
-	:global(.bx--btn.bx--btn--icon-only.bx--tooltip__trigger) {
+	.example1 :global(.bx--btn.bx--btn--icon-only.bx--tooltip__trigger) {
 		position: absolute !important;
 		right: 20px !important;
 		top: 20px !important;
 	}
 
-	:global(.settings--collapsed > .bx--btn.bx--btn--icon-only.bx--tooltip__trigger.settings__close-button) {
+	.example1 :global(.settings--collapsed > .bx--btn.bx--btn--icon-only.bx--tooltip__trigger.settings__close-button) {
 		display: none !important;
 	}
 
-	:global(.settings--expanded + .bx--btn.bx--btn--icon-only.bx--tooltip__trigger.settings__open-button) {
+	.example1 :global(.settings--expanded + .bx--btn.bx--btn--icon-only.bx--tooltip__trigger.settings__open-button) {
 		display: none !important;
 	}
 
-	.settings__form {
+	.example1 .settings__form {
 		width: 100%;
 		display: flex;
 		flex-direction: column;
@@ -307,16 +307,16 @@
 		align-items: flex-start;
 	}
 
-	.settings__space {
+	.example1 .settings__space {
 		border: none;
 		margin: 0.5rem 0;
 	}
 
-	.settings__preselection {
+	.example1 .settings__preselection {
 		position: relative;
 	}
 
-	.settings__preselection__color {
+	.example1 .settings__preselection__color {
 		position: absolute;
 		top: 24px;
 		left: 46px;
@@ -324,25 +324,25 @@
 		height: 16px;
 	}
 
-	:global(.bx--toggle__switch) {
+	.example1 :global(.bx--toggle__switch) {
 		margin-top: 0.5rem !important;
 	}
 
-	:global(.bx--slider__range-label) {
+	.example1 :global(.bx--slider__range-label) {
 		font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif !important;
 		font-size: 0.75rem !important;
 		color: #c6c6c6 !important;
 	}
 
-	:global(.bx--slider) {
+	.example1 :global(.bx--slider) {
 		min-width: 6rem !important;
 	}
 
-	:global(.bx--form-item) {
+	.example1 :global(.bx--form-item) {
 		width: 100%;
 	}
 
-	:global(.tooltip) {
+	.example1 :global(.tooltip) {
 		position: absolute;
 		z-index: 9999;
 		max-width: initial;
@@ -354,7 +354,7 @@
 		filter: drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.3));
 	}
 
-	:global(.tooltip::after) {
+	.example1 :global(.tooltip::after) {
 		content: '';
 		position: absolute;
 		top: 100%;
