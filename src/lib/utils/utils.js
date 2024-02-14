@@ -1,5 +1,16 @@
 import { extractByIndices } from '@untemps/utils/array/extractByIndices'
 
+export const transformColors = ($colors) => {
+	return $colors.map((color) => {
+		const name = color.name ?? null
+		const value = color.value ?? color
+		return {
+			...(!!name && { name }),
+			value,
+		}
+	})
+}
+
 export const calculateColors = ($colors, $params) => {
 	if (!$colors || !Array.isArray($colors)) {
 		$colors = []
@@ -14,11 +25,13 @@ export const calculateColors = ($colors, $params) => {
 		$params = { ...$params, maxColors: $colors.length }
 	}
 
+	$colors = transformColors($colors)
+
 	if (!!$params.isCompact) {
 		$colors = extractByIndices($colors, $params.compactColorIndices)
 	}
 	if (!$params.allowDuplicates) {
-		$colors = $colors.filter((item, index) => $colors.indexOf(item) === index)
+		$colors = $colors.filter((item, index) => $colors.findIndex(({ value }) => value === item.value) === index)
 	}
 	if ($colors.length > $params.maxColors) {
 		$colors = $colors.slice(0, $params.maxColors)

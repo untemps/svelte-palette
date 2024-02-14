@@ -133,7 +133,7 @@
 						</slot>
 					</li>
 				{/if}
-				{#each _colors as color, index (`${color}_${index}`)}
+				{#each _colors as color, index (`${color.value}_${index}`)}
 					<li
 						data-testid="__palette-cell__"
 						class="palette__cells__cell"
@@ -144,9 +144,17 @@
 							tooltipClassName,
 						}}
 					>
-						<slot name="slot" {color} {selectedColor} {transition} isCompact={_isCompact} {index}>
+						<slot
+							name="slot"
+							color={color.value}
+							colorName={color.name}
+							{selectedColor}
+							{transition}
+							isCompact={_isCompact}
+							{index}
+						>
 							<PaletteSlot
-								{color}
+								color={color.value}
 								selected={color === selectedColor}
 								{transition}
 								on:select={_onSlotSelect}

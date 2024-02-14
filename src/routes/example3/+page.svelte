@@ -2,40 +2,40 @@
 	import { Palette } from '$lib'
 
 	const blueColors = [
-		'#e5f0ff',
-		'#cee5ff',
-		'#9CC9FE',
-		'#65b0fb',
-		'#3496ff',
-		'#057cff',
-		'#0362cd',
-		'#024b98',
-		'#003464',
-		'#021730',
+		{ name: 'Blue 1', value: '#e5f0ff' },
+		{ name: 'Blue 2', value: '#cee5ff' },
+		{ name: 'Blue 3', value: '#9CC9FE' },
+		{ name: 'Blue 4', value: '#65b0fb' },
+		{ name: 'Blue 5', value: '#3496ff' },
+		{ name: 'Blue 6', value: '#057cff' },
+		{ name: 'Blue 7', value: '#0362cd' },
+		{ name: 'Blue 8', value: '#024b98' },
+		{ name: 'Blue 9', value: '#003464' },
+		{ name: 'Blue 10', value: '#021730' },
 	]
 	const purpleColors = [
-		'#F8EEFC',
-		'#EFDBF8',
-		'#DFBBF2',
-		'#CF99EB',
-		'#C076E5',
-		'#AF52DF',
-		'#8A42B1',
-		'#6A3184',
-		'#432258',
-		'#23102A',
+		{ name: 'Purple 1', value: '#F8EEFC' },
+		{ name: 'Purple 2', value: '#EFDBF8' },
+		{ name: 'Purple 3', value: '#DFBBF2' },
+		{ name: 'Purple 4', value: '#CF99EB' },
+		{ name: 'Purple 5', value: '#C076E5' },
+		{ name: 'Purple 6', value: '#AF52DF' },
+		{ name: 'Purple 7', value: '#8A42B1' },
+		{ name: 'Purple 8', value: '#6A3184' },
+		{ name: 'Purple 9', value: '#432258' },
+		{ name: 'Purple 10', value: '#23102A' },
 	]
 	const redColors = [
-		'#FEEAEA',
-		'#FFD9D6',
-		'#FFB2AC',
-		'#FF8983',
-		'#FF635A',
-		'#FF3B2F',
-		'#CC3127',
-		'#99241E',
-		'#661A13',
-		'#350A0C',
+		{ name: 'Red 1', value: '#FEEAEA' },
+		{ name: 'Red 2', value: '#FFD9D6' },
+		{ name: 'Red 3', value: '#FFB2AC' },
+		{ name: 'Red 4', value: '#FF8983' },
+		{ name: 'Red 5', value: '#FF635A' },
+		{ name: 'Red 6', value: '#FF3B2F' },
+		{ name: 'Red 7', value: '#CC3127' },
+		{ name: 'Red 8', value: '#99241E' },
+		{ name: 'Red 9', value: '#661A13' },
+		{ name: 'Red 10', value: '#350A0C' },
 	]
 </script>
 
@@ -45,11 +45,11 @@
 			<div slot="header" class="header">
 				<h1>Blue</h1>
 			</div>
-			<div slot="slot" class="slot" let:color let:index>
+			<div slot="slot" class="slot" let:color let:colorName let:index>
 				<div class="slot__color" style="--color:{color}"></div>
 				<div>
 					<div class="slot__color-rank">{`${index < 9 ? '0' : ''}${index + 1}`}</div>
-					<div class="slot__color-label">{color}</div>
+					<div class="slot__color-label">{colorName}</div>
 				</div>
 			</div>
 			<div slot="input"></div>
@@ -59,11 +59,11 @@
 			<div slot="header" class="header">
 				<h1>Purple</h1>
 			</div>
-			<div slot="slot" class="slot" let:color let:index>
+			<div slot="slot" class="slot" let:color let:colorName let:index>
 				<div class="slot__color" style="--color:{color}"></div>
 				<div>
 					<div class="slot__color-rank">{`${index < 9 ? '0' : ''}${index + 1}`}</div>
-					<div class="slot__color-label">{color}</div>
+					<div class="slot__color-label">{colorName}</div>
 				</div>
 			</div>
 			<div slot="input"></div>
@@ -73,11 +73,11 @@
 			<div slot="header" class="header">
 				<h1>Red</h1>
 			</div>
-			<div slot="slot" class="slot" let:color let:index>
+			<div slot="slot" class="slot" let:color let:colorName let:index>
 				<div class="slot__color" style="--color:{color}"></div>
 				<div>
 					<div class="slot__color-rank">{`${index < 9 ? '0' : ''}${index + 1}`}</div>
-					<div class="slot__color-label">{color}</div>
+					<div class="slot__color-label">{colorName}</div>
 				</div>
 			</div>
 			<div slot="input"></div>
