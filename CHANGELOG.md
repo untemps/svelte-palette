@@ -1,3 +1,9 @@
+# [4.1.0](https://github.com/untemps/svelte-palette/compare/v4.0.0...v4.1.0) (2024-02-29)
+
+### Features
+
+-   Allow to name colors ([#95](https://github.com/untemps/svelte-palette/issues/95)) ([f707306](https://github.com/untemps/svelte-palette/commit/f7073066eeef159714cee86e5f4bbad301590d0f))
+
 # [4.0.0](https://github.com/untemps/svelte-palette/compare/v3.0.1...v4.0.0) (2023-12-09)
 
 ### Features
