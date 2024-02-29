@@ -1,31 +1,114 @@
 import { describe, expect, test } from 'vitest'
 
-import { calculateColors, calculateNumColumns, isColorValid } from '../utils.js'
+import { calculateColors, calculateNumColumns, isColorValid, transformColors } from '../utils.js'
 
 describe('utils', () => {
+	describe('transformColors', () => {
+		const colorStrings = ['#123456', '#345612', '#456123']
+		const colorsObjects = [
+			{
+				name: 'Foo',
+				value: '#123456',
+			},
+			{
+				name: 'Bar',
+				value: '#345612',
+			},
+			{
+				name: 'Gag',
+				value: '#456123',
+			},
+		]
+
+		test.each([
+			[
+				colorStrings,
+				[
+					{
+						value: '#123456',
+					},
+					{
+						value: '#345612',
+					},
+					{
+						value: '#456123',
+					},
+				],
+			],
+			[colorsObjects, colorsObjects],
+			[
+				[
+					'#123456',
+					{
+						name: 'Bar',
+						value: '#345612',
+					},
+					{
+						value: '#456123',
+					},
+				],
+				[
+					{
+						value: '#123456',
+					},
+					{
+						name: 'Bar',
+						value: '#345612',
+					},
+					{
+						value: '#456123',
+					},
+				],
+			],
+		])('colors:%j, expected: %j', (colors, expected) => {
+			expect(transformColors(colors)).toEqual(expected)
+		})
+	})
+
 	describe('calculateColors', () => {
-		const colors = [1, 2, 3, 4, 5]
+		const colors = ['#123456', '#345612', '#456123', '#245136', '#425136']
 		const params = {
 			isCompact: false,
 			compactColorIndices: [],
 			allowDuplicates: true,
 			maxColors: 5,
 		}
+		const colorsObjects = [
+			{
+				value: colors[0],
+			},
+			{
+				value: colors[1],
+			},
+			{
+				value: colors[2],
+			},
+			{
+				value: colors[3],
+			},
+			{
+				value: colors[4],
+			},
+		]
 
 		test.each([
-			[colors, params, colors],
+			[colors, params, colorsObjects],
 			[colors, { ...params, isCompact: true }, []],
-			[colors, { ...params, isCompact: false, compactColorIndices: [0, 4] }, colors],
-			[colors, { ...params, isCompact: true, compactColorIndices: [0, 4] }, [1, 5]],
+			[colors, { ...params, isCompact: false, compactColorIndices: [0, 4] }, colorsObjects],
+			[
+				colors,
+				{ ...params, isCompact: true, compactColorIndices: [0, 4] },
+				[{ value: colors[0] }, { value: colors[4] }],
+			],
 			[colors, { ...params, isCompact: true, compactColorIndices: null }, []],
-			[colors, { ...params, allowDuplicates: false }, colors],
-			[[1, 1, 1], { ...params, allowDuplicates: false }, [1]],
-			[[1, 1, 1], { ...params, allowDuplicates: true }, [1, 1, 1]],
-			[colors, { ...params, maxColors: 8 }, colors],
-			[colors, { ...params, maxColors: 3 }, [1, 2, 3]],
-			[[1, 1, 1], { ...params, allowDuplicates: false, maxColors: 2 }, [1]],
-			[[1, 1, 1], { ...params, allowDuplicates: true, maxColors: 2 }, [1, 1]],
-			[[1, 1, 1], null, [1, 1, 1]],
+			[colors, { ...params, allowDuplicates: false }, colorsObjects],
+			[[1, 1, 1], { ...params, allowDuplicates: false }, [{ value: 1 }]],
+			[[1, 1, 1], { ...params, allowDuplicates: true }, [{ value: 1 }, { value: 1 }, { value: 1 }]],
+			[colors, { ...params, maxColors: 8 }, colorsObjects],
+			[colors, { ...params, maxColors: 3 }, colorsObjects.slice(0, 3)],
+			[[1, 1, 1], { ...params, allowDuplicates: false, maxColors: 2 }, [{ value: 1 }]],
+			[[1, 1, 1], { ...params, allowDuplicates: true, maxColors: 2 }, [{ value: 1 }, { value: 1 }]],
+			[[1, 1, 1], null, [{ value: 1 }, { value: 1 }, { value: 1 }]],
 			[null, params, []],
 			[null, null, []],
 			[[], params, []],
