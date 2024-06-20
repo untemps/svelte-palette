@@ -1,6 +1,7 @@
 import { afterEach, expect, test, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte'
+import { cleanup, render, screen, waitFor } from '@testing-library/svelte'
 import userEvent from '@testing-library/user-event'
+import { standby } from '@untemps/utils/async/standby'
 
 import Palette from '../Palette.svelte'
 
@@ -217,6 +218,8 @@ test('Removes duplicates when updating allowDuplicates value', async () => {
 		colors,
 		allowDuplicates: false,
 	})
+
+	await standby(1000)
 
 	slots = await screen.findAllByTestId('__palette-slot__')
 	expect(slots).toHaveLength(3)
