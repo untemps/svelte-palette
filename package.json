@@ -40,6 +40,7 @@
 		"@commitlint/cli": "^19.3.0",
 		"@commitlint/config-conventional": "^19.2.2",
 		"@semantic-release/changelog": "^6.0.3",
+		"@semantic-release/exec": "^6.0.3",
 		"@semantic-release/git": "^10.0.1",
 		"@semantic-release/github": "^10.0.6",
 		"@sveltejs/adapter-auto": "^3.2.2",
@@ -96,7 +97,18 @@
 			],
 			"@semantic-release/release-notes-generator",
 			"@semantic-release/changelog",
-			"@semantic-release/npm",
+			[
+				"@semantic-release/npm",
+				{
+					"npmPublish": false
+				}
+			],
+			[
+				"@semantic-release/exec",
+				{
+					"publishCmd": "npm publish --provenance --access public"
+				}
+			],
 			"@semantic-release/git",
 			[
 				"@semantic-release/github",
