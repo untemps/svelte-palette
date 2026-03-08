@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
 	export const usePortal = (node, { target = 'body', visible = false }) => {
 		const getTargetEl = (selector) => {
 			if (!!selector) {
