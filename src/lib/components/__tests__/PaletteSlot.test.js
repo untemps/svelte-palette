@@ -1,5 +1,5 @@
 import { afterEach, expect, test, vi } from 'vitest'
-import { cleanup, render, screen } from '@testing-library/svelte'
+import { cleanup, render, screen } from '@testing-library/svelte/svelte5'
 import userEvent from '@testing-library/user-event'
 
 import { SELECT } from '../../enums/PaletteEvent.js'
@@ -31,8 +31,7 @@ test('Sets empty aria-label if color is not set', () => {
 test('Triggers click event', async () => {
 	const color = '#ff0'
 	const onClick = vi.fn(() => 0)
-	const { component, user } = setup(PaletteSlot, { color })
-	component.$on(SELECT, onClick)
+	const { user } = setup(PaletteSlot, { props: { color }, events: { [SELECT]: onClick } })
 	const slot = screen.getByTestId('__palette-slot__')
 	await user.click(slot)
 	expect(onClick).toHaveBeenCalledWith(new CustomEvent({ detail: { color } }))

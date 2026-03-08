@@ -1,5 +1,5 @@
 import { afterEach, expect, test, vi } from 'vitest'
-import { cleanup, render, screen } from '@testing-library/svelte'
+import { cleanup, render, screen } from '@testing-library/svelte/svelte5'
 import userEvent from '@testing-library/user-event'
 
 import PaletteCompactToggleButton from '../PaletteCompactToggleButton.svelte'
@@ -36,8 +36,7 @@ test('Sets aria-label', () => {
 
 test('Triggers click event with current state', async () => {
 	const onClick = vi.fn(() => 0)
-	const { component, user } = setup(PaletteCompactToggleButton)
-	component.$on('click', onClick)
+	const { user } = setup(PaletteCompactToggleButton, { events: { click: onClick } })
 	const button = screen.getByTestId('__palette-compact-toggle-button__')
 	await user.click(button)
 	expect(onClick).toHaveBeenCalledWith(new CustomEvent({ detail: { isCompact: true } }))

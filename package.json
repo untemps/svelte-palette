@@ -46,11 +46,11 @@
 		"@sveltejs/adapter-auto": "^3.2.2",
 		"@sveltejs/kit": "^2.5.16",
 		"@sveltejs/package": "^2.3.2",
-		"@sveltejs/vite-plugin-svelte": "^3.1.1",
+		"@sveltejs/vite-plugin-svelte": "^4.0.0",
 		"@testing-library/jest-dom": "^6.4.6",
-		"@testing-library/svelte": "^5.1.0",
+		"@testing-library/svelte": "^5.3.1",
 		"@testing-library/user-event": "^14.5.2",
-		"@vitest/coverage-v8": "^1.6.0",
+		"@vitest/coverage-v8": "^2.0.0",
 		"carbon-components-svelte": "^0.85.0",
 		"carbon-icons-svelte": "^12.9.0",
 		"cross-env": "^7.0.3",
@@ -65,7 +65,7 @@
 		"tslib": "^2.6.3",
 		"typescript": "^5.4.5",
 		"vite": "^5.3.1",
-		"vitest": "^1.6.0"
+		"vitest": "^2.0.0"
 	},
 	"dependencies": {
 		"@untemps/svelte-use-drop-outside": "^1.6.0",

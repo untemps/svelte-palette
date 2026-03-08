@@ -1,5 +1,5 @@
 import { afterEach, expect, test, vi } from 'vitest'
-import { cleanup, render, screen, waitFor } from '@testing-library/svelte'
+import { cleanup, render, screen, waitFor } from '@testing-library/svelte/svelte5'
 import userEvent from '@testing-library/user-event'
 import { standby } from '@untemps/utils/async/standby'
 
@@ -45,11 +45,10 @@ test('Triggers select with color', async () => {
 	const onSelect = vi.fn(() => 0)
 	const colors = ['#ff0', '#0ff', '#f0f']
 
-	const { component, user } = setup(Palette, {
-		colors,
+	const { user } = setup(Palette, {
+		props: { colors },
+		events: { select: onSelect },
 	})
-
-	component.$on('select', onSelect)
 
 	cells = await screen.findAllByTestId('__palette-cell__')
 	cell = cells[0]
@@ -88,7 +87,6 @@ test('Deletes slot if deletionMode is set to "drop"', async () => {
 	const colors = ['#ff0', '#0ff', '#f0f']
 
 	const { user } = setup(Palette, {
-		accessors: true,
 		props: {
 			colors,
 			deletionMode: DROP,
@@ -121,12 +119,10 @@ test('Displays transparent slot if showTransparentSlot is truthy', async () => {
 	const onSelect = vi.fn(() => 0)
 	const colors = ['#ff0', '#0ff', '#f0f']
 
-	const { component, user } = setup(Palette, {
-		colors,
-		showTransparentSlot: true,
+	const { user } = setup(Palette, {
+		props: { colors, showTransparentSlot: true },
+		events: { select: onSelect },
 	})
-
-	component.$on('select', onSelect)
 	cells = await screen.findAllByTestId('__palette-cell__')
 	expect(cells).toHaveLength(colors.length + 1)
 
@@ -148,13 +144,10 @@ test.each([
 	const newColor = '0f0'
 	const onSelect = vi.fn(() => 0)
 
-	const { component, user } = setup(Palette, {
-		colors,
-		maxColors,
-		showInput: true,
+	const { user } = setup(Palette, {
+		props: { colors, maxColors, showInput: true },
+		events: { select: onSelect },
 	})
-
-	component.$on('select', onSelect)
 
 	input = await screen.findByTestId('__palette-input-input__')
 	await user.type(input, newColor)
@@ -181,12 +174,10 @@ test.each([
 	const newColor = 'f0f'
 	const onSelect = vi.fn(() => 0)
 
-	const { component, user } = setup(Palette, {
-		colors,
-		allowDuplicates,
-		showInput: true,
+	const { user } = setup(Palette, {
+		props: { colors, allowDuplicates, showInput: true },
+		events: { select: onSelect },
 	})
-	component.$on('select', onSelect)
 
 	input = await screen.findByTestId('__palette-input-input__')
 	await user.type(input, newColor)

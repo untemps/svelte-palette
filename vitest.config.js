@@ -11,4 +11,7 @@ export default defineConfig({
 		setupFiles: ['./vitest.setup.js'],
 	},
 	plugins: [sveltekit()],
+	resolve: {
+		conditions: ['browser'],
+	},
 })
