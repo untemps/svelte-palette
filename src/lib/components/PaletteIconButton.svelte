@@ -19,10 +19,6 @@
 		[TRASH]: TrashIcon,
 		[SETTINGS]: SettingsIcon,
 	}
-
-	const _renderIcon = (name) => {
-		return ICONS[name]
-	}
 </script>
 
 <button
@@ -33,7 +29,10 @@
 	class:icon_button__button--active={isActive}
 	on:click
 >
-	<svelte:component this={_renderIcon(icon)} />
+	{#if ICONS[icon]}
+		{@const IconComponent = ICONS[icon]}
+		<IconComponent />
+	{/if}
 </button>
 
 <style>
