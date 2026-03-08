@@ -128,6 +128,7 @@
 		"preview": "vite preview",
 		"package": "svelte-kit sync && svelte-package && publint",
 		"prepublishOnly": "yarn package",
+		"pretest": "svelte-kit sync",
 		"test": "vitest watch --coverage",
 		"test:ci": "vitest run --coverage",
 		"lint": "prettier --check .",
