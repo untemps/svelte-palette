@@ -61,7 +61,7 @@
 		"prettier-plugin-svelte": "^3.2.4",
 		"publint": "^0.2.8",
 		"semantic-release": "^24.0.0",
-		"svelte": "^4.2.18",
+		"svelte": "^5.53.5",
 		"tslib": "^2.6.3",
 		"typescript": "^5.4.5",
 		"vite": "^5.3.1",
