@@ -73,7 +73,7 @@
 		"@untemps/utils": "^3.0.0"
 	},
 	"peerDependencies": {
-		"svelte": "^4.0.0"
+		"svelte": "^5.0.0"
 	},
 	"release": {
 		"branches": [

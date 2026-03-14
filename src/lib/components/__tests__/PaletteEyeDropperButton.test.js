@@ -32,10 +32,10 @@ test('Sets eye dropper button aria-label', () => {
 
 test('Retrieves color from EyeDropper selection', async () => {
 	const onAdd = vi.fn()
-	const { user } = setup(PaletteEyeDropperButton, { events: { add: onAdd } })
+	const { user } = setup(PaletteEyeDropperButton, { props: { onadd: onAdd } })
 	const button = screen.getByTestId('__palette-eyedropper-button__')
 	await user.click(button)
-	await waitFor(() => expect(onAdd).toHaveBeenCalledWith(new CustomEvent({ detail: { color: '#ff0' } })))
+	await waitFor(() => expect(onAdd).toHaveBeenCalledWith({ color: '#ff0' }))
 })
 
 // EyeDropper API is invalid
@@ -49,8 +49,7 @@ test('Throws error', async () => {
 	const onError = vi.fn(() => 0)
 	const ariaLabel = 'Foo'
 	const { user } = setup(PaletteEyeDropperButton, {
-		props: { ['aria-label']: ariaLabel },
-		events: { error: onError },
+		props: { ['aria-label']: ariaLabel, onerror: onError },
 	})
 	const button = screen.getByLabelText(ariaLabel)
 	await user.click(button)

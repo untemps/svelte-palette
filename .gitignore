@@ -25,4 +25,4 @@ package-lock.json
 
 # Tests
 /coverage
-/__snapshots__
+/__snapshots__.env

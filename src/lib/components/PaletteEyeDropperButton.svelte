@@ -1,24 +1,16 @@
 <script>
-	import { createEventDispatcher } from 'svelte'
-
-	import { ADD, ERROR } from '../enums/PaletteEvent'
 	import { EYE_DROPPER } from '../enums/PaletteIcon'
-
 	import PaletteIconButton from './PaletteIconButton.svelte'
 
-	const dispatch = createEventDispatcher()
+	let { onadd = undefined, onerror = undefined, ...restProps } = $props()
 
 	const _onClick = async () => {
 		try {
 			const eyeDropper = new EyeDropper()
 			const { sRGBHex: color } = await eyeDropper.open()
-			dispatch(ADD, {
-				color,
-			})
+			onadd?.({ color })
 		} catch (error) {
-			dispatch(ERROR, {
-				error,
-			})
+			onerror?.({ error })
 		}
 	}
 </script>
@@ -26,8 +18,8 @@
 <PaletteIconButton
 	data-testid="__palette-eyedropper-button__"
 	aria-label="Submit the hex color value"
-	{...$$restProps}
+	{...restProps}
 	icon={EYE_DROPPER}
 	type="submit"
-	on:click={_onClick}
+	onclick={_onClick}
 />

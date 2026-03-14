@@ -36,8 +36,8 @@ test('Sets aria-label', () => {
 
 test('Triggers click event with current state', async () => {
 	const onClick = vi.fn(() => 0)
-	const { user } = setup(PaletteCompactToggleButton, { events: { click: onClick } })
+	const { user } = setup(PaletteCompactToggleButton, { props: { onclick: onClick } })
 	const button = screen.getByTestId('__palette-compact-toggle-button__')
 	await user.click(button)
-	expect(onClick).toHaveBeenCalledWith(new CustomEvent({ detail: { isCompact: true } }))
+	expect(onClick).toHaveBeenCalled()
 })

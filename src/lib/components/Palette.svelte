@@ -1,10 +1,9 @@
 <script>
 	// TODO: Manage maxNumColumns
-	import { createEventDispatcher } from 'svelte'
+	import { untrack } from 'svelte'
 
 	import { calculateColors, calculateNumColumns } from '../utils/utils.js'
 
-	import { SELECT } from '../enums/PaletteEvent'
 	import { NONE } from '../enums/PaletteDeletionMode'
 	import { COMPACT, SETTINGS } from '$lib/enums/PaletteTool.js'
 
@@ -18,52 +17,69 @@
 
 	import useDeletion from './useDeletion'
 
-	export let colors = null
-	export let selectedColor = null
-	export let isCompact = false
-	export let compactColorIndices = []
-	export let allowDuplicates = false
-	export let deletionMode = NONE
-	export let tooltipClassName = null
-	export let tooltipContentSelector = null
-	export let showTransparentSlot = false
-	export let maxColors = 30
-	export let showInput = false
-	export let inputType = 'text'
-	export let numColumns = 5
-	export let transition = null
+	let {
+		colors = null,
+		selectedColor = $bindable(null),
+		isCompact = false,
+		compactColorIndices = [],
+		allowDuplicates = false,
+		deletionMode = NONE,
+		tooltipClassName = null,
+		tooltipContentSelector = null,
+		showTransparentSlot = false,
+		maxColors = 30,
+		showInput = false,
+		inputType = 'text',
+		numColumns = 5,
+		transition = null,
+		onselect = undefined,
+		class: className = '',
+		header = undefined,
+		before_slot = undefined,
+		transparent_slot = undefined,
+		slot: colorSlot = undefined,
+		after_slot = undefined,
+		loader = undefined,
+		footer = undefined,
+		input = undefined,
+		tools = undefined,
+		settings = undefined,
+	} = $props()
 
-	let _colors = null
-	let _numColumns = numColumns
-	let _isSettingsOn = false
+	let _colors = $state(null)
+	let _numColumns = $state(untrack(() => numColumns))
+	let _isSettingsOn = $state(false)
+	let _isCompact = $state(untrack(() => isCompact))
 
-	$: _isCompact = isCompact
-
-	$: Promise.resolve(colors).then((results) => {
-		if (!!results) {
-			const newColors = calculateColors(results, {
-				isCompact: _isCompact,
-				compactColorIndices,
-				allowDuplicates,
-				maxColors,
-			})
-			_colors = newColors
-			_numColumns = calculateNumColumns(newColors.length, {
-				isCompact: _isCompact,
-				compactColorIndices,
-				showTransparentSlot,
-				numColumns,
-			})
-		}
+	$effect(() => {
+		_isCompact = isCompact
 	})
 
-	$: _tools = [...(compactColorIndices?.length ? [COMPACT] : []), ...($$slots.settings ? [SETTINGS] : [])]
+	$effect(() => {
+		Promise.resolve(colors).then((results) => {
+			if (!!results) {
+				const newColors = calculateColors(results, {
+					isCompact: _isCompact,
+					compactColorIndices,
+					allowDuplicates,
+					maxColors,
+				})
+				_colors = newColors
+				_numColumns = calculateNumColumns(newColors.length, {
+					isCompact: _isCompact,
+					compactColorIndices,
+					showTransparentSlot,
+					numColumns,
+				})
+			}
+		})
+	})
 
-	const dispatch = createEventDispatcher()
+	let _tools = $derived([...(compactColorIndices?.length ? [COMPACT] : []), ...(settings ? [SETTINGS] : [])])
 
 	const _selectColor = (color) => {
 		selectedColor = color
-		dispatch(SELECT, { color })
+		onselect?.({ color })
 	}
 
 	const _addColor = (color) => {
@@ -83,14 +99,14 @@
 
 	const _removeColor = (index) => (_colors = _colors.filter((c, i) => i !== index))
 
-	const _onSlotSelect = ({ detail: { color } }) => _selectColor(color)
+	const _onSlotSelect = ({ color }) => _selectColor(color)
 
-	const _onInputAdd = ({ detail: { color } }) => _addColor(color)
+	const _onInputAdd = ({ color }) => _addColor(color)
 
 	const _onDelete = (index) => _removeColor(index)
 
 	const _onToolSelect = (args) => {
-		const tool = args?.detail?.tool ?? args
+		const tool = args?.tool ?? args
 		switch (tool) {
 			case SETTINGS:
 				_isSettingsOn = true
@@ -112,25 +128,27 @@
 	}
 </script>
 
-<div class="palette {$$props.class ?? ''}" role="main">
+<div class="palette {className}" role="main">
 	<section class="palette__content" class:palette__content--compact={_isCompact} style="--num-columns: {_numColumns}">
 		{#if !_isCompact}
-			<slot name="header" {selectedColor} />
+			{@render header?.({ selectedColor })}
 		{/if}
 		{#if !!_colors}
 			<ul class="palette__cells">
-				{#if $$slots.before_slot}
-					<slot name="before_slot" {selectedColor} {transition} isCompact={_isCompact} />
+				{#if before_slot}
+					{@render before_slot({ selectedColor, transition, isCompact: _isCompact })}
 				{/if}
 				{#if showTransparentSlot}
 					<li data-testid="__palette-cell__" class="palette__cells__cell">
-						<slot name="transparent_slot">
+						{#if transparent_slot}
+							{@render transparent_slot()}
+						{:else}
 							<PaletteSlot
 								aria-label="Transparent slot"
 								selected={selectedColor === null}
-								on:select={_onSlotSelect}
+								onselect={_onSlotSelect}
 							/>
-						</slot>
+						{/if}
 					</li>
 				{/if}
 				{#each _colors as color, index (`${color.value}_${index}`)}
@@ -144,54 +162,59 @@
 							tooltipClassName,
 						}}
 					>
-						<slot
-							name="slot"
-							color={color.value}
-							colorName={color.name}
-							{selectedColor}
-							{transition}
-							isCompact={_isCompact}
-							{index}
-						>
+						{#if colorSlot}
+							{@render colorSlot({
+								color: color.value,
+								colorName: color.name,
+								selectedColor,
+								transition,
+								isCompact: _isCompact,
+								index,
+							})}
+						{:else}
 							<PaletteSlot
 								color={color.value}
 								selected={color === selectedColor}
 								{transition}
-								on:select={_onSlotSelect}
+								onselect={_onSlotSelect}
 							/>
-						</slot>
+						{/if}
 					</li>
 				{/each}
-				{#if $$slots.after_slot}
-					<slot name="after_slot" {selectedColor} {transition} isCompact={_isCompact} />
+				{#if after_slot}
+					{@render after_slot({ selectedColor, transition, isCompact: _isCompact })}
 				{/if}
 			</ul>
+		{:else if loader}
+			{@render loader()}
 		{:else}
-			<slot name="loader">
-				<PaletteLoader />
-			</slot>
+			<PaletteLoader />
 		{/if}
 		{#if !_isCompact}
-			<slot name="footer" {selectedColor} />
+			{@render footer?.({ selectedColor })}
 		{/if}
 		{#if _isCompact}
-			<PaletteCompactToggleButton isCompact={true} on:click={_onExpand} />
+			<PaletteCompactToggleButton isCompact={true} onclick={_onExpand} />
 		{/if}
 	</section>
 	{#if !_isCompact && showInput}
-		<slot name="input" {selectedColor} {inputType}>
-			<PaletteInput color={selectedColor} {inputType} on:add={_onInputAdd} />
-		</slot>
+		{#if input}
+			{@render input({ selectedColor, inputType })}
+		{:else}
+			<PaletteInput color={selectedColor} {inputType} onadd={_onInputAdd} />
+		{/if}
 	{/if}
 	{#if !_isCompact && !!_tools?.length}
-		<slot name="tools" {compactColorIndices} isCompact={_isCompact} onSelect={_onToolSelect}>
-			<PaletteTools tools={_tools} on:select={_onToolSelect} />
-		</slot>
+		{#if tools}
+			{@render tools({ compactColorIndices, isCompact: _isCompact, onSelect: _onToolSelect })}
+		{:else}
+			<PaletteTools tools={_tools} onselect={_onToolSelect} />
+		{/if}
 	{/if}
 </div>
-{#if $$slots.settings}
-	<PaletteSettingsPanel isVisible={_isSettingsOn} on:close={_onSettingsClose}>
-		<slot name="settings" onClose={_onSettingsClose} />
+{#if settings}
+	<PaletteSettingsPanel isVisible={_isSettingsOn}>
+		{@render settings({ onClose: _onSettingsClose })}
 	</PaletteSettingsPanel>
 {/if}
 

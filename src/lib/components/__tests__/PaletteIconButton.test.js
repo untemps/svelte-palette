@@ -29,7 +29,7 @@ test('Displays icon', () => {
 
 test('Triggers click event', async () => {
 	const onClick = vi.fn(() => 0)
-	const { user } = setup(PaletteIconButton, { props: { icon: COMPACT }, events: { click: onClick } })
+	const { user } = setup(PaletteIconButton, { props: { icon: COMPACT, onclick: onClick } })
 	const button = screen.getByTestId('__palette-icon-button__')
 	await user.click(button)
 	expect(onClick).toHaveBeenCalled()

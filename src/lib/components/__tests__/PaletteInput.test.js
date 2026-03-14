@@ -42,21 +42,21 @@ test('Disables submit button when set color is invalid', async () => {
 
 test('Triggers submit with color when clicking add button', async () => {
 	const onAdd = vi.fn(() => 0)
-	const { user } = setup(PaletteInput, { events: { add: onAdd } })
+	const { user } = setup(PaletteInput, { props: { onadd: onAdd } })
 	const input = screen.getByTestId('__palette-input-input__')
 	const button = screen.getByTestId('__palette-input-submit__')
 	await user.type(input, 'ff0')
 	await user.click(button)
-	expect(onAdd).toHaveBeenCalledWith(new CustomEvent({ detail: { color: '#ff0' } }))
+	expect(onAdd).toHaveBeenCalledWith({ color: '#ff0' })
 })
 
 test('Triggers submit with color when pressing Enter', async () => {
 	const onAdd = vi.fn(() => 0)
-	const { user } = setup(PaletteInput, { events: { add: onAdd } })
+	const { user } = setup(PaletteInput, { props: { onadd: onAdd } })
 	const input = screen.getByTestId('__palette-input-input__')
 	await user.type(input, 'ff0')
 	await user.keyboard('[Enter]')
-	expect(onAdd).toHaveBeenCalledWith(new CustomEvent({ detail: { color: '#ff0' } }))
+	expect(onAdd).toHaveBeenCalledWith({ color: '#ff0' })
 })
 
 test('Does not display slot if inputType is "color"', async () => {

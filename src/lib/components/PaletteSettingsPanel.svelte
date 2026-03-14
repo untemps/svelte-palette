@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
 	export const usePortal = (node, { target = 'body', visible = false }) => {
 		const getTargetEl = (selector) => {
 			if (!!selector) {
@@ -37,8 +37,7 @@
 </script>
 
 <script>
-	export let target = 'body'
-	export let isVisible = false
+	let { target = 'body', isVisible = false, children } = $props()
 </script>
 
 <section
@@ -46,7 +45,7 @@
 	class:palette__settings__panel--visible={isVisible}
 	use:usePortal={{ target, visible: isVisible }}
 >
-	<slot />
+	{@render children?.()}
 </section>
 
 <style>
