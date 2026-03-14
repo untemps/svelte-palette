@@ -41,7 +41,7 @@
 					<PaletteSlot {color} class="slot__custom" selected={color === selectedColor} onselect={_onSelect}
 					></PaletteSlot>
 				{/snippet}
-				{#snippet after_slot()}
+				{#snippet afterSlot()}
 					<li class="slot__add">
 						<button class="icon-button" aria-label="Open" onclick={_onOpen}>
 							<svg

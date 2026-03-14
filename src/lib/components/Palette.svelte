@@ -35,10 +35,10 @@
 		onselect = undefined,
 		class: className = '',
 		header = undefined,
-		before_slot = undefined,
-		transparent_slot = undefined,
+		beforeSlot = undefined,
+		transparentSlot = undefined,
 		slot: colorSlot = undefined,
-		after_slot = undefined,
+		afterSlot = undefined,
 		loader = undefined,
 		footer = undefined,
 		input = undefined,
@@ -139,13 +139,13 @@
 		{/if}
 		{#if !!_colors}
 			<ul class="palette__cells">
-				{#if before_slot}
-					{@render before_slot({ selectedColor, transition, isCompact: _isCompact })}
+				{#if beforeSlot}
+					{@render beforeSlot({ selectedColor, transition, isCompact: _isCompact })}
 				{/if}
 				{#if showTransparentSlot}
 					<li data-testid="__palette-cell__" class="palette__cells__cell">
-						{#if transparent_slot}
-							{@render transparent_slot()}
+						{#if transparentSlot}
+							{@render transparentSlot()}
 						{:else}
 							<PaletteSlot
 								aria-label="Transparent slot"
@@ -185,8 +185,8 @@
 						{/if}
 					</li>
 				{/each}
-				{#if after_slot}
-					{@render after_slot({ selectedColor, transition, isCompact: _isCompact })}
+				{#if afterSlot}
+					{@render afterSlot({ selectedColor, transition, isCompact: _isCompact })}
 				{/if}
 			</ul>
 		{:else if loader}
