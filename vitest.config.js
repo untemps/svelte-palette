@@ -7,8 +7,12 @@ export default defineConfig({
 		environment: 'jsdom',
 		coverage: {
 			reporter: ['text', 'lcov'],
+			exclude: ['src/routes/**', 'svelte.config.js', 'commitlint.config.js'],
 		},
 		setupFiles: ['./vitest.setup.js'],
 	},
 	plugins: [sveltekit()],
+	resolve: {
+		conditions: ['browser'],
+	},
 })

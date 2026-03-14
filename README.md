@@ -15,7 +15,7 @@
 
 <p align="center">
     :red_circle:&nbsp;<big><a href="https://svelte-palette.vercel.app" target="_blank" rel="noopener">LIVE
-    DEMO</a></big>&nbsp;:red_circle:
+    DEMO</a></big>
 </p>
 
 ## Installation
@@ -24,11 +24,13 @@
 yarn add @untemps/svelte-palette
 ```
 
+> Requires Svelte 5. For Svelte 4 support, use version 4.x.
+
 ## Usage
 
 ### Basic Usage
 
-```html
+```svelte
 <script>
     import { Palette } from '@untemps/svelte-palette'
 
@@ -44,7 +46,7 @@ yarn add @untemps/svelte-palette
 </script>
 
 <main style="--bgColor:{bgColor}">
-	<Palette {colors} on:select={({ detail: { color } }) => (bgColor = color)} />
+	<Palette {colors} onselect={({ color }) => (bgColor = color)} />
 </main>
 
 <style>
@@ -62,7 +64,7 @@ yarn add @untemps/svelte-palette
 | Props                    | Type                                                           | Default | Description                                                                                                                                                                                               |
 | ------------------------ | -------------------------------------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `colors`                 | string[] or Promise<string[]> or object[] or Promise<object[]> | []      | Array of colors to be displayed in the palette. See more about colors in the [Colors Setting](#colors-setting) section                                                                                    |
-| `selectedColor`          | string                                                         | null    | Default selected color. The color must be included in the `colors` prop.                                                                                                                                  |
+| `selectedColor`          | string                                                         | null    | Default selected color. The color must be included in the `colors` prop. Supports `bind:selectedColor`.                                                                                                   |
 | `isCompact`              | boolean                                                        | false   | Flag to display the palette in compact mode.                                                                                                                                                              |
 | `compactColorIndices`    | number[]                                                       | []      | Array of indices to pick from the `colors` array to be displayed in the compacted palette (see [Compact Mode](#compact-mode)).                                                                            |
 | `allowDuplicates`        | boolean                                                        | false   | Flag to allow color duplication.                                                                                                                                                                          |
@@ -76,31 +78,33 @@ yarn add @untemps/svelte-palette
 | `numColumns`             | number                                                         | 5       | Number of columns of the palette grid. This value can't exceed the number of maximum colors defined in `maxColors` and can't be lower than 1. Set this value to `0` to display the slots on a single row. |
 | `transition`             | object                                                         | null    | Animation when a slot is rendered (see [Transition](#transition)).                                                                                                                                        |
 
-## Events
+## Callbacks
 
-| Event    | Arguments | Type   | Description                                 |
-| -------- | --------- | ------ | ------------------------------------------- |
-| `select` |           |        | **Dispatched whenever a color is clicked.** |
-|          | `color`   | string | Selected color string.                      |
+| Prop       | Arguments | Type   | Description                             |
+| ---------- | --------- | ------ | --------------------------------------- |
+| `onselect` |           |        | **Called whenever a color is clicked.** |
+|            | `color`   | string | Selected color string.                  |
 
-## Slots
+## Snippets
 
-| Slot               | Description                                                                           | Available Properties Props                                                |
-| ------------------ | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `header`           | Allow to add a header to the palette. By default, it is empty.                        | `selectedColor`                                                           |
-| `footer`           | Allow to add a footer to the palette. By default, it contains an input to add colors. | `selectedColor`                                                           |
-| `slot`             | Allow to replace the default color slots.                                             | `index`, `color`, `colorName`, `selectedColor`, `transition`, `isCompact` |
-| `transparent_slot` | Allow to replace the default transparent slot.                                        | -                                                                         |
-| `before_slot`      | Allow to add an element before the color slots.                                       | `selectedColor`, `transition`, `isCompact`                                |
-| `after_slot`       | Allow to add an element after the color slots.                                        | `selectedColor`, `transition`, `isCompact`                                |
-| `input`            | Allow to replace the input in the footer if the default footer slot is kept as it is. | `selectedColor`, `inputType`                                              |
-| `settings`         | Allow to replace the settings panel. See the demo to grab a usage example.            | `onClose`                                                                 |
-| `tools`            | Allow to replace the tools panel.                                                     | `isCompact`, `compactColorIndices`, `onSelect`                            |
-| `loader`           | Allow to replace the loader displayed during the colors async retrieving.             | -                                                                         |
+Snippets replace the Svelte 4 named slots API. Pass them as children of `<Palette>` using the `{#snippet name(props)}` syntax.
+
+| Snippet           | Description                                                                           | Available Properties                                                      |
+| ----------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `header`          | Allow to add a header to the palette. By default, it is empty.                        | `selectedColor`                                                           |
+| `footer`          | Allow to add a footer to the palette. By default, it contains an input to add colors. | `selectedColor`                                                           |
+| `slot`            | Allow to replace the default color slots.                                             | `index`, `color`, `colorName`, `selectedColor`, `transition`, `isCompact` |
+| `transparentSlot` | Allow to replace the default transparent slot.                                        | -                                                                         |
+| `beforeSlot`      | Allow to add an element before the color slots.                                       | `selectedColor`, `transition`, `isCompact`                                |
+| `afterSlot`       | Allow to add an element after the color slots.                                        | `selectedColor`, `transition`, `isCompact`                                |
+| `input`           | Allow to replace the input in the footer if the default footer snippet is kept as is. | `selectedColor`, `inputType`                                              |
+| `settings`        | Allow to replace the settings panel. See the demo to grab a usage example.            | `onClose`                                                                 |
+| `tools`           | Allow to replace the tools panel.                                                     | `isCompact`, `compactColorIndices`, `onSelect`                            |
+| `loader`          | Allow to replace the loader displayed during the colors async retrieving.             | -                                                                         |
 
 ## Example
 
-```html
+```svelte
 <script>
 	import { Palette } from '@untemps/svelte-palette'
 
@@ -108,13 +112,19 @@ yarn add @untemps/svelte-palette
 </script>
 
 <Palette {colors}>
-	<div slot="header" class="palette__header">
-		<h1>Pick a color</h1>
-	</div>
-	<button let:color slot="slot" class="palette__slot" style="--color:{color}" />
-	<div slot="footer" class="palette__footer">
-		<a href="https://www.untemps.net">@untemps</a>
-	</div>
+	{#snippet header()}
+		<div class="palette__header">
+			<h1>Pick a color</h1>
+		</div>
+	{/snippet}
+	{#snippet slot({ color })}
+		<button class="palette__slot" style="--color:{color}"></button>
+	{/snippet}
+	{#snippet footer()}
+		<div class="palette__footer">
+			<a href="https://www.untemps.net">@untemps</a>
+		</div>
+	{/snippet}
 </Palette>
 
 <style>
@@ -182,12 +192,12 @@ As an helper, deletion mode enums are exported in `PaletteDeletionMode`.
 
 The compact mode is a way to display a minimal version of the palette with a restricted selection of the original colors and downsized spaces.
 
-The `compactColorIndices` prop allows to define the list of the colors to be picked from the `colors` array by their indices.  
+The `compactColorIndices` prop allows to define the list of the colors to be picked from the `colors` array by their indices.
 If set a control is added to toggle the compact mode.
 
 You may also specified whether the palette has to use the compact mode by default by setting `isCompact=true`.
 
-```html
+```svelte
 <script>
 	import { Palette } from '@untemps/svelte-palette'
 
@@ -209,7 +219,7 @@ You can style the component by passing a class down to the root tag (`div`).
 
 #### Example
 
-```html
+```svelte
 <script>
 	import { Palette } from '@untemps/svelte-palette'
 
@@ -235,12 +245,12 @@ To do so, set a **global** class name to the `tooltipClassName` prop.
 
 If you ignore that prop, a default class is used.
 
-> Please note that the default class name is `__tooltip__default`.  
+> Please note that the default class name is `__tooltip__default`.
 > Provide a different class name otherwise the default class would have the precedence over the custom one.
 
 #### Example
 
-```html
+```svelte
 <script>
 	import { Palette } from '@untemps/svelte-palette'
 
@@ -265,7 +275,7 @@ If you ignore that prop, a default class is used.
 
 ## EyeDropper API Support
 
-If supported by the browser, the default component within the `input` slot displays a button to trigger the [Web EyeDropper API](https://developer.mozilla.org/en-US/docs/Web/API/EyeDropper).  
+If supported by the browser, the default component within the `input` snippet displays a button to trigger the [Web EyeDropper API](https://developer.mozilla.org/en-US/docs/Web/API/EyeDropper).
 The tool allows to pick a color from the screen.
 
 <img src="assets/eyedropper.gif" alt="eyedropper" width="250"/>
@@ -274,7 +284,7 @@ Once selected, the color is inserted in the input waiting for the user to submit
 
 If the API is not available, nothing will be rendered.
 
-> The PaletteEyeDropper component can be used on its own anywhere within a slot or in an external component as it is exported from this lib.
+> The PaletteEyeDropper component can be used on its own anywhere within a snippet or in an external component as it is exported from this lib.
 
 ## Transition
 
@@ -293,7 +303,7 @@ This prop works the same way as the [in/out directive](https://svelte.dev/docs#t
 
 ### Example
 
-```html
+```svelte
 <script>
 	import { Palette } from '@untemps/svelte-palette'
 	import { elasticOut } from 'svelte/easing'
@@ -325,7 +335,7 @@ The component displays a customizable loader waiting to the promise to be resolv
 
 #### Example
 
-```html
+```svelte
 <script>
 	import { Palette } from '@untemps/svelte-palette'
 
@@ -335,7 +345,9 @@ The component displays a customizable loader waiting to the promise to be resolv
 </script>
 
 <Palette {colors}>
-	<p slot="loader">Loading...</p>
+	{#snippet loader()}
+		<p>Loading...</p>
+	{/snippet}
 </Palette>
 ```
 
@@ -345,15 +357,15 @@ By default, if `deletionMode` is set to `"tooltip"`, the tooltip displays a tras
 
 <img src="assets/trash.png" alt="trash" height="90"/>
 
-You may want to display a different content for various purposes.  
+You may want to display a different content for various purposes.
 That is possible by defining a DOM element selector to the `tooltipContentSelector` prop.
 
-> Note the piece of DOM used ad content is deeply cloned using [cloneNode()](https://developer.mozilla.org/fr/docs/Web/API/Node/cloneNode) before appending to the tooltip container.  
+> Note the piece of DOM used ad content is deeply cloned using [cloneNode()](https://developer.mozilla.org/fr/docs/Web/API/Node/cloneNode) before appending to the tooltip container.
 > That means the original element stays as it is but depending on element some props or behaviours may be removed from the clone.
 
 #### Example
 
-```html
+```svelte
 <script>
 	import { Palette } from '@untemps/svelte-palette'
 
@@ -370,14 +382,14 @@ That is possible by defining a DOM element selector to the `tooltipContentSelect
 
 By default, the input that allows to add a new slot in the palette is typed as "text".
 
-Although you may use the `ìnput` slot to display a custom component, it is possible to turn the input into color mode by setting the `inputType` prop to "color".  
+Although you may use the `input` snippet to display a custom component, it is possible to turn the input into color mode by setting the `inputType` prop to "color".
 That unlocks the color picker provided by the browser. Therefore the color spot and the eyedropper are hidden.
 
 <img src="assets/input-color.gif" alt="input color" width="250"/>
 
 #### Example
 
-```html
+```svelte
 <script>
 	import { Palette } from '@untemps/svelte-palette'
 
@@ -394,13 +406,13 @@ The tools panel is a container for two actions:
 -   Display the settings panel (`"settings"`)
 -   Toggle the compact mode (`"compact"`)
 
-For some use cases, you may want to provide your own controls by using the `tools` slot.
+For some use cases, you may want to provide your own controls by using the `tools` snippet.
 
 To access each tool behaviours, the Palette component exports a `onSelect` function that has to be called with the name of the tool (use the enums from the exported `PaletteTool`).
 
 #### Example
 
-```html
+```svelte
 <script>
 	import { Palette, PaletteTool } from '@untemps/svelte-palette'
 
@@ -408,10 +420,12 @@ To access each tool behaviours, the Palette component exports a `onSelect` funct
 </script>
 
 <Palette {colors}>
-	<div slot="tools" let:onSelect let:isCompact>
-		<button on:click="{onSelect(PaletteTool.SETTINGS)}">Settings</button>
-		<button on:click="{onSelect(PaletteTool.COMPACT)}">{isCompact ? 'Expand' : 'Compact'}</button>
-	</div>
+	{#snippet tools({ onSelect, isCompact })}
+		<div>
+			<button onclick={() => onSelect(PaletteTool.SETTINGS)}>Settings</button>
+			<button onclick={() => onSelect(PaletteTool.COMPACT)}>{isCompact ? 'Expand' : 'Compact'}</button>
+		</div>
+	{/snippet}
 </Palette>
 ```
 

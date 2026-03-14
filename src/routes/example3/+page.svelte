@@ -42,46 +42,58 @@
 <main class="example3" style="--bgColor:#000">
 	<div class="content">
 		<Palette class="palette__custom" colors={blueColors} numColumns="10">
-			<div slot="header" class="header">
-				<h1>Blue</h1>
-			</div>
-			<div slot="slot" class="slot" let:color let:colorName let:index>
-				<div class="slot__color" style="--color:{color}"></div>
-				<div>
-					<div class="slot__color-rank">{`${index < 9 ? '0' : ''}${index + 1}`}</div>
-					<div class="slot__color-label">{colorName}</div>
+			{#snippet header()}
+				<div class="header">
+					<h1>Blue</h1>
 				</div>
-			</div>
-			<div slot="input"></div>
-			<div slot="tools"></div>
+			{/snippet}
+			{#snippet slot({ color, colorName, index })}
+				<div class="slot">
+					<div class="slot__color" style="--color:{color}"></div>
+					<div>
+						<div class="slot__color-rank">{`${index < 9 ? '0' : ''}${index + 1}`}</div>
+						<div class="slot__color-label">{colorName}</div>
+					</div>
+				</div>
+			{/snippet}
+			{#snippet input()}{/snippet}
+			{#snippet tools()}{/snippet}
 		</Palette>
 		<Palette class="palette__custom" colors={purpleColors} numColumns="10">
-			<div slot="header" class="header">
-				<h1>Purple</h1>
-			</div>
-			<div slot="slot" class="slot" let:color let:colorName let:index>
-				<div class="slot__color" style="--color:{color}"></div>
-				<div>
-					<div class="slot__color-rank">{`${index < 9 ? '0' : ''}${index + 1}`}</div>
-					<div class="slot__color-label">{colorName}</div>
+			{#snippet header()}
+				<div class="header">
+					<h1>Purple</h1>
 				</div>
-			</div>
-			<div slot="input"></div>
-			<div slot="tools"></div>
+			{/snippet}
+			{#snippet slot({ color, colorName, index })}
+				<div class="slot">
+					<div class="slot__color" style="--color:{color}"></div>
+					<div>
+						<div class="slot__color-rank">{`${index < 9 ? '0' : ''}${index + 1}`}</div>
+						<div class="slot__color-label">{colorName}</div>
+					</div>
+				</div>
+			{/snippet}
+			{#snippet input()}{/snippet}
+			{#snippet tools()}{/snippet}
 		</Palette>
 		<Palette class="palette__custom" colors={redColors} numColumns="10">
-			<div slot="header" class="header">
-				<h1>Red</h1>
-			</div>
-			<div slot="slot" class="slot" let:color let:colorName let:index>
-				<div class="slot__color" style="--color:{color}"></div>
-				<div>
-					<div class="slot__color-rank">{`${index < 9 ? '0' : ''}${index + 1}`}</div>
-					<div class="slot__color-label">{colorName}</div>
+			{#snippet header()}
+				<div class="header">
+					<h1>Red</h1>
 				</div>
-			</div>
-			<div slot="input"></div>
-			<div slot="tools"></div>
+			{/snippet}
+			{#snippet slot({ color, colorName, index })}
+				<div class="slot">
+					<div class="slot__color" style="--color:{color}"></div>
+					<div>
+						<div class="slot__color-rank">{`${index < 9 ? '0' : ''}${index + 1}`}</div>
+						<div class="slot__color-label">{colorName}</div>
+					</div>
+				</div>
+			{/snippet}
+			{#snippet input()}{/snippet}
+			{#snippet tools()}{/snippet}
 		</Palette>
 	</div>
 </main>

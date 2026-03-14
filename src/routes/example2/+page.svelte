@@ -13,40 +13,56 @@
 	<div class="content">
 		<div class="content__grid">
 			<Palette class="palette__custom" colors={colors1} numColumns="5">
-				<div slot="slot" let:color style="--color: {color}" class="slot"></div>
-				<div slot="tools"></div>
-				<div slot="input"></div>
-				<div slot="footer" class="footer">
-					<h1>Quiet & Warm</h1>
-					<p>Winter Sunday Afternoon</p>
-				</div>
+				{#snippet slot({ color })}
+					<div style="--color: {color}" class="slot"></div>
+				{/snippet}
+				{#snippet tools()}{/snippet}
+				{#snippet input()}{/snippet}
+				{#snippet footer()}
+					<div class="footer">
+						<h1>Quiet & Warm</h1>
+						<p>Winter Sunday Afternoon</p>
+					</div>
+				{/snippet}
 			</Palette>
 			<Palette class="palette__custom" colors={colors2} numColumns="5">
-				<div slot="slot" let:color style="--color: {color}" class="slot"></div>
-				<div slot="tools"></div>
-				<div slot="input"></div>
-				<div slot="footer" class="footer">
-					<h1>Fancy Night</h1>
-					<p>Club, Cocktails & More</p>
-				</div>
+				{#snippet slot({ color })}
+					<div style="--color: {color}" class="slot"></div>
+				{/snippet}
+				{#snippet tools()}{/snippet}
+				{#snippet input()}{/snippet}
+				{#snippet footer()}
+					<div class="footer">
+						<h1>Fancy Night</h1>
+						<p>Club, Cocktails & More</p>
+					</div>
+				{/snippet}
 			</Palette>
 			<Palette class="palette__custom" colors={colors3} numColumns="5">
-				<div slot="slot" let:color style="--color: {color}" class="slot"></div>
-				<div slot="tools"></div>
-				<div slot="input"></div>
-				<div slot="footer" class="footer">
-					<h1>Grand'ma Jersey</h1>
-					<p>Cozy Wool</p>
-				</div>
+				{#snippet slot({ color })}
+					<div style="--color: {color}" class="slot"></div>
+				{/snippet}
+				{#snippet tools()}{/snippet}
+				{#snippet input()}{/snippet}
+				{#snippet footer()}
+					<div class="footer">
+						<h1>Grand'ma Jersey</h1>
+						<p>Cozy Wool</p>
+					</div>
+				{/snippet}
 			</Palette>
 			<Palette class="palette__custom" colors={colors4} numColumns="5">
-				<div slot="slot" let:color style="--color: {color}" class="slot"></div>
-				<div slot="tools"></div>
-				<div slot="input"></div>
-				<div slot="footer" class="footer">
-					<h1>California Sunset</h1>
-					<p>Chill & the Beach</p>
-				</div>
+				{#snippet slot({ color })}
+					<div style="--color: {color}" class="slot"></div>
+				{/snippet}
+				{#snippet tools()}{/snippet}
+				{#snippet input()}{/snippet}
+				{#snippet footer()}
+					<div class="footer">
+						<h1>California Sunset</h1>
+						<p>Chill & the Beach</p>
+					</div>
+				{/snippet}
 			</Palette>
 		</div>
 	</div>

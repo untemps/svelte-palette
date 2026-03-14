@@ -7,8 +7,8 @@
 
 	import { Palette } from '$lib'
 
-	let unique = {}
-	let colors = null
+	let unique = $state({})
+	let colors = $state(null)
 
 	/*onMount(() => {
 		colors = fetch('https://www.colr.org/json/colors/random/30')
@@ -29,7 +29,7 @@
 			})
 	})*/
 
-	colors = [
+	const _initialColors = [
 		'#865C54',
 		'#8F5447',
 		'#A65846',
@@ -54,25 +54,26 @@
 		'#BE3E82',
 		'#5E4352',
 	]
+	colors = _initialColors
 	const compactIndices = [2, 7, 13, 20]
 
-	let bgColor = colors?.[Math.round(Math.random() * (colors?.length - 1))]
+	let bgColor = $state(_initialColors[Math.round(Math.random() * (_initialColors.length - 1))])
 
-	let preselectColor = true
-	let allowDuplicates = true
-	let deletionMode = 'tooltip'
-	let useCustomTooltipClass = false
-	let useCustomTooltipContent = false
-	let showTransparentSlot = true
-	let maxColors = 30
-	let showInput = true
-	let inputType = 'text'
-	let showCompactControl = true
-	let numColumns = 5
-	let maxNumColumns = 10
-	let transitionType = 'custom'
+	let preselectColor = $state(true)
+	let allowDuplicates = $state(true)
+	let deletionMode = $state('tooltip')
+	let useCustomTooltipClass = $state(false)
+	let useCustomTooltipContent = $state(false)
+	let showTransparentSlot = $state(true)
+	let maxColors = $state(30)
+	let showInput = $state(true)
+	let inputType = $state('text')
+	let showCompactControl = $state(true)
+	let numColumns = $state(5)
+	let maxNumColumns = $state(10)
+	let transitionType = $state('custom')
 
-	$: unique = {}
+	unique = {}
 
 	const whoosh = (node, params) => {
 		const existingTransform = getComputedStyle(node).transform.replace('none', '')
@@ -114,125 +115,139 @@
 					{inputType}
 					{numColumns}
 					transition={transitions[transitionType]}
-					on:select={({ detail: { color } }) => {
+					onselect={({ color }) => {
 						bgColor = color
 						preselectColor = !!bgColor
 					}}
 				>
-					<div slot="settings" class="palette__settings" let:onClose>
-						<div class="settings">
-							<Button
-								kind="tertiary"
-								iconDescription="Close Settings"
-								tooltipPosition="left"
-								icon={Close}
-								class="settings__close-button"
-								on:click={onClose}
-							/>
-							<form class="settings__form">
-								<div class="settings__preselection">
-									<Toggle labelText="Preselect Color" size="sm" bind:toggled={preselectColor}>
-										<span slot="labelA" />
-										<span slot="labelB" />
-									</Toggle>
-									<span
-										class="settings__preselection__color"
-										style={`background-color: ${bgColor}`}
+					{#snippet settings({ onClose })}
+						<div class="palette__settings">
+							<div class="settings">
+								<Button
+									kind="tertiary"
+									iconDescription="Close Settings"
+									tooltipPosition="left"
+									icon={Close}
+									class="settings__close-button"
+									on:click={onClose}
+								/>
+								<form class="settings__form">
+									<div class="settings__preselection">
+										<Toggle labelText="Preselect Color" size="sm" bind:toggled={preselectColor}>
+											<span slot="labelA"></span>
+											<span slot="labelB"></span>
+										</Toggle>
+										<span
+											class="settings__preselection__color"
+											style={`background-color: ${bgColor}`}
+										></span>
+									</div>
+									<hr class="settings__space" />
+									<Select
+										labelText="Input Type"
+										inline
+										selected={inputType}
+										on:change={(e) => (inputType = e.target.value)}
+									>
+										<SelectItem value="text" />
+										<SelectItem value="color" />
+									</Select>
+									<hr class="settings__space" />
+									<Slider
+										labelText="Number of Columns"
+										fullWidth
+										min={0}
+										max={maxNumColumns}
+										step={1}
+										bind:value={numColumns}
 									/>
-								</div>
-								<hr class="settings__space" />
-								<Select
-									labelText="Input Type"
-									inline
-									selected={inputType}
-									on:change={(e) => (inputType = e.target.value)}
-								>
-									<SelectItem value="text" />
-									<SelectItem value="color" />
-								</Select>
-								<hr class="settings__space" />
-								<Slider
-									labelText="Number of Columns"
-									fullWidth
-									min={0}
-									max={maxNumColumns}
-									step={1}
-									bind:value={numColumns}
-								/>
-								<hr class="settings__space" />
-								<Slider
-									labelText="Maximum Number of Colors"
-									fullWidth
-									min={1}
-									max={50}
-									step={1}
-									bind:value={maxColors}
-								/>
-								<hr class="settings__space" />
-								<Toggle labelText="Allow Duplicates" size="sm" bind:toggled={allowDuplicates}>
-									<span slot="labelA" />
-									<span slot="labelB" />
-								</Toggle>
-								<hr class="settings__space" />
-								<Select
-									labelText="Deletion Mode"
-									inline
-									selected={deletionMode}
-									on:change={(e) => (deletionMode = e.target.value)}
-								>
-									<SelectItem value="none" />
-									<SelectItem value="tooltip" />
-									<SelectItem value="drop" />
-								</Select>
-								<hr class="settings__space" />
-								<Toggle labelText="Custom Tooltip Class" size="sm" bind:toggled={useCustomTooltipClass}>
-									<span slot="labelA" />
-									<span slot="labelB" />
-								</Toggle>
-								<hr class="settings__space" />
-								<Toggle
-									labelText="Custom Tooltip Content"
-									size="sm"
-									bind:toggled={useCustomTooltipContent}
-								>
-									<span slot="labelA" />
-									<span slot="labelB" />
-								</Toggle>
-								<div style="position: absolute; left: -200px; top: -200px">
-									<Button id="tooltip-content">Delete</Button>
-								</div>
-								<hr class="settings__space" />
-								<Toggle labelText="Show Transparent Slot" size="sm" bind:toggled={showTransparentSlot}>
-									<span slot="labelA" />
-									<span slot="labelB" />
-								</Toggle>
-								<hr class="settings__space" />
-								<Toggle labelText="Show Compact Control" size="sm" bind:toggled={showCompactControl}>
-									<span slot="labelA" />
-									<span slot="labelB" />
-								</Toggle>
-								<hr class="settings__space" />
-								<Toggle labelText="Show Input" size="sm" bind:toggled={showInput}>
-									<span slot="labelA" />
-									<span slot="labelB" />
-								</Toggle>
-								<hr class="settings__space" />
-								<Select
-									labelText="Transition Type"
-									inline
-									bind:selected={transitionType}
-									on:change={(e) => (transitionType = e.target.value)}
-								>
-									<SelectItem value="none" />
-									<SelectItem value="custom" />
-									<SelectItem value="fade" />
-									<SelectItem value="blur" />
-									<SelectItem value="fly" />
-									<SelectItem value="scale" />
-								</Select>
-							</form>
+									<hr class="settings__space" />
+									<Slider
+										labelText="Maximum Number of Colors"
+										fullWidth
+										min={1}
+										max={50}
+										step={1}
+										bind:value={maxColors}
+									/>
+									<hr class="settings__space" />
+									<Toggle labelText="Allow Duplicates" size="sm" bind:toggled={allowDuplicates}>
+										<span slot="labelA"></span>
+										<span slot="labelB"></span>
+									</Toggle>
+									<hr class="settings__space" />
+									<Select
+										labelText="Deletion Mode"
+										inline
+										selected={deletionMode}
+										on:change={(e) => (deletionMode = e.target.value)}
+									>
+										<SelectItem value="none" />
+										<SelectItem value="tooltip" />
+										<SelectItem value="drop" />
+									</Select>
+									<hr class="settings__space" />
+									<Toggle
+										labelText="Custom Tooltip Class"
+										size="sm"
+										bind:toggled={useCustomTooltipClass}
+									>
+										<span slot="labelA"></span>
+										<span slot="labelB"></span>
+									</Toggle>
+									<hr class="settings__space" />
+									<Toggle
+										labelText="Custom Tooltip Content"
+										size="sm"
+										bind:toggled={useCustomTooltipContent}
+									>
+										<span slot="labelA"></span>
+										<span slot="labelB"></span>
+									</Toggle>
+									<div style="position: absolute; left: -200px; top: -200px">
+										<Button id="tooltip-content">Delete</Button>
+									</div>
+									<hr class="settings__space" />
+									<Toggle
+										labelText="Show Transparent Slot"
+										size="sm"
+										bind:toggled={showTransparentSlot}
+									>
+										<span slot="labelA"></span>
+										<span slot="labelB"></span>
+									</Toggle>
+									<hr class="settings__space" />
+									<Toggle
+										labelText="Show Compact Control"
+										size="sm"
+										bind:toggled={showCompactControl}
+									>
+										<span slot="labelA"></span>
+										<span slot="labelB"></span>
+									</Toggle>
+									<hr class="settings__space" />
+									<Toggle labelText="Show Input" size="sm" bind:toggled={showInput}>
+										<span slot="labelA"></span>
+										<span slot="labelB"></span>
+									</Toggle>
+									<hr class="settings__space" />
+									<Select
+										labelText="Transition Type"
+										inline
+										bind:selected={transitionType}
+										on:change={(e) => (transitionType = e.target.value)}
+									>
+										<SelectItem value="none" />
+										<SelectItem value="custom" />
+										<SelectItem value="fade" />
+										<SelectItem value="blur" />
+										<SelectItem value="fly" />
+										<SelectItem value="scale" />
+									</Select>
+								</form>
+							</div>
 						</div>
-					</div>
+					{/snippet}
 				</Palette>
 			{/key}
 		</div>

@@ -8,8 +8,7 @@
 	import TrashIcon from './icons/TrashIcon.svelte'
 	import SettingsIcon from './icons/SettingsIcon.svelte'
 
-	export let icon = null
-	export let isActive = false
+	let { icon = null, isActive = false, class: className = '', onclick, ...restProps } = $props()
 
 	const ICONS = {
 		[COMPACT]: CompactIcon,
@@ -19,21 +18,20 @@
 		[TRASH]: TrashIcon,
 		[SETTINGS]: SettingsIcon,
 	}
-
-	const _renderIcon = (name) => {
-		return ICONS[name]
-	}
 </script>
 
 <button
 	data-testid="__palette-icon-button__"
 	type="button"
-	{...$$restProps}
-	class="icon_button__button {$$props.class ?? ''}"
+	{...restProps}
+	class="icon_button__button {className}"
 	class:icon_button__button--active={isActive}
-	on:click
+	{onclick}
 >
-	<svelte:component this={_renderIcon(icon)} />
+	{#if ICONS[icon]}
+		{@const IconComponent = ICONS[icon]}
+		<IconComponent />
+	{/if}
 </button>
 
 <style>

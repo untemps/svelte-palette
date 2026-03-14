@@ -1,37 +1,33 @@
 <script>
-	import { createEventDispatcher } from 'svelte'
-
-	import { SELECT } from '../enums/PaletteEvent'
-
-	export let color = null
-	export let selected = false
-	export let disabled = false
-	export let transition = null
-
-	const dispatch = createEventDispatcher()
+	let {
+		color = null,
+		selected = false,
+		disabled = false,
+		transition = null,
+		onselect = undefined,
+		...restProps
+	} = $props()
 
 	const enter = (node) => transition?.fn(node, transition?.args)
 
-	const _onClick = () => {
-		!disabled &&
-			dispatch(SELECT, {
-				color,
-			})
+	const _onClick = (e) => {
+		e.preventDefault()
+		!disabled && onselect?.({ color })
 	}
 </script>
 
 <button
 	data-testid="__palette-slot__"
 	aria-label={color}
-	{...$$restProps}
+	{...restProps}
 	class:empty={!color}
 	class:selected
 	class:clickable={!disabled}
 	style="--color:{color}; --outerBorderColor:{color || '#aaa'};"
 	{disabled}
 	in:enter
-	on:click|preventDefault={_onClick}
-/>
+	onclick={_onClick}
+></button>
 
 <style>
 	button {

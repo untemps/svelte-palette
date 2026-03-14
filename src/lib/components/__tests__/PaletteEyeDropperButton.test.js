@@ -1,5 +1,5 @@
 import { afterEach, expect, test, vi } from 'vitest'
-import { cleanup, render, screen, waitFor } from '@testing-library/svelte'
+import { cleanup, render, screen, waitFor } from '@testing-library/svelte/svelte5'
 import userEvent from '@testing-library/user-event'
 
 import PaletteEyeDropperButton from '../PaletteEyeDropperButton.svelte'
@@ -32,11 +32,10 @@ test('Sets eye dropper button aria-label', () => {
 
 test('Retrieves color from EyeDropper selection', async () => {
 	const onAdd = vi.fn()
-	const { component, user } = setup(PaletteEyeDropperButton)
+	const { user } = setup(PaletteEyeDropperButton, { props: { onadd: onAdd } })
 	const button = screen.getByTestId('__palette-eyedropper-button__')
-	component.$on('add', onAdd)
 	await user.click(button)
-	await waitFor(() => expect(onAdd).toHaveBeenCalledWith(new CustomEvent({ detail: { color: '#ff0' } })))
+	await waitFor(() => expect(onAdd).toHaveBeenCalledWith({ color: '#ff0' }))
 })
 
 // EyeDropper API is invalid
@@ -49,9 +48,10 @@ test('Throws error', async () => {
 
 	const onError = vi.fn(() => 0)
 	const ariaLabel = 'Foo'
-	const { component, user } = setup(PaletteEyeDropperButton, { ['aria-label']: ariaLabel })
+	const { user } = setup(PaletteEyeDropperButton, {
+		props: { ['aria-label']: ariaLabel, onerror: onError },
+	})
 	const button = screen.getByLabelText(ariaLabel)
-	component.$on('error', onError)
 	await user.click(button)
 	await waitFor(() => expect(onError).toHaveBeenCalled())
 })

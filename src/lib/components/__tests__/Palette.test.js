@@ -1,7 +1,8 @@
 import { afterEach, expect, test, vi } from 'vitest'
-import { cleanup, render, screen, waitFor } from '@testing-library/svelte'
+import { cleanup, render, screen, waitFor } from '@testing-library/svelte/svelte5'
 import userEvent from '@testing-library/user-event'
 import { standby } from '@untemps/utils/async/standby'
+import { createRawSnippet } from 'svelte'
 
 import Palette from '../Palette.svelte'
 
@@ -45,17 +46,15 @@ test('Triggers select with color', async () => {
 	const onSelect = vi.fn(() => 0)
 	const colors = ['#ff0', '#0ff', '#f0f']
 
-	const { component, user } = setup(Palette, {
-		colors,
+	const { user } = setup(Palette, {
+		props: { colors, onselect: onSelect },
 	})
-
-	component.$on('select', onSelect)
 
 	cells = await screen.findAllByTestId('__palette-cell__')
 	cell = cells[0]
 	await user.click(cell.firstChild)
 
-	expect(onSelect).toHaveBeenCalledWith(new CustomEvent({ detail: { color: colors[0] } }))
+	expect(onSelect).toHaveBeenCalledWith({ color: colors[0] })
 })
 
 test('Deletes slots if deletionMode is set to "tooltip"', async () => {
@@ -88,7 +87,6 @@ test('Deletes slot if deletionMode is set to "drop"', async () => {
 	const colors = ['#ff0', '#0ff', '#f0f']
 
 	const { user } = setup(Palette, {
-		accessors: true,
 		props: {
 			colors,
 			deletionMode: DROP,
@@ -121,40 +119,33 @@ test('Displays transparent slot if showTransparentSlot is truthy', async () => {
 	const onSelect = vi.fn(() => 0)
 	const colors = ['#ff0', '#0ff', '#f0f']
 
-	const { component, user } = setup(Palette, {
-		colors,
-		showTransparentSlot: true,
+	const { user } = setup(Palette, {
+		props: { colors, showTransparentSlot: true, onselect: onSelect },
 	})
-
-	component.$on('select', onSelect)
 	cells = await screen.findAllByTestId('__palette-cell__')
 	expect(cells).toHaveLength(colors.length + 1)
 
 	cell = cells[0]
 	await user.click(cell.firstChild)
 
-	expect(onSelect).toHaveBeenCalledWith(new CustomEvent({ detail: { color: null } }))
+	expect(onSelect).toHaveBeenCalledWith({ color: null })
 })
 
 test.each([
-	[['#ff0', '#0ff', '#f0f'], 99, 4],
-	[['#ff0', '#0ff', '#f0f'], -1, 4],
-	[['#ff0', '#0ff', '#f0f'], 3, 3],
-	[['#ff0', '#0ff', '#f0f'], 1, 1],
-])('Adds or replaces color regarding maxColors value', async (colors, maxColors, expected) => {
+	[['#ff0', '#0ff', '#f0f'], 99, 4, '#0f0'],
+	[['#ff0', '#0ff', '#f0f'], -1, 4, '#0f0'],
+	[['#ff0', '#0ff', '#f0f'], 3, 3, '#f0f'],
+	[['#ff0', '#0ff', '#f0f'], 1, 1, '#ff0'],
+])('Adds or replaces color regarding maxColors value', async (colors, maxColors, expected, expectedColor) => {
 	let input,
 		submit,
 		slots = null
 	const newColor = '0f0'
 	const onSelect = vi.fn(() => 0)
 
-	const { component, user } = setup(Palette, {
-		colors,
-		maxColors,
-		showInput: true,
+	const { user } = setup(Palette, {
+		props: { colors, maxColors, showInput: true, onselect: onSelect },
 	})
-
-	component.$on('select', onSelect)
 
 	input = await screen.findByTestId('__palette-input-input__')
 	await user.type(input, newColor)
@@ -167,7 +158,7 @@ test.each([
 
 	await user.click(slots[slots.length - 1])
 
-	expect(onSelect).toHaveBeenCalledWith(new CustomEvent({ detail: { color: '#000' } }))
+	expect(onSelect).toHaveBeenCalledWith({ color: expectedColor })
 })
 
 test.each([
@@ -181,12 +172,9 @@ test.each([
 	const newColor = 'f0f'
 	const onSelect = vi.fn(() => 0)
 
-	const { component, user } = setup(Palette, {
-		colors,
-		allowDuplicates,
-		showInput: true,
+	const { user } = setup(Palette, {
+		props: { colors, allowDuplicates, showInput: true, onselect: onSelect },
 	})
-	component.$on('select', onSelect)
 
 	input = await screen.findByTestId('__palette-input-input__')
 	await user.type(input, newColor)
@@ -199,7 +187,55 @@ test.each([
 
 	await user.click(slots[slots.length - 1])
 
-	expect(onSelect).toHaveBeenCalledWith(new CustomEvent({ detail: { color: '#f0f' } }))
+	expect(onSelect).toHaveBeenCalledWith({ color: '#f0f' })
+})
+
+test('Expands palette when compact toggle button is clicked', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const compactColorIndices = [0, 1]
+
+	const { user } = setup(Palette, {
+		props: { colors, compactColorIndices, isCompact: true },
+	})
+
+	const toggleButton = await screen.findByTestId('__palette-compact-toggle-button__')
+	expect(toggleButton).toBeInTheDocument()
+
+	await user.click(toggleButton)
+
+	const content = document.querySelector('.palette__content')
+	await waitFor(() => expect(content).not.toHaveClass('palette__content--compact'))
+})
+
+test('Closes settings panel when onClose is called', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const compactColorIndices = [0, 1]
+
+	const settingsSnippet = createRawSnippet((getProps) => ({
+		render: () => `<button data-testid="__settings-close-button__">Close</button>`,
+		setup: (element) => {
+			element.addEventListener('click', () => getProps().onClose())
+		},
+	}))
+
+	const { user } = setup(Palette, {
+		props: {
+			colors,
+			compactColorIndices,
+			settings: settingsSnippet,
+		},
+	})
+
+	const settingsButton = await screen.findByTestId('__palette-settings-button__')
+	await user.click(settingsButton)
+
+	const panel = document.querySelector('.palette__settings__panel')
+	await waitFor(() => expect(panel).toHaveClass('palette__settings__panel--visible'))
+
+	const closeButton = screen.getByTestId('__settings-close-button__')
+	await user.click(closeButton)
+
+	await waitFor(() => expect(panel).not.toHaveClass('palette__settings__panel--visible'))
 })
 
 test('Removes duplicates when updating allowDuplicates value', async () => {
