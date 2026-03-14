@@ -30,7 +30,7 @@ yarn add @untemps/svelte-palette
 
 ### Basic Usage
 
-```html
+```svelte
 <script>
     import { Palette } from '@untemps/svelte-palette'
 
@@ -104,7 +104,7 @@ Snippets replace the Svelte 4 named slots API. Pass them as children of `<Palett
 
 ## Example
 
-```html
+```svelte
 <script>
 	import { Palette } from '@untemps/svelte-palette'
 
@@ -113,15 +113,17 @@ Snippets replace the Svelte 4 named slots API. Pass them as children of `<Palett
 
 <Palette {colors}>
 	{#snippet header()}
-	<div class="palette__header">
-		<h1>Pick a color</h1>
-	</div>
-	{/snippet} {#snippet slot({ color })}
-	<button class="palette__slot" style="--color:{color}"></button>
-	{/snippet} {#snippet footer()}
-	<div class="palette__footer">
-		<a href="https://www.untemps.net">@untemps</a>
-	</div>
+		<div class="palette__header">
+			<h1>Pick a color</h1>
+		</div>
+	{/snippet}
+	{#snippet slot({ color })}
+		<button class="palette__slot" style="--color:{color}"></button>
+	{/snippet}
+	{#snippet footer()}
+		<div class="palette__footer">
+			<a href="https://www.untemps.net">@untemps</a>
+		</div>
 	{/snippet}
 </Palette>
 
@@ -195,7 +197,7 @@ If set a control is added to toggle the compact mode.
 
 You may also specified whether the palette has to use the compact mode by default by setting `isCompact=true`.
 
-```html
+```svelte
 <script>
 	import { Palette } from '@untemps/svelte-palette'
 
@@ -217,7 +219,7 @@ You can style the component by passing a class down to the root tag (`div`).
 
 #### Example
 
-```html
+```svelte
 <script>
 	import { Palette } from '@untemps/svelte-palette'
 
@@ -248,7 +250,7 @@ If you ignore that prop, a default class is used.
 
 #### Example
 
-```html
+```svelte
 <script>
 	import { Palette } from '@untemps/svelte-palette'
 
@@ -301,7 +303,7 @@ This prop works the same way as the [in/out directive](https://svelte.dev/docs#t
 
 ### Example
 
-```html
+```svelte
 <script>
 	import { Palette } from '@untemps/svelte-palette'
 	import { elasticOut } from 'svelte/easing'
@@ -333,7 +335,7 @@ The component displays a customizable loader waiting to the promise to be resolv
 
 #### Example
 
-```html
+```svelte
 <script>
 	import { Palette } from '@untemps/svelte-palette'
 
@@ -344,7 +346,7 @@ The component displays a customizable loader waiting to the promise to be resolv
 
 <Palette {colors}>
 	{#snippet loader()}
-	<p>Loading...</p>
+		<p>Loading...</p>
 	{/snippet}
 </Palette>
 ```
@@ -363,7 +365,7 @@ That is possible by defining a DOM element selector to the `tooltipContentSelect
 
 #### Example
 
-```html
+```svelte
 <script>
 	import { Palette } from '@untemps/svelte-palette'
 
@@ -387,7 +389,7 @@ That unlocks the color picker provided by the browser. Therefore the color spot 
 
 #### Example
 
-```html
+```svelte
 <script>
 	import { Palette } from '@untemps/svelte-palette'
 
@@ -410,7 +412,7 @@ To access each tool behaviours, the Palette component exports a `onSelect` funct
 
 #### Example
 
-```html
+```svelte
 <script>
 	import { Palette, PaletteTool } from '@untemps/svelte-palette'
 
@@ -419,10 +421,10 @@ To access each tool behaviours, the Palette component exports a `onSelect` funct
 
 <Palette {colors}>
 	{#snippet tools({ onSelect, isCompact })}
-	<div>
-		<button onclick="{()" ="">onSelect(PaletteTool.SETTINGS)}>Settings</button>
-		<button onclick="{()" ="">onSelect(PaletteTool.COMPACT)}>{isCompact ? 'Expand' : 'Compact'}</button>
-	</div>
+		<div>
+			<button onclick={() => onSelect(PaletteTool.SETTINGS)}>Settings</button>
+			<button onclick={() => onSelect(PaletteTool.COMPACT)}>{isCompact ? 'Expand' : 'Compact'}</button>
+		</div>
 	{/snippet}
 </Palette>
 ```
