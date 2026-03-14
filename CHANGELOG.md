@@ -1,3 +1,9 @@
+# [4.2.0](https://github.com/untemps/svelte-palette/compare/v4.1.0...v4.2.0) (2026-03-14)
+
+### Features
+
+-   Migrate to Svelte 5 ([#137](https://github.com/untemps/svelte-palette/issues/137)) ([a7fa0d6](https://github.com/untemps/svelte-palette/commit/a7fa0d62acec29f077b4e9102edc290f4bea354e))
+
 # [4.1.0](https://github.com/untemps/svelte-palette/compare/v4.0.0...v4.1.0) (2024-02-29)
 
 ### Features
