@@ -39,5 +39,5 @@ test('Triggers click event with current state', async () => {
 	const { user } = setup(PaletteCompactToggleButton, { props: { onclick: onClick } })
 	const button = screen.getByTestId('__palette-compact-toggle-button__')
 	await user.click(button)
-	expect(onClick).toHaveBeenCalled()
+	expect(onClick).toHaveBeenCalledWith(expect.any(MouseEvent))
 })
