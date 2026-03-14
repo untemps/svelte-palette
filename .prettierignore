@@ -15,6 +15,7 @@ yarn-error.log*
 # IDE
 /.idea
 /.vscode
+/.claude
 
 # Tests
 /coverage

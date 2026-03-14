@@ -1,39 +1,29 @@
 <script>
-	import { createEventDispatcher } from 'svelte'
-
 	import { COMPACT, SETTINGS } from '../enums/PaletteTool.js'
-	import { SELECT } from '../enums/PaletteEvent.js'
 
 	import PaletteCompactToggleButton from './PaletteCompactToggleButton.svelte'
 	import PaletteSettingsButton from './PaletteSettingsButton.svelte'
 
-	export let tools = []
+	let { tools = [], onselect = undefined } = $props()
 
 	const TOOL_BUTTONS = {
 		[COMPACT]: PaletteCompactToggleButton,
 		[SETTINGS]: PaletteSettingsButton,
 	}
 
-	const dispatch = createEventDispatcher()
-
-	const _renderTool = (index) => {
-		return tools[index] ? TOOL_BUTTONS[tools[index]] : null
-	}
-
 	const _selectTool = (index) => {
-		dispatch(SELECT, {
-			tool: tools[index],
-		})
+		onselect?.({ tool: tools[index] })
 	}
 </script>
 
 <hr class="palette__divider" />
 <section data-testid="__palette-tools__" aria-label="Palette tools" class="palette__tools">
-	<svelte:component this={_renderTool(0)} on:click={() => _selectTool(0)} />
-	<svelte:component this={_renderTool(1)} on:click={() => _selectTool(1)} />
-	<svelte:component this={_renderTool(2)} on:click={() => _selectTool(2)} />
-	<svelte:component this={_renderTool(3)} on:click={() => _selectTool(3)} />
-	<svelte:component this={_renderTool(4)} on:click={() => _selectTool(4)} />
+	{#each tools as tool, i (tool)}
+		{@const ToolComponent = TOOL_BUTTONS[tool]}
+		{#if ToolComponent}
+			<ToolComponent onclick={() => _selectTool(i)} />
+		{/if}
+	{/each}
 </section>
 
 <style>

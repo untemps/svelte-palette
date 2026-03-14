@@ -1,7 +1,6 @@
 <script>
-	import { createEventDispatcher, onDestroy, onMount } from 'svelte'
+	import { onMount, untrack } from 'svelte'
 
-	import { ADD } from '../enums/PaletteEvent'
 	import { PLUS } from '../enums/PaletteIcon'
 
 	import PaletteIconButton from './PaletteIconButton.svelte'
@@ -10,30 +9,28 @@
 
 	import { COLOR_REGEX, isColorValid } from '../utils/utils'
 
-	export let color = null
-	export let inputType = 'text'
+	let { color: colorProp = null, inputType = 'text', onadd = undefined, class: className = '' } = $props()
 
-	const dispatch = createEventDispatcher()
+	let color = $state(untrack(() => colorProp?.replace(COLOR_REGEX, '#$1') || ''))
+	let _isEyeDropperAvailable = $state(false)
 
-	let _isEyeDropperAvailable = false
-	let _gridColumnStart = 2
-	let _gridColumnEnd = 5
+	$effect(() => {
+		color = colorProp?.replace(COLOR_REGEX, '#$1') || ''
+	})
 
-	$: color = color?.replace(COLOR_REGEX, '#$1') || ''
-	$: isValid = isColorValid(color)
+	let _gridColumnStart = $derived(2 - +(inputType === 'color'))
+	let _gridColumnEnd = $derived((_isEyeDropperAvailable ? 5 : 6) + +(inputType === 'color'))
 
-	$: {
-		_gridColumnStart = 2 - +(inputType === 'color')
-		_gridColumnEnd = (_isEyeDropperAvailable ? 5 : 6) + +(inputType === 'color')
-	}
+	let isValid = $derived(isColorValid(color))
 
 	onMount(() => {
 		_isEyeDropperAvailable = !!window?.EyeDropper
 		return () => document.removeEventListener('keypress', _onKeyPress)
 	})
 
-	const _onInputChange = ({ target: { value } }) => {
-		color = value
+	const _onInputChange = (e) => {
+		e.preventDefault()
+		color = e.target.value?.replace(COLOR_REGEX, '#$1') || e.target.value
 	}
 
 	const _onKeyPress = (e) => {
@@ -48,27 +45,25 @@
 		document?.removeEventListener('keypress', _onKeyPress)
 	}
 
-	const _onEyeDropperAdd = ({ detail: { color: value } }) => {
+	const _onEyeDropperAdd = ({ color: value }) => {
 		color = value
 	}
 
 	const _onSubmit = () => {
-		dispatch(ADD, {
-			color,
-		})
+		onadd?.({ color })
 	}
 </script>
 
 <hr class="palette__divider" />
 <section
 	data-testid="__palette-input__"
-	class="palette__input {$$props.class ?? ''}"
+	class="palette__input {className}"
 	style="--grid-column-start: {_gridColumnStart}; --grid-column-end: {_gridColumnEnd}"
 >
 	<form>
 		{#if inputType !== 'color'}<PaletteSlot
 				data-testid="__palette-input-slot__"
-				bind:color
+				{color}
 				role="presentation"
 				tabindex="-1"
 				disabled
@@ -82,9 +77,9 @@
 				title="'The value must be a valid hex color'"
 				class="palette_input__input"
 				class:palette_input__input--color={inputType === 'color'}
-				on:focus={_onInputFocus}
-				on:blur={_onInputBlur}
-				on:input|preventDefault={_onInputChange}
+				onfocus={_onInputFocus}
+				onblur={_onInputBlur}
+				oninput={_onInputChange}
 			/>
 			<PaletteIconButton
 				data-testid="__palette-input-submit__"
@@ -93,11 +88,11 @@
 				disabled={!isValid}
 				aria-label="Submit the hex color value"
 				class="palette_input__submit"
-				on:click={_onSubmit}
+				onclick={_onSubmit}
 			/>
 		</span>
 		{#if _isEyeDropperAvailable && inputType !== 'color'}
-			<PaletteEyeDropperButton aria-label="Pick a color from the screen" on:add={_onEyeDropperAdd} />
+			<PaletteEyeDropperButton aria-label="Pick a color from the screen" onadd={_onEyeDropperAdd} />
 		{/if}
 	</form>
 </section>

@@ -1,16 +1,16 @@
 <script>
 	import TrashIcon from './icons/TrashIcon.svelte'
 
-	export let isActive = false
+	let { isActive = false, class: className = '', onclick = undefined, ...restProps } = $props()
 </script>
 
 <button
 	data-testid="__palette-trash-button__"
 	type="button"
-	{...$$restProps}
-	class="trash_button__button {$$props.class ?? ''}"
+	{...restProps}
+	class="trash_button__button {className}"
 	class:icon_button__button--active={isActive}
-	on:click
+	{onclick}
 >
 	<TrashIcon />
 </button>

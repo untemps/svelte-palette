@@ -1,5 +1,5 @@
 import { afterEach, expect, test, vi } from 'vitest'
-import { cleanup, render, screen } from '@testing-library/svelte'
+import { cleanup, render, screen } from '@testing-library/svelte/svelte5'
 import userEvent from '@testing-library/user-event'
 
 import { COMPACT } from '../../enums/PaletteIcon'
@@ -29,8 +29,7 @@ test('Displays icon', () => {
 
 test('Triggers click event', async () => {
 	const onClick = vi.fn(() => 0)
-	const { component, user } = setup(PaletteIconButton, { icon: COMPACT })
-	component.$on('click', onClick)
+	const { user } = setup(PaletteIconButton, { props: { icon: COMPACT, onclick: onClick } })
 	const button = screen.getByTestId('__palette-icon-button__')
 	await user.click(button)
 	expect(onClick).toHaveBeenCalled()

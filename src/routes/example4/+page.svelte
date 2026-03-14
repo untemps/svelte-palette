@@ -3,13 +3,13 @@
 
 	import { Palette, PaletteInput, PaletteSlot } from '$lib'
 
-	let colors = ['#F3B700', '#FAA300', '#E57C04', '#FF6201', '#F63E02', '#F50202']
+	let colors = $state(['#F3B700', '#FAA300', '#E57C04', '#FF6201', '#F63E02', '#F50202'])
 
-	let selectedColor = colors[3]
-	let textColor = '#fff'
-	let showInput = false
+	let selectedColor = $state('#FF6201')
+	let textColor = $state('#fff')
+	let showInput = $state(false)
 
-	const _onSelect = ({ detail: { color } }) => {
+	const _onSelect = ({ color }) => {
 		selectedColor = color
 		textColor = fontColorContrast(selectedColor)
 	}
@@ -22,7 +22,7 @@
 		showInput = false
 	}
 
-	const _onAdd = ({ detail: { color } }) => {
+	const _onAdd = ({ color }) => {
 		colors = [...colors, color]
 	}
 </script>
@@ -30,53 +30,50 @@
 <main class="example4" style="--bgColor:#000">
 	<div class="content">
 		<div>
-			<Palette {colors} {selectedColor} numColumns={5} {showInput} allowDuplicates on:select={_onSelect}>
-				<div
-					slot="header"
-					class="header"
-					let:selectedColor
-					style="--color:{selectedColor}; --textColor: {textColor}"
-				>
-					{selectedColor ?? ''}
-				</div>
-				<div slot="tools"></div>
-				<PaletteSlot
-					slot="slot"
-					let:color
-					{color}
-					class="slot__custom"
-					selected={color === selectedColor}
-					on:select={_onSelect}
-				></PaletteSlot>
-				<li slot="after_slot" class="slot__add">
-					<button class="icon-button" on:click={_onOpen}>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="32"
-							height="32"
-							fill="#646464"
-							viewBox="0 0 256 256"
-							><path
-								d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"
-							></path></svg
-						>
-					</button>
-				</li>
-				<div slot="input" let:selectedColor let:inputType class="input">
-					<PaletteInput class="input__input" on:add={_onAdd} />
-					<button class="icon-button" on:click={_onClose}>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="16"
-							height="16"
-							fill="#646464"
-							viewBox="0 0 256 256"
-							><path
-								d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"
-							></path></svg
-						>
-					</button>
-				</div>
+			<Palette {colors} {selectedColor} numColumns={5} {showInput} allowDuplicates onselect={_onSelect}>
+				{#snippet header({ selectedColor })}
+					<div class="header" style="--color:{selectedColor}; --textColor: {textColor}">
+						{selectedColor ?? ''}
+					</div>
+				{/snippet}
+				{#snippet tools()}{/snippet}
+				{#snippet slot({ color })}
+					<PaletteSlot {color} class="slot__custom" selected={color === selectedColor} onselect={_onSelect}
+					></PaletteSlot>
+				{/snippet}
+				{#snippet afterSlot()}
+					<li class="slot__add">
+						<button class="icon-button" aria-label="Open" onclick={_onOpen}>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="32"
+								height="32"
+								fill="#646464"
+								viewBox="0 0 256 256"
+								><path
+									d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"
+								></path></svg
+							>
+						</button>
+					</li>
+				{/snippet}
+				{#snippet input()}
+					<div class="input">
+						<PaletteInput class="input__input" onadd={_onAdd} />
+						<button class="icon-button" aria-label="Close" onclick={_onClose}>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="16"
+								height="16"
+								fill="#646464"
+								viewBox="0 0 256 256"
+								><path
+									d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"
+								></path></svg
+							>
+						</button>
+					</div>
+				{/snippet}
 			</Palette>
 		</div>
 	</div>
