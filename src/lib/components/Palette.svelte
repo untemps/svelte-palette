@@ -56,6 +56,10 @@
 	})
 
 	$effect(() => {
+		_numColumns = numColumns
+	})
+
+	$effect(() => {
 		Promise.resolve(colors).then((results) => {
 			if (!!results) {
 				const newColors = calculateColors(results, {
