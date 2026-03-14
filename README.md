@@ -15,7 +15,7 @@
 
 <p align="center">
     :red_circle:&nbsp;<big><a href="https://svelte-palette.vercel.app" target="_blank" rel="noopener">LIVE
-    DEMO</a></big>&nbsp;:red_circle:
+    DEMO</a></big>
 </p>
 
 ## Installation
