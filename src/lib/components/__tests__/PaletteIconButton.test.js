@@ -34,3 +34,9 @@ test('Triggers click event', async () => {
 	await user.click(button)
 	expect(onClick).toHaveBeenCalled()
 })
+
+test('Attaches active class when isActive is true', () => {
+	setup(PaletteIconButton, { props: { icon: COMPACT, isActive: true } })
+	const button = screen.getByTestId('__palette-icon-button__')
+	expect(button).toHaveClass('icon_button__button--active')
+})

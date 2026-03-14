@@ -75,3 +75,19 @@ test('Selects slot', () => {
 	const slot = screen.getByTestId('__palette-slot__')
 	expect(slot).toHaveClass('selected')
 })
+
+test('Does not call onselect when slot is disabled', async () => {
+	const color = '#ff0'
+	const onClick = vi.fn(() => 0)
+	const { user } = setup(PaletteSlot, { props: { color, disabled: true, onselect: onClick } })
+	const slot = screen.getByTestId('__palette-slot__')
+	await user.click(slot)
+	expect(onClick).not.toHaveBeenCalled()
+})
+
+test('Calls transition fn when slot enters the DOM', () => {
+	const color = '#ff0'
+	const transitionFn = vi.fn(() => ({}))
+	setup(PaletteSlot, { props: { color, transition: { fn: transitionFn } } })
+	expect(transitionFn).toHaveBeenCalled()
+})

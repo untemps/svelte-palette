@@ -77,3 +77,14 @@ test('Does not display EyeDropper button if API is not available', async () => {
 	const button = screen.queryByTestId('__palette-eyedropper-button__')
 	expect(button).not.toBeInTheDocument()
 })
+
+test('Updates input value with color from eyedropper', async () => {
+	window.EyeDropper = function () {
+		this.open = () => Promise.resolve({ sRGBHex: '#ff0' })
+	}
+	const { user } = setup(PaletteInput)
+	const button = await screen.findByTestId('__palette-eyedropper-button__')
+	await user.click(button)
+	const input = screen.getByTestId('__palette-input-input__')
+	await waitFor(() => expect(input).toHaveValue('#ff0'))
+})

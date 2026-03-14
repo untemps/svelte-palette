@@ -2,6 +2,7 @@ import { afterEach, expect, test, vi } from 'vitest'
 import { cleanup, render, screen, waitFor } from '@testing-library/svelte/svelte5'
 import userEvent from '@testing-library/user-event'
 import { standby } from '@untemps/utils/async/standby'
+import { createRawSnippet } from 'svelte'
 
 import Palette from '../Palette.svelte'
 
@@ -187,6 +188,54 @@ test.each([
 	await user.click(slots[slots.length - 1])
 
 	expect(onSelect).toHaveBeenCalledWith({ color: '#f0f' })
+})
+
+test('Expands palette when compact toggle button is clicked', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const compactColorIndices = [0, 1]
+
+	const { user } = setup(Palette, {
+		props: { colors, compactColorIndices, isCompact: true },
+	})
+
+	const toggleButton = await screen.findByTestId('__palette-compact-toggle-button__')
+	expect(toggleButton).toBeInTheDocument()
+
+	await user.click(toggleButton)
+
+	const content = document.querySelector('.palette__content')
+	await waitFor(() => expect(content).not.toHaveClass('palette__content--compact'))
+})
+
+test('Closes settings panel when onClose is called', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const compactColorIndices = [0, 1]
+
+	const settingsSnippet = createRawSnippet((getProps) => ({
+		render: () => `<button data-testid="__settings-close-button__">Close</button>`,
+		setup: (element) => {
+			element.addEventListener('click', () => getProps().onClose())
+		},
+	}))
+
+	const { user } = setup(Palette, {
+		props: {
+			colors,
+			compactColorIndices,
+			settings: settingsSnippet,
+		},
+	})
+
+	const settingsButton = await screen.findByTestId('__palette-settings-button__')
+	await user.click(settingsButton)
+
+	const panel = document.querySelector('.palette__settings__panel')
+	await waitFor(() => expect(panel).toHaveClass('palette__settings__panel--visible'))
+
+	const closeButton = screen.getByTestId('__settings-close-button__')
+	await user.click(closeButton)
+
+	await waitFor(() => expect(panel).not.toHaveClass('palette__settings__panel--visible'))
 })
 
 test('Removes duplicates when updating allowDuplicates value', async () => {
