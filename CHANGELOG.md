@@ -1,3 +1,15 @@
+# [5.0.0](https://github.com/untemps/svelte-palette/compare/v4.2.0...v5.0.0) (2026-03-14)
+
+-   feat!: Migrate to Svelte 5 ([e9551d6](https://github.com/untemps/svelte-palette/commit/e9551d60ad7d717be8dac94d4719adbe0914672c))
+
+### BREAKING CHANGES
+
+-   Custom events replaced by callback props (onselect, onadd,
+    onerror, onclick). Named slots replaced by snippet props. PaletteEvent enum
+    removed. peerDependencies updated to svelte ^5.0.0.
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
 # [4.2.0](https://github.com/untemps/svelte-palette/compare/v4.1.0...v4.2.0) (2026-03-14)
 
 ### Features
