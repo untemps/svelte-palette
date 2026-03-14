@@ -1,10 +1,13 @@
 {
 	"name": "@untemps/svelte-palette",
-	"version": "5.0.0-beta.2",
+	"version": "4.1.0",
 	"author": "Vincent Le Badezet <v.lebadezet@untemps.net>",
 	"license": "MIT",
 	"homepage": "https://svelte-palette.vercel.app",
-	"repository": "https://github.com/untemps/svelte-palette",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/untemps/svelte-palette.git"
+	},
 	"bugs": "https://github.com/untemps/svelte-palette/issues",
 	"description": "Svelte component to display a customisable color picker",
 	"keywords": [
