@@ -10,4 +10,4 @@ export { default as PaletteSettingsButton } from './components/PaletteSettingsBu
 export { default as PaletteSettingsPanel } from './components/PaletteSettingsPanel.svelte'
 export { default as PaletteTools } from './components/PaletteTools.svelte'
 export { NONE, TOOLTIP, DROP } from './enums/PaletteDeletionMode'
-export { COMPACT, SETTINGS } from './enums/PaletteTool.js'
+export { COMPACT, SETTINGS } from './enums/PaletteTool'
