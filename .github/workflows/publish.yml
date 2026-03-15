@@ -7,6 +7,8 @@ on:
 permissions:
     contents: write
     id-token: write
+    pull-requests: write
+    issues: write
 jobs:
     publish:
         runs-on: ubuntu-latest
@@ -17,6 +19,7 @@ jobs:
             - uses: actions/setup-node@v6
               with:
                   node-version: '24'
+                  registry-url: 'https://registry.npmjs.org'
             - run: yarn install
             - run: yarn test:ci
             - run: yarn build
