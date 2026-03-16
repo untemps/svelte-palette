@@ -1,14 +1,15 @@
 <script>
 	import { EYE_DROPPER } from '../enums/PaletteIcon'
 	import PaletteIconButton from './PaletteIconButton.svelte'
+	import { normalizeColor } from '../utils/utils.js'
 
 	let { onadd = undefined, onerror = undefined, ...restProps } = $props()
 
 	const _onClick = async () => {
 		try {
 			const eyeDropper = new EyeDropper()
-			const { sRGBHex: color } = await eyeDropper.open()
-			onadd?.({ color })
+			const { sRGBHex } = await eyeDropper.open()
+			onadd?.({ color: normalizeColor(sRGBHex) })
 		} catch (error) {
 			onerror?.({ error })
 		}

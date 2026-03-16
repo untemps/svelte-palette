@@ -58,3 +58,13 @@ export const COLOR_REGEX = /^#?(([0-9a-f]{2}){3,4}|([0-9a-f]){3})$/i
 export const isColorValid = ($color) => {
 	return COLOR_REGEX.test($color)
 }
+
+export const normalizeColor = ($color) => {
+	if (isColorValid($color)) return $color
+	const match = $color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/)
+	if (match) {
+		const [, r, g, b] = match
+		return `#${[r, g, b].map((v) => parseInt(v).toString(16).padStart(2, '0')).join('')}`
+	}
+	return $color
+}
