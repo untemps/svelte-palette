@@ -1,4 +1,4 @@
-# [5.0.0](https://github.com/untemps/svelte-palette/compare/v4.2.0...v5.0.0) (2026-03-14)
+# [5.0.0-beta.1](https://github.com/untemps/svelte-palette/compare/v4.1.0...v5.0.0-beta.1) (2026-03-16)
 
 -   feat!: Migrate to Svelte 5 ([e9551d6](https://github.com/untemps/svelte-palette/commit/e9551d60ad7d717be8dac94d4719adbe0914672c))
 
@@ -6,31 +6,17 @@
 
 -   Remove registry-url from setup-node to allow npm OIDC auth ([9e3bcf0](https://github.com/untemps/svelte-palette/commit/9e3bcf0a25c54019985d3098095ddec9b9bf8960))
 
-### BREAKING CHANGES
-
--   Custom events replaced by callback props (onselect, onadd,
-    onerror, onclick). Named slots replaced by snippet props. PaletteEvent enum
-    removed. peerDependencies updated to svelte ^5.0.0.
-
-Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
-
-# [5.0.0](https://github.com/untemps/svelte-palette/compare/v4.2.0...v5.0.0) (2026-03-14)
-
--   feat!: Migrate to Svelte 5 ([e9551d6](https://github.com/untemps/svelte-palette/commit/e9551d60ad7d717be8dac94d4719adbe0914672c))
-
-### BREAKING CHANGES
-
--   Custom events replaced by callback props (onselect, onadd,
-    onerror, onclick). Named slots replaced by snippet props. PaletteEvent enum
-    removed. peerDependencies updated to svelte ^5.0.0.
-
-Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
-
-# [4.2.0](https://github.com/untemps/svelte-palette/compare/v4.1.0...v4.2.0) (2026-03-14)
-
 ### Features
 
 -   Migrate to Svelte 5 ([#137](https://github.com/untemps/svelte-palette/issues/137)) ([a7fa0d6](https://github.com/untemps/svelte-palette/commit/a7fa0d62acec29f077b4e9102edc290f4bea354e))
+
+### BREAKING CHANGES
+
+-   Custom events replaced by callback props (onselect, onadd,
+    onerror, onclick). Named slots replaced by snippet props. PaletteEvent enum
+    removed. peerDependencies updated to svelte ^5.0.0.
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
 
 # [4.1.0](https://github.com/untemps/svelte-palette/compare/v4.0.0...v4.1.0) (2024-02-29)
 

@@ -1,10 +1,13 @@
 {
 	"name": "@untemps/svelte-palette",
-	"version": "5.0.0",
+	"version": "5.0.0-beta.1",
 	"author": "Vincent Le Badezet <v.lebadezet@untemps.net>",
 	"license": "MIT",
 	"homepage": "https://svelte-palette.vercel.app",
-	"repository": "https://github.com/untemps/svelte-palette",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/untemps/svelte-palette.git"
+	},
 	"bugs": "https://github.com/untemps/svelte-palette/issues",
 	"description": "Svelte component to display a customisable color picker",
 	"keywords": [
@@ -40,9 +43,9 @@
 		"@commitlint/cli": "^19.3.0",
 		"@commitlint/config-conventional": "^19.2.2",
 		"@semantic-release/changelog": "^6.0.3",
-		"@semantic-release/exec": "^6.0.3",
+		"@semantic-release/exec": "^7.1.0",
 		"@semantic-release/git": "^10.0.1",
-		"@semantic-release/github": "^10.0.6",
+		"@semantic-release/github": "^12.0.6",
 		"@sveltejs/adapter-auto": "^3.2.2",
 		"@sveltejs/kit": "^2.5.16",
 		"@sveltejs/package": "^2.3.2",
@@ -60,7 +63,7 @@
 		"prettier": "^3.3.2",
 		"prettier-plugin-svelte": "^3.5.1",
 		"publint": "^0.2.8",
-		"semantic-release": "^24.0.0",
+		"semantic-release": "^25.0.3",
 		"svelte": "^5.53.5",
 		"tslib": "^2.6.3",
 		"typescript": "^5.4.5",
@@ -97,18 +100,7 @@
 			],
 			"@semantic-release/release-notes-generator",
 			"@semantic-release/changelog",
-			[
-				"@semantic-release/npm",
-				{
-					"npmPublish": false
-				}
-			],
-			[
-				"@semantic-release/exec",
-				{
-					"publishCmd": "npm publish --provenance --access public"
-				}
-			],
+			"@semantic-release/npm",
 			"@semantic-release/git",
 			[
 				"@semantic-release/github",
