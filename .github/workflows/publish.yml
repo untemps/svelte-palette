@@ -22,19 +22,6 @@ jobs:
             - run: yarn install
             - run: yarn test:ci
             - run: yarn build
-            - name: Exchange OIDC token for npm token
-              run: |
-                  OIDC_TOKEN=$(curl -sS \
-                    -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-                    "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=npm:registry.npmjs.org" \
-                    | jq -r '.value')
-                  NPM_TOKEN=$(curl -sS \
-                    -X POST \
-                    -H "Authorization: Bearer $OIDC_TOKEN" \
-                    "https://registry.npmjs.org/-/npm/v1/oidc/token/exchange/package/%40untemps%2fsvelte-palette" \
-                    | jq -r '.token')
-                  echo "::add-mask::$NPM_TOKEN"
-                  echo "NPM_TOKEN=$NPM_TOKEN" >> $GITHUB_ENV
             - run: npx semantic-release
               env:
                   GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
