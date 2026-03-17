@@ -48,9 +48,11 @@ export const calculateNumColumns = ($colorLength, $params, $options) => {
 	if (!!$params.isCompact) {
 		return Math.min($colorLength, +$params.compactColorIndices?.length + +$params.showTransparentSlot)
 	}
-	return $params.numColumns > 0
-		? Math.max($params.numColumns, 0)
-		: Math.max($colorLength, $options?.minNumColumns ?? MIN_NUM_COLUMNS)
+	if ($params.numColumns > 0) {
+		return Math.max($params.numColumns, 0)
+	}
+	const cols = Math.max($colorLength, $options?.minNumColumns ?? MIN_NUM_COLUMNS)
+	return $params.maxColumns > 0 ? Math.min(cols, $params.maxColumns) : cols
 }
 
 export const COLOR_REGEX = /^#?(([0-9a-f]{2}){3,4}|([0-9a-f]){3})$/i
