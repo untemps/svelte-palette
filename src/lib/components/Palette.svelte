@@ -1,5 +1,4 @@
 <script>
-	// TODO: Manage maxNumColumns
 	import { untrack } from 'svelte'
 
 	import { calculateColors, calculateNumColumns } from '../utils/utils.js'
@@ -31,6 +30,7 @@
 		showInput = false,
 		inputType = 'text',
 		numColumns = 5,
+		maxColumns = 0,
 		transition = null,
 		onselect = undefined,
 		class: className = '',
@@ -74,6 +74,7 @@
 					compactColorIndices,
 					showTransparentSlot,
 					numColumns,
+					maxColumns,
 				})
 			}
 		})
@@ -98,6 +99,7 @@
 			compactColorIndices,
 			showTransparentSlot,
 			numColumns,
+			maxColumns,
 		})
 	}
 
