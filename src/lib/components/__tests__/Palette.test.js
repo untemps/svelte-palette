@@ -255,6 +255,22 @@ test.each([
 	await waitFor(() => expect(section.getAttribute('style')).toContain(`--num-columns: ${expected}`))
 })
 
+test('Updates num-columns when numColumns changes to 0', async () => {
+	const colors = Array.from({ length: 25 }, (_, i) => `#${String(i).padStart(6, '0')}`)
+
+	const { rerender } = setup(Palette, {
+		props: { colors, numColumns: 5 },
+	})
+
+	const content = await screen.findByRole('main')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 5'))
+
+	rerender({ colors, numColumns: 0 })
+
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 25'))
+})
+
 test('Removes duplicates when updating allowDuplicates value', async () => {
 	let slots = null
 	const colors = ['#ff0', '#0ff', '#f0f', '#f0f', '#f0f']

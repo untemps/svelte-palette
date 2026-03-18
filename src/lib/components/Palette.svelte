@@ -56,10 +56,14 @@
 	})
 
 	$effect(() => {
-		_numColumns = numColumns
+		if (numColumns > 0) {
+			_numColumns = numColumns
+		}
 	})
 
 	$effect(() => {
+		const _numCols = numColumns
+		const _maxCols = maxColumns
 		Promise.resolve(colors).then((results) => {
 			if (!!results) {
 				const newColors = calculateColors(results, {
@@ -73,8 +77,8 @@
 					isCompact: _isCompact,
 					compactColorIndices,
 					showTransparentSlot,
-					numColumns,
-					maxColumns,
+					numColumns: _numCols,
+					maxColumns: _maxCols,
 				})
 			}
 		})
