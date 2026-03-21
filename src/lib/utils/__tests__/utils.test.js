@@ -1,6 +1,13 @@
 import { describe, expect, test } from 'vitest'
 
-import { calculateColors, calculateNumColumns, isColorValid, transformColors } from '../utils.js'
+import {
+	calculateColorGroups,
+	calculateColors,
+	calculateNumColumns,
+	isColorGroups,
+	isColorValid,
+	transformColors,
+} from '../utils.js'
 
 describe('utils', () => {
 	describe('transformColors', () => {
@@ -148,6 +155,60 @@ describe('utils', () => {
 			[colorLength, { ...params, numColumns: -1 }, , colorLength],
 		])('colorLength:%j, params:%j, options:%j, expected:%j', (colorLength, params, options, expected) => {
 			expect(calculateNumColumns(colorLength, params, options)).toBe(expected)
+		})
+	})
+
+	describe('isColorGroups', () => {
+		test.each([
+			[[], false],
+			[['#ff0', '#0ff'], false],
+			[[{ value: '#ff0' }], false],
+			[[{ name: 'Yellows', colors: ['#ff0'] }], true],
+			[[{ colors: ['#ff0'] }, { name: 'Blues', colors: ['#00f'] }], true],
+			[null, false],
+			[undefined, false],
+			[1, false],
+		])('colors:%j, expected:%j', (colors, expected) => {
+			expect(isColorGroups(colors)).toBe(expected)
+		})
+	})
+
+	describe('calculateColorGroups', () => {
+		const params = {
+			isCompact: false,
+			compactColorIndices: [],
+			allowDuplicates: true,
+			maxColors: 5,
+		}
+
+		test.each([
+			[
+				[
+					{ name: 'Reds', colors: ['#f00', '#f11'] },
+					{ name: 'Blues', colors: ['#00f', '#11f'] },
+				],
+				params,
+				[
+					{ name: 'Reds', colors: [{ value: '#f00' }, { value: '#f11' }] },
+					{ name: 'Blues', colors: [{ value: '#00f' }, { value: '#11f' }] },
+				],
+			],
+			[[{ colors: ['#f00'] }], params, [{ colors: [{ value: '#f00' }] }]],
+			[
+				[{ name: 'Reds', colors: ['#f00', '#f00'] }, { colors: [] }],
+				{ ...params, allowDuplicates: false },
+				[{ name: 'Reds', colors: [{ value: '#f00' }] }, { colors: [] }],
+			],
+			[
+				[{ name: 'Reds', colors: ['#f00', '#f11', '#f22'] }],
+				{ ...params, maxColors: 2 },
+				[{ name: 'Reds', colors: [{ value: '#f00' }, { value: '#f11' }] }],
+			],
+			[[{ name: 'Reds' }, { colors: ['#f00'] }], params, [{ colors: [{ value: '#f00' }] }]],
+			[null, params, []],
+			[[], params, []],
+		])('groups:%j, params:%j, expected:%j', (groups, params, expected) => {
+			expect(calculateColorGroups(groups, params)).toEqual(expected)
 		})
 	})
 
