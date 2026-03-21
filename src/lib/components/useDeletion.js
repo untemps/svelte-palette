@@ -19,9 +19,15 @@ const createAction = (node, deletionMode, options) => {
 			})
 		}
 		case DROP: {
+			const slotButton = node.querySelector('[data-testid="__palette-slot__"]')
+			const dragImage = slotButton ? slotButton.cloneNode(true) : undefined
+			if (dragImage) {
+				dragImage.removeAttribute('data-testid')
+			}
 			return useDropOutside(node, {
 				areaSelector: '.palette',
 				animate: true,
+				dragImage,
 				onDropOutside: options.onDelete,
 			})
 		}
