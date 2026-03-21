@@ -24,6 +24,7 @@
 </script>
 
 <main class="example5" style="--bgColor:{selectedColor}">
+	<h1 class="title">Color Groups</h1>
 	<div class="content">
 		<Palette
 			class="palette__custom"
@@ -45,8 +46,20 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		flex-direction: column;
+		gap: 1em;
 		background-color: var(--bgColor);
 		transition: background-color 0.3s ease;
+	}
+
+	.example5 .title {
+		width: 100%;
+		max-width: 480px;
+		text-align: left;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		font-size: 0.65rem;
+		font-weight: 800;
 	}
 
 	.example5 .content {
@@ -59,10 +72,32 @@
 		border-radius: 0.5rem;
 	}
 
+	.example5 :global(.palette__groups__group) {
+		flex-direction: row;
+		align-items: center;
+	}
+
 	.example5 :global(.palette__groups__group__name) {
-		color: #666;
+		color: #fff;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 		font-size: 0.65rem;
+		width: 100px;
+		height: 50px;
+		background-color: #000;
+		border-radius: 0.5rem;
+	}
+
+	.example5 :global(.palette__cells) {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 1em;
+		border-radius: 0.5rem;
+		padding: 0 1em;
+		height: 50px;
 	}
 </style>
