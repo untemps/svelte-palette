@@ -108,10 +108,15 @@
   dependencies:
     "@babel/types" "^7.29.0"
 
-"@babel/runtime@^7.12.5", "@babel/runtime@^7.17.8", "@babel/runtime@^7.9.2":
+"@babel/runtime@^7.12.5", "@babel/runtime@^7.9.2":
   version "7.27.6"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.27.6.tgz#ec4070a04d76bae8ddbb10770ba55714a417b7c6"
   integrity sha512-vbavdySgbTTrmFE+EsiqUTzlOr5bzlnJtUv9PynGCAKvfQqjIXbvFdumPM/GxMDfyuGMJaJAU6TO4zc1Jf1i8Q==
+
+"@babel/runtime@^7.17.8":
+  version "7.29.2"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.29.2.tgz#9a6e2d05f4b6692e1801cd4fb176ad823930ed5e"
+  integrity sha512-JiDShH45zKHWyGe4ZNVRrCjBz8Nh9TMmZG1kh4QTK8hCBTWBi8Da+i7s1fJw7/lYpM4ccepSNfqzZ/QvABBi5g==
 
 "@babel/types@^7.25.4", "@babel/types@^7.29.0":
   version "7.29.0"
@@ -1252,13 +1257,12 @@
   integrity sha512-oZBj7j9hYSbuveNFvyPLamRfNh15KvGJC5pLGGpWVcO61EzISMESL0wudwP0UZETEu+0WfaJ16rGXtEZHsq+xw==
 
 "@untemps/svelte-use-drop-outside@^1.6.0":
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/@untemps/svelte-use-drop-outside/-/svelte-use-drop-outside-1.6.0.tgz#427937083d4dcb2ca9a10af52f93b475d92c28e6"
-  integrity sha512-izzpTG27DwMzx7QIIkt1S+Z5JAbzNAKn568JZWJXR1ZXWx6ZAJigj8oFlSDAVltlFjeasDPXPJSmGoXALgTw/A==
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/@untemps/svelte-use-drop-outside/-/svelte-use-drop-outside-1.7.0.tgz#e77fdce30a369f653afdac23bb2edbc4e6469e8b"
+  integrity sha512-pOvBa0+hL/rVKEzclq7TBoHB8Ai+p9+D8/vqW7MHmtxR/ZdX5+aS8zuCK7ZulUfwVTs03NC3S+XDxg2OgAfK2w==
   dependencies:
     "@untemps/dom-observer" "^2.0.0"
-    "@untemps/utils" "^2.0.0"
-    svelte "3.49.0"
+    "@untemps/utils" "3"
 
 "@untemps/svelte-use-tooltip@^2.8.0":
   version "2.8.0"
@@ -1269,17 +1273,17 @@
     "@untemps/utils" "^2.4.0"
     svelte "3.49.0"
 
-"@untemps/utils@^2.0.0", "@untemps/utils@^2.4.0":
+"@untemps/utils@3", "@untemps/utils@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@untemps/utils/-/utils-3.0.0.tgz#0f1968be1c2b079b2425e945e42bc7d61f0d776e"
+  integrity sha512-Iv7a1nvbTzk7ho8bry5iN/RYtns4dwNRuTqD49ixq0N3dOpoMIdSlhvVanbxEmRBqtV7MirCBEfScpTjDbo0ag==
+
+"@untemps/utils@^2.4.0":
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/@untemps/utils/-/utils-2.6.0.tgz#986fe9846d664c29b5c0dca84cb4f8b4112987e3"
   integrity sha512-3B5bb4iYkh2h86vqtY8+Mo9vdX1s/NT1cltWpS4U3/WHXFgy/4lJ9180vELJv01MbNNhjlZPtJCMtBp7Fpsb1Q==
   dependencies:
     "@babel/runtime" "^7.17.8"
-
-"@untemps/utils@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@untemps/utils/-/utils-3.0.0.tgz#0f1968be1c2b079b2425e945e42bc7d61f0d776e"
-  integrity sha512-Iv7a1nvbTzk7ho8bry5iN/RYtns4dwNRuTqD49ixq0N3dOpoMIdSlhvVanbxEmRBqtV7MirCBEfScpTjDbo0ag==
 
 "@vitest/coverage-v8@^2.0.0":
   version "2.1.9"

@@ -28,6 +28,7 @@ const createAction = (node, deletionMode, options) => {
 				areaSelector: '.palette',
 				animate: true,
 				dragImage,
+				dragHandleCentered: true,
 				onDropOutside: options.onDelete,
 			})
 		}
