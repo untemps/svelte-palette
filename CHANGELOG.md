@@ -1,3 +1,9 @@
+## [5.1.1](https://github.com/untemps/svelte-palette/compare/v5.1.0...v5.1.1) (2026-03-26)
+
+### Bug Fixes
+
+-   Restore drag placeholder visibility in drop deletion mode ([#145](https://github.com/untemps/svelte-palette/issues/145)) ([93fc18c](https://github.com/untemps/svelte-palette/commit/93fc18c86d98fedd294a975f3076e1759c57c119))
+
 # [5.1.0](https://github.com/untemps/svelte-palette/compare/v5.0.1...v5.1.0) (2026-03-26)
 
 ### Features
