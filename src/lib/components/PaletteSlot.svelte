@@ -1,4 +1,9 @@
-<script>
+<script lang="ts">
+	type TransitionConfig = {
+		fn: (node: Element, args?: Record<string, unknown>) => unknown
+		args?: Record<string, unknown>
+	}
+
 	let {
 		color = null,
 		selected = false,
@@ -6,11 +11,18 @@
 		transition = null,
 		onselect = undefined,
 		...restProps
+	}: {
+		color?: string | null
+		selected?: boolean
+		disabled?: boolean
+		transition?: TransitionConfig | null
+		onselect?: (event: { color: string | null }) => void
+		[key: string]: unknown
 	} = $props()
 
-	const enter = (node) => transition?.fn(node, transition?.args)
+	const enter = (node: Element) => transition?.fn(node, transition?.args)
 
-	const _onClick = (e) => {
+	const _onClick = (e: MouseEvent): void => {
 		e.preventDefault()
 		!disabled && onselect?.({ color })
 	}

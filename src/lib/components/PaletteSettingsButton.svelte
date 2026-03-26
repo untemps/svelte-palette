@@ -1,9 +1,15 @@
-<script>
+<script lang="ts">
 	import { SETTINGS } from '../enums/PaletteIcon'
 
 	import PaletteIconButton from './PaletteIconButton.svelte'
 
-	let { onclick = undefined, ...restProps } = $props()
+	let {
+		onclick = undefined,
+		...restProps
+	}: {
+		onclick?: () => void
+		[key: string]: unknown
+	} = $props()
 </script>
 
 <PaletteIconButton

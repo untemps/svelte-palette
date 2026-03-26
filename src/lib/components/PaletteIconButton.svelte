@@ -1,5 +1,7 @@
-<script>
+<script lang="ts">
+	import type { Component } from 'svelte'
 	import { COMPACT, ENLARGE, EYE_DROPPER, PLUS, SETTINGS, TRASH } from '../enums/PaletteIcon'
+	import type { PaletteIcon } from '../enums/PaletteIcon'
 
 	import CompactIcon from './icons/CompactIcon.svelte'
 	import EnlargeIcon from './icons/EnlargeIcon.svelte'
@@ -8,9 +10,21 @@
 	import TrashIcon from './icons/TrashIcon.svelte'
 	import SettingsIcon from './icons/SettingsIcon.svelte'
 
-	let { icon = null, isActive = false, class: className = '', onclick, ...restProps } = $props()
+	let {
+		icon = null,
+		isActive = false,
+		class: className = '',
+		onclick,
+		...restProps
+	}: {
+		icon?: PaletteIcon | null
+		isActive?: boolean
+		class?: string
+		onclick?: () => void
+		[key: string]: unknown
+	} = $props()
 
-	const ICONS = {
+	const ICONS: Record<PaletteIcon, Component> = {
 		[COMPACT]: CompactIcon,
 		[ENLARGE]: EnlargeIcon,
 		[EYE_DROPPER]: EyeDropperIcon,

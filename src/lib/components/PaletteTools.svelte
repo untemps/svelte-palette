@@ -1,17 +1,25 @@
-<script>
+<script lang="ts">
+	import type { Component } from 'svelte'
 	import { COMPACT, SETTINGS } from '../enums/PaletteTool'
+	import type { PaletteTool } from '../enums/PaletteTool'
 
 	import PaletteCompactToggleButton from './PaletteCompactToggleButton.svelte'
 	import PaletteSettingsButton from './PaletteSettingsButton.svelte'
 
-	let { tools = [], onselect = undefined } = $props()
+	let {
+		tools = [],
+		onselect = undefined,
+	}: {
+		tools?: PaletteTool[]
+		onselect?: (event: { tool: PaletteTool }) => void
+	} = $props()
 
-	const TOOL_BUTTONS = {
+	const TOOL_BUTTONS: Record<PaletteTool, Component> = {
 		[COMPACT]: PaletteCompactToggleButton,
 		[SETTINGS]: PaletteSettingsButton,
 	}
 
-	const _selectTool = (index) => {
+	const _selectTool = (index: number): void => {
 		onselect?.({ tool: tools[index] })
 	}
 </script>

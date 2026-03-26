@@ -1,7 +1,17 @@
-<script>
+<script lang="ts">
 	import TrashIcon from './icons/TrashIcon.svelte'
 
-	let { isActive = false, class: className = '', onclick = undefined, ...restProps } = $props()
+	let {
+		isActive = false,
+		class: className = '',
+		onclick = undefined,
+		...restProps
+	}: {
+		isActive?: boolean
+		class?: string
+		onclick?: () => void
+		[key: string]: unknown
+	} = $props()
 </script>
 
 <button

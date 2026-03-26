@@ -1,8 +1,16 @@
-<script>
+<script lang="ts">
 	import { COMPACT, ENLARGE } from '../enums/PaletteIcon'
 	import PaletteIconButton from './PaletteIconButton.svelte'
 
-	let { isCompact = false, onclick = undefined, ...restProps } = $props()
+	let {
+		isCompact = false,
+		onclick = undefined,
+		...restProps
+	}: {
+		isCompact?: boolean
+		onclick?: () => void
+		[key: string]: unknown
+	} = $props()
 </script>
 
 <PaletteIconButton

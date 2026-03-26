@@ -1,6 +1,9 @@
-<script module>
-	export const usePortal = (node, { target = 'body', visible = false }) => {
-		const getTargetEl = (selector) => {
+<script module lang="ts">
+	export const usePortal = (
+		node: HTMLElement,
+		{ target = 'body', visible = false }: { target?: string; visible?: boolean }
+	) => {
+		const getTargetEl = (selector: string): Element | null => {
 			if (!!selector) {
 				return document.querySelector(selector)
 			}
@@ -21,7 +24,13 @@
 		visible ? show() : hide()
 
 		return {
-			update: ({ target: newTarget = target, visible: newVisible = visible }) => {
+			update: ({
+				target: newTarget = target,
+				visible: newVisible = visible,
+			}: {
+				target?: string
+				visible?: boolean
+			}) => {
 				if (newTarget !== target) {
 					targetEl = getTargetEl(newTarget)
 				}
@@ -36,8 +45,18 @@
 	}
 </script>
 
-<script>
-	let { target = 'body', isVisible = false, children } = $props()
+<script lang="ts">
+	import type { Snippet } from 'svelte'
+
+	let {
+		target = 'body',
+		isVisible = false,
+		children,
+	}: {
+		target?: string
+		isVisible?: boolean
+		children?: Snippet
+	} = $props()
 </script>
 
 <section
