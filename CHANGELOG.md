@@ -1,3 +1,9 @@
+# [5.2.0](https://github.com/untemps/svelte-palette/compare/v5.1.1...v5.2.0) (2026-03-26)
+
+### Features
+
+-   Add color groups support ([#144](https://github.com/untemps/svelte-palette/issues/144)) ([6bb199d](https://github.com/untemps/svelte-palette/commit/6bb199dfd76eb3986fd77ed7bed14d8c4c0b6d2f))
+
 ## [5.1.1](https://github.com/untemps/svelte-palette/compare/v5.1.0...v5.1.1) (2026-03-26)
 
 ### Bug Fixes
