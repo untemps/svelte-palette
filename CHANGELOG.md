@@ -1,3 +1,9 @@
+## [5.0.1](https://github.com/untemps/svelte-palette/compare/v5.0.0...v5.0.1) (2026-03-26)
+
+### Bug Fixes
+
+-   Normalize rgb/rgba output from EyeDropper API ([#141](https://github.com/untemps/svelte-palette/issues/141)) ([509bc38](https://github.com/untemps/svelte-palette/commit/509bc38655e141a9369593479b4112b2f1c05239))
+
 # [5.0.0](https://github.com/untemps/svelte-palette/compare/v4.1.0...v5.0.0) (2026-03-16)
 
 -   feat!: Migrate to Svelte 5 ([e9551d6](https://github.com/untemps/svelte-palette/commit/e9551d60ad7d717be8dac94d4719adbe0914672c))
