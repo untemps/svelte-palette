@@ -1,5 +1,4 @@
 <script>
-	// TODO: Manage maxNumColumns
 	import { untrack } from 'svelte'
 
 	import { calculateColorGroups, calculateColors, calculateNumColumns, isColorGroups } from '../utils/utils.js'
@@ -31,6 +30,7 @@
 		showInput = false,
 		inputType = 'text',
 		numColumns = 5,
+		maxColumns = 0,
 		transition = null,
 		onselect = undefined,
 		class: className = '',
@@ -57,10 +57,14 @@
 	})
 
 	$effect(() => {
-		_numColumns = numColumns
+		if (numColumns > 0) {
+			_numColumns = numColumns
+		}
 	})
 
 	$effect(() => {
+		const _numCols = numColumns
+		const _maxCols = maxColumns
 		Promise.resolve(colors).then((results) => {
 			if (!!results) {
 				if (isColorGroups(results)) {
@@ -71,7 +75,7 @@
 					_colorGroups = newColorGroups
 					_colors = null
 					const maxGroupLength = newColorGroups.reduce((max, g) => Math.max(max, g.colors.length), 0)
-					_numColumns = calculateNumColumns(maxGroupLength, { numColumns })
+					_numColumns = calculateNumColumns(maxGroupLength, { numColumns: _numCols })
 				} else {
 					const newColors = calculateColors(results, {
 						isCompact: _isCompact,
@@ -85,7 +89,8 @@
 						isCompact: _isCompact,
 						compactColorIndices,
 						showTransparentSlot,
-						numColumns,
+						numColumns: _numCols,
+						maxColumns: _maxCols,
 					})
 				}
 			}
@@ -114,6 +119,7 @@
 			compactColorIndices,
 			showTransparentSlot,
 			numColumns,
+			maxColumns,
 		})
 	}
 

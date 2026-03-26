@@ -71,6 +71,7 @@
 	let showCompactControl = $state(true)
 	let numColumns = $state(5)
 	let maxNumColumns = $state(10)
+	let maxColumns = $state(0)
 	let transitionType = $state('custom')
 
 	unique = {}
@@ -114,6 +115,7 @@
 					{showInput}
 					{inputType}
 					{numColumns}
+					{maxColumns}
 					transition={transitions[transitionType]}
 					onselect={({ color }) => {
 						bgColor = color
@@ -160,6 +162,16 @@
 										max={maxNumColumns}
 										step={1}
 										bind:value={numColumns}
+									/>
+									<hr class="settings__space" />
+									<Slider
+										labelText="Maximum Number of Columns"
+										fullWidth
+										min={0}
+										max={maxNumColumns}
+										step={1}
+										disabled={numColumns > 0}
+										bind:value={maxColumns}
 									/>
 									<hr class="settings__space" />
 									<Slider

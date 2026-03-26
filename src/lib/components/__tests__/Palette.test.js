@@ -299,6 +299,39 @@ test('Deletes color slot in group mode when deletionMode is tooltip', async () =
 	expect(cells).toHaveLength(3)
 })
 
+test.each([
+	[0, 8, 8],
+	[0, 30, 25],
+	[0, 0, 25],
+	[5, 3, 5],
+])('Sets num-columns according to numColumns and maxColumns values', async (numColumns, maxColumns, expected) => {
+	const colors = Array.from({ length: 25 }, (_, i) => `#${String(i).padStart(6, '0')}`)
+
+	setup(Palette, {
+		props: { colors, numColumns, maxColumns },
+	})
+
+	const content = await screen.findByRole('main')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain(`--num-columns: ${expected}`))
+})
+
+test('Updates num-columns when numColumns changes to 0', async () => {
+	const colors = Array.from({ length: 25 }, (_, i) => `#${String(i).padStart(6, '0')}`)
+
+	const { rerender } = setup(Palette, {
+		props: { colors, numColumns: 5 },
+	})
+
+	const content = await screen.findByRole('main')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 5'))
+
+	rerender({ colors, numColumns: 0 })
+
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 25'))
+})
+
 test('Removes duplicates when updating allowDuplicates value', async () => {
 	let slots = null
 	const colors = ['#ff0', '#0ff', '#f0f', '#f0f', '#f0f']

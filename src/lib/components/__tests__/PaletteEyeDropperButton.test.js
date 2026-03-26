@@ -38,6 +38,28 @@ test('Retrieves color from EyeDropper selection', async () => {
 	await waitFor(() => expect(onAdd).toHaveBeenCalledWith({ color: '#ff0' }))
 })
 
+test('Normalizes rgb color from EyeDropper selection to hex', async () => {
+	window.EyeDropper = function () {
+		this.open = () => Promise.resolve({ sRGBHex: 'rgb(255, 0, 0)' })
+	}
+	const onAdd = vi.fn()
+	const { user } = setup(PaletteEyeDropperButton, { props: { onadd: onAdd } })
+	const button = screen.getByTestId('__palette-eyedropper-button__')
+	await user.click(button)
+	await waitFor(() => expect(onAdd).toHaveBeenCalledWith({ color: '#ff0000' }))
+})
+
+test('Normalizes rgba color from EyeDropper selection to hex', async () => {
+	window.EyeDropper = function () {
+		this.open = () => Promise.resolve({ sRGBHex: 'rgba(0, 128, 0, 1)' })
+	}
+	const onAdd = vi.fn()
+	const { user } = setup(PaletteEyeDropperButton, { props: { onadd: onAdd } })
+	const button = screen.getByTestId('__palette-eyedropper-button__')
+	await user.click(button)
+	await waitFor(() => expect(onAdd).toHaveBeenCalledWith({ color: '#008000' }))
+})
+
 // EyeDropper API is invalid
 test('Throws error', async () => {
 	window.EyeDropper = function () {

@@ -6,6 +6,7 @@ import {
 	calculateNumColumns,
 	isColorGroups,
 	isColorValid,
+	normalizeColor,
 	transformColors,
 } from '../utils.js'
 
@@ -153,6 +154,10 @@ describe('utils', () => {
 			[colorLength, null, , 1],
 			[-1, null, , 1],
 			[colorLength, { ...params, numColumns: -1 }, , colorLength],
+			[colorLength, { ...params, numColumns: 0, maxColumns: 10 }, , 10],
+			[colorLength, { ...params, numColumns: 0, maxColumns: 30 }, , colorLength],
+			[colorLength, { ...params, numColumns: 0, maxColumns: 0 }, , colorLength],
+			[colorLength, { ...params, numColumns: 5, maxColumns: 3 }, , params.numColumns],
 		])('colorLength:%j, params:%j, options:%j, expected:%j', (colorLength, params, options, expected) => {
 			expect(calculateNumColumns(colorLength, params, options)).toBe(expected)
 		})
@@ -209,6 +214,19 @@ describe('utils', () => {
 			[[], params, []],
 		])('groups:%j, params:%j, expected:%j', (groups, params, expected) => {
 			expect(calculateColorGroups(groups, params)).toEqual(expected)
+		})
+	})
+
+	describe('normalizeColor', () => {
+		test.each([
+			['#ff0', '#ff0'],
+			['#ff0000', '#ff0000'],
+			['rgb(255, 0, 0)', '#ff0000'],
+			['rgba(255, 0, 0, 1)', '#ff0000'],
+			['rgb(0,128,0)', '#008000'],
+			['not-a-color', 'not-a-color'],
+		])('color:%j, expected:%j', (color, expected) => {
+			expect(normalizeColor(color)).toBe(expected)
 		})
 	})
 

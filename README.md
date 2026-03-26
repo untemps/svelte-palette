@@ -76,6 +76,7 @@ yarn add @untemps/svelte-palette
 | `showInput`              | boolean                                                                                                 | false   | Flag to display the input within the footer slot.                                                                                                                                                         |
 | `inputType`              | string                                                                                                  | "text"  | Type of the input within the footer slot. Only "text" and "color" are allowed. All other value will be replaced by "text".                                                                                |
 | `numColumns`             | number                                                                                                  | 5       | Number of columns of the palette grid. This value can't exceed the number of maximum colors defined in `maxColors` and can't be lower than 1. Set this value to `0` to display the slots on a single row. |
+| `maxColumns`             | number                                                                                                  | 0       | Maximum number of columns when `numColumns` is set to `0`. Once reached, additional slots wrap to a new row. Set this value to `0` to allow unlimited columns.                                            |
 | `transition`             | object                                                                                                  | null    | Animation when a slot is rendered (see [Transition](#transition)).                                                                                                                                        |
 
 ## Callbacks
@@ -302,6 +303,8 @@ The tool allows to pick a color from the screen.
 Once selected, the color is inserted in the input waiting for the user to submit and adding it to the palette.
 
 If the API is not available, nothing will be rendered.
+
+> **Browser compatibility note:** The EyeDropper API specification defines `sRGBHex` as returning a hexadecimal color string (e.g. `#rrggbb`). However, some browsers return an `rgb()` or `rgba()` string instead. The component normalizes the value to hex format automatically.
 
 > The PaletteEyeDropper component can be used on its own anywhere within a snippet or in an external component as it is exported from this lib.
 

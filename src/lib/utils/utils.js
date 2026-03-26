@@ -48,9 +48,11 @@ export const calculateNumColumns = ($colorLength, $params, $options) => {
 	if (!!$params.isCompact) {
 		return Math.min($colorLength, +$params.compactColorIndices?.length + +$params.showTransparentSlot)
 	}
-	return $params.numColumns > 0
-		? Math.max($params.numColumns, 0)
-		: Math.max($colorLength, $options?.minNumColumns ?? MIN_NUM_COLUMNS)
+	if ($params.numColumns > 0) {
+		return Math.max($params.numColumns, 0)
+	}
+	const cols = Math.max($colorLength, $options?.minNumColumns ?? MIN_NUM_COLUMNS)
+	return $params.maxColumns > 0 ? Math.min(cols, $params.maxColumns) : cols
 }
 
 export const isColorGroups = ($colors) => {
@@ -73,4 +75,14 @@ export const COLOR_REGEX = /^#?(([0-9a-f]{2}){3,4}|([0-9a-f]){3})$/i
 
 export const isColorValid = ($color) => {
 	return COLOR_REGEX.test($color)
+}
+
+export const normalizeColor = ($color) => {
+	if (isColorValid($color)) return $color
+	const match = $color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/)
+	if (match) {
+		const [, r, g, b] = match
+		return `#${[r, g, b].map((v) => parseInt(v).toString(16).padStart(2, '0')).join('')}`
+	}
+	return $color
 }
