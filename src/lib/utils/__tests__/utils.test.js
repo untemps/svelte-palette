@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import { calculateColors, calculateNumColumns, isColorValid, transformColors } from '../utils.js'
+import { calculateColors, calculateNumColumns, isColorValid, normalizeColor, transformColors } from '../utils.js'
 
 describe('utils', () => {
 	describe('transformColors', () => {
@@ -148,6 +148,19 @@ describe('utils', () => {
 			[colorLength, { ...params, numColumns: -1 }, , colorLength],
 		])('colorLength:%j, params:%j, options:%j, expected:%j', (colorLength, params, options, expected) => {
 			expect(calculateNumColumns(colorLength, params, options)).toBe(expected)
+		})
+	})
+
+	describe('normalizeColor', () => {
+		test.each([
+			['#ff0', '#ff0'],
+			['#ff0000', '#ff0000'],
+			['rgb(255, 0, 0)', '#ff0000'],
+			['rgba(255, 0, 0, 1)', '#ff0000'],
+			['rgb(0,128,0)', '#008000'],
+			['not-a-color', 'not-a-color'],
+		])('color:%j, expected:%j', (color, expected) => {
+			expect(normalizeColor(color)).toBe(expected)
 		})
 	})
 

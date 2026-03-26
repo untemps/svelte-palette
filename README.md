@@ -284,6 +284,8 @@ Once selected, the color is inserted in the input waiting for the user to submit
 
 If the API is not available, nothing will be rendered.
 
+> **Browser compatibility note:** The EyeDropper API specification defines `sRGBHex` as returning a hexadecimal color string (e.g. `#rrggbb`). However, some browsers return an `rgb()` or `rgba()` string instead. The component normalizes the value to hex format automatically.
+
 > The PaletteEyeDropper component can be used on its own anywhere within a snippet or in an external component as it is exported from this lib.
 
 ## Transition
