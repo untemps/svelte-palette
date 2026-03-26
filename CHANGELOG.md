@@ -1,3 +1,9 @@
+# [5.1.0](https://github.com/untemps/svelte-palette/compare/v5.0.1...v5.1.0) (2026-03-26)
+
+### Features
+
+-   Add maxColumns prop to limit columns in auto-expanding mode ([#142](https://github.com/untemps/svelte-palette/issues/142)) ([efa4c1f](https://github.com/untemps/svelte-palette/commit/efa4c1fb933df4424afd10a59e097039bfc3a678))
+
 ## [5.0.1](https://github.com/untemps/svelte-palette/compare/v5.0.0...v5.0.1) (2026-03-26)
 
 ### Bug Fixes
