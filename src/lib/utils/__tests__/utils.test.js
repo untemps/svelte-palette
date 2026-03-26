@@ -8,7 +8,7 @@ import {
 	isColorValid,
 	normalizeColor,
 	transformColors,
-} from '../utils.js'
+} from '../utils'
 
 describe('utils', () => {
 	describe('transformColors', () => {

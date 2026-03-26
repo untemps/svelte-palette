@@ -1,7 +1,7 @@
 <script>
 	import { EYE_DROPPER } from '../enums/PaletteIcon'
 	import PaletteIconButton from './PaletteIconButton.svelte'
-	import { normalizeColor } from '../utils/utils.js'
+	import { normalizeColor } from '../utils/utils'
 
 	let { onadd = undefined, onerror = undefined, ...restProps } = $props()
 

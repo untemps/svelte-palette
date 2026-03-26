@@ -1,7 +1,7 @@
 <script>
 	import { untrack } from 'svelte'
 
-	import { calculateColorGroups, calculateColors, calculateNumColumns, isColorGroups } from '../utils/utils.js'
+	import { calculateColorGroups, calculateColors, calculateNumColumns, isColorGroups } from '../utils/utils'
 
 	import { NONE } from '../enums/PaletteDeletionMode'
 	import { COMPACT, SETTINGS } from '$lib/enums/PaletteTool'
