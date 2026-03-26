@@ -1,7 +1,7 @@
 <script>
 	import { untrack } from 'svelte'
 
-	import { calculateColors, calculateNumColumns } from '../utils/utils.js'
+	import { calculateColorGroups, calculateColors, calculateNumColumns, isColorGroups } from '../utils/utils.js'
 
 	import { NONE } from '../enums/PaletteDeletionMode'
 	import { COMPACT, SETTINGS } from '$lib/enums/PaletteTool.js'
@@ -47,6 +47,7 @@
 	} = $props()
 
 	let _colors = $state(null)
+	let _colorGroups = $state(null)
 	let _numColumns = $state(untrack(() => numColumns))
 	let _isSettingsOn = $state(false)
 	let _isCompact = $state(untrack(() => isCompact))
@@ -66,25 +67,40 @@
 		const _maxCols = maxColumns
 		Promise.resolve(colors).then((results) => {
 			if (!!results) {
-				const newColors = calculateColors(results, {
-					isCompact: _isCompact,
-					compactColorIndices,
-					allowDuplicates,
-					maxColors,
-				})
-				_colors = newColors
-				_numColumns = calculateNumColumns(newColors.length, {
-					isCompact: _isCompact,
-					compactColorIndices,
-					showTransparentSlot,
-					numColumns: _numCols,
-					maxColumns: _maxCols,
-				})
+				if (isColorGroups(results)) {
+					const newColorGroups = calculateColorGroups(results, {
+						allowDuplicates,
+						maxColors,
+					})
+					_colorGroups = newColorGroups
+					_colors = null
+					const maxGroupLength = newColorGroups.reduce((max, g) => Math.max(max, g.colors.length), 0)
+					_numColumns = calculateNumColumns(maxGroupLength, { numColumns: _numCols })
+				} else {
+					const newColors = calculateColors(results, {
+						isCompact: _isCompact,
+						compactColorIndices,
+						allowDuplicates,
+						maxColors,
+					})
+					_colors = newColors
+					_colorGroups = null
+					_numColumns = calculateNumColumns(newColors.length, {
+						isCompact: _isCompact,
+						compactColorIndices,
+						showTransparentSlot,
+						numColumns: _numCols,
+						maxColumns: _maxCols,
+					})
+				}
 			}
 		})
 	})
 
-	let _tools = $derived([...(compactColorIndices?.length ? [COMPACT] : []), ...(settings ? [SETTINGS] : [])])
+	let _tools = $derived([
+		...(_colorGroups == null && compactColorIndices?.length ? [COMPACT] : []),
+		...(settings ? [SETTINGS] : []),
+	])
 
 	const _selectColor = (color) => {
 		selectedColor = color
@@ -108,6 +124,12 @@
 	}
 
 	const _removeColor = (index) => (_colors = _colors.filter((c, i) => i !== index))
+
+	const _removeGroupColor = (groupIndex, colorIndex) => {
+		_colorGroups = _colorGroups.map((group, gi) =>
+			gi === groupIndex ? { ...group, colors: group.colors.filter((_, ci) => ci !== colorIndex) } : group
+		)
+	}
 
 	const _onSlotSelect = ({ color }) => _selectColor(color)
 
@@ -143,7 +165,52 @@
 		{#if !_isCompact}
 			{@render header?.({ selectedColor })}
 		{/if}
-		{#if !!_colors}
+		{#if !!_colorGroups}
+			<div class="palette__groups">
+				{#each _colorGroups as group, groupIndex}
+					<div class="palette__groups__group" data-testid="__palette-group__">
+						{#if group.name}
+							<p class="palette__groups__group__name" data-testid="__palette-group-name__">
+								{group.name}
+							</p>
+						{/if}
+						<ul class="palette__cells">
+							{#each group.colors as color, colorIndex (`${color.value}_${colorIndex}`)}
+								<li
+									data-testid="__palette-cell__"
+									class="palette__cells__cell"
+									use:useDeletion={{
+										deletionMode,
+										onDelete: () => _removeGroupColor(groupIndex, colorIndex),
+										tooltipContentSelector,
+										tooltipClassName,
+									}}
+								>
+									{#if colorSlot}
+										{@render colorSlot({
+											color: color.value,
+											colorName: color.name,
+											groupName: group.name,
+											selectedColor,
+											transition,
+											isCompact: false,
+											index: colorIndex,
+										})}
+									{:else}
+										<PaletteSlot
+											color={color.value}
+											selected={color === selectedColor}
+											{transition}
+											onselect={_onSlotSelect}
+										/>
+									{/if}
+								</li>
+							{/each}
+						</ul>
+					</div>
+				{/each}
+			</div>
+		{:else if !!_colors}
 			<ul class="palette__cells">
 				{#if beforeSlot}
 					{@render beforeSlot({ selectedColor, transition, isCompact: _isCompact })}
@@ -287,5 +354,25 @@
 	.palette__content.palette__content--compact > .palette__cells {
 		grid-template-columns: repeat(var(--num-columns), minmax(1.5rem, 1fr));
 		column-gap: 0;
+	}
+
+	.palette__groups {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.palette__groups__group {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.palette__groups__group__name {
+		font-size: 0.75rem;
+		font-weight: 600;
+		margin: 0;
 	}
 </style>

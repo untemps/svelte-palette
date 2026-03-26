@@ -238,6 +238,67 @@ test('Closes settings panel when onClose is called', async () => {
 	await waitFor(() => expect(panel).not.toHaveClass('palette__settings__panel--visible'))
 })
 
+test('Displays groups with their names and color slots', async () => {
+	const colors = [
+		{ name: 'Reds', colors: ['#f00', '#f11', '#f22'] },
+		{ name: 'Blues', colors: ['#00f', '#11f'] },
+	]
+
+	setup(Palette, { props: { colors } })
+
+	const groups = await screen.findAllByTestId('__palette-group__')
+	expect(groups).toHaveLength(2)
+
+	const names = await screen.findAllByTestId('__palette-group-name__')
+	expect(names[0]).toHaveTextContent('Reds')
+	expect(names[1]).toHaveTextContent('Blues')
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(5)
+})
+
+test('Does not display group name when group has no name', async () => {
+	const colors = [{ colors: ['#f00', '#0f0'] }]
+
+	setup(Palette, { props: { colors } })
+
+	await screen.findAllByTestId('__palette-group__')
+	expect(screen.queryByTestId('__palette-group-name__')).toBeNull()
+})
+
+test('Triggers select with color in group mode', async () => {
+	const onSelect = vi.fn()
+	const colors = [
+		{ name: 'Reds', colors: ['#f00', '#f11'] },
+		{ name: 'Blues', colors: ['#00f'] },
+	]
+
+	const { user } = setup(Palette, { props: { colors, onselect: onSelect } })
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.click(cells[0].firstChild)
+
+	expect(onSelect).toHaveBeenCalledWith({ color: '#f00' })
+})
+
+test('Deletes color slot in group mode when deletionMode is tooltip', async () => {
+	const colors = [
+		{ name: 'Reds', colors: ['#f00', '#f11', '#f22'] },
+		{ name: 'Blues', colors: ['#00f'] },
+	]
+
+	const { user } = setup(Palette, { props: { colors, deletionMode: TOOLTIP } })
+
+	let cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[0])
+
+	const trash = await screen.findByTestId('__trash-icon__')
+	await user.click(trash)
+
+	cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+})
+
 test.each([
 	[0, 8, 8],
 	[0, 30, 25],

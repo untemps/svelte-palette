@@ -61,23 +61,23 @@ yarn add @untemps/svelte-palette
 
 ## API
 
-| Props                    | Type                                                           | Default | Description                                                                                                                                                                                               |
-| ------------------------ | -------------------------------------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `colors`                 | string[] or Promise<string[]> or object[] or Promise<object[]> | []      | Array of colors to be displayed in the palette. See more about colors in the [Colors Setting](#colors-setting) section                                                                                    |
-| `selectedColor`          | string                                                         | null    | Default selected color. The color must be included in the `colors` prop. Supports `bind:selectedColor`.                                                                                                   |
-| `isCompact`              | boolean                                                        | false   | Flag to display the palette in compact mode.                                                                                                                                                              |
-| `compactColorIndices`    | number[]                                                       | []      | Array of indices to pick from the `colors` array to be displayed in the compacted palette (see [Compact Mode](#compact-mode)).                                                                            |
-| `allowDuplicates`        | boolean                                                        | false   | Flag to allow color duplication.                                                                                                                                                                          |
-| `deletionMode`           | string                                                         | "none"  | Mode of slot deletion, between `"none"` and `"tooltip"` and `"drop"` (see [Deletion Modes](#deletion-modes)).                                                                                             |
-| `tooltipClassName`       | string                                                         | null    | Class name to pass down to the deletion tooltip (see [Styles](#styles)).                                                                                                                                  |
-| `tooltipContentSelector` | string                                                         | null    | Selector of the deletion tooltip content (see [Customize the Content of the Deletion Tooltip](#customize-the-content-of-the-deletion-tooltip)).                                                           |
-| `showTransparentSlot`    | boolean                                                        | false   | Flag to display a transparent slot at the start of the slot list.                                                                                                                                         |
-| `maxColors`              | number                                                         | 30      | Maximum number of slots to be displayed in the palette. Set this value to `-1` to allow infinite number of slots.                                                                                         |
-| `showInput`              | boolean                                                        | false   | Flag to display the input within the footer slot.                                                                                                                                                         |
-| `inputType`              | string                                                         | "text"  | Type of the input within the footer slot. Only "text" and "color" are allowed. All other value will be replaced by "text".                                                                                |
-| `numColumns`             | number                                                         | 5       | Number of columns of the palette grid. This value can't exceed the number of maximum colors defined in `maxColors` and can't be lower than 1. Set this value to `0` to display the slots on a single row. |
-| `maxColumns`             | number                                                         | 0       | Maximum number of columns when `numColumns` is set to `0`. Once reached, additional slots wrap to a new row. Set this value to `0` to allow unlimited columns.                                            |
-| `transition`             | object                                                         | null    | Animation when a slot is rendered (see [Transition](#transition)).                                                                                                                                        |
+| Props                    | Type                                                                                                    | Default | Description                                                                                                                                                                                               |
+| ------------------------ | ------------------------------------------------------------------------------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `colors`                 | string[] or Promise<string[]> or object[] or Promise<object[]> or ColorGroup[] or Promise<ColorGroup[]> | []      | Array of colors to be displayed in the palette. Pass an array of `{ name, colors }` objects to display grouped collections. See more about colors in the [Colors Setting](#colors-setting) section        |
+| `selectedColor`          | string                                                                                                  | null    | Default selected color. The color must be included in the `colors` prop. Supports `bind:selectedColor`.                                                                                                   |
+| `isCompact`              | boolean                                                                                                 | false   | Flag to display the palette in compact mode.                                                                                                                                                              |
+| `compactColorIndices`    | number[]                                                                                                | []      | Array of indices to pick from the `colors` array to be displayed in the compacted palette (see [Compact Mode](#compact-mode)).                                                                            |
+| `allowDuplicates`        | boolean                                                                                                 | false   | Flag to allow color duplication.                                                                                                                                                                          |
+| `deletionMode`           | string                                                                                                  | "none"  | Mode of slot deletion, between `"none"` and `"tooltip"` and `"drop"` (see [Deletion Modes](#deletion-modes)).                                                                                             |
+| `tooltipClassName`       | string                                                                                                  | null    | Class name to pass down to the deletion tooltip (see [Styles](#styles)).                                                                                                                                  |
+| `tooltipContentSelector` | string                                                                                                  | null    | Selector of the deletion tooltip content (see [Customize the Content of the Deletion Tooltip](#customize-the-content-of-the-deletion-tooltip)).                                                           |
+| `showTransparentSlot`    | boolean                                                                                                 | false   | Flag to display a transparent slot at the start of the slot list.                                                                                                                                         |
+| `maxColors`              | number                                                                                                  | 30      | Maximum number of slots to be displayed in the palette. Set this value to `-1` to allow infinite number of slots.                                                                                         |
+| `showInput`              | boolean                                                                                                 | false   | Flag to display the input within the footer slot.                                                                                                                                                         |
+| `inputType`              | string                                                                                                  | "text"  | Type of the input within the footer slot. Only "text" and "color" are allowed. All other value will be replaced by "text".                                                                                |
+| `numColumns`             | number                                                                                                  | 5       | Number of columns of the palette grid. This value can't exceed the number of maximum colors defined in `maxColors` and can't be lower than 1. Set this value to `0` to display the slots on a single row. |
+| `maxColumns`             | number                                                                                                  | 0       | Maximum number of columns when `numColumns` is set to `0`. Once reached, additional slots wrap to a new row. Set this value to `0` to allow unlimited columns.                                            |
+| `transition`             | object                                                                                                  | null    | Animation when a slot is rendered (see [Transition](#transition)).                                                                                                                                        |
 
 ## Callbacks
 
@@ -173,9 +173,28 @@ colors = [
 ]
 ```
 
+## Array of Color Groups
+
+Colors can be organized into named groups by passing an array of `ColorGroup` objects:
+
+```
+colors = [
+	{ name: 'Warm', colors: ['#865C54', '#8F5447', '#A65846'] },
+	{ name: 'Cool', colors: ['#172B41', '#32465C', '#617899'] },
+	{ colors: ['#8B8C6B', '#97A847'] }
+]
+```
+
+Each group has:
+
+-   `name` (optional) — displayed as a label above the group
+-   `colors` — array of color strings or color objects
+
+When groups are used, compact mode and the color input are not available. The `colorSlot` snippet receives an additional `groupName` parameter.
+
 ## Promise
 
-A promise to be resolved with an array of color strings or objects can be passed as well (see [Use an API to fill the palette](#use-an-api-to-fill-the-palette))
+A promise to be resolved with an array of color strings, objects, or groups can be passed as well (see [Use an API to fill the palette](#use-an-api-to-fill-the-palette))
 
 # Deletion Modes
 

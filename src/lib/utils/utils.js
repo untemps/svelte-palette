@@ -55,6 +55,22 @@ export const calculateNumColumns = ($colorLength, $params, $options) => {
 	return $params.maxColumns > 0 ? Math.min(cols, $params.maxColumns) : cols
 }
 
+export const isColorGroups = ($colors) => {
+	return Array.isArray($colors) && $colors.length > 0 && Array.isArray($colors[0]?.colors)
+}
+
+export const calculateColorGroups = ($groups, $params) => {
+	if (!$groups || !Array.isArray($groups)) {
+		return []
+	}
+	return $groups
+		.filter((group) => Array.isArray(group?.colors))
+		.map((group) => ({
+			...(group.name != null && { name: group.name }),
+			colors: calculateColors(group.colors, $params),
+		}))
+}
+
 export const COLOR_REGEX = /^#?(([0-9a-f]{2}){3,4}|([0-9a-f]){3})$/i
 
 export const isColorValid = ($color) => {
