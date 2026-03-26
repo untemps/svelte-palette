@@ -1,5 +1,5 @@
 <script>
-	import { COMPACT, SETTINGS } from '../enums/PaletteTool.js'
+	import { COMPACT, SETTINGS } from '../enums/PaletteTool'
 
 	import PaletteCompactToggleButton from './PaletteCompactToggleButton.svelte'
 	import PaletteSettingsButton from './PaletteSettingsButton.svelte'

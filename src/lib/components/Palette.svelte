@@ -4,7 +4,7 @@
 	import { calculateColorGroups, calculateColors, calculateNumColumns, isColorGroups } from '../utils/utils.js'
 
 	import { NONE } from '../enums/PaletteDeletionMode'
-	import { COMPACT, SETTINGS } from '$lib/enums/PaletteTool.js'
+	import { COMPACT, SETTINGS } from '$lib/enums/PaletteTool'
 
 	import PaletteInput from './PaletteInput.svelte'
 	import PaletteSlot from './PaletteSlot.svelte'

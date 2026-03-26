@@ -2,7 +2,7 @@ import { afterEach, expect, test, vi } from 'vitest'
 import { cleanup, render, screen } from '@testing-library/svelte/svelte5'
 import userEvent from '@testing-library/user-event'
 
-import { COMPACT, SETTINGS } from '../../enums/PaletteTool.js'
+import { COMPACT, SETTINGS } from '../../enums/PaletteTool'
 
 import PaletteTools from '../PaletteTools.svelte'
 
