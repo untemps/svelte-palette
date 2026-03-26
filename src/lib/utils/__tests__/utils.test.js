@@ -146,6 +146,10 @@ describe('utils', () => {
 			[colorLength, null, , 1],
 			[-1, null, , 1],
 			[colorLength, { ...params, numColumns: -1 }, , colorLength],
+			[colorLength, { ...params, numColumns: 0, maxColumns: 10 }, , 10],
+			[colorLength, { ...params, numColumns: 0, maxColumns: 30 }, , colorLength],
+			[colorLength, { ...params, numColumns: 0, maxColumns: 0 }, , colorLength],
+			[colorLength, { ...params, numColumns: 5, maxColumns: 3 }, , params.numColumns],
 		])('colorLength:%j, params:%j, options:%j, expected:%j', (colorLength, params, options, expected) => {
 			expect(calculateNumColumns(colorLength, params, options)).toBe(expected)
 		})
