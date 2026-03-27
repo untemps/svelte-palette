@@ -12,7 +12,8 @@ export default defineConfig({
 		},
 		coverage: {
 			reporter: ['text', 'lcov'],
-			exclude: ['src/routes/**', 'svelte.config.js', 'commitlint.config.js'],
+			include: ['src/lib/components/**/*.{ts,svelte}', 'src/lib/utils/**/*.ts'],
+			exclude: ['src/lib/**/__tests__/**'],
 		},
 		setupFiles: ['./vitest.setup.js'],
 	},
