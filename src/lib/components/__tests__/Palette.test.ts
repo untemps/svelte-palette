@@ -1,6 +1,7 @@
 import { afterEach, expect, test, vi } from 'vitest'
 import { cleanup, render, screen, waitFor } from '@testing-library/svelte/svelte5'
 import userEvent from '@testing-library/user-event'
+import type { Component } from 'svelte'
 import { standby } from '@untemps/utils/async/standby'
 import { createRawSnippet } from 'svelte'
 
@@ -9,7 +10,7 @@ import Palette from '../Palette.svelte'
 // TODO: Fix "Error: Not implemented: HTMLFormElement.prototype.requestSubmit"
 import { TOOLTIP, DROP } from '../../enums/PaletteDeletionMode'
 
-const setup = (component, options) => {
+const setup = (component: Component, options?: Record<string, unknown>) => {
 	return {
 		user: userEvent.setup(),
 		...render(component, options),
@@ -19,30 +20,22 @@ const setup = (component, options) => {
 afterEach(() => cleanup())
 
 test('Displays as many color slots as set', async () => {
-	let cells = null
 	const colors = ['#ff0', '#0ff', '#f0f']
-	setup(Palette, {
-		colors,
-	})
+	setup(Palette, { colors })
 
-	cells = await screen.findAllByTestId('__palette-cell__')
+	const cells = await screen.findAllByTestId('__palette-cell__')
 	expect(cells).toHaveLength(colors.length)
 })
 
 test('Displays as many color slots as set in async mode', async () => {
-	let cells = null
 	const colors = Promise.resolve(['#ff0', '#0ff', '#f0f'])
-	setup(Palette, {
-		colors,
-	})
+	setup(Palette, { colors })
 
-	cells = await screen.findAllByTestId('__palette-cell__')
+	const cells = await screen.findAllByTestId('__palette-cell__')
 	waitFor(() => expect(cells).toHaveLength(3))
 })
 
 test('Triggers select with color', async () => {
-	let cells,
-		cell = null
 	const onSelect = vi.fn(() => 0)
 	const colors = ['#ff0', '#0ff', '#f0f']
 
@@ -50,17 +43,14 @@ test('Triggers select with color', async () => {
 		props: { colors, onselect: onSelect },
 	})
 
-	cells = await screen.findAllByTestId('__palette-cell__')
-	cell = cells[0]
-	await user.click(cell.firstChild)
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	const cell = cells[0]
+	await user.click(cell.firstChild as Element)
 
 	expect(onSelect).toHaveBeenCalledWith({ color: colors[0] })
 })
 
 test('Deletes slots if deletionMode is set to "tooltip"', async () => {
-	let cells,
-		cell,
-		trash = null
 	const colors = ['#ff0', '#0ff', '#f0f']
 
 	const { user } = setup(Palette, {
@@ -68,12 +58,12 @@ test('Deletes slots if deletionMode is set to "tooltip"', async () => {
 		deletionMode: TOOLTIP,
 	})
 
-	cells = await screen.findAllByTestId('__palette-cell__')
-	cell = cells[0]
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	const cell = cells[0]
 
 	await user.hover(cell)
 
-	trash = await screen.findByTestId('__trash-icon__')
+	const trash = await screen.findByTestId('__trash-icon__')
 	expect(trash).toBeInTheDocument()
 
 	await user.click(trash)
@@ -82,8 +72,6 @@ test('Deletes slots if deletionMode is set to "tooltip"', async () => {
 })
 
 test('Deletes slot if deletionMode is set to "drop"', async () => {
-	let cells,
-		cell = null
 	const colors = ['#ff0', '#0ff', '#f0f']
 
 	const { user } = setup(Palette, {
@@ -93,13 +81,12 @@ test('Deletes slot if deletionMode is set to "drop"', async () => {
 		},
 	})
 
-	cells = await screen.findAllByTestId('__palette-cell__')
-
-	cell = cells[0]
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	const cell = cells[0]
 
 	await user.pointer({ keys: '[MouseLeft>]', target: cell })
 
-	const drag = document.querySelector('#drag')
+	const drag = document.querySelector('#drag') as HTMLElement
 	drag.getBoundingClientRect = () => ({
 		width: 20,
 		height: 20,
@@ -107,6 +94,9 @@ test('Deletes slot if deletionMode is set to "drop"', async () => {
 		left: 2000,
 		right: 2020,
 		bottom: 2020,
+		x: 2000,
+		y: 2000,
+		toJSON: () => ({}),
 	})
 	await user.pointer('[/MouseLeft]')
 
@@ -114,19 +104,17 @@ test('Deletes slot if deletionMode is set to "drop"', async () => {
 })
 
 test('Displays transparent slot if showTransparentSlot is truthy', async () => {
-	let cells,
-		cell = null
 	const onSelect = vi.fn(() => 0)
 	const colors = ['#ff0', '#0ff', '#f0f']
 
 	const { user } = setup(Palette, {
 		props: { colors, showTransparentSlot: true, onselect: onSelect },
 	})
-	cells = await screen.findAllByTestId('__palette-cell__')
+	const cells = await screen.findAllByTestId('__palette-cell__')
 	expect(cells).toHaveLength(colors.length + 1)
 
-	cell = cells[0]
-	await user.click(cell.firstChild)
+	const cell = cells[0]
+	await user.click(cell.firstChild as Element)
 
 	expect(onSelect).toHaveBeenCalledWith({ color: null })
 })
@@ -137,9 +125,6 @@ test.each([
 	[['#ff0', '#0ff', '#f0f'], 3, 3, '#f0f'],
 	[['#ff0', '#0ff', '#f0f'], 1, 1, '#ff0'],
 ])('Adds or replaces color regarding maxColors value', async (colors, maxColors, expected, expectedColor) => {
-	let input,
-		submit,
-		slots = null
 	const newColor = '0f0'
 	const onSelect = vi.fn(() => 0)
 
@@ -147,13 +132,13 @@ test.each([
 		props: { colors, maxColors, showInput: true, onselect: onSelect },
 	})
 
-	input = await screen.findByTestId('__palette-input-input__')
+	const input = await screen.findByTestId('__palette-input-input__')
 	await user.type(input, newColor)
 
-	submit = await screen.findByTestId('__palette-input-submit__')
+	const submit = await screen.findByTestId('__palette-input-submit__')
 	await user.click(submit)
 
-	slots = await screen.findAllByTestId('__palette-slot__')
+	const slots = await screen.findAllByTestId('__palette-slot__')
 	expect(slots).toHaveLength(expected)
 
 	await user.click(slots[slots.length - 1])
@@ -166,9 +151,6 @@ test.each([
 	[['#ff0', '#0ff', '#f0f', '#f0f'], false, 3],
 	[['#ff0', '#0ff', '#f0f'], true, 4],
 ])('Adds or not color regarding allowDuplicates value', async (colors, allowDuplicates, expected) => {
-	let input,
-		submit,
-		slots = null
 	const newColor = 'f0f'
 	const onSelect = vi.fn(() => 0)
 
@@ -176,13 +158,13 @@ test.each([
 		props: { colors, allowDuplicates, showInput: true, onselect: onSelect },
 	})
 
-	input = await screen.findByTestId('__palette-input-input__')
+	const input = await screen.findByTestId('__palette-input-input__')
 	await user.type(input, newColor)
 
-	submit = await screen.findByTestId('__palette-input-submit__')
+	const submit = await screen.findByTestId('__palette-input-submit__')
 	await user.click(submit)
 
-	slots = await screen.findAllByTestId('__palette-slot__')
+	const slots = await screen.findAllByTestId('__palette-slot__')
 	expect(slots).toHaveLength(expected)
 
 	await user.click(slots[slots.length - 1])
@@ -211,7 +193,7 @@ test('Closes settings panel when onClose is called', async () => {
 	const colors = ['#ff0', '#0ff', '#f0f']
 	const compactColorIndices = [0, 1]
 
-	const settingsSnippet = createRawSnippet((getProps) => ({
+	const settingsSnippet = createRawSnippet<[{ onClose: () => void }]>((getProps) => ({
 		render: () => `<button data-testid="__settings-close-button__">Close</button>`,
 		setup: (element) => {
 			element.addEventListener('click', () => getProps().onClose())
@@ -276,7 +258,7 @@ test('Triggers select with color in group mode', async () => {
 	const { user } = setup(Palette, { props: { colors, onselect: onSelect } })
 
 	const cells = await screen.findAllByTestId('__palette-cell__')
-	await user.click(cells[0].firstChild)
+	await user.click(cells[0].firstChild as Element)
 
 	expect(onSelect).toHaveBeenCalledWith({ color: '#f00' })
 })
@@ -313,7 +295,7 @@ test.each([
 
 	const content = await screen.findByRole('main')
 	const section = content.querySelector('.palette__content')
-	await waitFor(() => expect(section.getAttribute('style')).toContain(`--num-columns: ${expected}`))
+	await waitFor(() => expect(section!.getAttribute('style')).toContain(`--num-columns: ${expected}`))
 })
 
 test('Updates num-columns when numColumns changes to 0', async () => {
@@ -325,15 +307,14 @@ test('Updates num-columns when numColumns changes to 0', async () => {
 
 	const content = await screen.findByRole('main')
 	const section = content.querySelector('.palette__content')
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 5'))
+	await waitFor(() => expect(section!.getAttribute('style')).toContain('--num-columns: 5'))
 
 	rerender({ colors, numColumns: 0 })
 
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 25'))
+	await waitFor(() => expect(section!.getAttribute('style')).toContain('--num-columns: 25'))
 })
 
 test('Removes duplicates when updating allowDuplicates value', async () => {
-	let slots = null
 	const colors = ['#ff0', '#0ff', '#f0f', '#f0f', '#f0f']
 
 	const { rerender } = setup(Palette, {
@@ -341,7 +322,7 @@ test('Removes duplicates when updating allowDuplicates value', async () => {
 		allowDuplicates: true,
 	})
 
-	slots = await screen.findAllByTestId('__palette-slot__')
+	let slots = await screen.findAllByTestId('__palette-slot__')
 	expect(slots).toHaveLength(colors.length)
 
 	rerender({

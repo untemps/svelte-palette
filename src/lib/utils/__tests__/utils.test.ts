@@ -77,7 +77,7 @@ describe('utils', () => {
 		const colors = ['#123456', '#345612', '#456123', '#245136', '#425136']
 		const params = {
 			isCompact: false,
-			compactColorIndices: [],
+			compactColorIndices: [] as number[],
 			allowDuplicates: true,
 			maxColors: 5,
 		}
@@ -123,7 +123,7 @@ describe('utils', () => {
 			['[]', params, []],
 			[1, params, []],
 		])('colors:%j, params:%j, expected: %j', (colors, params, expected) => {
-			expect(calculateColors(colors, params)).toEqual(expected)
+			expect(calculateColors(colors as unknown, params)).toEqual(expected)
 		})
 	})
 
@@ -131,7 +131,7 @@ describe('utils', () => {
 		const colorLength = 25
 		const params = {
 			isCompact: false,
-			compactColorIndices: [],
+			compactColorIndices: [] as number[],
 			showTransparentSlot: false,
 			numColumns: 5,
 		}
@@ -181,7 +181,7 @@ describe('utils', () => {
 	describe('calculateColorGroups', () => {
 		const params = {
 			isCompact: false,
-			compactColorIndices: [],
+			compactColorIndices: [] as number[],
 			allowDuplicates: true,
 			maxColors: 5,
 		}
@@ -213,7 +213,7 @@ describe('utils', () => {
 			[null, params, []],
 			[[], params, []],
 		])('groups:%j, params:%j, expected:%j', (groups, params, expected) => {
-			expect(calculateColorGroups(groups, params)).toEqual(expected)
+			expect(calculateColorGroups(groups as unknown, params)).toEqual(expected)
 		})
 	})
 

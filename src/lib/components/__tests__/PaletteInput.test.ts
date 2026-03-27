@@ -1,10 +1,11 @@
 import { afterEach, expect, test, vi } from 'vitest'
 import { cleanup, render, screen, waitFor } from '@testing-library/svelte/svelte5'
 import userEvent from '@testing-library/user-event'
+import type { Component } from 'svelte'
 
 import PaletteInput from '../PaletteInput.svelte'
 
-const setup = (component, options) => {
+const setup = (component: Component, options?: Record<string, unknown>) => {
 	return {
 		user: userEvent.setup(),
 		...render(component, options),
@@ -69,7 +70,7 @@ test('Does not display slot if inputType is "color"', async () => {
 })
 
 test('Does not display EyeDropper button if API is not available', async () => {
-	window.EyeDropper = undefined
+	window.EyeDropper = undefined as unknown as typeof EyeDropper
 	setup(PaletteInput, {
 		color: 'ff',
 		inputType: 'foo',
@@ -79,9 +80,9 @@ test('Does not display EyeDropper button if API is not available', async () => {
 })
 
 test('Updates input value with color from eyedropper', async () => {
-	window.EyeDropper = function () {
+	window.EyeDropper = function (this: EyeDropper) {
 		this.open = () => Promise.resolve({ sRGBHex: '#ff0' })
-	}
+	} as unknown as typeof EyeDropper
 	const { user } = setup(PaletteInput)
 	const button = await screen.findByTestId('__palette-eyedropper-button__')
 	await user.click(button)

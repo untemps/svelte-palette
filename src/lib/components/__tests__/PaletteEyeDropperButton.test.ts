@@ -1,10 +1,11 @@
 import { afterEach, expect, test, vi } from 'vitest'
 import { cleanup, render, screen, waitFor } from '@testing-library/svelte/svelte5'
 import userEvent from '@testing-library/user-event'
+import type { Component } from 'svelte'
 
 import PaletteEyeDropperButton from '../PaletteEyeDropperButton.svelte'
 
-const setup = (component, options) => {
+const setup = (component: Component, options?: Record<string, unknown>) => {
 	return {
 		user: userEvent.setup(),
 		...render(component, options),
@@ -13,9 +14,9 @@ const setup = (component, options) => {
 
 afterEach(() => cleanup())
 
-window.EyeDropper = function () {
+window.EyeDropper = function (this: EyeDropper) {
 	this.open = () => Promise.resolve({ sRGBHex: '#ff0' })
-}
+} as unknown as typeof EyeDropper
 
 test('Renders eye dropper button', async () => {
 	setup(PaletteEyeDropperButton)
@@ -39,9 +40,9 @@ test('Retrieves color from EyeDropper selection', async () => {
 })
 
 test('Normalizes rgb color from EyeDropper selection to hex', async () => {
-	window.EyeDropper = function () {
+	window.EyeDropper = function (this: EyeDropper) {
 		this.open = () => Promise.resolve({ sRGBHex: 'rgb(255, 0, 0)' })
-	}
+	} as unknown as typeof EyeDropper
 	const onAdd = vi.fn()
 	const { user } = setup(PaletteEyeDropperButton, { props: { onadd: onAdd } })
 	const button = screen.getByTestId('__palette-eyedropper-button__')
@@ -50,9 +51,9 @@ test('Normalizes rgb color from EyeDropper selection to hex', async () => {
 })
 
 test('Normalizes rgba color from EyeDropper selection to hex', async () => {
-	window.EyeDropper = function () {
+	window.EyeDropper = function (this: EyeDropper) {
 		this.open = () => Promise.resolve({ sRGBHex: 'rgba(0, 128, 0, 1)' })
-	}
+	} as unknown as typeof EyeDropper
 	const onAdd = vi.fn()
 	const { user } = setup(PaletteEyeDropperButton, { props: { onadd: onAdd } })
 	const button = screen.getByTestId('__palette-eyedropper-button__')
@@ -62,11 +63,11 @@ test('Normalizes rgba color from EyeDropper selection to hex', async () => {
 
 // EyeDropper API is invalid
 test('Throws error', async () => {
-	window.EyeDropper = function () {
+	window.EyeDropper = function (this: EyeDropper) {
 		this.open = () => {
 			throw new Error('Error')
 		}
-	}
+	} as unknown as typeof EyeDropper
 
 	const onError = vi.fn(() => 0)
 	const ariaLabel = 'Foo'
@@ -80,7 +81,7 @@ test('Throws error', async () => {
 
 // EyeDropper API is not available
 test('Renders nothing', async () => {
-	window.EyeDropper = null
+	window.EyeDropper = null as unknown as typeof EyeDropper
 	setup(PaletteEyeDropperButton)
 	try {
 		await screen.findByTestId('__palette-eyedropper-button__')
