@@ -41,3 +41,9 @@ test('Attaches active class when isActive is true', () => {
 	const button = screen.getByTestId('__palette-icon-button__')
 	expect(button).toHaveClass('icon_button__button--active')
 })
+
+test('Applies custom class when class prop is set', () => {
+	setup(PaletteIconButton, { props: { class: 'custom-class' } })
+	const button = screen.getByTestId('__palette-icon-button__')
+	expect(button).toHaveClass('custom-class')
+})

@@ -79,6 +79,23 @@ test('Does not display EyeDropper button if API is not available', async () => {
 	expect(button).not.toBeInTheDocument()
 })
 
+test('Does not display EyeDropper button when inputType is "color" even if EyeDropper is available', async () => {
+	window.EyeDropper = function (this: EyeDropper) {
+		this.open = () => Promise.resolve({ sRGBHex: '#ff0' })
+	} as unknown as typeof EyeDropper
+	setup(PaletteInput, { props: { inputType: 'color' } })
+	const button = screen.queryByTestId('__palette-eyedropper-button__')
+	expect(button).not.toBeInTheDocument()
+})
+
+test('Handles empty input value in change handler', async () => {
+	const { user } = setup(PaletteInput)
+	const input = screen.getByTestId('__palette-input-input__')
+	await user.type(input, 'ff0')
+	await user.clear(input)
+	expect(input).toHaveValue('')
+})
+
 test('Updates input value with color from eyedropper', async () => {
 	window.EyeDropper = function (this: EyeDropper) {
 		this.open = () => Promise.resolve({ sRGBHex: '#ff0' })
@@ -88,4 +105,19 @@ test('Updates input value with color from eyedropper', async () => {
 	await user.click(button)
 	const input = screen.getByTestId('__palette-input-input__')
 	await waitFor(() => expect(input).toHaveValue('#ff0'))
+})
+
+test('Applies custom class when class prop is set', () => {
+	setup(PaletteInput, { props: { class: 'custom-class' } })
+	const section = screen.getByTestId('__palette-input__')
+	expect(section).toHaveClass('custom-class')
+})
+
+test('Updates style when inputType changes', async () => {
+	const { rerender } = setup(PaletteInput, { props: { inputType: 'text' } })
+	const section = screen.getByTestId('__palette-input__')
+	expect(section).toHaveAttribute('style', expect.stringContaining('--grid-column-start: 2'))
+
+	rerender({ inputType: 'color' })
+	await waitFor(() => expect(section).toHaveAttribute('style', expect.stringContaining('--grid-column-start: 1')))
 })

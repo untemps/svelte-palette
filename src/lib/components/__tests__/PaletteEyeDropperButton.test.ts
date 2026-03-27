@@ -61,6 +61,16 @@ test('Normalizes rgba color from EyeDropper selection to hex', async () => {
 	await waitFor(() => expect(onAdd).toHaveBeenCalledWith({ color: '#008000' }))
 })
 
+test('Does not throw when no onadd handler is provided', async () => {
+	window.EyeDropper = function (this: EyeDropper) {
+		this.open = () => Promise.resolve({ sRGBHex: '#ff0' })
+	} as unknown as typeof EyeDropper
+	const { user } = setup(PaletteEyeDropperButton)
+	const button = screen.getByTestId('__palette-eyedropper-button__')
+	await user.click(button)
+	// onadd is undefined → onadd?.() short-circuits without error
+})
+
 // EyeDropper API is invalid
 test('Throws error', async () => {
 	window.EyeDropper = function (this: EyeDropper) {

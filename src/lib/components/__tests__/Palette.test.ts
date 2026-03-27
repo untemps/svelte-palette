@@ -8,7 +8,7 @@ import { createRawSnippet } from 'svelte'
 import Palette from '../Palette.svelte'
 
 // TODO: Fix "Error: Not implemented: HTMLFormElement.prototype.requestSubmit"
-import { TOOLTIP, DROP } from '../../enums/PaletteDeletionMode'
+import { NONE, TOOLTIP, DROP } from '../../enums/PaletteDeletionMode'
 
 const setup = (component: Component, options?: Record<string, unknown>) => {
 	return {
@@ -218,6 +218,127 @@ test('Closes settings panel when onClose is called', async () => {
 	await user.click(closeButton)
 
 	await waitFor(() => expect(panel).not.toHaveClass('palette__settings__panel--visible'))
+})
+
+test('Renders afterSlot snippet', async () => {
+	const colors = ['#f00', '#0f0']
+	const afterSlot = createRawSnippet<[{ selectedColor: string | null; transition: null; isCompact: boolean }]>(
+		() => ({
+			render: () => `<div data-testid="__after-slot__">After</div>`,
+		})
+	)
+
+	setup(Palette, { props: { colors, afterSlot } })
+
+	const el = await screen.findByTestId('__after-slot__')
+	expect(el).toBeInTheDocument()
+})
+
+test('Renders loader snippet while colors are loading', async () => {
+	let resolveColors!: (v: string[]) => void
+	const colors = new Promise<string[]>((r) => {
+		resolveColors = r
+	})
+	const loader = createRawSnippet<[]>(() => ({
+		render: () => `<div data-testid="__custom-loader__">Loading...</div>`,
+	}))
+
+	setup(Palette, { props: { colors, loader } })
+
+	const el = await screen.findByTestId('__custom-loader__')
+	expect(el).toBeInTheDocument()
+
+	resolveColors(['#f00'])
+})
+
+test('Renders input snippet when showInput is true', async () => {
+	const colors = ['#f00', '#0f0']
+	const input = createRawSnippet<[{ selectedColor: string | null; inputType: string }]>(() => ({
+		render: () => `<div data-testid="__custom-input__">Custom Input</div>`,
+	}))
+
+	setup(Palette, { props: { colors, showInput: true, input } })
+
+	const el = await screen.findByTestId('__custom-input__')
+	expect(el).toBeInTheDocument()
+})
+
+test('Renders tools snippet when compactColorIndices is set', async () => {
+	const colors = ['#f00', '#0f0', '#00f']
+	const tools = createRawSnippet<
+		[{ compactColorIndices: number[]; isCompact: boolean; onSelect: (args: unknown) => void }]
+	>(() => ({
+		render: () => `<div data-testid="__custom-tools__">Custom Tools</div>`,
+	}))
+
+	setup(Palette, { props: { colors, compactColorIndices: [0, 1], tools } })
+
+	const el = await screen.findByTestId('__custom-tools__')
+	expect(el).toBeInTheDocument()
+})
+
+test('Renders colorSlot snippet in regular mode', async () => {
+	const colors = ['#f00', '#0f0']
+	const slot = createRawSnippet<[{ color: string }]>(() => ({
+		render: () => `<div data-testid="__custom-slot__">Custom Slot</div>`,
+	}))
+
+	setup(Palette, { props: { colors, slot } })
+
+	const els = await screen.findAllByTestId('__custom-slot__')
+	expect(els).toHaveLength(colors.length)
+})
+
+test('Renders colorSlot snippet in group mode', async () => {
+	const colors = [{ name: 'Reds', colors: ['#f00', '#f11'] }]
+	const slot = createRawSnippet<[{ color: string }]>(() => ({
+		render: () => `<div data-testid="__custom-group-slot__">Custom Group Slot</div>`,
+	}))
+
+	setup(Palette, { props: { colors, slot } })
+
+	const els = await screen.findAllByTestId('__custom-group-slot__')
+	expect(els).toHaveLength(2)
+})
+
+test('Renders beforeSlot snippet', async () => {
+	const colors = ['#f00', '#0f0']
+	const beforeSlot = createRawSnippet<[{ selectedColor: string | null }]>(() => ({
+		render: () => `<li data-testid="__before-slot__">Before</li>`,
+	}))
+
+	setup(Palette, { props: { colors, beforeSlot } })
+
+	const el = await screen.findByTestId('__before-slot__')
+	expect(el).toBeInTheDocument()
+})
+
+test('Renders transparentSlot snippet when showTransparentSlot is true', async () => {
+	const colors = ['#f00', '#0f0']
+	const transparentSlot = createRawSnippet<[]>(() => ({
+		render: () => `<div data-testid="__custom-transparent-slot__">Transparent</div>`,
+	}))
+
+	setup(Palette, { props: { colors, showTransparentSlot: true, transparentSlot } })
+
+	const el = await screen.findByTestId('__custom-transparent-slot__')
+	expect(el).toBeInTheDocument()
+})
+
+test('Switches deletionMode from NONE to TOOLTIP via rerender', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+
+	const { rerender } = setup(Palette, {
+		props: { colors, deletionMode: NONE },
+	})
+
+	rerender({ colors, deletionMode: TOOLTIP })
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await userEvent.setup().hover(cells[0])
+
+	const trash = await screen.findByTestId('__trash-icon__')
+	expect(trash).toBeInTheDocument()
 })
 
 test('Displays groups with their names and color slots', async () => {

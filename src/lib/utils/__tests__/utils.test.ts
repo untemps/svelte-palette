@@ -114,6 +114,7 @@ describe('utils', () => {
 			[[1, 1, 1], { ...params, allowDuplicates: true }, [{ value: 1 }, { value: 1 }, { value: 1 }]],
 			[colors, { ...params, maxColors: 8 }, colorsObjects],
 			[colors, { ...params, maxColors: 3 }, colorsObjects.slice(0, 3)],
+			[colors, { isCompact: false, compactColorIndices: [], allowDuplicates: true }, colorsObjects],
 			[[1, 1, 1], { ...params, allowDuplicates: false, maxColors: 2 }, [{ value: 1 }]],
 			[[1, 1, 1], { ...params, allowDuplicates: true, maxColors: 2 }, [{ value: 1 }, { value: 1 }]],
 			[[1, 1, 1], null, [{ value: 1 }, { value: 1 }, { value: 1 }]],
@@ -158,6 +159,8 @@ describe('utils', () => {
 			[colorLength, { ...params, numColumns: 0, maxColumns: 30 }, , colorLength],
 			[colorLength, { ...params, numColumns: 0, maxColumns: 0 }, , colorLength],
 			[colorLength, { ...params, numColumns: 5, maxColumns: 3 }, , params.numColumns],
+			[colorLength, { isCompact: false, showTransparentSlot: false }, , colorLength],
+			[colorLength, { isCompact: true, compactColorIndices: null }, , 0],
 		])('colorLength:%j, params:%j, options:%j, expected:%j', (colorLength, params, options, expected) => {
 			expect(calculateNumColumns(colorLength, params, options)).toBe(expected)
 		})

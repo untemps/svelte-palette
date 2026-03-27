@@ -1,5 +1,5 @@
 import { afterEach, expect, test, vi } from 'vitest'
-import { cleanup, render, screen } from '@testing-library/svelte/svelte5'
+import { cleanup, render, screen, waitFor } from '@testing-library/svelte/svelte5'
 import userEvent from '@testing-library/user-event'
 import type { Component } from 'svelte'
 
@@ -91,4 +91,13 @@ test('Calls transition fn when slot enters the DOM', () => {
 	const transitionFn = vi.fn(() => ({}))
 	setup(PaletteSlot, { props: { color, transition: { fn: transitionFn } } })
 	expect(transitionFn).toHaveBeenCalled()
+})
+
+test('Updates style when color changes', async () => {
+	const { rerender } = setup(PaletteSlot, { props: { color: '#ff0' } })
+	const slot = screen.getByTestId('__palette-slot__')
+	expect(slot).toHaveAttribute('style', expect.stringContaining('--color: #ff0'))
+
+	rerender({ color: '#00f' })
+	await waitFor(() => expect(slot).toHaveAttribute('style', expect.stringContaining('--color: #00f')))
 })
