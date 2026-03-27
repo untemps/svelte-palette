@@ -1,10 +1,15 @@
-<script>
+<script lang="ts">
 	import { untrack } from 'svelte'
+	import type { Snippet } from 'svelte'
 
 	import { calculateColorGroups, calculateColors, calculateNumColumns, isColorGroups } from '../utils/utils'
 
 	import { NONE } from '../enums/PaletteDeletionMode'
+	import type { PaletteDeletionMode } from '../enums/PaletteDeletionMode'
 	import { COMPACT, SETTINGS } from '$lib/enums/PaletteTool'
+	import type { PaletteTool } from '$lib/enums/PaletteTool'
+
+	import type { ColorItem, ColorsInput, NormalizedColorGroup, TransitionConfig } from '../types'
 
 	import PaletteInput from './PaletteInput.svelte'
 	import PaletteSlot from './PaletteSlot.svelte'
@@ -15,6 +20,18 @@
 	import PaletteCompactToggleButton from './PaletteCompactToggleButton.svelte'
 
 	import useDeletion from './useDeletion'
+
+	type SlotSnippetProps = {
+		color: string
+		colorName?: string
+		groupName?: string
+		selectedColor: string | null
+		transition: TransitionConfig | null
+		isCompact: boolean
+		index: number
+	}
+
+	type ToolSelectArg = { tool: PaletteTool } | PaletteTool
 
 	let {
 		colors = null,
@@ -44,10 +61,42 @@
 		input = undefined,
 		tools = undefined,
 		settings = undefined,
+	}: {
+		colors?: ColorsInput | Promise<ColorsInput> | null
+		selectedColor?: string | null
+		isCompact?: boolean
+		compactColorIndices?: number[]
+		allowDuplicates?: boolean
+		deletionMode?: PaletteDeletionMode
+		tooltipClassName?: string | null
+		tooltipContentSelector?: string | null
+		showTransparentSlot?: boolean
+		maxColors?: number
+		showInput?: boolean
+		inputType?: string
+		numColumns?: number
+		maxColumns?: number
+		transition?: TransitionConfig | null
+		onselect?: (event: { color: string | null }) => void
+		class?: string
+		header?: Snippet<[{ selectedColor: string | null }]>
+		beforeSlot?: Snippet<
+			[{ selectedColor: string | null; transition: TransitionConfig | null; isCompact: boolean }]
+		>
+		transparentSlot?: Snippet
+		slot?: Snippet<[SlotSnippetProps]>
+		afterSlot?: Snippet<[{ selectedColor: string | null; transition: TransitionConfig | null; isCompact: boolean }]>
+		loader?: Snippet
+		footer?: Snippet<[{ selectedColor: string | null }]>
+		input?: Snippet<[{ selectedColor: string | null; inputType: string }]>
+		tools?: Snippet<
+			[{ compactColorIndices: number[]; isCompact: boolean; onSelect: (args: ToolSelectArg) => void }]
+		>
+		settings?: Snippet<[{ onClose: () => void }]>
 	} = $props()
 
-	let _colors = $state(null)
-	let _colorGroups = $state(null)
+	let _colors = $state<ColorItem[] | null>(null)
+	let _colorGroups = $state<NormalizedColorGroup[] | null>(null)
 	let _numColumns = $state(untrack(() => numColumns))
 	let _isSettingsOn = $state(false)
 	let _isCompact = $state(untrack(() => isCompact))
@@ -97,18 +146,18 @@
 		})
 	})
 
-	let _tools = $derived([
+	let _tools = $derived<PaletteTool[]>([
 		...(_colorGroups == null && compactColorIndices?.length ? [COMPACT] : []),
 		...(settings ? [SETTINGS] : []),
 	])
 
-	const _selectColor = (color) => {
+	const _selectColor = (color: string | null) => {
 		selectedColor = color
 		onselect?.({ color })
 	}
 
-	const _addColor = (color) => {
-		_colors = calculateColors([..._colors, color], {
+	const _addColor = (color: string) => {
+		_colors = calculateColors([...(_colors ?? []), color], {
 			isCompact: _isCompact,
 			compactColorIndices,
 			allowDuplicates,
@@ -123,22 +172,22 @@
 		})
 	}
 
-	const _removeColor = (index) => (_colors = _colors.filter((c, i) => i !== index))
+	const _removeColor = (index: number) => (_colors = (_colors ?? []).filter((_, i) => i !== index))
 
-	const _removeGroupColor = (groupIndex, colorIndex) => {
-		_colorGroups = _colorGroups.map((group, gi) =>
+	const _removeGroupColor = (groupIndex: number, colorIndex: number) => {
+		_colorGroups = (_colorGroups ?? []).map((group, gi) =>
 			gi === groupIndex ? { ...group, colors: group.colors.filter((_, ci) => ci !== colorIndex) } : group
 		)
 	}
 
-	const _onSlotSelect = ({ color }) => _selectColor(color)
+	const _onSlotSelect = ({ color }: { color: string | null }) => _selectColor(color)
 
-	const _onInputAdd = ({ color }) => _addColor(color)
+	const _onInputAdd = ({ color }: { color: string }) => _addColor(color)
 
-	const _onDelete = (index) => _removeColor(index)
+	const _onDelete = (index: number) => _removeColor(index)
 
-	const _onToolSelect = (args) => {
-		const tool = args?.tool ?? args
+	const _onToolSelect = (args: ToolSelectArg) => {
+		const tool = (args as { tool: PaletteTool })?.tool ?? (args as PaletteTool)
 		switch (tool) {
 			case SETTINGS:
 				_isSettingsOn = true

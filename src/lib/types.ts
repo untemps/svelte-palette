@@ -14,3 +14,8 @@ export type NormalizedColorGroup = {
 }
 
 export type ColorsInput = (string | ColorItem)[] | ColorGroup[]
+
+export type TransitionConfig = {
+	fn: (node: Element, args?: Record<string, unknown>) => unknown
+	args?: Record<string, unknown>
+}

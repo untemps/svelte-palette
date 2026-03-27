@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { onMount, untrack } from 'svelte'
 
 	import { PLUS } from '../enums/PaletteIcon'
@@ -9,7 +9,17 @@
 
 	import { COLOR_REGEX, isColorValid } from '../utils/utils'
 
-	let { color: colorProp = null, inputType = 'text', onadd = undefined, class: className = '' } = $props()
+	let {
+		color: colorProp = null,
+		inputType = 'text',
+		onadd = undefined,
+		class: className = '',
+	}: {
+		color?: string | null
+		inputType?: string
+		onadd?: (event: { color: string }) => void
+		class?: string
+	} = $props()
 
 	let color = $state(untrack(() => colorProp?.replace(COLOR_REGEX, '#$1') || ''))
 	let _isEyeDropperAvailable = $state(false)
@@ -28,12 +38,13 @@
 		return () => document.removeEventListener('keypress', _onKeyPress)
 	})
 
-	const _onInputChange = (e) => {
+	const _onInputChange = (e: Event) => {
 		e.preventDefault()
-		color = e.target.value?.replace(COLOR_REGEX, '#$1') || e.target.value
+		const target = e.target as HTMLInputElement
+		color = target.value?.replace(COLOR_REGEX, '#$1') || target.value
 	}
 
-	const _onKeyPress = (e) => {
+	const _onKeyPress = (e: KeyboardEvent) => {
 		e.code === 'Enter' && _onSubmit()
 	}
 
@@ -45,7 +56,7 @@
 		document?.removeEventListener('keypress', _onKeyPress)
 	}
 
-	const _onEyeDropperAdd = ({ color: value }) => {
+	const _onEyeDropperAdd = ({ color: value }: { color: string }) => {
 		color = value
 	}
 

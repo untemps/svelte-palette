@@ -1,9 +1,17 @@
-<script>
+<script lang="ts">
 	import { EYE_DROPPER } from '../enums/PaletteIcon'
 	import PaletteIconButton from './PaletteIconButton.svelte'
 	import { normalizeColor } from '../utils/utils'
 
-	let { onadd = undefined, onerror = undefined, ...restProps } = $props()
+	let {
+		onadd = undefined,
+		onerror = undefined,
+		...restProps
+	}: {
+		onadd?: (event: { color: string }) => void
+		onerror?: (event: { error: unknown }) => void
+		[key: string]: unknown
+	} = $props()
 
 	const _onClick = async () => {
 		try {

@@ -1,8 +1,5 @@
 <script lang="ts">
-	type TransitionConfig = {
-		fn: (node: Element, args?: Record<string, unknown>) => unknown
-		args?: Record<string, unknown>
-	}
+	import type { TransitionConfig } from '../types'
 
 	let {
 		color = null,

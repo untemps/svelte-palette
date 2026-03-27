@@ -11,3 +11,6 @@ export { default as PaletteSettingsPanel } from './components/PaletteSettingsPan
 export { default as PaletteTools } from './components/PaletteTools.svelte'
 export { NONE, TOOLTIP, DROP } from './enums/PaletteDeletionMode'
 export { COMPACT, SETTINGS } from './enums/PaletteTool'
+export type { ColorItem, ColorGroup, NormalizedColorGroup, ColorsInput, TransitionConfig } from './types'
+export type { PaletteDeletionMode } from './enums/PaletteDeletionMode'
+export type { PaletteTool } from './enums/PaletteTool'
