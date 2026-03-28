@@ -1278,7 +1278,7 @@
     "@untemps/utils" "^2.4.0"
     svelte "3.49.0"
 
-"@untemps/utils@3", "@untemps/utils@^3.0.0":
+"@untemps/utils@3":
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@untemps/utils/-/utils-3.0.0.tgz#0f1968be1c2b079b2425e945e42bc7d61f0d776e"
   integrity sha512-Iv7a1nvbTzk7ho8bry5iN/RYtns4dwNRuTqD49ixq0N3dOpoMIdSlhvVanbxEmRBqtV7MirCBEfScpTjDbo0ag==
@@ -1289,6 +1289,11 @@
   integrity sha512-3B5bb4iYkh2h86vqtY8+Mo9vdX1s/NT1cltWpS4U3/WHXFgy/4lJ9180vELJv01MbNNhjlZPtJCMtBp7Fpsb1Q==
   dependencies:
     "@babel/runtime" "^7.17.8"
+
+"@untemps/utils@^3.0.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@untemps/utils/-/utils-3.1.0.tgz#0823f2e5faba842f3c9eb3683025ce2bd60fef38"
+  integrity sha512-2lK8ZWCMgMCXPeubH4y3mq2ubN9Wj0KjUm2qMXM7vr+AImTtZVHFoaOnFK7tsbLf2h09pm/DeaWNdLg1fjvEzA==
 
 "@vitest/coverage-v8@^2.0.0":
   version "2.1.9"

@@ -2,7 +2,7 @@ import { afterEach, expect, test, vi } from 'vitest'
 import { cleanup, render, screen, waitFor } from '@testing-library/svelte/svelte5'
 import userEvent from '@testing-library/user-event'
 import type { Component } from 'svelte'
-import { standby } from '@untemps/utils/async/standby'
+import { standby } from '@untemps/utils'
 import { createRawSnippet } from 'svelte'
 
 import Palette from '../Palette.svelte'

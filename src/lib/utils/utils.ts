@@ -1,4 +1,4 @@
-import { extractByIndices } from '@untemps/utils/array/extractByIndices'
+import { extractByIndices } from '@untemps/utils'
 
 import type { ColorItem, ColorGroup, NormalizedColorGroup, ColorsInput } from '../types.js'
 
