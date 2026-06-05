@@ -1233,16 +1233,16 @@
     import-meta-resolve "^4.1.0"
 
 "@sveltejs/kit@^2.5.16":
-  version "2.52.2"
-  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-2.52.2.tgz#8de4a96ef7b54a59ccb2d13f4297da3f22c3ec1d"
-  integrity sha512-1in76dftrofUt138rVLvYuwiQLkg9K3cG8agXEE6ksf7gCGs8oIr3+pFrVtbRmY9JvW+psW5fvLM/IwVybOLBA==
+  version "2.60.1"
+  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-2.60.1.tgz#41e73108f66588784e4bd3c32ac8500ee92e6b59"
+  integrity sha512-mQjlkNo+rJvpln7V2IGY2j99BqhcFbS4UN0AQNKNYfhBAFZTuCDAdW3a1sgf330mvtNvsBXn3HpAhcmvdJTcIQ==
   dependencies:
     "@standard-schema/spec" "^1.0.0"
     "@sveltejs/acorn-typescript" "^1.0.5"
     "@types/cookie" "^0.6.0"
     acorn "^8.14.1"
     cookie "^0.6.0"
-    devalue "^5.6.3"
+    devalue "^5.8.1"
     esm-env "^1.2.2"
     kleur "^4.1.5"
     magic-string "^0.30.5"
