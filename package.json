@@ -68,7 +68,7 @@
 		"tslib": "^2.6.3",
 		"typescript": "^5.4.5",
 		"vite": "^6.4.2",
-		"vitest": "^2.0.0"
+		"vitest": "^4.1.0"
 	},
 	"dependencies": {
 		"@untemps/svelte-use-drop-outside": "^1.6.0",
