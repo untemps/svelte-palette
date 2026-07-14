@@ -125,6 +125,6 @@
 		"test:ci": "vitest run --coverage",
 		"lint": "prettier --check .",
 		"format": "prettier --write . && git add . && git status",
-		"prepare": "husky install"
+		"prepare": "husky"
 	}
 }
