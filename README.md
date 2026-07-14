@@ -187,8 +187,8 @@ colors = [
 
 Each group has:
 
--   `name` (optional) — displayed as a label above the group
--   `colors` — array of color strings or color objects
+- `name` (optional) — displayed as a label above the group
+- `colors` — array of color strings or color objects
 
 When groups are used, compact mode and the color input are not available. The `colorSlot` snippet receives an additional `groupName` parameter.
 
@@ -234,8 +234,8 @@ You may also specified whether the palette has to use the compact mode by defaul
 
 You can style the component by passing a class down to the root tag (`div`).
 
--   Flag the class as global to make it available in the Palette component
--   Prefix your class with `.palette[role="main"]` to give precedence over the default one or mark each style with `!important` (not recommanded)
+- Flag the class as global to make it available in the Palette component
+- Prefix your class with `.palette[role="main"]` to give precedence over the default one or mark each style with `!important` (not recommanded)
 
 #### Example
 
@@ -425,8 +425,8 @@ That unlocks the color picker provided by the browser. Therefore the color spot 
 
 The tools panel is a container for two actions:
 
--   Display the settings panel (`"settings"`)
--   Toggle the compact mode (`"compact"`)
+- Display the settings panel (`"settings"`)
+- Toggle the compact mode (`"compact"`)
 
 For some use cases, you may want to provide your own controls by using the `tools` snippet.
 
@@ -463,9 +463,9 @@ yarn dev
 
 Contributions are warmly welcomed:
 
--   Fork the repository
--   Create a feature branch
--   Develop the feature AND write the tests (or write the tests AND develop the feature)
--   Commit your changes
-    using [Angular Git Commit Guidelines](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#-git-commit-guidelines)
--   Submit a Pull Request
+- Fork the repository
+- Create a feature branch
+- Develop the feature AND write the tests (or write the tests AND develop the feature)
+- Commit your changes
+  using [Angular Git Commit Guidelines](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#-git-commit-guidelines)
+- Submit a Pull Request

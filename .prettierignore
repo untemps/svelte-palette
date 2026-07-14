@@ -2,6 +2,9 @@
 /dist
 /.svelte-kit
 
+# Generated (managed by semantic-release)
+CHANGELOG.md
+
 # Misc
 .DS_STORE
 .husky
