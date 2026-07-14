@@ -50,11 +50,11 @@
 	}
 
 	:global(
-			.trash_button__button > svg path,
-			.trash_button__button > svg circle,
-			.trash_button__button > svg line,
-			.trash_button__button > svg polyline
-		) {
+		.trash_button__button > svg path,
+		.trash_button__button > svg circle,
+		.trash_button__button > svg line,
+		.trash_button__button > svg polyline
+	) {
 		stroke: #fff;
 	}
 </style>

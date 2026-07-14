@@ -72,20 +72,20 @@
 	}
 
 	:global(
-			.icon_button__button > svg path,
-			.icon_button__button > svg circle,
-			.icon_button__button > svg line,
-			.icon_button__button > svg polyline
-		) {
+		.icon_button__button > svg path,
+		.icon_button__button > svg circle,
+		.icon_button__button > svg line,
+		.icon_button__button > svg polyline
+	) {
 		stroke: #646464;
 	}
 
 	:global(
-			.icon_button__button:disabled > svg path,
-			.icon_button__button:disabled > svg circle,
-			.icon_button__button:disabled > svg line,
-			.icon_button__button:disabled > svg polyline
-		) {
+		.icon_button__button:disabled > svg path,
+		.icon_button__button:disabled > svg circle,
+		.icon_button__button:disabled > svg line,
+		.icon_button__button:disabled > svg polyline
+	) {
 		stroke: #bdbdbd;
 	}
 </style>
