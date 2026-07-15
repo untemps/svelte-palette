@@ -56,7 +56,6 @@
 		"@vitest/coverage-v8": "^4.1.0",
 		"carbon-components-svelte": "^0.85.0",
 		"carbon-icons-svelte": "^12.9.0",
-		"cross-env": "^7.0.3",
 		"font-color-contrast": "^11.1.0",
 		"husky": "^9.0.11",
 		"jsdom": "^29.1.1",
