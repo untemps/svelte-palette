@@ -1,3 +1,10 @@
+## [5.2.1](https://github.com/untemps/svelte-palette/compare/v5.2.0...v5.2.1) (2026-07-15)
+
+
+### Bug Fixes
+
+* Restore npm publishing and modernize the build & dev toolchain ([#163](https://github.com/untemps/svelte-palette/issues/163)) ([543d9aa](https://github.com/untemps/svelte-palette/commit/543d9aa215c06deb675d8aa59d7a2a17212bd661))
+
 # [5.2.0](https://github.com/untemps/svelte-palette/compare/v5.1.1...v5.2.0) (2026-03-26)
 
 ### Features
