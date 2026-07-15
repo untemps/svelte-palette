@@ -60,7 +60,6 @@
 		"font-color-contrast": "^11.1.0",
 		"husky": "^9.0.11",
 		"jsdom": "^24.1.0",
-		"lint-staged": "^16.4.0",
 		"prettier": "^3.3.2",
 		"prettier-plugin-svelte": "^3.5.1",
 		"publint": "^0.2.8",
@@ -125,10 +124,7 @@
 		"test": "vitest watch --coverage",
 		"test:ci": "vitest run --coverage",
 		"lint": "prettier --check .",
-		"format": "prettier --write .",
+		"prettier": "prettier \"*/**/*.{js,svelte}\" --ignore-path ./.prettierignore --write && git add -u && git status",
 		"prepare": "husky"
-	},
-	"lint-staged": {
-		"*": "prettier --write --ignore-unknown"
 	}
 }

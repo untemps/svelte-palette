@@ -1,6 +1,7 @@
 # Build
 /dist
 /.svelte-kit
+/.vercel
 
 # Generated (managed by semantic-release)
 CHANGELOG.md
