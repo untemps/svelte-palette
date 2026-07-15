@@ -1677,18 +1677,18 @@ callsites@^3.0.0:
   resolved "https://registry.yarnpkg.com/callsites/-/callsites-3.1.0.tgz#b3630abd8943432f54b3f0519238e33cd7df2f73"
   integrity sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ==
 
-carbon-components-svelte@^0.85.0:
-  version "0.85.4"
-  resolved "https://registry.yarnpkg.com/carbon-components-svelte/-/carbon-components-svelte-0.85.4.tgz#1a931908c9aef83c3be3a71b08e86ea48bebac12"
-  integrity sha512-8dBgRF8Y6TPu+WiythDrYilNAJbhbpHu3kThJazquCO1hyGftWsa2T0HhY+k4+szIiutcc8qVzUMfRZvcGUflQ==
+carbon-components-svelte@^0.110.0:
+  version "0.110.0"
+  resolved "https://registry.yarnpkg.com/carbon-components-svelte/-/carbon-components-svelte-0.110.0.tgz#3ca8d4723d0a9636f40c54ae7a436fe273c8bd1a"
+  integrity sha512-epaoP7U/u91dYP1wpqqwDvKBkbA99lTtHH35Jm8qRuek7rW0/9mjLhC4eSbO8teUWiHB3w2ru0Ne8vp7WsOGPw==
   dependencies:
     "@ibm/telemetry-js" "^1.5.0"
     flatpickr "4.6.9"
 
-carbon-icons-svelte@^12.9.0:
-  version "12.26.0"
-  resolved "https://registry.yarnpkg.com/carbon-icons-svelte/-/carbon-icons-svelte-12.26.0.tgz#93229475bcec804b72560986d3472da55c5cc191"
-  integrity sha512-UnYW6G5YTZj4EtzLP0IykFG41rWlzodtgOo1OsIP5VGrGN2L16h5MqRS9vhfseG4+ypkJ0OA2xqsstfQhdVyuQ==
+carbon-icons-svelte@^13.13.0:
+  version "13.13.0"
+  resolved "https://registry.yarnpkg.com/carbon-icons-svelte/-/carbon-icons-svelte-13.13.0.tgz#a846f0ddd8b9be45c53f100843913d7655f62cda"
+  integrity sha512-9oBq+RjpCR8Zv5X4yFfPl7zWJb+4/qHTSuhCw8r7SfhC3PBBJiiHgZ5Dn73AjkR88CaOCNTmtSFVEyXplluhEQ==
 
 chai@^6.2.2:
   version "6.2.2"

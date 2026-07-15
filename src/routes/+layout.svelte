@@ -18,7 +18,7 @@
 	let isSideNavOpen = false
 </script>
 
-<Header company="@untemps" platformName="/svelte-palette" bind:isSideNavOpen persistentHamburgerMenu={true}>
+<Header companyName="@untemps" platformName="/svelte-palette" bind:isSideNavOpen persistentHamburgerMenu={true}>
 	<HeaderNav>
 		<HeaderNavItem href="/example1" text="Example 1" />
 		<HeaderNavItem href="/example2" text="Example 2" />
