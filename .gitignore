@@ -3,6 +3,7 @@
 /dist
 /package
 /.svelte-kit
+/.vercel
 
 # Env
 .env
