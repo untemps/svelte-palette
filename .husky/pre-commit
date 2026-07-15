@@ -1,1 +1,1 @@
-yarn test:ci && yarn format
+yarn test:ci && npx --no -- lint-staged
