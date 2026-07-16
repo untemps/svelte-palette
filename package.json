@@ -70,7 +70,7 @@
 		"vitest": "^4.1.0"
 	},
 	"dependencies": {
-		"@untemps/svelte-use-drop-outside": "^1.6.0",
+		"@untemps/svelte-use-drop-outside": "^1.7.0",
 		"@untemps/svelte-use-tooltip": "^4.0.0",
 		"@untemps/utils": "^3.0.0"
 	},

@@ -1306,7 +1306,7 @@
   resolved "https://registry.yarnpkg.com/@untemps/dom-observer/-/dom-observer-4.8.0.tgz#aac12118d342de96baf4e25b0d8ea5959b6ff556"
   integrity sha512-XvinGCPYHPJPg2OiIk8VQl0RMH8Sj+wW/Kx8g5UHPWS3my702wFhBQe8zp518jB7MMma8V6J+SOgvr4TuoU9hw==
 
-"@untemps/svelte-use-drop-outside@^1.6.0":
+"@untemps/svelte-use-drop-outside@^1.7.0":
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/@untemps/svelte-use-drop-outside/-/svelte-use-drop-outside-1.7.0.tgz#e77fdce30a369f653afdac23bb2edbc4e6469e8b"
   integrity sha512-pOvBa0+hL/rVKEzclq7TBoHB8Ai+p9+D8/vqW7MHmtxR/ZdX5+aS8zuCK7ZulUfwVTs03NC3S+XDxg2OgAfK2w==
