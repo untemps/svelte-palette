@@ -93,7 +93,7 @@
   dependencies:
     "@babel/types" "^7.29.7"
 
-"@babel/runtime@^7.12.5", "@babel/runtime@^7.17.8":
+"@babel/runtime@^7.12.5":
   version "7.29.7"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.29.7.tgz#12022450c45a4da6d8d8287b18a4ff2ddb23f768"
   integrity sha512-Nq8OhGWiZIZGV6hLHoyAKLLcJihP/xFeBMGJoUrxTX2psI8dCifzLhZISFb+VWS3wFMRDmCGw5R+dOySCqPLhw==
@@ -1301,6 +1301,11 @@
   resolved "https://registry.yarnpkg.com/@untemps/dom-observer/-/dom-observer-2.1.0.tgz#6eae530a298970fb1b097d273663a07e51a07f3f"
   integrity sha512-ggMiuSPIBFEgp645T71djHdRAdhgCfif0Zuxv1hlGc0PQyOxEBihpDM+n7OOLqmedqc9xnMzg9sol2dqsoFRDA==
 
+"@untemps/dom-observer@^4.0.0":
+  version "4.8.0"
+  resolved "https://registry.yarnpkg.com/@untemps/dom-observer/-/dom-observer-4.8.0.tgz#aac12118d342de96baf4e25b0d8ea5959b6ff556"
+  integrity sha512-XvinGCPYHPJPg2OiIk8VQl0RMH8Sj+wW/Kx8g5UHPWS3my702wFhBQe8zp518jB7MMma8V6J+SOgvr4TuoU9hw==
+
 "@untemps/svelte-use-drop-outside@^1.6.0":
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/@untemps/svelte-use-drop-outside/-/svelte-use-drop-outside-1.7.0.tgz#e77fdce30a369f653afdac23bb2edbc4e6469e8b"
@@ -1309,26 +1314,19 @@
     "@untemps/dom-observer" "^2.0.0"
     "@untemps/utils" "3"
 
-"@untemps/svelte-use-tooltip@^2.8.0":
-  version "2.8.0"
-  resolved "https://registry.yarnpkg.com/@untemps/svelte-use-tooltip/-/svelte-use-tooltip-2.8.0.tgz#e2c167a9397fa364f3ddd029e29adafa68c2f29c"
-  integrity sha512-rXzYyU1JzKucyjAr4J+byrDUk0eFhwC8ggiitJE/v945OJDjjA29dA2d+DTjyppqlm2ZQZzGHYKY5hrdRKdrAg==
+"@untemps/svelte-use-tooltip@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@untemps/svelte-use-tooltip/-/svelte-use-tooltip-4.0.0.tgz#6c79dec72b61b5952c63943810d56fbfb0d0c314"
+  integrity sha512-mE0F5xgD63KDTFVqoJ9jjl9HCPjUbON2cFgf/1c6940s4vqcRexF5pniDfqJS32IhIQzSBRnLyBOi52uAu7jzQ==
   dependencies:
-    "@untemps/dom-observer" "^2.0.0"
-    "@untemps/utils" "^2.4.0"
-    svelte "3.49.0"
+    "@untemps/dom-observer" "^4.0.0"
+    "@untemps/utils" "^3.0.0"
+    esm-env "^1.0.0"
 
 "@untemps/utils@3", "@untemps/utils@^3.0.0":
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/@untemps/utils/-/utils-3.2.1.tgz#4cd521f661f2376d48ad51e6f8b209bfe4c516a7"
   integrity sha512-6+lQBrEEtRd0s/sdz7Q+ooeSDbQ40wCRN/4hxJP978xSZ/m6T3H29QVHyDWIdx7Bbnk9nyrq6KPkAt68gt3wWg==
-
-"@untemps/utils@^2.4.0":
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/@untemps/utils/-/utils-2.6.0.tgz#986fe9846d664c29b5c0dca84cb4f8b4112987e3"
-  integrity sha512-3B5bb4iYkh2h86vqtY8+Mo9vdX1s/NT1cltWpS4U3/WHXFgy/4lJ9180vELJv01MbNNhjlZPtJCMtBp7Fpsb1Q==
-  dependencies:
-    "@babel/runtime" "^7.17.8"
 
 "@vercel/nft@^1.3.2":
   version "1.10.2"
@@ -2172,7 +2170,7 @@ escape-string-regexp@^1.0.5:
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz#1b61c0562190a8dff6ae3bb2cf0200ca130b86d4"
   integrity sha512-vbRorB5FUQWvla16U8R/qgaFIya2qGzwDrNmCZuYKrbdSUMG6I1ZCGQRefkRVhuOkIGVne7BQ35DSfo1qvJqFg==
 
-esm-env@^1.2.1, esm-env@^1.2.2:
+esm-env@^1.0.0, esm-env@^1.2.1, esm-env@^1.2.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/esm-env/-/esm-env-1.2.2.tgz#263c9455c55861f41618df31b20cb571fc20b75e"
   integrity sha512-Epxrv+Nr/CaL4ZcFGPJIYLWFom+YeV1DqMLHJoEd9SYRxNbaFruBwfEX/kkHUJf55j2+TUbmDcmuilbP1TmXHA==
@@ -4431,11 +4429,6 @@ svelte2tsx@~0.7.55:
   dependencies:
     dedent-js "^1.0.1"
     scule "^1.3.0"
-
-svelte@3.49.0:
-  version "3.49.0"
-  resolved "https://registry.yarnpkg.com/svelte/-/svelte-3.49.0.tgz#5baee3c672306de1070c3b7888fc2204e36a4029"
-  integrity sha512-+lmjic1pApJWDfPCpUUTc1m8azDqYCG1JN9YEngrx/hUyIcFJo6VZhj0A1Ai0wqoHcEIuQy+e9tk+4uDgdtsFA==
 
 svelte@^5.53.5:
   version "5.56.5"

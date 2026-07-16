@@ -16,6 +16,7 @@ const createAction = (node, deletionMode, options) => {
 					},
 				},
 				containerClassName: options.tooltipClassName,
+				portal: false,
 			})
 		}
 		case DROP: {
