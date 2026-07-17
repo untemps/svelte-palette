@@ -20,7 +20,7 @@
 	 * @property {(event: MouseEvent) => void} [onclick] Called when the button is clicked.
 	 */
 
-	/** @type {Props & Record<string, any>} */
+	/** @type {Props & Omit<import('svelte/elements').HTMLButtonAttributes, keyof Props>} */
 	let { icon = null, isActive = false, class: className = '', onclick, ...restProps } = $props()
 
 	const ICONS = {

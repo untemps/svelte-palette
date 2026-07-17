@@ -14,7 +14,7 @@
 	 * @property {(args: SelectEventArgs) => void} [onselect] Called when the slot is clicked.
 	 */
 
-	/** @type {Props & Record<string, any>} */
+	/** @type {Props & Omit<import('svelte/elements').HTMLButtonAttributes, keyof Props>} */
 	let {
 		color = null,
 		selected = false,

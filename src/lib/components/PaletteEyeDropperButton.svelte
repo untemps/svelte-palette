@@ -14,7 +14,7 @@
 	 * @property {(args: ErrorEventArgs) => void} [onerror] Called when the eye dropper fails or is dismissed.
 	 */
 
-	/** @type {Props & Record<string, any>} */
+	/** @type {Props & Omit<import('svelte/elements').HTMLButtonAttributes, keyof Props>} */
 	let { onadd = undefined, onerror = undefined, ...restProps } = $props()
 
 	const _onClick = async () => {

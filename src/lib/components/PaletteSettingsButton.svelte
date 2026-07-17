@@ -8,7 +8,7 @@
 	 * @property {(event: MouseEvent) => void} [onclick] Called when the button is clicked.
 	 */
 
-	/** @type {Props & Record<string, any>} */
+	/** @type {Props & Omit<import('svelte/elements').HTMLButtonAttributes, keyof Props>} */
 	let { onclick = undefined, ...restProps } = $props()
 </script>
 

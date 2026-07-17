@@ -160,7 +160,7 @@ export interface ToolsSnippetProps {
 	compactColorIndices: number[]
 	/** Whether the palette is displayed in compact mode. */
 	isCompact: boolean
-	/** Activates a tool by name (use the exported `PaletteTool` enums). */
+	/** Activates a tool by name (use the exported `COMPACT` and `SETTINGS` constants). */
 	onSelect: (tool: PaletteToolName) => void
 }
 
