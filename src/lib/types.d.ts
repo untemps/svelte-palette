@@ -130,8 +130,8 @@ export interface SlotSnippetProps {
 	index: number
 	/** The color value of the slot. */
 	color: ColorValue
-	/** The color name, when the color was provided as an object. */
-	colorName: string | null
+	/** The color name, when the color was provided as an object; `undefined` for bare color values. */
+	colorName?: string
 	/** The group name, only provided when the colors are grouped. */
 	groupName?: string
 	/** The currently selected color, or `null` when none is selected. */
