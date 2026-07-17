@@ -37,6 +37,14 @@
 </script>
 
 <script>
+	/**
+	 * @typedef {Object} Props
+	 * @property {string} [target] Selector or element the panel is portalled into.
+	 * @property {boolean} [isVisible] Whether the panel is visible.
+	 * @property {import('svelte').Snippet} [children] Panel content.
+	 */
+
+	/** @type {Props} */
 	let { target = 'body', isVisible = false, children } = $props()
 </script>
 

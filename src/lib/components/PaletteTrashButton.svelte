@@ -1,6 +1,14 @@
 <script>
 	import TrashIcon from './icons/TrashIcon.svelte'
 
+	/**
+	 * @typedef {Object} Props
+	 * @property {boolean} [isActive] Whether the button is in its active state.
+	 * @property {string} [class] Class name applied to the button.
+	 * @property {(event: MouseEvent) => void} [onclick] Called when the button is clicked.
+	 */
+
+	/** @type {Props & Record<string, any>} */
 	let { isActive = false, class: className = '', onclick = undefined, ...restProps } = $props()
 </script>
 

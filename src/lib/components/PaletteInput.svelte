@@ -9,6 +9,21 @@
 
 	import { COLOR_REGEX, isColorValid } from '../utils/utils'
 
+	/**
+	 * @typedef {import('../types').ColorValue} ColorValue
+	 * @typedef {import('../types').InputType} InputType
+	 * @typedef {import('../types').AddEventArgs} AddEventArgs
+	 */
+
+	/**
+	 * @typedef {Object} Props
+	 * @property {ColorValue | null} [color] The color pre-filled in the input.
+	 * @property {InputType} [inputType] Type of the input.
+	 * @property {(args: AddEventArgs) => void} [onadd] Called when a color is submitted.
+	 * @property {string} [class] Class name applied to the root element.
+	 */
+
+	/** @type {Props} */
 	let { color: colorProp = null, inputType = 'text', onadd = undefined, class: className = '' } = $props()
 
 	let color = $state(untrack(() => colorProp?.replace(COLOR_REGEX, '#$1') || ''))

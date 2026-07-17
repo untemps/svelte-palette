@@ -34,6 +34,9 @@
 		".": {
 			"types": "./dist/index.d.ts",
 			"svelte": "./dist/index.js"
+		},
+		"./types": {
+			"types": "./dist/types.d.ts"
 		}
 	},
 	"engines": {

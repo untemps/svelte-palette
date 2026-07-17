@@ -8,6 +8,19 @@
 	import TrashIcon from './icons/TrashIcon.svelte'
 	import SettingsIcon from './icons/SettingsIcon.svelte'
 
+	/**
+	 * @typedef {import('../types').PaletteIconName} PaletteIconName
+	 */
+
+	/**
+	 * @typedef {Object} Props
+	 * @property {PaletteIconName | null} [icon] Icon to render.
+	 * @property {boolean} [isActive] Whether the button is in its active state.
+	 * @property {string} [class] Class name applied to the button.
+	 * @property {(event: MouseEvent) => void} [onclick] Called when the button is clicked.
+	 */
+
+	/** @type {Props & Record<string, any>} */
 	let { icon = null, isActive = false, class: className = '', onclick, ...restProps } = $props()
 
 	const ICONS = {
