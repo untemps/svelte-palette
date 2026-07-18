@@ -91,3 +91,45 @@ test('Calls transition fn when slot enters the DOM', () => {
 	setup(PaletteSlot, { props: { color, transition: { fn: transitionFn } } })
 	expect(transitionFn).toHaveBeenCalled()
 })
+
+test('Exposes the option role', () => {
+	const color = '#ff0'
+	setup(PaletteSlot, { color })
+	const slot = screen.getByTestId('__palette-slot__')
+	expect(slot).toHaveAttribute('role', 'option')
+})
+
+test('Reflects the selected state through aria-selected', () => {
+	const color = '#ff0'
+	setup(PaletteSlot, { color, selected: true })
+	const slot = screen.getByTestId('__palette-slot__')
+	expect(slot).toHaveAttribute('aria-selected', 'true')
+})
+
+test('Sets aria-selected to false when not selected', () => {
+	const color = '#ff0'
+	setup(PaletteSlot, { color })
+	const slot = screen.getByTestId('__palette-slot__')
+	expect(slot).toHaveAttribute('aria-selected', 'false')
+})
+
+test('Defaults tabindex to 0', () => {
+	const color = '#ff0'
+	setup(PaletteSlot, { color })
+	const slot = screen.getByTestId('__palette-slot__')
+	expect(slot).toHaveAttribute('tabindex', '0')
+})
+
+test('Applies the provided tabindex', () => {
+	const color = '#ff0'
+	setup(PaletteSlot, { color, tabindex: -1 })
+	const slot = screen.getByTestId('__palette-slot__')
+	expect(slot).toHaveAttribute('tabindex', '-1')
+})
+
+test('Lets consumers override the role', () => {
+	const color = '#ff0'
+	setup(PaletteSlot, { color, ['role']: 'presentation' })
+	const slot = screen.getByTestId('__palette-slot__')
+	expect(slot).toHaveAttribute('role', 'presentation')
+})

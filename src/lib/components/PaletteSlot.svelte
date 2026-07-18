@@ -11,6 +11,8 @@
 		selected?: boolean
 		/** Whether the slot is disabled. */
 		disabled?: boolean
+		/** Tab index applied to the slot button. Used to build the grid roving tabindex. */
+		tabindex?: number
 		/** Animation applied when the slot is rendered. */
 		transition?: Transition | null
 		/** Called when the slot is clicked. */
@@ -21,6 +23,7 @@
 		color = null,
 		selected = false,
 		disabled = false,
+		tabindex = 0,
 		transition = null,
 		onselect = undefined,
 		...restProps
@@ -37,12 +40,15 @@
 <button
 	data-testid="__palette-slot__"
 	aria-label={color}
+	role="option"
+	aria-selected={selected}
 	{...restProps}
 	class:empty={!color}
 	class:selected
 	class:clickable={!disabled}
 	style="--color:{color}; --outerBorderColor:{color || '#aaa'};"
 	{disabled}
+	{tabindex}
 	in:enter
 	onclick={_onClick}
 ></button>

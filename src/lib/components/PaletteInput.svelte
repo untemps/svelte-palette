@@ -79,6 +79,7 @@
 				data-testid="__palette-input-slot__"
 				{color}
 				role="presentation"
+				aria-selected={undefined}
 				tabindex={-1}
 				disabled
 			/>{/if}
