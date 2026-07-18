@@ -1,3 +1,10 @@
+# [5.4.0](https://github.com/untemps/svelte-palette/compare/v5.3.0...v5.4.0) (2026-07-18)
+
+
+### Features
+
+* Complete the TypeScript migration ([#214](https://github.com/untemps/svelte-palette/issues/214)) ([ce0dc78](https://github.com/untemps/svelte-palette/commit/ce0dc78d9aae2f5ff3e3f74c25a7c5e15b8f6bf4))
+
 # [5.3.0](https://github.com/untemps/svelte-palette/compare/v5.2.1...v5.3.0) (2026-07-18)
 
 
