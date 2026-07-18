@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte'
 	import { fade, blur, fly, scale } from 'svelte/transition'
 	import { elasticOut } from 'svelte/easing'
@@ -149,7 +149,7 @@
 										labelText="Input Type"
 										inline
 										selected={inputType}
-										on:change={(e) => (inputType = e.target.value)}
+										on:change={(e) => (inputType = (e.target as HTMLSelectElement).value)}
 									>
 										<SelectItem value="text" />
 										<SelectItem value="color" />
@@ -192,7 +192,7 @@
 										labelText="Deletion Mode"
 										inline
 										selected={deletionMode}
-										on:change={(e) => (deletionMode = e.target.value)}
+										on:change={(e) => (deletionMode = (e.target as HTMLSelectElement).value)}
 									>
 										<SelectItem value="none" />
 										<SelectItem value="tooltip" />
@@ -247,7 +247,7 @@
 										labelText="Transition Type"
 										inline
 										bind:selected={transitionType}
-										on:change={(e) => (transitionType = e.target.value)}
+										on:change={(e) => (transitionType = (e.target as HTMLSelectElement).value)}
 									>
 										<SelectItem value="none" />
 										<SelectItem value="custom" />

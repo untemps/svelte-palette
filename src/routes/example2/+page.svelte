@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { Palette } from '$lib'
 
 	const colors1 = ['#EDEDE9', '#D6CCC2', '#F5EBE0', '#E3D5CA', '#D5BDAF']
