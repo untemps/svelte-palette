@@ -1,3 +1,10 @@
+# [5.3.0](https://github.com/untemps/svelte-palette/compare/v5.2.1...v5.3.0) (2026-07-18)
+
+
+### Features
+
+* Add TypeScript support ([#212](https://github.com/untemps/svelte-palette/issues/212)) ([f3a3d30](https://github.com/untemps/svelte-palette/commit/f3a3d307cc2d10706413d5b27c32ea0725eab5a7))
+
 ## [5.2.1](https://github.com/untemps/svelte-palette/compare/v5.2.0...v5.2.1) (2026-07-15)
 
 
