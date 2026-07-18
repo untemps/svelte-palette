@@ -126,7 +126,7 @@
 		"test": "vitest watch --coverage",
 		"test:ci": "vitest run --coverage",
 		"lint": "prettier --check .",
-		"prettier": "prettier \"*/**/*.{js,svelte}\" --ignore-path ./.prettierignore --write && git add -u && git status",
+		"prettier": "prettier \"*/**/*.{js,ts,svelte}\" --ignore-path ./.prettierignore --write && git add -u && git status",
 		"prepare": "husky"
 	}
 }
