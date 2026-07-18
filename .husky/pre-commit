@@ -1,1 +1,1 @@
-yarn test:ci && yarn prettier
+yarn run check && yarn test:ci && yarn prettier

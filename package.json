@@ -67,6 +67,7 @@
 		"publint": "^0.3.21",
 		"semantic-release": "^25.0.3",
 		"svelte": "^5.53.5",
+		"svelte-check": "^4.7.3",
 		"tslib": "^2.6.3",
 		"typescript": "^6.0.3",
 		"vite": "^8.0.0",
@@ -126,6 +127,7 @@
 		"test": "vitest watch --coverage",
 		"test:ci": "vitest run --coverage",
 		"lint": "prettier --check .",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"prettier": "prettier \"*/**/*.{js,ts,svelte}\" --ignore-path ./.prettierignore --write && git add -u && git status",
 		"prepare": "husky"
 	}

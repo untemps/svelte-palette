@@ -23,6 +23,7 @@ jobs:
                   node-version: '24'
             - run: yarn install --frozen-lockfile
             - run: yarn test:ci
+            - run: yarn run check
             - run: yarn build
             - run: npx semantic-release
               env:
