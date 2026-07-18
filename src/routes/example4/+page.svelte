@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import fontColorContrast from 'font-color-contrast'
 
 	import { Palette, PaletteInput, PaletteSlot } from '$lib'

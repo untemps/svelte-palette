@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { COMPACT, ENLARGE, EYE_DROPPER, PLUS, SETTINGS, TRASH } from '../enums/PaletteIcon'
 
 	import CompactIcon from './icons/CompactIcon.svelte'
@@ -8,20 +8,28 @@
 	import TrashIcon from './icons/TrashIcon.svelte'
 	import SettingsIcon from './icons/SettingsIcon.svelte'
 
-	/**
-	 * @typedef {import('../types').PaletteIconName} PaletteIconName
-	 */
+	import type { HTMLButtonAttributes } from 'svelte/elements'
 
-	/**
-	 * @typedef {Object} Props
-	 * @property {PaletteIconName | null} [icon] Icon to render.
-	 * @property {boolean} [isActive] Whether the button is in its active state.
-	 * @property {string} [class] Class name applied to the button.
-	 * @property {(event: MouseEvent) => void} [onclick] Called when the button is clicked.
-	 */
+	import type { PaletteIconName } from '../types'
 
-	/** @type {Props & Omit<import('svelte/elements').HTMLButtonAttributes, keyof Props>} */
-	let { icon = null, isActive = false, class: className = '', onclick, ...restProps } = $props()
+	interface Props {
+		/** Icon to render. */
+		icon?: PaletteIconName | null
+		/** Whether the button is in its active state. */
+		isActive?: boolean
+		/** Class name applied to the button. */
+		class?: HTMLButtonAttributes['class']
+		/** Called when the button is clicked. */
+		onclick?: (event: MouseEvent) => void
+	}
+
+	let {
+		icon = null,
+		isActive = false,
+		class: className = '',
+		onclick,
+		...restProps
+	}: Props & Omit<HTMLButtonAttributes, keyof Props> = $props()
 
 	const ICONS = {
 		[COMPACT]: CompactIcon,
@@ -41,7 +49,7 @@
 	class:icon_button__button--active={isActive}
 	{onclick}
 >
-	{#if ICONS[icon]}
+	{#if icon && ICONS[icon]}
 		{@const IconComponent = ICONS[icon]}
 		<IconComponent />
 	{/if}

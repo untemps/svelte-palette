@@ -1,20 +1,22 @@
-<script>
-	/**
-	 * @typedef {import('../types').ColorValue} ColorValue
-	 * @typedef {import('../types').Transition} Transition
-	 * @typedef {import('../types').SelectEventArgs} SelectEventArgs
-	 */
+<script lang="ts">
+	import type { HTMLButtonAttributes } from 'svelte/elements'
+	import type { TransitionConfig } from 'svelte/transition'
 
-	/**
-	 * @typedef {Object} Props
-	 * @property {ColorValue | null} [color] The color value of the slot.
-	 * @property {boolean} [selected] Whether the slot is selected.
-	 * @property {boolean} [disabled] Whether the slot is disabled.
-	 * @property {Transition | null} [transition] Animation applied when the slot is rendered.
-	 * @property {(args: SelectEventArgs) => void} [onselect] Called when the slot is clicked.
-	 */
+	import type { ColorValue, SelectEventArgs, Transition } from '../types'
 
-	/** @type {Props & Omit<import('svelte/elements').HTMLButtonAttributes, keyof Props>} */
+	interface Props {
+		/** The color value of the slot. */
+		color?: ColorValue | null
+		/** Whether the slot is selected. */
+		selected?: boolean
+		/** Whether the slot is disabled. */
+		disabled?: boolean
+		/** Animation applied when the slot is rendered. */
+		transition?: Transition | null
+		/** Called when the slot is clicked. */
+		onselect?: (args: SelectEventArgs) => void
+	}
+
 	let {
 		color = null,
 		selected = false,
@@ -22,11 +24,11 @@
 		transition = null,
 		onselect = undefined,
 		...restProps
-	} = $props()
+	}: Props & Omit<HTMLButtonAttributes, keyof Props> = $props()
 
-	const enter = (node) => transition?.fn(node, transition?.args)
+	const enter = (node: Element): TransitionConfig => transition?.fn(node, transition?.args) ?? {}
 
-	const _onClick = (e) => {
+	const _onClick = (e: MouseEvent) => {
 		e.preventDefault()
 		!disabled && onselect?.({ color })
 	}

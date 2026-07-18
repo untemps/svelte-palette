@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { onMount, untrack } from 'svelte'
 
 	import { PLUS } from '../enums/PaletteIcon'
@@ -9,22 +9,20 @@
 
 	import { COLOR_REGEX, isColorValid } from '../utils/utils'
 
-	/**
-	 * @typedef {import('../types').ColorValue} ColorValue
-	 * @typedef {import('../types').InputType} InputType
-	 * @typedef {import('../types').AddEventArgs} AddEventArgs
-	 */
+	import type { AddEventArgs, ColorValue, InputType } from '../types'
 
-	/**
-	 * @typedef {Object} Props
-	 * @property {ColorValue | null} [color] The color pre-filled in the input.
-	 * @property {InputType} [inputType] Type of the input.
-	 * @property {(args: AddEventArgs) => void} [onadd] Called when a color is submitted.
-	 * @property {string} [class] Class name applied to the root element.
-	 */
+	interface Props {
+		/** The color pre-filled in the input. */
+		color?: ColorValue | null
+		/** Type of the input. */
+		inputType?: InputType
+		/** Called when a color is submitted. */
+		onadd?: (args: AddEventArgs) => void
+		/** Class name applied to the root element. */
+		class?: string
+	}
 
-	/** @type {Props} */
-	let { color: colorProp = null, inputType = 'text', onadd = undefined, class: className = '' } = $props()
+	let { color: colorProp = null, inputType = 'text', onadd = undefined, class: className = '' }: Props = $props()
 
 	let color = $state(untrack(() => colorProp?.replace(COLOR_REGEX, '#$1') || ''))
 	let _isEyeDropperAvailable = $state(false)
@@ -33,8 +31,8 @@
 		color = colorProp?.replace(COLOR_REGEX, '#$1') || ''
 	})
 
-	let _gridColumnStart = $derived(2 - +(inputType === 'color'))
-	let _gridColumnEnd = $derived((_isEyeDropperAvailable ? 5 : 6) + +(inputType === 'color'))
+	let _gridColumnStart = $derived(2 - Number(inputType === 'color'))
+	let _gridColumnEnd = $derived((_isEyeDropperAvailable ? 5 : 6) + Number(inputType === 'color'))
 
 	let isValid = $derived(isColorValid(color))
 
@@ -43,12 +41,13 @@
 		return () => document.removeEventListener('keypress', _onKeyPress)
 	})
 
-	const _onInputChange = (e) => {
+	const _onInputChange = (e: Event) => {
 		e.preventDefault()
-		color = e.target.value?.replace(COLOR_REGEX, '#$1') || e.target.value
+		const target = e.target as HTMLInputElement
+		color = target.value?.replace(COLOR_REGEX, '#$1') || target.value
 	}
 
-	const _onKeyPress = (e) => {
+	const _onKeyPress = (e: KeyboardEvent) => {
 		e.code === 'Enter' && _onSubmit()
 	}
 
@@ -60,7 +59,7 @@
 		document?.removeEventListener('keypress', _onKeyPress)
 	}
 
-	const _onEyeDropperAdd = ({ color: value }) => {
+	const _onEyeDropperAdd = ({ color: value }: AddEventArgs) => {
 		color = value
 	}
 
@@ -80,7 +79,7 @@
 				data-testid="__palette-input-slot__"
 				{color}
 				role="presentation"
-				tabindex="-1"
+				tabindex={-1}
 				disabled
 			/>{/if}
 		<span class="palette_input__adder">

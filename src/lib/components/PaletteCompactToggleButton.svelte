@@ -1,15 +1,21 @@
-<script>
+<script lang="ts">
 	import { COMPACT, ENLARGE } from '../enums/PaletteIcon'
 	import PaletteIconButton from './PaletteIconButton.svelte'
 
-	/**
-	 * @typedef {Object} Props
-	 * @property {boolean} [isCompact] Whether the palette is currently compact.
-	 * @property {(event: MouseEvent) => void} [onclick] Called when the button is clicked.
-	 */
+	import type { HTMLButtonAttributes } from 'svelte/elements'
 
-	/** @type {Props & Omit<import('svelte/elements').HTMLButtonAttributes, keyof Props>} */
-	let { isCompact = false, onclick = undefined, ...restProps } = $props()
+	interface Props {
+		/** Whether the palette is currently compact. */
+		isCompact?: boolean
+		/** Called when the button is clicked. */
+		onclick?: (event: MouseEvent) => void
+	}
+
+	let {
+		isCompact = false,
+		onclick = undefined,
+		...restProps
+	}: Props & Omit<HTMLButtonAttributes, keyof Props> = $props()
 </script>
 
 <PaletteIconButton

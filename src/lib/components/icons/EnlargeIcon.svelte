@@ -1,3 +1,5 @@
+<script lang="ts"></script>
+
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" data-testid="__enlarge-icon__"
 	><rect width="256" height="256" fill="none" /><polyline
 		points="160 48 208 48 208 96"

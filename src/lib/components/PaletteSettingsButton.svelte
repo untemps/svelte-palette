@@ -1,15 +1,16 @@
-<script>
+<script lang="ts">
 	import { SETTINGS } from '../enums/PaletteIcon'
 
 	import PaletteIconButton from './PaletteIconButton.svelte'
 
-	/**
-	 * @typedef {Object} Props
-	 * @property {(event: MouseEvent) => void} [onclick] Called when the button is clicked.
-	 */
+	import type { HTMLButtonAttributes } from 'svelte/elements'
 
-	/** @type {Props & Omit<import('svelte/elements').HTMLButtonAttributes, keyof Props>} */
-	let { onclick = undefined, ...restProps } = $props()
+	interface Props {
+		/** Called when the button is clicked. */
+		onclick?: (event: MouseEvent) => void
+	}
+
+	let { onclick = undefined, ...restProps }: Props & Omit<HTMLButtonAttributes, keyof Props> = $props()
 </script>
 
 <PaletteIconButton

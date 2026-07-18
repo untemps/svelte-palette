@@ -1,9 +1,23 @@
+import type { Action } from 'svelte/action'
+
 import { useTooltip } from '@untemps/svelte-use-tooltip'
 import { useDropOutside } from '@untemps/svelte-use-drop-outside'
 
 import { TOOLTIP, DROP } from '../enums/PaletteDeletionMode'
 
-const createAction = (node, deletionMode, options) => {
+import type { DeletionMode } from '../types'
+
+export interface UseDeletionOptions {
+	onDelete?: () => void
+	tooltipContentSelector?: string | null
+	tooltipClassName?: string | null
+}
+
+export interface UseDeletionParameter extends UseDeletionOptions {
+	deletionMode?: DeletionMode
+}
+
+const createAction = (node: HTMLElement, deletionMode: DeletionMode | undefined, options: UseDeletionOptions) => {
 	switch (deletionMode) {
 		case TOOLTIP: {
 			return useTooltip(node, {
@@ -11,7 +25,7 @@ const createAction = (node, deletionMode, options) => {
 				contentActions: {
 					'*': {
 						eventType: 'click',
-						callback: options.onDelete,
+						callback: options.onDelete ?? (() => {}),
 						closeOnCallback: true,
 					},
 				},
@@ -21,7 +35,7 @@ const createAction = (node, deletionMode, options) => {
 		}
 		case DROP: {
 			const slotButton = node.querySelector('[data-testid="__palette-slot__"]')
-			const dragImage = slotButton ? slotButton.cloneNode(true) : undefined
+			const dragImage = slotButton ? (slotButton.cloneNode(true) as HTMLElement) : undefined
 			if (dragImage) {
 				dragImage.removeAttribute('data-testid')
 			}
@@ -38,17 +52,17 @@ const createAction = (node, deletionMode, options) => {
 	}
 }
 
-const useDeletion = (node, { deletionMode, ...options }) => {
-	let mode = deletionMode
+const useDeletion: Action<HTMLElement, UseDeletionParameter> = (node, parameter) => {
+	const { deletionMode, ...options } = parameter ?? {}
 	let action = createAction(node, deletionMode, options)
 
 	return {
-		update: ({ deletionMode: newDeletionMode, ...newOptions }) => {
-			mode = newDeletionMode
-			action?.destroy()
+		update: (newParameter) => {
+			const { deletionMode: newDeletionMode, ...newOptions } = newParameter ?? {}
+			action?.destroy?.()
 			action = createAction(node, newDeletionMode || deletionMode, { ...options, ...newOptions })
 		},
-		destroy: () => action?.destroy(),
+		destroy: () => action?.destroy?.(),
 	}
 }
 

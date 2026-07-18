@@ -1,6 +1,11 @@
-<script module>
-	export const usePortal = (node, { target = 'body', visible = false }) => {
-		const getTargetEl = (selector) => {
+<script module lang="ts">
+	import type { Action } from 'svelte/action'
+
+	export const usePortal: Action<HTMLElement, { target?: string; visible?: boolean }> = (
+		node,
+		{ target = 'body', visible = false }
+	) => {
+		const getTargetEl = (selector: string): Element | null => {
 			if (!!selector) {
 				return document.querySelector(selector)
 			}
@@ -36,16 +41,19 @@
 	}
 </script>
 
-<script>
-	/**
-	 * @typedef {Object} Props
-	 * @property {string} [target] Selector or element the panel is portalled into.
-	 * @property {boolean} [isVisible] Whether the panel is visible.
-	 * @property {import('svelte').Snippet} [children] Panel content.
-	 */
+<script lang="ts">
+	import type { Snippet } from 'svelte'
 
-	/** @type {Props} */
-	let { target = 'body', isVisible = false, children } = $props()
+	interface Props {
+		/** Selector or element the panel is portalled into. */
+		target?: string
+		/** Whether the panel is visible. */
+		isVisible?: boolean
+		/** Panel content. */
+		children?: Snippet
+	}
+
+	let { target = 'body', isVisible = false, children }: Props = $props()
 </script>
 
 <section
