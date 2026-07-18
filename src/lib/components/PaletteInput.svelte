@@ -48,7 +48,7 @@
 	}
 
 	const _onKeyPress = (e: KeyboardEvent) => {
-		e.code === 'Enter' && _onSubmit()
+		e.key === 'Enter' && _onSubmit()
 	}
 
 	const _onInputFocus = () => {
@@ -64,7 +64,7 @@
 	}
 
 	const _onSubmit = () => {
-		onadd?.({ color })
+		isValid && onadd?.({ color })
 	}
 </script>
 
@@ -74,7 +74,7 @@
 	class="palette__input {className}"
 	style="--grid-column-start: {_gridColumnStart}; --grid-column-end: {_gridColumnEnd}"
 >
-	<form>
+	<form onsubmit={(e) => e.preventDefault()}>
 		{#if inputType !== 'color'}<PaletteSlot
 				data-testid="__palette-input-slot__"
 				{color}
@@ -97,7 +97,7 @@
 			/>
 			<PaletteIconButton
 				data-testid="__palette-input-submit__"
-				type="submit"
+				type="button"
 				icon={PLUS}
 				disabled={!isValid}
 				aria-label="Submit the hex color value"

@@ -6,7 +6,6 @@ import { createRawSnippet } from 'svelte'
 
 import Palette from '../Palette.svelte'
 
-// TODO: Fix "Error: Not implemented: HTMLFormElement.prototype.requestSubmit"
 import { TOOLTIP, DROP } from '../../enums/PaletteDeletionMode'
 
 const setup = (component: Parameters<typeof render>[0], options?: Parameters<typeof render>[1]) => {
