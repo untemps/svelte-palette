@@ -128,6 +128,8 @@ export interface EdgeSlotSnippetProps {
 export interface SlotSnippetProps {
 	/** Index of the color within its list (or group). */
 	index: number
+	/** Roving tab index to forward to the custom slot so it joins arrow-key navigation (`0` when active, `-1` otherwise). */
+	tabindex: number
 	/** The color value of the slot. */
 	color: ColorValue
 	/** The color name, when the color was provided as an object; `undefined` for bare color values. */

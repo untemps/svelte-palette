@@ -421,3 +421,116 @@ test('Does not set aria-labelledby on a group without a name', async () => {
 	const group = await screen.findByRole('group')
 	expect(group).not.toHaveAttribute('aria-labelledby')
 })
+
+test('Makes only the first swatch tabbable when nothing is selected', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	setup(Palette, { colors })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots[0]).toHaveAttribute('tabindex', '0')
+	expect(slots[1]).toHaveAttribute('tabindex', '-1')
+	expect(slots[2]).toHaveAttribute('tabindex', '-1')
+})
+
+test('Makes the selected swatch the tabbable one', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	setup(Palette, { props: { colors, selectedColor: '#f0f' } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots[0]).toHaveAttribute('tabindex', '-1')
+	expect(slots[1]).toHaveAttribute('tabindex', '-1')
+	expect(slots[2]).toHaveAttribute('tabindex', '0')
+})
+
+test('Moves focus to the next swatch with ArrowRight and rolls the tabindex', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const { user } = setup(Palette, { colors })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	slots[0].focus()
+	await user.keyboard('{ArrowRight}')
+
+	expect(slots[1]).toHaveFocus()
+	await waitFor(() => expect(slots[1]).toHaveAttribute('tabindex', '0'))
+	expect(slots[0]).toHaveAttribute('tabindex', '-1')
+})
+
+test('Moves focus to the previous swatch with ArrowLeft and clamps at the start', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const { user } = setup(Palette, { colors })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	slots[1].focus()
+	await user.keyboard('{ArrowLeft}')
+	expect(slots[0]).toHaveFocus()
+
+	await user.keyboard('{ArrowLeft}')
+	expect(slots[0]).toHaveFocus()
+})
+
+test('Moves focus by a full row with ArrowDown and ArrowUp', async () => {
+	const colors = ['#100', '#200', '#300', '#400', '#500', '#600']
+	const { user } = setup(Palette, { props: { colors, numColumns: 3 } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	slots[0].focus()
+	await user.keyboard('{ArrowDown}')
+	expect(slots[3]).toHaveFocus()
+
+	await user.keyboard('{ArrowUp}')
+	expect(slots[0]).toHaveFocus()
+})
+
+test('Jumps to the first and last swatch with Home and End', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f', '#fff']
+	const { user } = setup(Palette, { colors })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	slots[1].focus()
+	await user.keyboard('{End}')
+	expect(slots[slots.length - 1]).toHaveFocus()
+
+	await user.keyboard('{Home}')
+	expect(slots[0]).toHaveFocus()
+})
+
+test('Does not select a color while navigating with arrow keys', async () => {
+	const onSelect = vi.fn()
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const { user } = setup(Palette, { props: { colors, onselect: onSelect } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	slots[0].focus()
+	await user.keyboard('{ArrowRight}{ArrowRight}')
+
+	expect(onSelect).not.toHaveBeenCalled()
+})
+
+test('Includes the transparent slot as the first navigable option', async () => {
+	const colors = ['#ff0', '#0ff']
+	const { user } = setup(Palette, { props: { colors, showTransparentSlot: true } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(3)
+	expect(slots[0]).toHaveAttribute('aria-label', 'Transparent slot')
+	expect(slots[0]).toHaveAttribute('tabindex', '0')
+
+	slots[0].focus()
+	await user.keyboard('{ArrowRight}')
+	expect(slots[1]).toHaveFocus()
+})
+
+test('Navigates across group boundaries with arrow keys', async () => {
+	const colors = [
+		{ name: 'Reds', colors: ['#f00', '#f11'] },
+		{ name: 'Blues', colors: ['#00f', '#11f'] },
+	]
+	const { user } = setup(Palette, { props: { colors } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(4)
+
+	slots[1].focus()
+	await user.keyboard('{ArrowRight}')
+	expect(slots[2]).toHaveFocus()
+})
