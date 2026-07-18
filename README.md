@@ -244,9 +244,9 @@ The swatch grid follows the [ARIA listbox pattern](https://www.w3.org/WAI/ARIA/a
 | `Home` / `End`    | Move to the first / last swatch    |
 | `Enter` / `Space` | Select the focused swatch          |
 
-Arrow keys only move focus; the selection (and the `onselect` callback) is triggered on `Enter`, `Space` or a click, so navigating the grid never changes the selected color on its own.
+Arrow keys only move focus; the selection (and the `onselect` callback) is triggered on `Enter`, `Space` or a click, so navigating the grid never changes the selected color on its own. In grouped palettes, `↑` / `↓` move by a fixed stride (the widest group's column count) and cross group boundaries, so vertical steps are row-accurate for flat palettes and approximate across groups of different sizes.
 
-> **Custom slots** — the roving tab index is applied automatically to the default swatches. When you replace them through the `slot`, `beforeSlot` or `afterSlot` snippets, forward the provided `tabindex` argument (and, ideally, `role="option"` and `aria-selected`) onto your own element so it joins the arrow-key navigation. A custom slot that ignores `tabindex` keeps working but stays a separate tab stop.
+> **Custom slots** — the roving tab index is managed automatically for the default swatches. Only the [`slot`](#snippets) snippet receives the computed `tabindex` argument: forward it (and, ideally, `role="option"` and `aria-selected`) onto your own element so it joins the arrow-key navigation. A `slot` that ignores `tabindex` keeps working but stays a separate tab stop. The `beforeSlot`, `afterSlot` and `transparentSlot` snippets sit outside the option sequence and are **not** part of the arrow-key navigation — keep any interactive content they render reachable with `Tab`, and avoid giving it `role="option"`.
 
 ## Landmark
 

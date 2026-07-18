@@ -407,19 +407,20 @@ test('Groups swatches and associates each group with its name', async () => {
 	const groups = await screen.findAllByRole('group')
 	expect(groups).toHaveLength(2)
 
+	expect(groups[0]).toHaveAttribute('aria-label', 'Reds')
+	expect(groups[1]).toHaveAttribute('aria-label', 'Blues')
+
 	const names = screen.getAllByTestId('__palette-group-name__')
-	expect(groups[0]).toHaveAttribute('aria-labelledby', names[0].id)
-	expect(groups[1]).toHaveAttribute('aria-labelledby', names[1].id)
 	expect(names[0]).toHaveTextContent('Reds')
 	expect(names[1]).toHaveTextContent('Blues')
 })
 
-test('Does not set aria-labelledby on a group without a name', async () => {
+test('Does not set aria-label on a group without a name', async () => {
 	const colors = [{ colors: ['#f00', '#0f0'] }]
 	setup(Palette, { props: { colors } })
 
 	const group = await screen.findByRole('group')
-	expect(group).not.toHaveAttribute('aria-labelledby')
+	expect(group).not.toHaveAttribute('aria-label')
 })
 
 test('Makes only the first swatch tabbable when nothing is selected', async () => {
@@ -533,4 +534,74 @@ test('Navigates across group boundaries with arrow keys', async () => {
 	slots[1].focus()
 	await user.keyboard('{ArrowRight}')
 	expect(slots[2]).toHaveFocus()
+})
+
+test('Selects the focused swatch with Enter and Space', async () => {
+	const onSelect = vi.fn()
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const { user } = setup(Palette, { props: { colors, onselect: onSelect } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	slots[1].focus()
+	await user.keyboard('{Enter}')
+	expect(onSelect).toHaveBeenLastCalledWith({ color: '#0ff' })
+
+	slots[2].focus()
+	await user.keyboard('{ }')
+	expect(onSelect).toHaveBeenLastCalledWith({ color: '#f0f' })
+})
+
+test('Reflects the selection through aria-selected on the grid options', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	setup(Palette, { props: { colors, selectedColor: '#0ff' } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots[0]).toHaveAttribute('aria-selected', 'false')
+	expect(slots[1]).toHaveAttribute('aria-selected', 'true')
+	expect(slots[2]).toHaveAttribute('aria-selected', 'false')
+})
+
+test('Reflects the selection through aria-selected in group mode', async () => {
+	const colors = [
+		{ name: 'Reds', colors: ['#f00', '#f11'] },
+		{ name: 'Blues', colors: ['#00f'] },
+	]
+	setup(Palette, { props: { colors, selectedColor: '#f11' } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots[0]).toHaveAttribute('aria-selected', 'false')
+	expect(slots[1]).toHaveAttribute('aria-selected', 'true')
+	expect(slots[2]).toHaveAttribute('aria-selected', 'false')
+})
+
+test('Forwards the roving tabindex to custom slot snippets', async () => {
+	const slotSnippet = createRawSnippet((getProps) => ({
+		render: () => `<span data-testid="__custom-slot__" data-tabindex="${getProps().tabindex}"></span>`,
+	}))
+	const colors = ['#ff0', '#0ff', '#f0f']
+	setup(Palette, { props: { colors, slot: slotSnippet } })
+
+	const custom = await screen.findAllByTestId('__custom-slot__')
+	expect(custom).toHaveLength(3)
+	expect(custom[0]).toHaveAttribute('data-tabindex', '0')
+	expect(custom[1]).toHaveAttribute('data-tabindex', '-1')
+	expect(custom[2]).toHaveAttribute('data-tabindex', '-1')
+})
+
+test('Keeps exactly one tabbable swatch after the colors change', async () => {
+	const colors = ['#100', '#200', '#300', '#400', '#500', '#600']
+	const { rerender } = setup(Palette, { props: { colors, numColumns: 3 } })
+
+	let slots = await screen.findAllByTestId('__palette-slot__')
+	slots[4].focus()
+	await waitFor(() => expect(slots[4]).toHaveAttribute('tabindex', '0'))
+
+	rerender({ colors: ['#aa0', '#bb0', '#cc0'], numColumns: 3 })
+
+	await waitFor(async () => {
+		slots = await screen.findAllByTestId('__palette-slot__')
+		expect(slots).toHaveLength(3)
+		expect(slots.filter((slot) => slot.getAttribute('tabindex') === '0')).toHaveLength(1)
+		expect(slots[0]).toHaveAttribute('tabindex', '0')
+	})
 })

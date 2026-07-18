@@ -128,8 +128,6 @@
 		settings = undefined,
 	}: Props = $props()
 
-	const _uid = $props.id()
-
 	let _colors = $state<NormalizedColor[] | null>(null)
 	let _colorGroups = $state<NormalizedColorGroup[] | null>(null)
 	let _numColumns = $state(untrack(() => numColumns))
@@ -153,6 +151,9 @@
 		const _maxCols = maxColumns
 		Promise.resolve(colors).then((results) => {
 			if (!!results) {
+				// Forget the last focused swatch so the roving tab stop falls back to the
+				// selected (or first) option when the color set is replaced.
+				_focusedIndex = null
 				if (isColorGroups(results)) {
 					const newColorGroups = calculateColorGroups(results, {
 						allowDuplicates,
@@ -353,7 +354,6 @@
 				class="palette__groups"
 				role="listbox"
 				aria-label={label}
-				aria-orientation="horizontal"
 				tabindex={-1}
 				onkeydown={_onListboxKeydown}
 				onfocusin={_onListboxFocusin}
@@ -362,18 +362,14 @@
 					<div class="palette__groups__group" role="presentation" data-testid="__palette-group__">
 						{#if group.name}
 							<p
-								id="{_uid}-group-{groupIndex}"
 								class="palette__groups__group__name"
+								aria-hidden="true"
 								data-testid="__palette-group-name__"
 							>
 								{group.name}
 							</p>
 						{/if}
-						<ul
-							class="palette__cells"
-							role="group"
-							aria-labelledby={group.name ? `${_uid}-group-${groupIndex}` : undefined}
-						>
+						<ul class="palette__cells" role="group" aria-label={group.name || undefined}>
 							{#each group.colors as color, colorIndex (`${color.value}_${colorIndex}`)}
 								{@const optionIndex = (_groupOffsets[groupIndex] ?? 0) + colorIndex}
 								<li
@@ -419,7 +415,6 @@
 				class="palette__cells"
 				role="listbox"
 				aria-label={label}
-				aria-orientation="horizontal"
 				tabindex={-1}
 				onkeydown={_onListboxKeydown}
 				onfocusin={_onListboxFocusin}
