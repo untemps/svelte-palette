@@ -33,7 +33,7 @@
 
 <PaletteIconButton
 	data-testid="__palette-eyedropper-button__"
-	aria-label="Submit the hex color value"
+	aria-label="Pick a color from the screen"
 	{...restProps}
 	icon={EYE_DROPPER}
 	onclick={_onClick}

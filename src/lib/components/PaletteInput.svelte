@@ -48,7 +48,7 @@
 	}
 
 	const _onKeyPress = (e: KeyboardEvent) => {
-		e.code === 'Enter' && _onSubmit()
+		e.key === 'Enter' && _onSubmit()
 	}
 
 	const _onInputFocus = () => {
@@ -64,7 +64,7 @@
 	}
 
 	const _onSubmit = () => {
-		onadd?.({ color })
+		isValid && onadd?.({ color })
 	}
 </script>
 
@@ -97,7 +97,7 @@
 			/>
 			<PaletteIconButton
 				data-testid="__palette-input-submit__"
-				type="submit"
+				type="button"
 				icon={PLUS}
 				disabled={!isValid}
 				aria-label="Submit the hex color value"

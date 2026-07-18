@@ -11,7 +11,12 @@ const setup = (component: Parameters<typeof render>[0], options?: Parameters<typ
 	}
 }
 
-afterEach(() => cleanup())
+const originalEyeDropper = window.EyeDropper
+
+afterEach(() => {
+	cleanup()
+	window.EyeDropper = originalEyeDropper
+})
 
 test('Enables submit button when input color is valid', async () => {
 	const { user } = setup(PaletteInput)
@@ -57,6 +62,12 @@ test('Does not render the eyedropper as a submit button', async () => {
 	expect(button).toHaveAttribute('type', 'button')
 })
 
+test('Does not render the add button as a submit button', async () => {
+	setup(PaletteInput)
+	const button = screen.getByTestId('__palette-input-submit__')
+	expect(button).toHaveAttribute('type', 'button')
+})
+
 test('Triggers submit with color when clicking add button', async () => {
 	const onAdd = vi.fn(() => 0)
 	const { user } = setup(PaletteInput, { props: { onadd: onAdd } })
@@ -74,6 +85,25 @@ test('Triggers submit with color when pressing Enter', async () => {
 	await user.type(input, 'ff0')
 	await user.keyboard('[Enter]')
 	expect(onAdd).toHaveBeenCalledWith({ color: '#ff0' })
+})
+
+test('Triggers submit with color when pressing Enter on the numeric keypad', async () => {
+	// The numeric-keypad Enter reports key="Enter" but code="NumpadEnter"; the handler must key off `key`.
+	const onAdd = vi.fn(() => 0)
+	const { user } = setup(PaletteInput, { props: { onadd: onAdd } })
+	const input = screen.getByTestId('__palette-input-input__')
+	await user.type(input, 'ff0')
+	input.dispatchEvent(new KeyboardEvent('keypress', { key: 'Enter', code: 'NumpadEnter', bubbles: true }))
+	expect(onAdd).toHaveBeenCalledWith({ color: '#ff0' })
+})
+
+test('Does not submit when pressing Enter with an invalid color', async () => {
+	const onAdd = vi.fn(() => 0)
+	const { user } = setup(PaletteInput, { props: { onadd: onAdd } })
+	const input = screen.getByTestId('__palette-input-input__')
+	await user.type(input, 'zz')
+	await user.keyboard('[Enter]')
+	expect(onAdd).not.toHaveBeenCalled()
 })
 
 test('Does not display slot if inputType is "color"', async () => {
