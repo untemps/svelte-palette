@@ -29,6 +29,18 @@ test('Displays as many color slots as set', async () => {
 	expect(cells).toHaveLength(colors.length)
 })
 
+test('Marks the slot matching selectedColor as selected', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	setup(Palette, {
+		props: { colors, selectedColor: '#0ff' },
+	})
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots[0]).not.toHaveClass('selected')
+	expect(slots[1]).toHaveClass('selected')
+	expect(slots[2]).not.toHaveClass('selected')
+})
+
 test('Displays as many color slots as set in async mode', async () => {
 	let cells = null
 	const colors = Promise.resolve(['#ff0', '#0ff', '#f0f'])

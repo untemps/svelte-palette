@@ -278,7 +278,7 @@
 									{:else}
 										<PaletteSlot
 											color={color.value}
-											selected={(color as unknown) === selectedColor}
+											selected={color.value === selectedColor}
 											{transition}
 											onselect={_onSlotSelect}
 										/>
@@ -330,7 +330,7 @@
 						{:else}
 							<PaletteSlot
 								color={color.value}
-								selected={(color as unknown) === selectedColor}
+								selected={color.value === selectedColor}
 								{transition}
 								onselect={_onSlotSelect}
 							/>
