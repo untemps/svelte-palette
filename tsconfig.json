@@ -6,5 +6,6 @@
 		"resolveJsonModule": true,
 		"skipLibCheck": true,
 		"sourceMap": true
-	}
+	},
+	"exclude": ["node_modules/**", "src/**/__tests__/**"]
 }

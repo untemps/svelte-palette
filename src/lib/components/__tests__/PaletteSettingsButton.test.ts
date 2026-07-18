@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 
 import PaletteSettingsButton from '../PaletteSettingsButton.svelte'
 
-const setup = (component, options) => {
+const setup = (component: Parameters<typeof render>[0], options?: Parameters<typeof render>[1]) => {
 	return {
 		user: userEvent.setup(),
 		...render(component, options),

@@ -6,7 +6,7 @@ import { COMPACT, SETTINGS } from '../../enums/PaletteTool.js'
 
 import PaletteTools from '../PaletteTools.svelte'
 
-const setup = (component, options) => {
+const setup = (component: Parameters<typeof render>[0], options?: Parameters<typeof render>[1]) => {
 	return {
 		user: userEvent.setup(),
 		...render(component, options),
