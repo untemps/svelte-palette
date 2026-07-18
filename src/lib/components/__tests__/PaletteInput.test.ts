@@ -40,6 +40,23 @@ test('Disables submit button when set color is invalid', async () => {
 	expect(button).toBeDisabled()
 })
 
+test('Prevents native form submission to avoid a page reload', async () => {
+	const { container } = setup(PaletteInput, { props: { color: '#ff0' } })
+	const form = container.querySelector('form') as HTMLFormElement
+	const event = new Event('submit', { bubbles: true, cancelable: true })
+	form.dispatchEvent(event)
+	expect(event.defaultPrevented).toBe(true)
+})
+
+test('Does not render the eyedropper as a submit button', async () => {
+	window.EyeDropper = function () {
+		this.open = () => Promise.resolve({ sRGBHex: '#ff0' })
+	}
+	setup(PaletteInput)
+	const button = await screen.findByTestId('__palette-eyedropper-button__')
+	expect(button).toHaveAttribute('type', 'button')
+})
+
 test('Triggers submit with color when clicking add button', async () => {
 	const onAdd = vi.fn(() => 0)
 	const { user } = setup(PaletteInput, { props: { onadd: onAdd } })

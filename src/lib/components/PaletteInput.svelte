@@ -74,7 +74,7 @@
 	class="palette__input {className}"
 	style="--grid-column-start: {_gridColumnStart}; --grid-column-end: {_gridColumnEnd}"
 >
-	<form>
+	<form onsubmit={(e) => e.preventDefault()}>
 		{#if inputType !== 'color'}<PaletteSlot
 				data-testid="__palette-input-slot__"
 				{color}

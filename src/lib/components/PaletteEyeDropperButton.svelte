@@ -36,6 +36,5 @@
 	aria-label="Submit the hex color value"
 	{...restProps}
 	icon={EYE_DROPPER}
-	type="submit"
 	onclick={_onClick}
 />
