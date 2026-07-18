@@ -71,6 +71,8 @@
 		transition?: Transition | null
 		/** Called whenever a color is selected. */
 		onselect?: (args: SelectEventArgs) => void
+		/** Accessible name announced for the color swatch listbox. */
+		label?: string
 		/** Class name applied to the root element. */
 		class?: string
 		/** Replaces the header. */
@@ -112,6 +114,7 @@
 		maxColumns = 0,
 		transition = null,
 		onselect = undefined,
+		label = 'Color swatches',
 		class: className = '',
 		header = undefined,
 		beforeSlot = undefined,
@@ -124,6 +127,8 @@
 		tools = undefined,
 		settings = undefined,
 	}: Props = $props()
+
+	const _uid = $props.id()
 
 	let _colors = $state<NormalizedColor[] | null>(null)
 	let _colorGroups = $state<NormalizedColorGroup[] | null>(null)
@@ -239,25 +244,34 @@
 	}
 </script>
 
-<div class="palette {className}" role="main">
+<div class="palette {className}" data-testid="__palette__" data-palette>
 	<section class="palette__content" class:palette__content--compact={_isCompact} style="--num-columns: {_numColumns}">
 		{#if !_isCompact}
 			{@render header?.({ selectedColor })}
 		{/if}
 		{#if !!_colorGroups}
-			<div class="palette__groups">
+			<div class="palette__groups" role="listbox" aria-label={label} aria-orientation="horizontal">
 				{#each _colorGroups as group, groupIndex}
-					<div class="palette__groups__group" data-testid="__palette-group__">
+					<div class="palette__groups__group" role="presentation" data-testid="__palette-group__">
 						{#if group.name}
-							<p class="palette__groups__group__name" data-testid="__palette-group-name__">
+							<p
+								id="{_uid}-group-{groupIndex}"
+								class="palette__groups__group__name"
+								data-testid="__palette-group-name__"
+							>
 								{group.name}
 							</p>
 						{/if}
-						<ul class="palette__cells">
+						<ul
+							class="palette__cells"
+							role="group"
+							aria-labelledby={group.name ? `${_uid}-group-${groupIndex}` : undefined}
+						>
 							{#each group.colors as color, colorIndex (`${color.value}_${colorIndex}`)}
 								<li
 									data-testid="__palette-cell__"
 									class="palette__cells__cell"
+									role="presentation"
 									use:useDeletion={{
 										deletionMode,
 										onDelete: () => _removeGroupColor(groupIndex, colorIndex),
@@ -290,12 +304,12 @@
 				{/each}
 			</div>
 		{:else if !!_colors}
-			<ul class="palette__cells">
+			<ul class="palette__cells" role="listbox" aria-label={label} aria-orientation="horizontal">
 				{#if beforeSlot}
 					{@render beforeSlot({ selectedColor, transition, isCompact: _isCompact })}
 				{/if}
 				{#if showTransparentSlot}
-					<li data-testid="__palette-cell__" class="palette__cells__cell">
+					<li data-testid="__palette-cell__" class="palette__cells__cell" role="presentation">
 						{#if transparentSlot}
 							{@render transparentSlot()}
 						{:else}
@@ -311,6 +325,7 @@
 					<li
 						data-testid="__palette-cell__"
 						class="palette__cells__cell"
+						role="presentation"
 						use:useDeletion={{
 							deletionMode,
 							onDelete: () => _onDelete(index),

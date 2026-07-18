@@ -323,7 +323,7 @@ test.each([
 		props: { colors, numColumns, maxColumns },
 	})
 
-	const content = await screen.findByRole('main')
+	const content = await screen.findByTestId('__palette__')
 	const section = content.querySelector('.palette__content')
 	await waitFor(() => expect(section.getAttribute('style')).toContain(`--num-columns: ${expected}`))
 })
@@ -335,7 +335,7 @@ test('Updates num-columns when numColumns changes to 0', async () => {
 		props: { colors, numColumns: 5 },
 	})
 
-	const content = await screen.findByRole('main')
+	const content = await screen.findByTestId('__palette__')
 	const section = content.querySelector('.palette__content')
 	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 5'))
 
@@ -365,4 +365,59 @@ test('Removes duplicates when updating allowDuplicates value', async () => {
 
 	slots = await screen.findAllByTestId('__palette-slot__')
 	expect(slots).toHaveLength(3)
+})
+
+test('Does not expose a main landmark on the root', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	setup(Palette, { colors })
+
+	await screen.findAllByTestId('__palette-slot__')
+	expect(screen.queryByRole('main')).toBeNull()
+
+	const root = screen.getByTestId('__palette__')
+	expect(root).toHaveAttribute('data-palette')
+})
+
+test('Exposes the swatch grid as a listbox', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	setup(Palette, { colors })
+
+	const listbox = await screen.findByRole('listbox')
+	expect(listbox).toHaveAttribute('aria-label', 'Color swatches')
+})
+
+test('Names the listbox with the label prop', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	setup(Palette, { props: { colors, label: 'Brand colors' } })
+
+	const listbox = await screen.findByRole('listbox')
+	expect(listbox).toHaveAttribute('aria-label', 'Brand colors')
+})
+
+test('Groups swatches and associates each group with its name', async () => {
+	const colors = [
+		{ name: 'Reds', colors: ['#f00', '#f11'] },
+		{ name: 'Blues', colors: ['#00f'] },
+	]
+	setup(Palette, { props: { colors } })
+
+	const listbox = await screen.findByRole('listbox')
+	expect(listbox).toBeInTheDocument()
+
+	const groups = await screen.findAllByRole('group')
+	expect(groups).toHaveLength(2)
+
+	const names = screen.getAllByTestId('__palette-group-name__')
+	expect(groups[0]).toHaveAttribute('aria-labelledby', names[0].id)
+	expect(groups[1]).toHaveAttribute('aria-labelledby', names[1].id)
+	expect(names[0]).toHaveTextContent('Reds')
+	expect(names[1]).toHaveTextContent('Blues')
+})
+
+test('Does not set aria-labelledby on a group without a name', async () => {
+	const colors = [{ colors: ['#f00', '#0f0'] }]
+	setup(Palette, { props: { colors } })
+
+	const group = await screen.findByRole('group')
+	expect(group).not.toHaveAttribute('aria-labelledby')
 })
