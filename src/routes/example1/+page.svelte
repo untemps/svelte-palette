@@ -103,6 +103,7 @@
 			{#key unique}
 				<Palette
 					class="palette__custom"
+					label="Background color swatches"
 					{colors}
 					compactColorIndices={showCompactControl ? compactIndices : null}
 					selectedColor={preselectColor ? bgColor : null}
@@ -287,7 +288,7 @@
 		justify-content: center;
 	}
 
-	.example1 :global(.palette[role='main'].palette__custom) {
+	.example1 :global(.palette[data-palette].palette__custom) {
 		background-color: #fff;
 	}
 

@@ -67,7 +67,7 @@
 		max-width: 480px;
 	}
 
-	.example5 :global(.palette[role='main'].palette__custom) {
+	.example5 :global(.palette[data-palette].palette__custom) {
 		background-color: #fff;
 		border-radius: 0.5rem;
 	}
