@@ -24,6 +24,7 @@
 		selected = false,
 		disabled = false,
 		tabindex = 0,
+		role = undefined,
 		transition = null,
 		onselect = undefined,
 		...restProps
@@ -40,8 +41,8 @@
 <button
 	data-testid="__palette-slot__"
 	aria-label={color}
-	role="option"
-	aria-selected={selected}
+	{role}
+	aria-selected={role === 'option' ? selected : undefined}
 	{...restProps}
 	class:empty={!color}
 	class:selected

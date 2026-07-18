@@ -397,6 +397,7 @@
 									{:else}
 										<PaletteSlot
 											color={color.value}
+											role="option"
 											selected={color.value === selectedColor}
 											tabindex={optionIndex === _activeIndex ? 0 : -1}
 											{transition}
@@ -429,6 +430,7 @@
 						{:else}
 							<PaletteSlot
 								aria-label="Transparent slot"
+								role="option"
 								selected={selectedColor === null}
 								tabindex={_activeIndex === 0 ? 0 : -1}
 								onselect={_onSlotSelect}
@@ -462,6 +464,7 @@
 						{:else}
 							<PaletteSlot
 								color={color.value}
+								role="option"
 								selected={color.value === selectedColor}
 								tabindex={optionIndex === _activeIndex ? 0 : -1}
 								{transition}
