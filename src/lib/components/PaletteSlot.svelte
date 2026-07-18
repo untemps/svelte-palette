@@ -1,4 +1,20 @@
 <script>
+	/**
+	 * @typedef {import('../types').ColorValue} ColorValue
+	 * @typedef {import('../types').Transition} Transition
+	 * @typedef {import('../types').SelectEventArgs} SelectEventArgs
+	 */
+
+	/**
+	 * @typedef {Object} Props
+	 * @property {ColorValue | null} [color] The color value of the slot.
+	 * @property {boolean} [selected] Whether the slot is selected.
+	 * @property {boolean} [disabled] Whether the slot is disabled.
+	 * @property {Transition | null} [transition] Animation applied when the slot is rendered.
+	 * @property {(args: SelectEventArgs) => void} [onselect] Called when the slot is clicked.
+	 */
+
+	/** @type {Props & Omit<import('svelte/elements').HTMLButtonAttributes, keyof Props>} */
 	let {
 		color = null,
 		selected = false,
