@@ -1,15 +1,23 @@
-<script>
+<script lang="ts">
+	import type { HTMLButtonAttributes } from 'svelte/elements'
+
 	import TrashIcon from './icons/TrashIcon.svelte'
 
-	/**
-	 * @typedef {Object} Props
-	 * @property {boolean} [isActive] Whether the button is in its active state.
-	 * @property {string} [class] Class name applied to the button.
-	 * @property {(event: MouseEvent) => void} [onclick] Called when the button is clicked.
-	 */
+	interface Props {
+		/** Whether the button is in its active state. */
+		isActive?: boolean
+		/** Class name applied to the button. */
+		class?: string
+		/** Called when the button is clicked. */
+		onclick?: (event: MouseEvent) => void
+	}
 
-	/** @type {Props & Omit<import('svelte/elements').HTMLButtonAttributes, keyof Props>} */
-	let { isActive = false, class: className = '', onclick = undefined, ...restProps } = $props()
+	let {
+		isActive = false,
+		class: className = '',
+		onclick = undefined,
+		...restProps
+	}: Props & Omit<HTMLButtonAttributes, keyof Props> = $props()
 </script>
 
 <button

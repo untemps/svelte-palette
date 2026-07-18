@@ -25,7 +25,7 @@ const createAction = (node: HTMLElement, deletionMode: DeletionMode | undefined,
 				contentActions: {
 					'*': {
 						eventType: 'click',
-						callback: options.onDelete,
+						callback: options.onDelete ?? (() => {}),
 						closeOnCallback: true,
 					},
 				},

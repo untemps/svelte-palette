@@ -1,3 +1,5 @@
+<script lang="ts"></script>
+
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" data-testid="__eyedropper-icon__"
 	><rect width="256" height="256" fill="none" /><path
 		d="M182.43,113.17l4.88,4.89a16,16,0,0,1,0,22.63l-9,9a8,8,0,0,1-11.31,0L106.34,89a8,8,0,0,1,0-11.31l9-9a16,16,0,0,1,22.63,0l4.89,4.88,25-25.1c10.79-10.79,28.37-11.45,39.44-1a28,28,0,0,1,.57,40.15Z"

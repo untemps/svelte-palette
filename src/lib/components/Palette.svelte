@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { untrack } from 'svelte'
 
 	import { calculateColorGroups, calculateColors, calculateNumColumns, isColorGroups } from '../utils/utils.js'
@@ -16,53 +16,85 @@
 
 	import useDeletion from './useDeletion'
 
-	/**
-	 * @typedef {import('../types').ColorValue} ColorValue
-	 * @typedef {import('../types').ColorsProp} ColorsProp
-	 * @typedef {import('../types').DeletionMode} DeletionMode
-	 * @typedef {import('../types').InputType} InputType
-	 * @typedef {import('../types').Transition} Transition
-	 * @typedef {import('../types').SelectEventArgs} SelectEventArgs
-	 * @typedef {import('../types').HeaderSnippetProps} HeaderSnippetProps
-	 * @typedef {import('../types').EdgeSlotSnippetProps} EdgeSlotSnippetProps
-	 * @typedef {import('../types').SlotSnippetProps} SlotSnippetProps
-	 * @typedef {import('../types').InputSnippetProps} InputSnippetProps
-	 * @typedef {import('../types').ToolsSnippetProps} ToolsSnippetProps
-	 * @typedef {import('../types').SettingsSnippetProps} SettingsSnippetProps
-	 */
+	import type { Snippet } from 'svelte'
 
-	/**
-	 * @typedef {Object} Props
-	 * @property {ColorsProp | null} [colors] Colors to display, or a promise resolving to them. Accepts color strings, color objects or color groups.
-	 * @property {ColorValue | null} [selectedColor] Selected color. Supports `bind:selectedColor`.
-	 * @property {boolean} [isCompact] Whether the palette is displayed in compact mode.
-	 * @property {number[]} [compactColorIndices] Indices picked from `colors` when in compact mode.
-	 * @property {boolean} [allowDuplicates] Whether duplicate colors are allowed.
-	 * @property {DeletionMode} [deletionMode] Slot deletion mode.
-	 * @property {string | null} [tooltipClassName] Class name applied to the deletion tooltip.
-	 * @property {string | null} [tooltipContentSelector] Selector of the deletion tooltip content.
-	 * @property {boolean} [showTransparentSlot] Whether to display a transparent slot at the start of the list.
-	 * @property {number} [maxColors] Maximum number of slots. Set to `-1` for no limit.
-	 * @property {boolean} [showInput] Whether to display the color input within the footer.
-	 * @property {InputType} [inputType] Type of the color input.
-	 * @property {number} [numColumns] Number of grid columns. Set to `0` to display slots on a single row.
-	 * @property {number} [maxColumns] Maximum number of columns when `numColumns` is `0`. Set to `0` for no limit.
-	 * @property {Transition | null} [transition] Animation applied when a slot is rendered.
-	 * @property {(args: SelectEventArgs) => void} [onselect] Called whenever a color is selected.
-	 * @property {string} [class] Class name applied to the root element.
-	 * @property {import('svelte').Snippet<[HeaderSnippetProps]>} [header] Replaces the header.
-	 * @property {import('svelte').Snippet<[EdgeSlotSnippetProps]>} [beforeSlot] Rendered before the color slots.
-	 * @property {import('svelte').Snippet} [transparentSlot] Replaces the transparent slot.
-	 * @property {import('svelte').Snippet<[SlotSnippetProps]>} [slot] Replaces the default color slots.
-	 * @property {import('svelte').Snippet<[EdgeSlotSnippetProps]>} [afterSlot] Rendered after the color slots.
-	 * @property {import('svelte').Snippet} [loader] Replaces the loader shown while colors resolve.
-	 * @property {import('svelte').Snippet<[HeaderSnippetProps]>} [footer] Replaces the footer.
-	 * @property {import('svelte').Snippet<[InputSnippetProps]>} [input] Replaces the footer input.
-	 * @property {import('svelte').Snippet<[ToolsSnippetProps]>} [tools] Replaces the tools panel.
-	 * @property {import('svelte').Snippet<[SettingsSnippetProps]>} [settings] Replaces the settings panel content.
-	 */
+	import type { NormalizedColor, NormalizedColorGroup } from '../utils/utils.js'
 
-	/** @type {Props} */
+	import type {
+		AddEventArgs,
+		ColorValue,
+		ColorsProp,
+		DeletionMode,
+		EdgeSlotSnippetProps,
+		HeaderSnippetProps,
+		InputSnippetProps,
+		InputType,
+		PaletteToolName,
+		SelectEventArgs,
+		SettingsSnippetProps,
+		SlotSnippetProps,
+		ToolSelectEventArgs,
+		ToolsSnippetProps,
+		Transition,
+	} from '../types'
+
+	interface Props {
+		/** Colors to display, or a promise resolving to them. Accepts color strings, color objects or color groups. */
+		colors?: ColorsProp | null
+		/** Selected color. Supports `bind:selectedColor`. */
+		selectedColor?: ColorValue | null
+		/** Whether the palette is displayed in compact mode. */
+		isCompact?: boolean
+		/** Indices picked from `colors` when in compact mode. */
+		compactColorIndices?: number[]
+		/** Whether duplicate colors are allowed. */
+		allowDuplicates?: boolean
+		/** Slot deletion mode. */
+		deletionMode?: DeletionMode
+		/** Class name applied to the deletion tooltip. */
+		tooltipClassName?: string | null
+		/** Selector of the deletion tooltip content. */
+		tooltipContentSelector?: string | null
+		/** Whether to display a transparent slot at the start of the list. */
+		showTransparentSlot?: boolean
+		/** Maximum number of slots. Set to `-1` for no limit. */
+		maxColors?: number
+		/** Whether to display the color input within the footer. */
+		showInput?: boolean
+		/** Type of the color input. */
+		inputType?: InputType
+		/** Number of grid columns. Set to `0` to display slots on a single row. */
+		numColumns?: number
+		/** Maximum number of columns when `numColumns` is `0`. Set to `0` for no limit. */
+		maxColumns?: number
+		/** Animation applied when a slot is rendered. */
+		transition?: Transition | null
+		/** Called whenever a color is selected. */
+		onselect?: (args: SelectEventArgs) => void
+		/** Class name applied to the root element. */
+		class?: string
+		/** Replaces the header. */
+		header?: Snippet<[HeaderSnippetProps]>
+		/** Rendered before the color slots. */
+		beforeSlot?: Snippet<[EdgeSlotSnippetProps]>
+		/** Replaces the transparent slot. */
+		transparentSlot?: Snippet
+		/** Replaces the default color slots. */
+		slot?: Snippet<[SlotSnippetProps]>
+		/** Rendered after the color slots. */
+		afterSlot?: Snippet<[EdgeSlotSnippetProps]>
+		/** Replaces the loader shown while colors resolve. */
+		loader?: Snippet
+		/** Replaces the footer. */
+		footer?: Snippet<[HeaderSnippetProps]>
+		/** Replaces the footer input. */
+		input?: Snippet<[InputSnippetProps]>
+		/** Replaces the tools panel. */
+		tools?: Snippet<[ToolsSnippetProps]>
+		/** Replaces the settings panel content. */
+		settings?: Snippet<[SettingsSnippetProps]>
+	}
+
 	let {
 		colors = null,
 		selectedColor = $bindable(null),
@@ -91,10 +123,10 @@
 		input = undefined,
 		tools = undefined,
 		settings = undefined,
-	} = $props()
+	}: Props = $props()
 
-	let _colors = $state(null)
-	let _colorGroups = $state(null)
+	let _colors = $state<NormalizedColor[] | null>(null)
+	let _colorGroups = $state<NormalizedColorGroup[] | null>(null)
 	let _numColumns = $state(untrack(() => numColumns))
 	let _isSettingsOn = $state(false)
 	let _isCompact = $state(untrack(() => isCompact))
@@ -144,18 +176,18 @@
 		})
 	})
 
-	let _tools = $derived([
+	let _tools: PaletteToolName[] = $derived([
 		...(_colorGroups == null && compactColorIndices?.length ? [COMPACT] : []),
 		...(settings ? [SETTINGS] : []),
-	])
+	] as PaletteToolName[])
 
-	const _selectColor = (color) => {
+	const _selectColor = (color: ColorValue | null) => {
 		selectedColor = color
 		onselect?.({ color })
 	}
 
-	const _addColor = (color) => {
-		_colors = calculateColors([..._colors, color], {
+	const _addColor = (color: ColorValue) => {
+		_colors = calculateColors([...(_colors ?? []), color], {
 			isCompact: _isCompact,
 			compactColorIndices,
 			allowDuplicates,
@@ -170,22 +202,22 @@
 		})
 	}
 
-	const _removeColor = (index) => (_colors = _colors.filter((c, i) => i !== index))
+	const _removeColor = (index: number) => (_colors = (_colors ?? []).filter((c, i) => i !== index))
 
-	const _removeGroupColor = (groupIndex, colorIndex) => {
-		_colorGroups = _colorGroups.map((group, gi) =>
+	const _removeGroupColor = (groupIndex: number, colorIndex: number) => {
+		_colorGroups = (_colorGroups ?? []).map((group, gi) =>
 			gi === groupIndex ? { ...group, colors: group.colors.filter((_, ci) => ci !== colorIndex) } : group
 		)
 	}
 
-	const _onSlotSelect = ({ color }) => _selectColor(color)
+	const _onSlotSelect = ({ color }: SelectEventArgs) => _selectColor(color)
 
-	const _onInputAdd = ({ color }) => _addColor(color)
+	const _onInputAdd = ({ color }: AddEventArgs) => _addColor(color)
 
-	const _onDelete = (index) => _removeColor(index)
+	const _onDelete = (index: number) => _removeColor(index)
 
-	const _onToolSelect = (args) => {
-		const tool = args?.tool ?? args
+	const _onToolSelect = (args: ToolSelectEventArgs | PaletteToolName) => {
+		const tool = typeof args === 'string' ? args : args.tool
 		switch (tool) {
 			case SETTINGS:
 				_isSettingsOn = true
@@ -246,7 +278,7 @@
 									{:else}
 										<PaletteSlot
 											color={color.value}
-											selected={color === selectedColor}
+											selected={(color as unknown) === selectedColor}
 											{transition}
 											onselect={_onSlotSelect}
 										/>
@@ -298,7 +330,7 @@
 						{:else}
 							<PaletteSlot
 								color={color.value}
-								selected={color === selectedColor}
+								selected={(color as unknown) === selectedColor}
 								{transition}
 								onselect={_onSlotSelect}
 							/>

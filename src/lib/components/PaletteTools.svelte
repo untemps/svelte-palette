@@ -1,29 +1,26 @@
-<script>
+<script lang="ts">
 	import { COMPACT, SETTINGS } from '../enums/PaletteTool.js'
 
 	import PaletteCompactToggleButton from './PaletteCompactToggleButton.svelte'
 	import PaletteSettingsButton from './PaletteSettingsButton.svelte'
 
-	/**
-	 * @typedef {import('../types').PaletteToolName} PaletteToolName
-	 * @typedef {import('../types').ToolSelectEventArgs} ToolSelectEventArgs
-	 */
+	import type { PaletteToolName, ToolSelectEventArgs } from '../types'
 
-	/**
-	 * @typedef {Object} Props
-	 * @property {PaletteToolName[]} [tools] Tools to display.
-	 * @property {(args: ToolSelectEventArgs) => void} [onselect] Called when a tool is selected.
-	 */
+	interface Props {
+		/** Tools to display. */
+		tools?: PaletteToolName[]
+		/** Called when a tool is selected. */
+		onselect?: (args: ToolSelectEventArgs) => void
+	}
 
-	/** @type {Props} */
-	let { tools = [], onselect = undefined } = $props()
+	let { tools = [], onselect = undefined }: Props = $props()
 
 	const TOOL_BUTTONS = {
 		[COMPACT]: PaletteCompactToggleButton,
 		[SETTINGS]: PaletteSettingsButton,
 	}
 
-	const _selectTool = (index) => {
+	const _selectTool = (index: number) => {
 		onselect?.({ tool: tools[index] })
 	}
 </script>

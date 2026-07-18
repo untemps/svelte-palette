@@ -1,3 +1,5 @@
+<script lang="ts"></script>
+
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" data-testid="__plus-icon__"
 	><rect width="256" height="256" fill="none" /><line
 		x1="40"

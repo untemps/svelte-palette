@@ -1,21 +1,24 @@
-<script>
+<script lang="ts">
 	import { EYE_DROPPER } from '../enums/PaletteIcon'
 	import PaletteIconButton from './PaletteIconButton.svelte'
 	import { normalizeColor } from '../utils/utils.js'
 
-	/**
-	 * @typedef {import('../types').AddEventArgs} AddEventArgs
-	 * @typedef {import('../types').ErrorEventArgs} ErrorEventArgs
-	 */
+	import type { HTMLButtonAttributes } from 'svelte/elements'
 
-	/**
-	 * @typedef {Object} Props
-	 * @property {(args: AddEventArgs) => void} [onadd] Called when a color is picked with the eye dropper.
-	 * @property {(args: ErrorEventArgs) => void} [onerror] Called when the eye dropper fails or is dismissed.
-	 */
+	import type { AddEventArgs, ErrorEventArgs } from '../types'
 
-	/** @type {Props & Omit<import('svelte/elements').HTMLButtonAttributes, keyof Props>} */
-	let { onadd = undefined, onerror = undefined, ...restProps } = $props()
+	interface Props {
+		/** Called when a color is picked with the eye dropper. */
+		onadd?: (args: AddEventArgs) => void
+		/** Called when the eye dropper fails or is dismissed. */
+		onerror?: (args: ErrorEventArgs) => void
+	}
+
+	let {
+		onadd = undefined,
+		onerror = undefined,
+		...restProps
+	}: Props & Omit<HTMLButtonAttributes, keyof Props> = $props()
 
 	const _onClick = async () => {
 		try {
