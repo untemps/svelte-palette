@@ -1,3 +1,10 @@
+## [5.4.1](https://github.com/untemps/svelte-palette/compare/v5.4.0...v5.4.1) (2026-07-18)
+
+
+### Bug Fixes
+
+* Prevent form submit buttons from reloading the page ([#216](https://github.com/untemps/svelte-palette/issues/216)) ([7ac3d93](https://github.com/untemps/svelte-palette/commit/7ac3d9351ec1f480a448b06cd67aeb988ff5605c))
+
 # [5.4.0](https://github.com/untemps/svelte-palette/compare/v5.3.0...v5.4.0) (2026-07-18)
 
 
