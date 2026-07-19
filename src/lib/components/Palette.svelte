@@ -29,6 +29,8 @@
 		HeaderSnippetProps,
 		InputSnippetProps,
 		InputType,
+		PaletteAddEventArgs,
+		PaletteDeleteEventArgs,
 		PaletteToolName,
 		SelectEventArgs,
 		SettingsSnippetProps,
@@ -72,6 +74,10 @@
 		transition?: Transition | null
 		/** Called whenever a color is selected. */
 		onselect?: (args: SelectEventArgs) => void
+		/** Called once a color has been added to the list through the input. */
+		onadd?: (args: PaletteAddEventArgs) => void
+		/** Called once a color has been removed from the list through the deletion gesture. */
+		ondelete?: (args: PaletteDeleteEventArgs) => void
 		/** Accessible name announced for the color slot listbox. */
 		label?: string
 		/**
@@ -112,7 +118,7 @@
 	}
 
 	let {
-		colors = null,
+		colors = $bindable(null),
 		selectedColor = $bindable(null),
 		isCompact = false,
 		compactColorIndices = [],
@@ -128,6 +134,8 @@
 		maxColumns = 0,
 		transition = null,
 		onselect = undefined,
+		onadd = undefined,
+		ondelete = undefined,
 		label = 'Color slots',
 		presentational = false,
 		class: className = '',
@@ -151,6 +159,13 @@
 	let _isCompact = $state(untrack(() => isCompact))
 	let _listboxEl = $state<HTMLElement | null>(null)
 	let _focusedIndex = $state<number | null>(null)
+	// Raised by the mutation helpers right before they write `colors` back through the binding, so the
+	// resolver effect below skips re-processing our own write and needlessly recomputing the resolved
+	// state. Read through `untrack` so the effect never subscribes to it — otherwise clearing it would
+	// re-run the effect and reprocess the value anyway. This one-shot flag assumes the write-back is
+	// consumed by exactly one resolver run; a consumer reassigning `colors` synchronously from within
+	// `onadd`/`ondelete` would have that write skipped until the next external change.
+	let _skipColorsSync = $state(false)
 
 	$effect(() => {
 		_isCompact = isCompact
@@ -163,9 +178,15 @@
 	})
 
 	$effect(() => {
+		// Read every dependency before the guard so a skipped run still re-subscribes to all of them.
+		const _source = colors
 		const _numCols = numColumns
 		const _maxCols = maxColumns
-		Promise.resolve(colors).then((results) => {
+		if (untrack(() => _skipColorsSync)) {
+			_skipColorsSync = false
+			return
+		}
+		Promise.resolve(_source).then((results) => {
 			if (!!results) {
 				_focusedIndex = null
 				if (isColorGroups(results)) {
@@ -264,28 +285,76 @@
 		onselect?.({ color })
 	}
 
+	// Push an internal mutation back through `bind:colors`. The guard keeps the resolver effect from
+	// reprocessing the value we just resolved ourselves.
+	const _syncColors = (nextColors: NormalizedColor[]) => {
+		_skipColorsSync = true
+		colors = nextColors
+	}
+
+	const _syncColorGroups = (nextGroups: NormalizedColorGroup[]) => {
+		_skipColorsSync = true
+		colors = nextGroups
+	}
+
 	const _addColor = (color: ColorValue) => {
-		_colors = calculateColors([...(_colors ?? []), color], {
+		// The input only feeds a flat list; in grouped mode there is no target group, and writing a flat
+		// list back through `bind:colors` would destroy the group structure, so adding is a no-op.
+		if (_colorGroups != null) {
+			return
+		}
+		const previousLength = (_colors ?? []).length
+		const nextColors = calculateColors([...(_colors ?? []), color], {
 			isCompact: _isCompact,
 			compactColorIndices,
 			allowDuplicates,
 			maxColors,
 		})
-		_numColumns = calculateNumColumns(_colors.length, {
+		_colors = nextColors
+		_numColumns = calculateNumColumns(nextColors.length, {
 			isCompact: _isCompact,
 			compactColorIndices,
 			showTransparentSlot,
 			numColumns,
 			maxColumns,
 		})
+		// A duplicate or a color beyond `maxColors` leaves the list unchanged: report and propagate nothing.
+		if (nextColors.length > previousLength) {
+			_syncColors(nextColors)
+			onadd?.({ color, colors: nextColors })
+		}
 	}
 
-	const _removeColor = (index: number) => (_colors = (_colors ?? []).filter((c, i) => i !== index))
+	const _removeColor = (index: number) => {
+		const removed = (_colors ?? [])[index]
+		const nextColors = (_colors ?? []).filter((c, i) => i !== index)
+		_colors = nextColors
+		// In compact mode `_colors` is only the extracted subset, and its indices no longer map to the
+		// source list, so writing it back through `bind:colors` would drop every non-compact color.
+		// Keep the deletion local to the compact view and report nothing.
+		if (!_isCompact && removed) {
+			_syncColors(nextColors)
+			ondelete?.({ color: removed.value, index, colors: nextColors })
+		}
+	}
 
 	const _removeGroupColor = (groupIndex: number, colorIndex: number) => {
-		_colorGroups = (_colorGroups ?? []).map((group, gi) =>
-			gi === groupIndex ? { ...group, colors: group.colors.filter((_, ci) => ci !== colorIndex) } : group
+		const group = (_colorGroups ?? [])[groupIndex]
+		const removed = group?.colors[colorIndex]
+		const nextGroups = (_colorGroups ?? []).map((g, gi) =>
+			gi === groupIndex ? { ...g, colors: g.colors.filter((_, ci) => ci !== colorIndex) } : g
 		)
+		_colorGroups = nextGroups
+		_syncColorGroups(nextGroups)
+		if (removed) {
+			ondelete?.({
+				color: removed.value,
+				index: colorIndex,
+				colors: nextGroups,
+				groupIndex,
+				...(group?.name != null && { groupName: group.name }),
+			})
+		}
 	}
 
 	const _onSlotSelect = ({ color }: SelectEventArgs) => _selectColor(color)

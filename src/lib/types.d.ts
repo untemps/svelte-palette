@@ -87,6 +87,32 @@ export interface AddEventArgs {
 }
 
 /**
+ * Argument passed to the palette-level `onadd` callback once a color has been added to the list.
+ */
+export interface PaletteAddEventArgs {
+	/** The color value that was added. */
+	color: ColorValue
+	/** The resulting color list, resolved to its normalized form. */
+	colors: Colors
+}
+
+/**
+ * Argument passed to the palette-level `ondelete` callback once a color has been removed from the list.
+ */
+export interface PaletteDeleteEventArgs {
+	/** The color value that was removed. */
+	color: ColorValue
+	/** The index of the removed color within its list (or group in grouped mode). */
+	index: number
+	/** The resulting color list, resolved to its normalized form. */
+	colors: Colors
+	/** The index of the group the color was removed from, only provided in grouped mode. */
+	groupIndex?: number
+	/** The name of the group the color was removed from, only provided in grouped mode when the group is named. */
+	groupName?: string
+}
+
+/**
  * Argument passed to the `onerror` callback when the eye dropper fails or is dismissed.
  */
 export interface ErrorEventArgs {
