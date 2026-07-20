@@ -681,3 +681,50 @@ test('Keeps ArrowUp and ArrowDown as no-ops on a single visual row', async () =>
 	await user.keyboard('{ArrowUp}')
 	expect(slots[1]).toHaveFocus()
 })
+
+test('Navigates a custom slot that forwards tabindex without role="option"', async () => {
+	// A custom swatch that forwards the roving `tabindex` but never sets `role="option"`.
+	const slotSnippet = createRawSnippet((getProps) => ({
+		render: () => `<button data-testid="__nav-slot__" tabindex="${getProps().tabindex}"></button>`,
+	}))
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const { user } = setup(Palette, { props: { colors, slot: slotSnippet } })
+
+	const custom = await screen.findAllByTestId('__nav-slot__')
+	expect(custom).toHaveLength(3)
+	// None of them is exposed as an option...
+	expect(custom.some((el) => el.getAttribute('role') === 'option')).toBe(false)
+	// ...yet exactly one holds the roving tab stop...
+	expect(custom[0]).toHaveAttribute('tabindex', '0')
+	expect(custom[1]).toHaveAttribute('tabindex', '-1')
+	expect(custom[2]).toHaveAttribute('tabindex', '-1')
+
+	// ...and arrow keys still reach every swatch instead of trapping focus on the first.
+	custom[0].focus()
+	await user.keyboard('{ArrowRight}')
+	expect(custom[1]).toHaveFocus()
+
+	await user.keyboard('{End}')
+	expect(custom[2]).toHaveFocus()
+
+	await user.keyboard('{Home}')
+	expect(custom[0]).toHaveFocus()
+})
+
+test('Navigates custom-slot swatches without role="option" across group boundaries', async () => {
+	const slotSnippet = createRawSnippet((getProps) => ({
+		render: () => `<button data-testid="__nav-slot__" tabindex="${getProps().tabindex}"></button>`,
+	}))
+	const colors = [
+		{ name: 'Reds', colors: ['#f00', '#f11'] },
+		{ name: 'Blues', colors: ['#00f', '#11f'] },
+	]
+	const { user } = setup(Palette, { props: { colors, slot: slotSnippet } })
+
+	const custom = await screen.findAllByTestId('__nav-slot__')
+	expect(custom).toHaveLength(4)
+
+	custom[1].focus()
+	await user.keyboard('{ArrowRight}')
+	expect(custom[2]).toHaveFocus()
+})

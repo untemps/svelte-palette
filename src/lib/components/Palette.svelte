@@ -297,8 +297,20 @@
 		_isSettingsOn = false
 	}
 
+	// Navigable options in DOM order. Navigation keys off the component-owned cell
+	// wrapper and the roving `tabindex` rather than `role="option"`, so a custom `slot`
+	// that forwards the `tabindex` argument stays reachable by arrow keys even without
+	// the option role (which remains the consumer's job for screen-reader semantics).
 	const _getOptions = (): HTMLElement[] =>
-		_listboxEl ? [..._listboxEl.querySelectorAll<HTMLElement>('[role="option"]:not([disabled])')] : []
+		_listboxEl
+			? [..._listboxEl.querySelectorAll<HTMLElement>('.palette__cells__cell')]
+					.map(
+						(cell) =>
+							cell.querySelector<HTMLElement>('[role="option"]:not([disabled])') ??
+							cell.querySelector<HTMLElement>('[tabindex]:not([disabled])')
+					)
+					.filter((el): el is HTMLElement => el != null)
+			: []
 
 	const _onListboxKeydown = (e: KeyboardEvent) => {
 		const options = _getOptions()
