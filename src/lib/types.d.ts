@@ -145,6 +145,16 @@ export interface SlotSnippetProps {
 }
 
 /**
+ * Properties passed to the `transparentSlot` snippet that replaces the default transparent slot.
+ */
+export interface TransparentSlotSnippetProps {
+	/** Roving tab index to forward so the transparent option keeps the single tab stop (`0` when active, `-1` otherwise). */
+	tabindex: number
+	/** Whether the transparent (no-color) option is currently selected, i.e. `selectedColor === null`. */
+	selected: boolean
+}
+
+/**
  * Properties passed to the `input` snippet that replaces the default color input.
  */
 export interface InputSnippetProps {

@@ -126,7 +126,7 @@
 	}
 
 	@media screen and (max-width: 640px) {
-		.example3 :global(.palette[data-palette].palette__custom .palette__cells) {
+		.example3 :global(.palette[data-palette].palette__custom .palette__cells > .palette__listbox) {
 			grid-template-columns: repeat(var(--num-columns), minmax(1rem, 1fr));
 			column-gap: 0;
 		}

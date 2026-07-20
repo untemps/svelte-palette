@@ -96,7 +96,7 @@ Snippets replace the Svelte 4 named slots API. Pass them as children of `<Palett
 | `header`          | Allow to add a header to the palette. By default, it is empty.                        | `selectedColor`                                                                       |
 | `footer`          | Allow to add a footer to the palette. By default, it contains an input to add colors. | `selectedColor`                                                                       |
 | `slot`            | Allow to replace the default color slots.                                             | `index`, `color`, `colorName`, `selectedColor`, `transition`, `isCompact`, `tabindex` |
-| `transparentSlot` | Allow to replace the default transparent slot.                                        | -                                                                                     |
+| `transparentSlot` | Allow to replace the default transparent slot.                                        | `tabindex`, `selected`                                                                |
 | `beforeSlot`      | Allow to add an element before the color slots.                                       | `selectedColor`, `transition`, `isCompact`                                            |
 | `afterSlot`       | Allow to add an element after the color slots.                                        | `selectedColor`, `transition`, `isCompact`                                            |
 | `input`           | Allow to replace the input in the footer if the default footer snippet is kept as is. | `selectedColor`, `inputType`                                                          |
@@ -246,7 +246,9 @@ The swatch grid follows the [ARIA listbox pattern](https://www.w3.org/WAI/ARIA/a
 
 Arrow keys only move focus; the selection (and the `onselect` callback) is triggered on `Enter`, `Space` or a click, so navigating the grid never changes the selected color on its own. In grouped palettes, `↑` / `↓` move by a fixed stride (the widest group's column count) and cross group boundaries, so vertical steps are row-accurate for flat palettes and approximate across groups of different sizes.
 
-> **Custom slots** — the roving tab index is managed automatically for the default swatches. Only the [`slot`](#snippets) snippet receives the computed `tabindex` argument: forward it (and, ideally, `role="option"` and `aria-selected`) onto your own element so it joins the arrow-key navigation. A `slot` that ignores `tabindex` keeps working but stays a separate tab stop. The `beforeSlot`, `afterSlot` and `transparentSlot` snippets sit outside the option sequence and are **not** part of the arrow-key navigation — keep any interactive content they render reachable with `Tab`, and avoid giving it `role="option"`.
+> **Custom slots** — the roving tab index is managed automatically for the default swatches. Only the [`slot`](#snippets) snippet receives the computed `tabindex` argument: forward it (and, ideally, `role="option"` and `aria-selected`) onto your own element so it joins the arrow-key navigation. A `slot` that ignores `tabindex` keeps working but stays a separate tab stop.
+>
+> The `beforeSlot` and `afterSlot` snippets render **outside** the `listbox`, stacked before and after the swatch grid, so they are not options and are **not** part of the arrow-key navigation. Render them as plain elements (e.g. a `<div>`, **not** an `<li>`), keep any interactive content they hold reachable with `Tab`, and do not give it `role="option"`. The `transparentSlot` snippet, by contrast, replaces the leading option _inside_ the listbox and now receives `tabindex` and `selected`: forward `role="option"`, the `tabindex` argument, and `aria-selected={selected}` onto your element so it stays the single leading tab stop and part of arrow-key navigation.
 
 ## Landmark
 
@@ -278,6 +280,20 @@ You can style the component by passing a class down to the root tag (`div`).
 	}
 </style>
 ```
+
+### Swatch Grid Class
+
+The swatch grid (columns, gaps) is laid out on the `listbox` element, `.palette__listbox`, not on its `.palette__cells` wrapper — the wrapper is a flex column that stacks the optional `beforeSlot` / `afterSlot` around the grid. Target `.palette__listbox` (e.g. `.palette__cells > .palette__listbox`) to override the flat-mode grid:
+
+```svelte
+<style>
+	:global(.palette[data-palette].palette__custom > .palette__content > .palette__cells > .palette__listbox) {
+		column-gap: 0;
+	}
+</style>
+```
+
+When colors are grouped, each group keeps its own `.palette__cells` grid instead.
 
 ### Deletion Tooltip Class
 

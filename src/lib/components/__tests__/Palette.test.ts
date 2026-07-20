@@ -605,3 +605,79 @@ test('Keeps exactly one tabbable swatch after the colors change', async () => {
 		expect(slots[0]).toHaveAttribute('tabindex', '0')
 	})
 })
+
+test('Renders the edge slots outside the listbox', async () => {
+	const beforeSlot = createRawSnippet(() => ({
+		render: () => `<div data-testid="__before__"><button>Before</button></div>`,
+	}))
+	const afterSlot = createRawSnippet(() => ({
+		render: () => `<div data-testid="__after__"><button>After</button></div>`,
+	}))
+	const colors = ['#ff0', '#0ff', '#f0f']
+	setup(Palette, { props: { colors, beforeSlot, afterSlot } })
+
+	const listbox = await screen.findByRole('listbox')
+	const before = screen.getByTestId('__before__')
+	const after = screen.getByTestId('__after__')
+
+	// The edge slots are rendered...
+	expect(before).toBeInTheDocument()
+	expect(after).toBeInTheDocument()
+	// ...but they live outside the listbox subtree, so their content is never an option.
+	expect(listbox).not.toContainElement(before)
+	expect(listbox).not.toContainElement(after)
+	expect(screen.getAllByRole('option')).toHaveLength(3)
+})
+
+test('Keeps arrow-key navigation confined to the swatches when edge slots are present', async () => {
+	const afterSlot = createRawSnippet(() => ({
+		render: () => `<div data-testid="__after__"><button>After</button></div>`,
+	}))
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const { user } = setup(Palette, { props: { colors, afterSlot } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(3)
+
+	slots[2].focus()
+	await user.keyboard('{ArrowRight}')
+
+	// Focus clamps at the last option instead of stepping onto the afterSlot button.
+	expect(slots[2]).toHaveFocus()
+})
+
+test('Forwards the roving tabindex to a custom transparent slot', async () => {
+	const transparentSlot = createRawSnippet((getProps) => ({
+		render: () =>
+			`<span data-testid="__custom-transparent__" data-tabindex="${getProps().tabindex}" data-selected="${getProps().selected}"></span>`,
+	}))
+	const colors = ['#ff0', '#0ff']
+	setup(Palette, { props: { colors, showTransparentSlot: true, transparentSlot } })
+
+	const custom = await screen.findByTestId('__custom-transparent__')
+	expect(custom).toHaveAttribute('data-tabindex', '0')
+	expect(custom).toHaveAttribute('data-selected', 'true')
+})
+
+test('Marks only the first swatch as selected when the selected color is duplicated', async () => {
+	const colors = ['#ff0', '#f0f', '#f0f']
+	setup(Palette, { props: { colors, allowDuplicates: true, selectedColor: '#f0f' } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots.filter((s) => s.getAttribute('aria-selected') === 'true')).toHaveLength(1)
+	expect(slots[1]).toHaveAttribute('aria-selected', 'true')
+	expect(slots[2]).toHaveAttribute('aria-selected', 'false')
+})
+
+test('Keeps ArrowUp and ArrowDown as no-ops on a single visual row', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f', '#fff']
+	const { user } = setup(Palette, { props: { colors, numColumns: 0 } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	slots[1].focus()
+	await user.keyboard('{ArrowDown}')
+	expect(slots[1]).toHaveFocus()
+
+	await user.keyboard('{ArrowUp}')
+	expect(slots[1]).toHaveFocus()
+})

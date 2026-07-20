@@ -42,7 +42,7 @@
 					></PaletteSlot>
 				{/snippet}
 				{#snippet afterSlot()}
-					<li class="slot__add">
+					<div class="slot__add">
 						<button class="icon-button" aria-label="Open" onclick={_onOpen}>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -55,7 +55,7 @@
 								></path></svg
 							>
 						</button>
-					</li>
+					</div>
 				{/snippet}
 				{#snippet input()}
 					<div class="input">

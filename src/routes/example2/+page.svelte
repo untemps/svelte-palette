@@ -112,17 +112,31 @@
 		padding: 0;
 	}
 
-	:global(.palette[data-palette].palette__custom > .palette__content > .palette__cells) {
+	:global(.palette[data-palette].palette__custom > .palette__content > .palette__cells > .palette__listbox) {
 		column-gap: 0;
 	}
 
 	.example2
-		:global(.palette[data-palette].palette__custom > .palette__content > .palette__cells > li:first-child > .slot) {
+		:global(
+			.palette[data-palette].palette__custom
+				> .palette__content
+				> .palette__cells
+				> .palette__listbox
+				> li:first-child
+				> .slot
+		) {
 		border-top-left-radius: 1rem;
 	}
 
 	.example2
-		:global(.palette[data-palette].palette__custom > .palette__content > .palette__cells > li:last-child > .slot) {
+		:global(
+			.palette[data-palette].palette__custom
+				> .palette__content
+				> .palette__cells
+				> .palette__listbox
+				> li:last-child
+				> .slot
+		) {
 		border-top-right-radius: 1rem;
 	}
 

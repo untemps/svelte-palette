@@ -36,6 +36,7 @@
 		ToolSelectEventArgs,
 		ToolsSnippetProps,
 		Transition,
+		TransparentSlotSnippetProps,
 	} from '../types'
 
 	interface Props {
@@ -80,7 +81,7 @@
 		/** Rendered before the color slots. */
 		beforeSlot?: Snippet<[EdgeSlotSnippetProps]>
 		/** Replaces the transparent slot. */
-		transparentSlot?: Snippet
+		transparentSlot?: Snippet<[TransparentSlotSnippetProps]>
 		/** Replaces the default color slots. */
 		slot?: Snippet<[SlotSnippetProps]>
 		/** Rendered after the color slots. */
@@ -316,10 +317,10 @@
 				next = Math.max(from - 1, 0)
 				break
 			case 'ArrowDown':
-				next = Math.min(from + _numColumns, count - 1)
+				next = from + _numColumns < count ? from + _numColumns : from
 				break
 			case 'ArrowUp':
-				next = Math.max(from - _numColumns, 0)
+				next = from - _numColumns >= 0 ? from - _numColumns : from
 				break
 			case 'Home':
 				next = 0
@@ -398,7 +399,7 @@
 										<PaletteSlot
 											color={color.value}
 											role="option"
-											selected={color.value === selectedColor}
+											selected={optionIndex === _selectedIndex}
 											tabindex={optionIndex === _activeIndex ? 0 : -1}
 											{transition}
 											onselect={_onSlotSelect}
@@ -411,72 +412,77 @@
 				{/each}
 			</div>
 		{:else if !!_colors}
-			<ul
-				bind:this={_listboxEl}
-				class="palette__cells"
-				role="listbox"
-				aria-label={label}
-				tabindex={-1}
-				onkeydown={_onListboxKeydown}
-				onfocusin={_onListboxFocusin}
-			>
+			<div class="palette__cells">
 				{#if beforeSlot}
 					{@render beforeSlot({ selectedColor, transition, isCompact: _isCompact })}
 				{/if}
-				{#if showTransparentSlot}
-					<li data-testid="__palette-cell__" class="palette__cells__cell" role="presentation">
-						{#if transparentSlot}
-							{@render transparentSlot()}
-						{:else}
-							<PaletteSlot
-								aria-label="Transparent slot"
-								role="option"
-								selected={selectedColor === null}
-								tabindex={_activeIndex === 0 ? 0 : -1}
-								onselect={_onSlotSelect}
-							/>
-						{/if}
-					</li>
-				{/if}
-				{#each _colors as color, index (`${color.value}_${index}`)}
-					{@const optionIndex = index + (showTransparentSlot ? 1 : 0)}
-					<li
-						data-testid="__palette-cell__"
-						class="palette__cells__cell"
-						role="presentation"
-						use:useDeletion={{
-							deletionMode,
-							onDelete: () => _onDelete(index),
-							tooltipContentSelector,
-							tooltipClassName,
-						}}
-					>
-						{#if colorSlot}
-							{@render colorSlot({
-								color: color.value,
-								colorName: color.name,
-								selectedColor,
-								transition,
-								isCompact: _isCompact,
-								index,
-								tabindex: optionIndex === _activeIndex ? 0 : -1,
-							})}
-						{:else}
-							<PaletteSlot
-								color={color.value}
-								role="option"
-								selected={color.value === selectedColor}
-								tabindex={optionIndex === _activeIndex ? 0 : -1}
-								{transition}
-								onselect={_onSlotSelect}
-							/>
-						{/if}
-					</li>
-				{/each}
+				<ul
+					bind:this={_listboxEl}
+					class="palette__listbox"
+					role="listbox"
+					aria-label={label}
+					tabindex={-1}
+					onkeydown={_onListboxKeydown}
+					onfocusin={_onListboxFocusin}
+				>
+					{#if showTransparentSlot}
+						<li data-testid="__palette-cell__" class="palette__cells__cell" role="presentation">
+							{#if transparentSlot}
+								{@render transparentSlot({
+									tabindex: _activeIndex === 0 ? 0 : -1,
+									selected: selectedColor === null,
+								})}
+							{:else}
+								<PaletteSlot
+									aria-label="Transparent slot"
+									role="option"
+									selected={selectedColor === null}
+									tabindex={_activeIndex === 0 ? 0 : -1}
+									onselect={_onSlotSelect}
+								/>
+							{/if}
+						</li>
+					{/if}
+					{#each _colors as color, index (`${color.value}_${index}`)}
+						{@const optionIndex = index + (showTransparentSlot ? 1 : 0)}
+						<li
+							data-testid="__palette-cell__"
+							class="palette__cells__cell"
+							role="presentation"
+							use:useDeletion={{
+								deletionMode,
+								onDelete: () => _onDelete(index),
+								tooltipContentSelector,
+								tooltipClassName,
+							}}
+						>
+							{#if colorSlot}
+								{@render colorSlot({
+									color: color.value,
+									colorName: color.name,
+									selectedColor,
+									transition,
+									isCompact: _isCompact,
+									index,
+									tabindex: optionIndex === _activeIndex ? 0 : -1,
+								})}
+							{:else}
+								<PaletteSlot
+									color={color.value}
+									role="option"
+									selected={optionIndex === _selectedIndex}
+									tabindex={optionIndex === _activeIndex ? 0 : -1}
+									{transition}
+									onselect={_onSlotSelect}
+								/>
+							{/if}
+						</li>
+					{/each}
+				</ul>
 				{#if afterSlot}
 					{@render afterSlot({ selectedColor, transition, isCompact: _isCompact })}
 				{/if}
-			</ul>
+			</div>
 		{:else if loader}
 			{@render loader()}
 		{:else}
@@ -545,7 +551,23 @@
 		column-gap: 0.7rem;
 	}
 
+	/* Flat-mode wrapper: a plain flex column that stacks the optional edge slots
+	   above and below the swatch grid, keeping them OUTSIDE the listbox in both the
+	   DOM and the accessibility tree. */
 	.palette__content > .palette__cells {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.6rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	/* The listbox is a real box (no display:contents) so its role and aria-label are
+	   always exposed in the accessibility tree; it carries the swatch grid itself. */
+	.palette__content > .palette__cells > .palette__listbox {
 		width: 100%;
 		display: grid;
 		grid-template-columns: repeat(var(--num-columns), minmax(2rem, 1fr));
@@ -559,14 +581,14 @@
 		list-style: none;
 	}
 
-	.palette__content > .palette__cells > .palette__cells__cell {
+	.palette__content > .palette__cells .palette__cells__cell {
 		width: 100%;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 	}
 
-	.palette__content.palette__content--compact > .palette__cells {
+	.palette__content.palette__content--compact > .palette__cells > .palette__listbox {
 		grid-template-columns: repeat(var(--num-columns), minmax(1.5rem, 1fr));
 		column-gap: 0;
 	}
