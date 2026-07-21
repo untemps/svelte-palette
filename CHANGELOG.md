@@ -1,3 +1,10 @@
+# [6.0.0-beta.2](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.1...v6.0.0-beta.2) (2026-07-21)
+
+
+### Features
+
+* Announce the keyboard deletion shortcut via aria-keyshortcuts ([#222](https://github.com/untemps/svelte-palette/issues/222)) ([1124b33](https://github.com/untemps/svelte-palette/commit/1124b335973886bfa03e925c6eeb08c0a3fd7a16))
+
 # [6.0.0-beta.1](https://github.com/untemps/svelte-palette/compare/v5.4.1...v6.0.0-beta.1) (2026-07-21)
 
 
