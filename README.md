@@ -245,7 +245,7 @@ The slot grid follows the [ARIA listbox pattern](https://www.w3.org/WAI/ARIA/apg
 | `Home` / `End`    | Move to the first / last slot    |
 | `Enter` / `Space` | Select the focused slot          |
 
-Arrow keys only move focus; the selection (and the `onselect` callback) is triggered on `Enter`, `Space` or a click, so navigating the grid never changes the selected color on its own. In grouped palettes, `↑` / `↓` move by a fixed stride (the widest group's column count) and cross group boundaries, so vertical steps are row-accurate for flat palettes and approximate across groups of different sizes.
+Arrow keys only move focus; the selection (and the `onselect` callback) is triggered on `Enter`, `Space` or a click, so navigating the grid never changes the selected color on its own. In grouped palettes each group is a row: `↑` / `↓` move to the slot at the same position in the adjacent group (clamped to that group's length).
 
 > **Custom slots** — the roving tab index is managed automatically for the default slots. Only the [`slot`](#snippets) snippet receives the computed `tabindex` argument: forward it onto your own focusable element and the slot joins the arrow-key navigation — no `role="option"` is required for keyboard access. Also add `role="option"` and `aria-selected={selectedColor === color}` so screen readers expose the slot as a selectable option. A `slot` that ignores `tabindex` keeps working but stays a separate tab stop.
 >

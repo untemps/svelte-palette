@@ -314,6 +314,30 @@
 					.filter((el): el is HTMLElement => el != null)
 			: []
 
+	const _rowStep = (options: HTMLElement[], from: number, dir: number): number => {
+		if (!_colorGroups) {
+			const target = from + dir * _numColumns
+			return target >= 0 && target < options.length ? target : from
+		}
+		const rows: number[][] = []
+		let lastRow: Element | null = null
+		options.forEach((option, index) => {
+			const row = option.closest('.palette__cells')
+			if (row !== lastRow) {
+				rows.push([])
+				lastRow = row
+			}
+			rows[rows.length - 1].push(index)
+		})
+		const rowIndex = rows.findIndex((row) => row.includes(from))
+		const targetRow = rows[rowIndex + dir]
+		if (rowIndex < 0 || !targetRow) {
+			return from
+		}
+		const column = rows[rowIndex].indexOf(from)
+		return targetRow[Math.min(column, targetRow.length - 1)]
+	}
+
 	const _onListboxKeydown = (e: KeyboardEvent) => {
 		const options = _getOptions()
 		const count = options.length
@@ -331,10 +355,10 @@
 				next = Math.max(from - 1, 0)
 				break
 			case 'ArrowDown':
-				next = from + _numColumns < count ? from + _numColumns : from
+				next = _rowStep(options, from, 1)
 				break
 			case 'ArrowUp':
-				next = from - _numColumns >= 0 ? from - _numColumns : from
+				next = _rowStep(options, from, -1)
 				break
 			case 'Home':
 				next = 0

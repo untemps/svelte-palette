@@ -536,6 +536,30 @@ test('Navigates across group boundaries with arrow keys', async () => {
 	expect(slots[2]).toHaveFocus()
 })
 
+test('Moves between groups by row with ArrowDown and ArrowUp, clamping to the group length', async () => {
+	const colors = [
+		{ name: 'A', colors: ['#a00', '#a11', '#a22', '#a33'] },
+		{ name: 'B', colors: ['#b00', '#b11'] },
+		{ name: 'C', colors: ['#c00', '#c11', '#c22'] },
+	]
+	const { user } = setup(Palette, { props: { colors } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+
+	slots[0].focus()
+	await user.keyboard('{ArrowDown}')
+	expect(slots[4]).toHaveFocus()
+	await user.keyboard('{ArrowDown}')
+	expect(slots[6]).toHaveFocus()
+
+	await user.keyboard('{ArrowUp}')
+	expect(slots[4]).toHaveFocus()
+
+	slots[3].focus()
+	await user.keyboard('{ArrowDown}')
+	expect(slots[5]).toHaveFocus()
+})
+
 test('Selects the focused slot with Enter and Space', async () => {
 	const onSelect = vi.fn()
 	const colors = ['#ff0', '#0ff', '#f0f']
