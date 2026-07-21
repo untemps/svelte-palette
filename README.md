@@ -239,14 +239,17 @@ The slot grid follows the [ARIA listbox pattern](https://www.w3.org/WAI/ARIA/apg
 - **Single tab stop** — the whole grid takes a single tab stop instead of one per slot. `Tab` moves focus onto the selected slot (or the first one when nothing is selected), then out of the grid.
 - **Arrow-key navigation** — once a slot is focused, move within the grid with the keyboard:
 
-| Key               | Action                           |
-| ----------------- | -------------------------------- |
-| `←` / `→`         | Move to the previous / next slot |
-| `↑` / `↓`         | Move up / down one row           |
-| `Home` / `End`    | Move to the first / last slot    |
-| `Enter` / `Space` | Select the focused slot          |
+| Key                    | Action                                                 |
+| ---------------------- | ------------------------------------------------------ |
+| `←` / `→`              | Move to the previous / next slot                       |
+| `↑` / `↓`              | Move up / down one row                                 |
+| `Home` / `End`         | Move to the first / last slot                          |
+| `Enter` / `Space`      | Select the focused slot                                |
+| `Delete` / `Backspace` | Remove the focused slot (when a `deletionMode` is set) |
 
 Arrow keys only move focus; the selection (and the `onselect` callback) is triggered on `Enter`, `Space` or a click, so navigating the grid never changes the selected color on its own. In grouped palettes each group is a row: `↑` / `↓` move to the slot at the same position in the adjacent group (clamped to that group's length).
+
+When a `deletionMode` (`"tooltip"` or `"drop"`) is set, `Delete` or `Backspace` removes the focused slot and moves focus to the neighbour that takes its place — the keyboard counterpart of the pointer-only tooltip and drop affordances. The leading transparent slot is never removed, and the keys do nothing when `deletionMode` is `"none"`.
 
 > **Custom slots** — the roving tab index is managed automatically for the default slots. Only the [`slot`](#snippets) snippet receives the computed `tabindex` argument: forward it onto your own focusable element and the slot joins the arrow-key navigation — no `role="option"` is required for keyboard access. Also add `role="option"` and `aria-selected={selected}` (the snippet receives a computed `selected` flag that is index-accurate, so with `allowDuplicates` only the first matching slot is marked) so screen readers expose the slot as a selectable option. A `slot` that ignores `tabindex` keeps working but stays a separate tab stop.
 >

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { untrack } from 'svelte'
+	import { tick, untrack } from 'svelte'
 
 	import { calculateColorGroups, calculateColors, calculateNumColumns, isColorGroups } from '../utils/utils.js'
 
@@ -369,6 +369,49 @@
 		return targetRow[Math.min(column, targetRow.length - 1)]
 	}
 
+	// Delete the color under the focused option, the keyboard counterpart of the pointer-only
+	// tooltip/drop deletion affordances. Focus stays on the neighbour that shifts into place.
+	const _deleteOption = async (from: number) => {
+		if (deletionMode === NONE) {
+			return
+		}
+		if (_colorGroups) {
+			let groupIndex = -1
+			for (let i = 0; i < _groupOffsets.length; i++) {
+				if (from >= _groupOffsets[i]) {
+					groupIndex = i
+				} else {
+					break
+				}
+			}
+			if (groupIndex < 0) {
+				return
+			}
+			_removeGroupColor(groupIndex, from - _groupOffsets[groupIndex])
+		} else {
+			const colorIndex = from - (showTransparentSlot ? 1 : 0)
+			if (colorIndex < 0) {
+				// The leading transparent slot clears the selection; it is not a deletable color.
+				return
+			}
+			_onDelete(colorIndex)
+		}
+		// The option set has been replaced; drop the cache and move focus to the neighbour.
+		await tick()
+		_cachedOptions = null
+		const options = _getOptions()
+		if (options.length === 0) {
+			// Nothing left to focus: keep focus on the listbox container rather than
+			// letting it fall back to <body> now that the deleted option is gone.
+			_focusedIndex = null
+			_listboxEl?.focus()
+			return
+		}
+		const next = Math.min(from, options.length - 1)
+		_focusedIndex = next
+		options[next]?.focus()
+	}
+
 	const _onListboxKeydown = (e: KeyboardEvent) => {
 		const options = _getOptions()
 		const count = options.length
@@ -377,6 +420,14 @@
 		}
 		const current = options.indexOf(document.activeElement as HTMLElement)
 		const from = current >= 0 ? current : Math.min(_activeIndex, count - 1)
+		if (e.key === 'Delete' || e.key === 'Backspace') {
+			if (deletionMode === NONE || current < 0) {
+				return
+			}
+			e.preventDefault()
+			_deleteOption(current)
+			return
+		}
 		let next: number
 		switch (e.key) {
 			case 'ArrowRight':

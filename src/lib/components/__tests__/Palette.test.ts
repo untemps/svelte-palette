@@ -983,3 +983,183 @@ test('Leaves the forwarded focusColor undefined on custom slots when unset', asy
 	const custom = await screen.findAllByTestId('__fc-unset__')
 	custom.forEach((el) => expect(el).toHaveAttribute('data-focuscolor', 'undefined'))
 })
+
+test('Removes the focused slot with Delete in tooltip deletion mode', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const { user } = setup(Palette, { props: { colors, deletionMode: TOOLTIP } })
+
+	let slots = await screen.findAllByTestId('__palette-slot__')
+	slots[1].focus()
+	await user.keyboard('{Delete}')
+
+	await waitFor(async () => {
+		slots = await screen.findAllByTestId('__palette-slot__')
+		expect(slots).toHaveLength(2)
+	})
+	expect(slots.map((slot) => slot.getAttribute('aria-label'))).toEqual(['#ff0', '#f0f'])
+})
+
+test('Removes the focused slot with Backspace', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const { user } = setup(Palette, { props: { colors, deletionMode: TOOLTIP } })
+
+	let slots = await screen.findAllByTestId('__palette-slot__')
+	slots[0].focus()
+	await user.keyboard('{Backspace}')
+
+	await waitFor(async () => {
+		slots = await screen.findAllByTestId('__palette-slot__')
+		expect(slots).toHaveLength(2)
+	})
+	expect(slots.map((slot) => slot.getAttribute('aria-label'))).toEqual(['#0ff', '#f0f'])
+})
+
+test('Moves focus to the neighbouring slot after a keyboard deletion', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const { user } = setup(Palette, { props: { colors, deletionMode: TOOLTIP } })
+
+	let slots = await screen.findAllByTestId('__palette-slot__')
+	slots[1].focus()
+	await user.keyboard('{Delete}')
+
+	await waitFor(async () => {
+		slots = await screen.findAllByTestId('__palette-slot__')
+		expect(slots).toHaveLength(2)
+	})
+	expect(slots[1]).toHaveFocus()
+	expect(slots[1]).toHaveAttribute('aria-label', '#f0f')
+})
+
+test('Clamps focus to the last slot when the last slot is deleted', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const { user } = setup(Palette, { props: { colors, deletionMode: TOOLTIP } })
+
+	let slots = await screen.findAllByTestId('__palette-slot__')
+	slots[2].focus()
+	await user.keyboard('{Delete}')
+
+	await waitFor(async () => {
+		slots = await screen.findAllByTestId('__palette-slot__')
+		expect(slots).toHaveLength(2)
+	})
+	expect(slots[1]).toHaveFocus()
+})
+
+test('Removes the focused slot with Delete in drop deletion mode', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const { user } = setup(Palette, { props: { colors, deletionMode: DROP } })
+
+	let slots = await screen.findAllByTestId('__palette-slot__')
+	slots[0].focus()
+	await user.keyboard('{Delete}')
+
+	await waitFor(async () => {
+		slots = await screen.findAllByTestId('__palette-slot__')
+		expect(slots).toHaveLength(2)
+	})
+	expect(slots.map((slot) => slot.getAttribute('aria-label'))).toEqual(['#0ff', '#f0f'])
+})
+
+test('Does not delete slots when the deletion mode is none', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const { user } = setup(Palette, { colors })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	slots[1].focus()
+	await user.keyboard('{Delete}')
+	await user.keyboard('{Backspace}')
+
+	expect(screen.getAllByTestId('__palette-slot__')).toHaveLength(3)
+})
+
+test('Does not remove the leading transparent slot with Delete', async () => {
+	const colors = ['#ff0', '#0ff']
+	const { user } = setup(Palette, { props: { colors, showTransparentSlot: true, deletionMode: TOOLTIP } })
+
+	let slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(3)
+	slots[0].focus()
+	await user.keyboard('{Delete}')
+
+	slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(3)
+})
+
+test('Removes the correct color when a transparent slot precedes the grid', async () => {
+	const colors = ['#ff0', '#0ff']
+	const { user } = setup(Palette, { props: { colors, showTransparentSlot: true, deletionMode: TOOLTIP } })
+
+	let slots = await screen.findAllByTestId('__palette-slot__')
+	slots[1].focus()
+	await user.keyboard('{Delete}')
+
+	await waitFor(async () => {
+		slots = await screen.findAllByTestId('__palette-slot__')
+		expect(slots).toHaveLength(2)
+	})
+	expect(slots[1]).toHaveAttribute('aria-label', '#0ff')
+})
+
+test('Removes the focused slot with Delete in grouped mode', async () => {
+	const colors = [
+		{ name: 'Reds', colors: ['#f00', '#f11'] },
+		{ name: 'Blues', colors: ['#00f', '#11f'] },
+	]
+	const { user } = setup(Palette, { props: { colors, deletionMode: TOOLTIP } })
+
+	let slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(4)
+	slots[2].focus()
+	await user.keyboard('{Delete}')
+
+	await waitFor(async () => {
+		slots = await screen.findAllByTestId('__palette-slot__')
+		expect(slots).toHaveLength(3)
+	})
+	expect(slots.map((slot) => slot.getAttribute('aria-label'))).toEqual(['#f00', '#f11', '#11f'])
+})
+
+test('Does not select a color while deleting with the keyboard', async () => {
+	const onSelect = vi.fn()
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const { user } = setup(Palette, { props: { colors, deletionMode: TOOLTIP, onselect: onSelect } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	slots[1].focus()
+	await user.keyboard('{Delete}')
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-slot__')).toHaveLength(2))
+	expect(onSelect).not.toHaveBeenCalled()
+})
+
+test('Keeps focus on the listbox after deleting the last remaining slot', async () => {
+	const colors = ['#ff0']
+	const { user } = setup(Palette, { props: { colors, deletionMode: TOOLTIP } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(1)
+	slots[0].focus()
+	await user.keyboard('{Delete}')
+
+	await waitFor(() => expect(screen.queryAllByTestId('__palette-slot__')).toHaveLength(0))
+	expect(screen.getByRole('listbox')).toHaveFocus()
+})
+
+test('Removes the first color of a group that follows an empty group', async () => {
+	const colors = [
+		{ name: 'Reds', colors: [] },
+		{ name: 'Blues', colors: ['#00f', '#11f'] },
+	]
+	const { user } = setup(Palette, { props: { colors, deletionMode: TOOLTIP } })
+
+	let slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(2)
+	slots[0].focus()
+	await user.keyboard('{Delete}')
+
+	await waitFor(async () => {
+		slots = await screen.findAllByTestId('__palette-slot__')
+		expect(slots).toHaveLength(1)
+	})
+	expect(slots[0]).toHaveAttribute('aria-label', '#11f')
+})
