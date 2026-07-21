@@ -41,7 +41,7 @@
 
 <main class="example3" style="--bgColor:#000">
 	<div class="content">
-		<Palette class="palette__custom" colors={blueColors} numColumns="10">
+		<Palette class="palette__custom" colors={blueColors} numColumns="10" presentational>
 			{#snippet header()}
 				<div class="header">
 					<h1>Blue</h1>
@@ -59,7 +59,7 @@
 			{#snippet input()}{/snippet}
 			{#snippet tools()}{/snippet}
 		</Palette>
-		<Palette class="palette__custom" colors={purpleColors} numColumns="10">
+		<Palette class="palette__custom" colors={purpleColors} numColumns="10" presentational>
 			{#snippet header()}
 				<div class="header">
 					<h1>Purple</h1>
@@ -77,7 +77,7 @@
 			{#snippet input()}{/snippet}
 			{#snippet tools()}{/snippet}
 		</Palette>
-		<Palette class="palette__custom" colors={redColors} numColumns="10">
+		<Palette class="palette__custom" colors={redColors} numColumns="10" presentational>
 			{#snippet header()}
 				<div class="header">
 					<h1>Red</h1>

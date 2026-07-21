@@ -61,24 +61,25 @@ yarn add @untemps/svelte-palette
 
 ## API
 
-| Props                    | Type                                                                                                    | Default          | Description                                                                                                                                                                                               |
-| ------------------------ | ------------------------------------------------------------------------------------------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `colors`                 | string[] or Promise<string[]> or object[] or Promise<object[]> or ColorGroup[] or Promise<ColorGroup[]> | []               | Array of colors to be displayed in the palette. Pass an array of `{ name, colors }` objects to display grouped collections. See more about colors in the [Colors Setting](#colors-setting) section        |
-| `selectedColor`          | string                                                                                                  | null             | Default selected color. The color must be included in the `colors` prop. Supports `bind:selectedColor`.                                                                                                   |
-| `isCompact`              | boolean                                                                                                 | false            | Flag to display the palette in compact mode.                                                                                                                                                              |
-| `compactColorIndices`    | number[]                                                                                                | []               | Array of indices to pick from the `colors` array to be displayed in the compacted palette (see [Compact Mode](#compact-mode)).                                                                            |
-| `allowDuplicates`        | boolean                                                                                                 | false            | Flag to allow color duplication.                                                                                                                                                                          |
-| `deletionMode`           | string                                                                                                  | "none"           | Mode of slot deletion, between `"none"` and `"tooltip"` and `"drop"` (see [Deletion Modes](#deletion-modes)).                                                                                             |
-| `tooltipClassName`       | string                                                                                                  | null             | Class name to pass down to the deletion tooltip (see [Styles](#styles)).                                                                                                                                  |
-| `tooltipContentSelector` | string                                                                                                  | null             | Selector of the deletion tooltip content (see [Customize the Content of the Deletion Tooltip](#customize-the-content-of-the-deletion-tooltip)).                                                           |
-| `showTransparentSlot`    | boolean                                                                                                 | false            | Flag to display a transparent slot at the start of the slot list.                                                                                                                                         |
-| `maxColors`              | number                                                                                                  | 30               | Maximum number of slots to be displayed in the palette. Set this value to `-1` to allow infinite number of slots.                                                                                         |
-| `showInput`              | boolean                                                                                                 | false            | Flag to display the input within the footer slot.                                                                                                                                                         |
-| `inputType`              | string                                                                                                  | "text"           | Type of the input within the footer slot. Only "text" and "color" are allowed. All other value will be replaced by "text".                                                                                |
-| `numColumns`             | number                                                                                                  | 5                | Number of columns of the palette grid. This value can't exceed the number of maximum colors defined in `maxColors` and can't be lower than 1. Set this value to `0` to display the slots on a single row. |
-| `maxColumns`             | number                                                                                                  | 0                | Maximum number of columns when `numColumns` is set to `0`. Once reached, additional slots wrap to a new row. Set this value to `0` to allow unlimited columns.                                            |
-| `transition`             | object                                                                                                  | null             | Animation when a slot is rendered (see [Transition](#transition)).                                                                                                                                        |
-| `label`                  | string                                                                                                  | "Color swatches" | Accessible name announced for the swatch listbox (see [Accessibility](#accessibility)).                                                                                                                   |
+| Props                    | Type                                                                                                    | Default       | Description                                                                                                                                                                                                                                        |
+| ------------------------ | ------------------------------------------------------------------------------------------------------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `colors`                 | string[] or Promise<string[]> or object[] or Promise<object[]> or ColorGroup[] or Promise<ColorGroup[]> | []            | Array of colors to be displayed in the palette. Pass an array of `{ name, colors }` objects to display grouped collections. See more about colors in the [Colors Setting](#colors-setting) section                                                 |
+| `selectedColor`          | string                                                                                                  | null          | Default selected color. The color must be included in the `colors` prop. Supports `bind:selectedColor`.                                                                                                                                            |
+| `isCompact`              | boolean                                                                                                 | false         | Flag to display the palette in compact mode.                                                                                                                                                                                                       |
+| `compactColorIndices`    | number[]                                                                                                | []            | Array of indices to pick from the `colors` array to be displayed in the compacted palette (see [Compact Mode](#compact-mode)).                                                                                                                     |
+| `allowDuplicates`        | boolean                                                                                                 | false         | Flag to allow color duplication.                                                                                                                                                                                                                   |
+| `deletionMode`           | string                                                                                                  | "none"        | Mode of slot deletion, between `"none"` and `"tooltip"` and `"drop"` (see [Deletion Modes](#deletion-modes)).                                                                                                                                      |
+| `tooltipClassName`       | string                                                                                                  | null          | Class name to pass down to the deletion tooltip (see [Styles](#styles)).                                                                                                                                                                           |
+| `tooltipContentSelector` | string                                                                                                  | null          | Selector of the deletion tooltip content (see [Customize the Content of the Deletion Tooltip](#customize-the-content-of-the-deletion-tooltip)).                                                                                                    |
+| `showTransparentSlot`    | boolean                                                                                                 | false         | Flag to display a transparent slot at the start of the slot list.                                                                                                                                                                                  |
+| `maxColors`              | number                                                                                                  | 30            | Maximum number of slots to be displayed in the palette. Set this value to `-1` to allow infinite number of slots.                                                                                                                                  |
+| `showInput`              | boolean                                                                                                 | false         | Flag to display the input within the footer slot.                                                                                                                                                                                                  |
+| `inputType`              | string                                                                                                  | "text"        | Type of the input within the footer slot. Only "text" and "color" are allowed. All other value will be replaced by "text".                                                                                                                         |
+| `numColumns`             | number                                                                                                  | 5             | Number of columns of the palette grid. This value can't exceed the number of maximum colors defined in `maxColors` and can't be lower than 1. Set this value to `0` to display the slots on a single row.                                          |
+| `maxColumns`             | number                                                                                                  | 0             | Maximum number of columns when `numColumns` is set to `0`. Once reached, additional slots wrap to a new row. Set this value to `0` to allow unlimited columns.                                                                                     |
+| `transition`             | object                                                                                                  | null          | Animation when a slot is rendered (see [Transition](#transition)).                                                                                                                                                                                 |
+| `label`                  | string                                                                                                  | "Color slots" | Accessible name announced for the slot listbox (see [Accessibility](#accessibility)).                                                                                                                                                              |
+| `presentational`         | boolean                                                                                                 | false         | Renders the slot grid as a purely visual display: drops the `listbox`/`option` roles, the single tab stop and the arrow-key navigation. Use it for decorative palettes that are not meant to be picked from (see [Accessibility](#accessibility)). |
 
 ## Callbacks
 
@@ -231,24 +232,36 @@ You may also specified whether the palette has to use the compact mode by defaul
 
 # Accessibility
 
-The swatch grid follows the [ARIA listbox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/) so it behaves as a single composite widget for keyboard and screen-reader users.
+The slot grid follows the [ARIA listbox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/) so it behaves as a single composite widget for keyboard and screen-reader users.
 
-- **Listbox semantics** — the grid is exposed as a `listbox` and each swatch as an `option` whose selection state is reflected through `aria-selected`. Name the listbox with the [`label`](#api) prop (defaults to `"Color swatches"`). When colors are grouped, each group is a labelled `group` associated with its name.
-- **Single tab stop** — the whole grid takes a single tab stop instead of one per swatch. `Tab` moves focus onto the selected swatch (or the first one when nothing is selected), then out of the grid.
-- **Arrow-key navigation** — once a swatch is focused, move within the grid with the keyboard:
+- **Listbox semantics** — the grid is exposed as a `listbox` and each slot as an `option` whose selection state is reflected through `aria-selected`. Name the listbox with the [`label`](#api) prop (defaults to `"Color slots"`). When colors are grouped, each group is a labelled `group` associated with its name.
+- **Single tab stop** — the whole grid takes a single tab stop instead of one per slot. `Tab` moves focus onto the selected slot (or the first one when nothing is selected), then out of the grid.
+- **Arrow-key navigation** — once a slot is focused, move within the grid with the keyboard:
 
-| Key               | Action                             |
-| ----------------- | ---------------------------------- |
-| `←` / `→`         | Move to the previous / next swatch |
-| `↑` / `↓`         | Move up / down one row             |
-| `Home` / `End`    | Move to the first / last swatch    |
-| `Enter` / `Space` | Select the focused swatch          |
+| Key               | Action                           |
+| ----------------- | -------------------------------- |
+| `←` / `→`         | Move to the previous / next slot |
+| `↑` / `↓`         | Move up / down one row           |
+| `Home` / `End`    | Move to the first / last slot    |
+| `Enter` / `Space` | Select the focused slot          |
 
 Arrow keys only move focus; the selection (and the `onselect` callback) is triggered on `Enter`, `Space` or a click, so navigating the grid never changes the selected color on its own. In grouped palettes, `↑` / `↓` move by a fixed stride (the widest group's column count) and cross group boundaries, so vertical steps are row-accurate for flat palettes and approximate across groups of different sizes.
 
-> **Custom slots** — the roving tab index is managed automatically for the default swatches. Only the [`slot`](#snippets) snippet receives the computed `tabindex` argument: forward it onto your own focusable element and the swatch joins the arrow-key navigation — no `role="option"` is required for keyboard access. Also add `role="option"` and `aria-selected={selectedColor === color}` so screen readers expose the swatch as a selectable option. A `slot` that ignores `tabindex` keeps working but stays a separate tab stop.
+> **Custom slots** — the roving tab index is managed automatically for the default slots. Only the [`slot`](#snippets) snippet receives the computed `tabindex` argument: forward it onto your own focusable element and the slot joins the arrow-key navigation — no `role="option"` is required for keyboard access. Also add `role="option"` and `aria-selected={selectedColor === color}` so screen readers expose the slot as a selectable option. A `slot` that ignores `tabindex` keeps working but stays a separate tab stop.
 >
-> The `beforeSlot` and `afterSlot` snippets render **outside** the `listbox`, stacked before and after the swatch grid, so they are not options and are **not** part of the arrow-key navigation. Render them as plain elements (e.g. a `<div>`, **not** an `<li>`), keep any interactive content they hold reachable with `Tab`, and do not give it `role="option"`. The `transparentSlot` snippet, by contrast, replaces the leading option _inside_ the listbox and now receives `tabindex` and `selected`: forward `role="option"`, the `tabindex` argument, and `aria-selected={selected}` onto your element so it stays the single leading tab stop and part of arrow-key navigation.
+> The `beforeSlot` and `afterSlot` snippets render **outside** the `listbox`, stacked before and after the slot grid, so they are not options and are **not** part of the arrow-key navigation. Render them as plain elements (e.g. a `<div>`, **not** an `<li>`), keep any interactive content they hold reachable with `Tab`, and do not give it `role="option"`. The `transparentSlot` snippet, by contrast, replaces the leading option _inside_ the listbox and now receives `tabindex` and `selected`: forward `role="option"`, the `tabindex` argument, and `aria-selected={selected}` onto your element so it stays the single leading tab stop and part of arrow-key navigation.
+
+## Display-only palettes
+
+If a palette is purely decorative — a slot board or a color reference that is not meant to be picked from — set the [`presentational`](#api) prop. The grid then renders as a plain container: no `listbox`/`option` roles, no tab stop and no arrow-key navigation. This avoids exposing an empty `listbox` when you replace the slots with non-interactive `slot` content (e.g. bare `<div>`s). Grouped palettes keep their visible group names as regular text.
+
+```svelte
+<Palette {colors} presentational>
+	{#snippet slot({ color })}
+		<div style="--color: {color}" class="slot"></div>
+	{/snippet}
+</Palette>
+```
 
 ## Landmark
 
@@ -281,9 +294,9 @@ You can style the component by passing a class down to the root tag (`div`).
 </style>
 ```
 
-### Swatch Grid Class
+### Slot Grid Class
 
-The swatch grid (columns, gaps) is laid out on the `listbox` element, `.palette__listbox`, not on its `.palette__cells` wrapper — the wrapper is a flex column that stacks the optional `beforeSlot` / `afterSlot` around the grid. Target `.palette__listbox` (e.g. `.palette__cells > .palette__listbox`) to override the flat-mode grid:
+The slot grid (columns, gaps) is laid out on the `listbox` element, `.palette__listbox`, not on its `.palette__cells` wrapper — the wrapper is a flex column that stacks the optional `beforeSlot` / `afterSlot` around the grid. Target `.palette__listbox` (e.g. `.palette__cells > .palette__listbox`) to override the flat-mode grid:
 
 ```svelte
 <style>

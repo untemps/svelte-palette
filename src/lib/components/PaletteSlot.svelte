@@ -24,9 +24,9 @@
 		selected = false,
 		disabled = false,
 		tabindex = 0,
-		role = undefined,
+		role,
 		transition = null,
-		onselect = undefined,
+		onselect,
 		...restProps
 	}: Props & Omit<HTMLButtonAttributes, keyof Props> = $props()
 

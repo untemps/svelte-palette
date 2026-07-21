@@ -72,8 +72,14 @@
 		transition?: Transition | null
 		/** Called whenever a color is selected. */
 		onselect?: (args: SelectEventArgs) => void
-		/** Accessible name announced for the color swatch listbox. */
+		/** Accessible name announced for the color slot listbox. */
 		label?: string
+		/**
+		 * Renders the slot grid as a purely visual display instead of a listbox:
+		 * drops the `listbox`/`option` roles, the roving tab stop and the arrow-key
+		 * navigation. Use it for decorative palettes that are not meant to be picked from.
+		 */
+		presentational?: boolean
 		/** Class name applied to the root element. */
 		class?: string
 		/** Replaces the header. */
@@ -115,7 +121,8 @@
 		maxColumns = 0,
 		transition = null,
 		onselect = undefined,
-		label = 'Color swatches',
+		label = 'Color slots',
+		presentational = false,
 		class: className = '',
 		header = undefined,
 		beforeSlot = undefined,
@@ -152,8 +159,6 @@
 		const _maxCols = maxColumns
 		Promise.resolve(colors).then((results) => {
 			if (!!results) {
-				// Forget the last focused swatch so the roving tab stop falls back to the
-				// selected (or first) option when the color set is replaced.
 				_focusedIndex = null
 				if (isColorGroups(results)) {
 					const newColorGroups = calculateColorGroups(results, {
@@ -190,7 +195,6 @@
 		...(settings ? [SETTINGS] : []),
 	] as PaletteToolName[])
 
-	// Number of navigable options rendered on the default slot path.
 	const _optionCount = $derived(
 		_colorGroups
 			? _colorGroups.reduce((sum, group) => sum + group.colors.length, 0)
@@ -199,7 +203,6 @@
 				: 0
 	)
 
-	// Global option index at which each group starts, in DOM order.
 	const _groupOffsets = $derived.by(() => {
 		const offsets: number[] = []
 		let base = 0
@@ -210,7 +213,6 @@
 		return offsets
 	})
 
-	// Global option index of the current selection, or -1 when none matches.
 	const _selectedIndex = $derived.by(() => {
 		if (_colorGroups) {
 			let base = 0
@@ -234,11 +236,15 @@
 		return -1
 	})
 
-	// Option that owns `tabindex="0"`: last focused, else selected, else first.
 	const _activeIndex = $derived.by(() => {
 		const preferred = _focusedIndex ?? (_selectedIndex >= 0 ? _selectedIndex : 0)
 		return Math.min(Math.max(preferred, 0), Math.max(_optionCount - 1, 0))
 	})
+
+	const _rovingTabindex = (optionIndex: number): number =>
+		presentational ? -1 : optionIndex === _activeIndex ? 0 : -1
+
+	const _optionRole = $derived(presentational ? undefined : 'option')
 
 	const _selectColor = (color: ColorValue | null) => {
 		selectedColor = color
@@ -297,10 +303,6 @@
 		_isSettingsOn = false
 	}
 
-	// Navigable options in DOM order. Navigation keys off the component-owned cell
-	// wrapper and the roving `tabindex` rather than `role="option"`, so a custom `slot`
-	// that forwards the `tabindex` argument stays reachable by arrow keys even without
-	// the option role (which remains the consumer's job for screen-reader semantics).
 	const _getOptions = (): HTMLElement[] =>
 		_listboxEl
 			? [..._listboxEl.querySelectorAll<HTMLElement>('.palette__cells__cell')]
@@ -362,33 +364,39 @@
 			{@render header?.({ selectedColor })}
 		{/if}
 		{#if !!_colorGroups}
+			<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 			<div
 				bind:this={_listboxEl}
 				class="palette__groups"
-				role="listbox"
-				aria-label={label}
+				role={presentational ? undefined : 'listbox'}
+				aria-label={presentational ? undefined : label}
 				tabindex={-1}
-				onkeydown={_onListboxKeydown}
-				onfocusin={_onListboxFocusin}
+				onkeydown={presentational ? undefined : _onListboxKeydown}
+				onfocusin={presentational ? undefined : _onListboxFocusin}
 			>
 				{#each _colorGroups as group, groupIndex}
 					<div class="palette__groups__group" role="presentation" data-testid="__palette-group__">
 						{#if group.name}
 							<p
 								class="palette__groups__group__name"
-								aria-hidden="true"
+								aria-hidden={presentational ? undefined : 'true'}
 								data-testid="__palette-group-name__"
 							>
 								{group.name}
 							</p>
 						{/if}
-						<ul class="palette__cells" role="group" aria-label={group.name || undefined}>
+						<ul
+							class="palette__cells"
+							role={presentational ? 'presentation' : 'group'}
+							aria-label={presentational ? undefined : group.name || undefined}
+						>
 							{#each group.colors as color, colorIndex (`${color.value}_${colorIndex}`)}
 								{@const optionIndex = (_groupOffsets[groupIndex] ?? 0) + colorIndex}
 								<li
 									data-testid="__palette-cell__"
 									class="palette__cells__cell"
 									role="presentation"
+									tabindex="-1"
 									use:useDeletion={{
 										deletionMode,
 										onDelete: () => _removeGroupColor(groupIndex, colorIndex),
@@ -405,14 +413,14 @@
 											transition,
 											isCompact: false,
 											index: colorIndex,
-											tabindex: optionIndex === _activeIndex ? 0 : -1,
+											tabindex: _rovingTabindex(optionIndex),
 										})}
 									{:else}
 										<PaletteSlot
 											color={color.value}
-											role="option"
+											role={_optionRole}
 											selected={optionIndex === _selectedIndex}
-											tabindex={optionIndex === _activeIndex ? 0 : -1}
+											tabindex={_rovingTabindex(optionIndex)}
 											{transition}
 											onselect={_onSlotSelect}
 										/>
@@ -428,28 +436,29 @@
 				{#if beforeSlot}
 					{@render beforeSlot({ selectedColor, transition, isCompact: _isCompact })}
 				{/if}
+				<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 				<ul
 					bind:this={_listboxEl}
 					class="palette__listbox"
-					role="listbox"
-					aria-label={label}
+					role={presentational ? 'presentation' : 'listbox'}
+					aria-label={presentational ? undefined : label}
 					tabindex={-1}
-					onkeydown={_onListboxKeydown}
-					onfocusin={_onListboxFocusin}
+					onkeydown={presentational ? undefined : _onListboxKeydown}
+					onfocusin={presentational ? undefined : _onListboxFocusin}
 				>
 					{#if showTransparentSlot}
 						<li data-testid="__palette-cell__" class="palette__cells__cell" role="presentation">
 							{#if transparentSlot}
 								{@render transparentSlot({
-									tabindex: _activeIndex === 0 ? 0 : -1,
+									tabindex: _rovingTabindex(0),
 									selected: selectedColor === null,
 								})}
 							{:else}
 								<PaletteSlot
 									aria-label="Transparent slot"
-									role="option"
+									role={_optionRole}
 									selected={selectedColor === null}
-									tabindex={_activeIndex === 0 ? 0 : -1}
+									tabindex={_rovingTabindex(0)}
 									onselect={_onSlotSelect}
 								/>
 							{/if}
@@ -461,6 +470,7 @@
 							data-testid="__palette-cell__"
 							class="palette__cells__cell"
 							role="presentation"
+							tabindex="-1"
 							use:useDeletion={{
 								deletionMode,
 								onDelete: () => _onDelete(index),
@@ -476,14 +486,14 @@
 									transition,
 									isCompact: _isCompact,
 									index,
-									tabindex: optionIndex === _activeIndex ? 0 : -1,
+									tabindex: _rovingTabindex(optionIndex),
 								})}
 							{:else}
 								<PaletteSlot
 									color={color.value}
-									role="option"
+									role={_optionRole}
 									selected={optionIndex === _selectedIndex}
-									tabindex={optionIndex === _activeIndex ? 0 : -1}
+									tabindex={_rovingTabindex(optionIndex)}
 									{transition}
 									onselect={_onSlotSelect}
 								/>
@@ -563,9 +573,6 @@
 		column-gap: 0.7rem;
 	}
 
-	/* Flat-mode wrapper: a plain flex column that stacks the optional edge slots
-	   above and below the swatch grid, keeping them OUTSIDE the listbox in both the
-	   DOM and the accessibility tree. */
 	.palette__content > .palette__cells {
 		width: 100%;
 		display: flex;
@@ -577,8 +584,6 @@
 		list-style: none;
 	}
 
-	/* The listbox is a real box (no display:contents) so its role and aria-label are
-	   always exposed in the accessibility tree; it carries the swatch grid itself. */
 	.palette__content > .palette__cells > .palette__listbox {
 		width: 100%;
 		display: grid;
@@ -598,6 +603,12 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+	}
+
+	.palette__cells__cell:focus,
+	.palette__listbox:focus,
+	.palette__groups:focus {
+		outline: none;
 	}
 
 	.palette__content.palette__content--compact > .palette__cells > .palette__listbox {

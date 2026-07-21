@@ -103,7 +103,7 @@
 			{#key unique}
 				<Palette
 					class="palette__custom"
-					label="Background color swatches"
+					label="Background color slots"
 					{colors}
 					compactColorIndices={showCompactControl ? compactIndices : null}
 					selectedColor={preselectColor ? bgColor : null}

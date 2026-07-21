@@ -31,6 +31,8 @@ const createAction = (node: HTMLElement, deletionMode: DeletionMode | undefined,
 				},
 				containerClassName: options.tooltipClassName,
 				portal: false,
+				showOn: ['mouseenter'],
+				hideOn: ['mouseleave'],
 			})
 		}
 		case DROP: {

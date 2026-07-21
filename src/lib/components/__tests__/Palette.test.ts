@@ -378,12 +378,12 @@ test('Does not expose a main landmark on the root', async () => {
 	expect(root).toHaveAttribute('data-palette')
 })
 
-test('Exposes the swatch grid as a listbox', async () => {
+test('Exposes the slot grid as a listbox', async () => {
 	const colors = ['#ff0', '#0ff', '#f0f']
 	setup(Palette, { colors })
 
 	const listbox = await screen.findByRole('listbox')
-	expect(listbox).toHaveAttribute('aria-label', 'Color swatches')
+	expect(listbox).toHaveAttribute('aria-label', 'Color slots')
 })
 
 test('Names the listbox with the label prop', async () => {
@@ -394,7 +394,7 @@ test('Names the listbox with the label prop', async () => {
 	expect(listbox).toHaveAttribute('aria-label', 'Brand colors')
 })
 
-test('Groups swatches and associates each group with its name', async () => {
+test('Groups slots and associates each group with its name', async () => {
 	const colors = [
 		{ name: 'Reds', colors: ['#f00', '#f11'] },
 		{ name: 'Blues', colors: ['#00f'] },
@@ -423,7 +423,7 @@ test('Does not set aria-label on a group without a name', async () => {
 	expect(group).not.toHaveAttribute('aria-label')
 })
 
-test('Makes only the first swatch tabbable when nothing is selected', async () => {
+test('Makes only the first slot tabbable when nothing is selected', async () => {
 	const colors = ['#ff0', '#0ff', '#f0f']
 	setup(Palette, { colors })
 
@@ -433,7 +433,7 @@ test('Makes only the first swatch tabbable when nothing is selected', async () =
 	expect(slots[2]).toHaveAttribute('tabindex', '-1')
 })
 
-test('Makes the selected swatch the tabbable one', async () => {
+test('Makes the selected slot the tabbable one', async () => {
 	const colors = ['#ff0', '#0ff', '#f0f']
 	setup(Palette, { props: { colors, selectedColor: '#f0f' } })
 
@@ -443,7 +443,7 @@ test('Makes the selected swatch the tabbable one', async () => {
 	expect(slots[2]).toHaveAttribute('tabindex', '0')
 })
 
-test('Moves focus to the next swatch with ArrowRight and rolls the tabindex', async () => {
+test('Moves focus to the next slot with ArrowRight and rolls the tabindex', async () => {
 	const colors = ['#ff0', '#0ff', '#f0f']
 	const { user } = setup(Palette, { colors })
 
@@ -456,7 +456,7 @@ test('Moves focus to the next swatch with ArrowRight and rolls the tabindex', as
 	expect(slots[0]).toHaveAttribute('tabindex', '-1')
 })
 
-test('Moves focus to the previous swatch with ArrowLeft and clamps at the start', async () => {
+test('Moves focus to the previous slot with ArrowLeft and clamps at the start', async () => {
 	const colors = ['#ff0', '#0ff', '#f0f']
 	const { user } = setup(Palette, { colors })
 
@@ -482,7 +482,7 @@ test('Moves focus by a full row with ArrowDown and ArrowUp', async () => {
 	expect(slots[0]).toHaveFocus()
 })
 
-test('Jumps to the first and last swatch with Home and End', async () => {
+test('Jumps to the first and last slot with Home and End', async () => {
 	const colors = ['#ff0', '#0ff', '#f0f', '#fff']
 	const { user } = setup(Palette, { colors })
 
@@ -536,7 +536,7 @@ test('Navigates across group boundaries with arrow keys', async () => {
 	expect(slots[2]).toHaveFocus()
 })
 
-test('Selects the focused swatch with Enter and Space', async () => {
+test('Selects the focused slot with Enter and Space', async () => {
 	const onSelect = vi.fn()
 	const colors = ['#ff0', '#0ff', '#f0f']
 	const { user } = setup(Palette, { props: { colors, onselect: onSelect } })
@@ -588,7 +588,7 @@ test('Forwards the roving tabindex to custom slot snippets', async () => {
 	expect(custom[2]).toHaveAttribute('data-tabindex', '-1')
 })
 
-test('Keeps exactly one tabbable swatch after the colors change', async () => {
+test('Keeps exactly one tabbable slot after the colors change', async () => {
 	const colors = ['#100', '#200', '#300', '#400', '#500', '#600']
 	const { rerender } = setup(Palette, { props: { colors, numColumns: 3 } })
 
@@ -620,16 +620,14 @@ test('Renders the edge slots outside the listbox', async () => {
 	const before = screen.getByTestId('__before__')
 	const after = screen.getByTestId('__after__')
 
-	// The edge slots are rendered...
 	expect(before).toBeInTheDocument()
 	expect(after).toBeInTheDocument()
-	// ...but they live outside the listbox subtree, so their content is never an option.
 	expect(listbox).not.toContainElement(before)
 	expect(listbox).not.toContainElement(after)
 	expect(screen.getAllByRole('option')).toHaveLength(3)
 })
 
-test('Keeps arrow-key navigation confined to the swatches when edge slots are present', async () => {
+test('Keeps arrow-key navigation confined to the slots when edge slots are present', async () => {
 	const afterSlot = createRawSnippet(() => ({
 		render: () => `<div data-testid="__after__"><button>After</button></div>`,
 	}))
@@ -642,7 +640,6 @@ test('Keeps arrow-key navigation confined to the swatches when edge slots are pr
 	slots[2].focus()
 	await user.keyboard('{ArrowRight}')
 
-	// Focus clamps at the last option instead of stepping onto the afterSlot button.
 	expect(slots[2]).toHaveFocus()
 })
 
@@ -659,7 +656,7 @@ test('Forwards the roving tabindex to a custom transparent slot', async () => {
 	expect(custom).toHaveAttribute('data-selected', 'true')
 })
 
-test('Marks only the first swatch as selected when the selected color is duplicated', async () => {
+test('Marks only the first slot as selected when the selected color is duplicated', async () => {
 	const colors = ['#ff0', '#f0f', '#f0f']
 	setup(Palette, { props: { colors, allowDuplicates: true, selectedColor: '#f0f' } })
 
@@ -683,7 +680,6 @@ test('Keeps ArrowUp and ArrowDown as no-ops on a single visual row', async () =>
 })
 
 test('Navigates a custom slot that forwards tabindex without role="option"', async () => {
-	// A custom swatch that forwards the roving `tabindex` but never sets `role="option"`.
 	const slotSnippet = createRawSnippet((getProps) => ({
 		render: () => `<button data-testid="__nav-slot__" tabindex="${getProps().tabindex}"></button>`,
 	}))
@@ -692,14 +688,11 @@ test('Navigates a custom slot that forwards tabindex without role="option"', asy
 
 	const custom = await screen.findAllByTestId('__nav-slot__')
 	expect(custom).toHaveLength(3)
-	// None of them is exposed as an option...
 	expect(custom.some((el) => el.getAttribute('role') === 'option')).toBe(false)
-	// ...yet exactly one holds the roving tab stop...
 	expect(custom[0]).toHaveAttribute('tabindex', '0')
 	expect(custom[1]).toHaveAttribute('tabindex', '-1')
 	expect(custom[2]).toHaveAttribute('tabindex', '-1')
 
-	// ...and arrow keys still reach every swatch instead of trapping focus on the first.
 	custom[0].focus()
 	await user.keyboard('{ArrowRight}')
 	expect(custom[1]).toHaveFocus()
@@ -711,7 +704,7 @@ test('Navigates a custom slot that forwards tabindex without role="option"', asy
 	expect(custom[0]).toHaveFocus()
 })
 
-test('Navigates custom-slot swatches without role="option" across group boundaries', async () => {
+test('Navigates custom-slot slots without role="option" across group boundaries', async () => {
 	const slotSnippet = createRawSnippet((getProps) => ({
 		render: () => `<button data-testid="__nav-slot__" tabindex="${getProps().tabindex}"></button>`,
 	}))
@@ -727,4 +720,66 @@ test('Navigates custom-slot swatches without role="option" across group boundari
 	custom[1].focus()
 	await user.keyboard('{ArrowRight}')
 	expect(custom[2]).toHaveFocus()
+})
+
+test('Drops the listbox and option roles in presentational mode', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	setup(Palette, { props: { colors, presentational: true } })
+
+	await screen.findAllByTestId('__palette-slot__')
+	expect(screen.queryByRole('listbox')).toBeNull()
+	expect(screen.queryAllByRole('option')).toHaveLength(0)
+})
+
+test('Does not expose aria-selected on the slots in presentational mode', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	setup(Palette, { props: { colors, selectedColor: '#0ff', presentational: true } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	slots.forEach((slot) => expect(slot).not.toHaveAttribute('aria-selected'))
+})
+
+test('Removes the slots from the tab order in presentational mode', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	setup(Palette, { props: { colors, presentational: true } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	slots.forEach((slot) => expect(slot).toHaveAttribute('tabindex', '-1'))
+})
+
+test('Disables arrow-key navigation in presentational mode', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const { user } = setup(Palette, { props: { colors, presentational: true } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	slots[0].focus()
+	await user.keyboard('{ArrowRight}')
+
+	expect(slots[0]).toHaveFocus()
+})
+
+test('Forwards a non-tabbable tabindex to custom slots in presentational mode', async () => {
+	const slotSnippet = createRawSnippet((getProps) => ({
+		render: () => `<span data-testid="__custom-slot__" data-tabindex="${getProps().tabindex}"></span>`,
+	}))
+	const colors = ['#ff0', '#0ff', '#f0f']
+	setup(Palette, { props: { colors, presentational: true, slot: slotSnippet } })
+
+	const custom = await screen.findAllByTestId('__custom-slot__')
+	custom.forEach((el) => expect(el).toHaveAttribute('data-tabindex', '-1'))
+})
+
+test('Drops the group roles and reveals the group name in presentational mode', async () => {
+	const colors = [
+		{ name: 'Reds', colors: ['#f00', '#f11'] },
+		{ name: 'Blues', colors: ['#00f'] },
+	]
+	setup(Palette, { props: { colors, presentational: true } })
+
+	await screen.findAllByTestId('__palette-slot__')
+	expect(screen.queryByRole('listbox')).toBeNull()
+	expect(screen.queryAllByRole('group')).toHaveLength(0)
+
+	const name = screen.getAllByTestId('__palette-group-name__')[0]
+	expect(name).not.toHaveAttribute('aria-hidden')
 })

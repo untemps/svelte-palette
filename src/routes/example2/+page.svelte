@@ -12,7 +12,7 @@
 <main class="example2" style="--bgColor:{bgColor}">
 	<div class="content">
 		<div class="content__grid">
-			<Palette class="palette__custom" colors={colors1} numColumns="5">
+			<Palette class="palette__custom" colors={colors1} numColumns="5" presentational>
 				{#snippet slot({ color })}
 					<div style="--color: {color}" class="slot"></div>
 				{/snippet}
@@ -25,7 +25,7 @@
 					</div>
 				{/snippet}
 			</Palette>
-			<Palette class="palette__custom" colors={colors2} numColumns="5">
+			<Palette class="palette__custom" colors={colors2} numColumns="5" presentational>
 				{#snippet slot({ color })}
 					<div style="--color: {color}" class="slot"></div>
 				{/snippet}
@@ -38,7 +38,7 @@
 					</div>
 				{/snippet}
 			</Palette>
-			<Palette class="palette__custom" colors={colors3} numColumns="5">
+			<Palette class="palette__custom" colors={colors3} numColumns="5" presentational>
 				{#snippet slot({ color })}
 					<div style="--color: {color}" class="slot"></div>
 				{/snippet}
@@ -51,7 +51,7 @@
 					</div>
 				{/snippet}
 			</Palette>
-			<Palette class="palette__custom" colors={colors4} numColumns="5">
+			<Palette class="palette__custom" colors={colors4} numColumns="5" presentational>
 				{#snippet slot({ color })}
 					<div style="--color: {color}" class="slot"></div>
 				{/snippet}
