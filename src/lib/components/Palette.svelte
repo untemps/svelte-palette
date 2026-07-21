@@ -82,6 +82,8 @@
 		presentational?: boolean
 		/** Class name applied to the root element. */
 		class?: string
+		/** Color of the focus outline on color slots. Defaults to `blue`; can also be set through the `--focusColor` CSS variable. */
+		focusColor?: string
 		/** Replaces the header. */
 		header?: Snippet<[HeaderSnippetProps]>
 		/** Rendered before the color slots. */
@@ -124,6 +126,7 @@
 		label = 'Color slots',
 		presentational = false,
 		class: className = '',
+		focusColor = undefined,
 		header = undefined,
 		beforeSlot = undefined,
 		transparentSlot = undefined,
@@ -469,6 +472,7 @@
 											selected={optionIndex === _selectedIndex}
 											tabindex={_rovingTabindex(optionIndex)}
 											{transition}
+											{focusColor}
 											onselect={_onSlotSelect}
 										/>
 									{/if}
@@ -506,6 +510,7 @@
 									role={_optionRole}
 									selected={selectedColor === null}
 									tabindex={_rovingTabindex(0)}
+									{focusColor}
 									onselect={_onSlotSelect}
 								/>
 							{/if}
@@ -542,6 +547,7 @@
 									selected={optionIndex === _selectedIndex}
 									tabindex={_rovingTabindex(optionIndex)}
 									{transition}
+									{focusColor}
 									onselect={_onSlotSelect}
 								/>
 							{/if}

@@ -13,6 +13,8 @@
 		disabled?: boolean
 		/** Tab index applied to the slot button. Used to build the grid roving tabindex. */
 		tabindex?: number
+		/** Color of the focus outline. Defaults to `blue`; can also be set through the `--focusColor` CSS variable. */
+		focusColor?: string
 		/** Animation applied when the slot is rendered. */
 		transition?: Transition | null
 		/** Called when the slot is clicked. */
@@ -24,6 +26,7 @@
 		selected = false,
 		disabled = false,
 		tabindex = 0,
+		focusColor,
 		role,
 		transition = null,
 		onselect,
@@ -48,6 +51,7 @@
 	class:selected
 	class:clickable={!disabled}
 	style="--color:{color}; --outerBorderColor:{color || '#aaa'};"
+	style:--focusColor={focusColor}
 	{disabled}
 	{tabindex}
 	in:enter
@@ -70,13 +74,17 @@
 	}
 
 	button:focus {
-		outline: 2px solid #bdbdbd;
-		outline-offset: 2px;
+		outline: 2px solid var(--focusColor, blue);
+		outline-offset: 5px;
 	}
 
 	button.selected {
-		outline: 2px solid var(--outerBorderColor);
-		outline-offset: 2px;
+		/* Drawn as a box-shadow rather than an outline so the focus outline can sit 2px
+		   further out and stay visible when a slot is both selected and focused. The
+		   #fafafa layer keeps the 2px gap between the swatch and the ring. */
+		box-shadow:
+			0 0 0 2px #fafafa,
+			0 0 0 4px var(--outerBorderColor);
 	}
 
 	button.clickable {

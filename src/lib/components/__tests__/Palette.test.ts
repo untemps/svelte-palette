@@ -884,3 +884,32 @@ test('Drops the group roles and reveals the group name in presentational mode', 
 	const name = screen.getAllByTestId('__palette-group-name__')[0]
 	expect(name).not.toHaveAttribute('aria-hidden')
 })
+
+test('Propagates focusColor to the color slots and the transparent slot', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	setup(Palette, { props: { colors, showTransparentSlot: true, focusColor: 'red' } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(colors.length + 1)
+	slots.forEach((slot) => expect(slot.getAttribute('style')).toMatch(/--focusColor:\s*red/))
+})
+
+test('Propagates focusColor to grouped slots', async () => {
+	const colors = [
+		{ name: 'Reds', colors: ['#f00', '#f11'] },
+		{ name: 'Blues', colors: ['#00f'] },
+	]
+	setup(Palette, { props: { colors, focusColor: 'red' } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(3)
+	slots.forEach((slot) => expect(slot.getAttribute('style')).toMatch(/--focusColor:\s*red/))
+})
+
+test('Leaves the slot focus color to its default when focusColor is unset', async () => {
+	const colors = ['#ff0', '#0ff']
+	setup(Palette, { props: { colors } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	slots.forEach((slot) => expect(slot.getAttribute('style') ?? '').not.toContain('--focusColor'))
+})
