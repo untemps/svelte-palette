@@ -92,18 +92,18 @@ yarn add @untemps/svelte-palette
 
 Snippets replace the Svelte 4 named slots API. Pass them as children of `<Palette>` using the `{#snippet name(props)}` syntax.
 
-| Snippet           | Description                                                                           | Available Properties                                                                  |
-| ----------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| `header`          | Allow to add a header to the palette. By default, it is empty.                        | `selectedColor`                                                                       |
-| `footer`          | Allow to add a footer to the palette. By default, it contains an input to add colors. | `selectedColor`                                                                       |
-| `slot`            | Allow to replace the default color slots.                                             | `index`, `color`, `colorName`, `selectedColor`, `transition`, `isCompact`, `tabindex` |
-| `transparentSlot` | Allow to replace the default transparent slot.                                        | `tabindex`, `selected`                                                                |
-| `beforeSlot`      | Allow to add an element before the color slots.                                       | `selectedColor`, `transition`, `isCompact`                                            |
-| `afterSlot`       | Allow to add an element after the color slots.                                        | `selectedColor`, `transition`, `isCompact`                                            |
-| `input`           | Allow to replace the input in the footer if the default footer snippet is kept as is. | `selectedColor`, `inputType`                                                          |
-| `settings`        | Allow to replace the settings panel. See the demo to grab a usage example.            | `onClose`                                                                             |
-| `tools`           | Allow to replace the tools panel.                                                     | `isCompact`, `compactColorIndices`, `onSelect`                                        |
-| `loader`          | Allow to replace the loader displayed during the colors async retrieving.             | -                                                                                     |
+| Snippet           | Description                                                                           | Available Properties                                                                              |
+| ----------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `header`          | Allow to add a header to the palette. By default, it is empty.                        | `selectedColor`                                                                                   |
+| `footer`          | Allow to add a footer to the palette. By default, it contains an input to add colors. | `selectedColor`                                                                                   |
+| `slot`            | Allow to replace the default color slots.                                             | `index`, `color`, `colorName`, `selectedColor`, `selected`, `transition`, `isCompact`, `tabindex` |
+| `transparentSlot` | Allow to replace the default transparent slot.                                        | `tabindex`, `selected`                                                                            |
+| `beforeSlot`      | Allow to add an element before the color slots.                                       | `selectedColor`, `transition`, `isCompact`                                                        |
+| `afterSlot`       | Allow to add an element after the color slots.                                        | `selectedColor`, `transition`, `isCompact`                                                        |
+| `input`           | Allow to replace the input in the footer if the default footer snippet is kept as is. | `selectedColor`, `inputType`                                                                      |
+| `settings`        | Allow to replace the settings panel. See the demo to grab a usage example.            | `onClose`                                                                                         |
+| `tools`           | Allow to replace the tools panel.                                                     | `isCompact`, `compactColorIndices`, `onSelect`                                                    |
+| `loader`          | Allow to replace the loader displayed during the colors async retrieving.             | -                                                                                                 |
 
 ## Example
 
@@ -247,7 +247,7 @@ The slot grid follows the [ARIA listbox pattern](https://www.w3.org/WAI/ARIA/apg
 
 Arrow keys only move focus; the selection (and the `onselect` callback) is triggered on `Enter`, `Space` or a click, so navigating the grid never changes the selected color on its own. In grouped palettes each group is a row: `↑` / `↓` move to the slot at the same position in the adjacent group (clamped to that group's length).
 
-> **Custom slots** — the roving tab index is managed automatically for the default slots. Only the [`slot`](#snippets) snippet receives the computed `tabindex` argument: forward it onto your own focusable element and the slot joins the arrow-key navigation — no `role="option"` is required for keyboard access. Also add `role="option"` and `aria-selected={selectedColor === color}` so screen readers expose the slot as a selectable option. A `slot` that ignores `tabindex` keeps working but stays a separate tab stop.
+> **Custom slots** — the roving tab index is managed automatically for the default slots. Only the [`slot`](#snippets) snippet receives the computed `tabindex` argument: forward it onto your own focusable element and the slot joins the arrow-key navigation — no `role="option"` is required for keyboard access. Also add `role="option"` and `aria-selected={selected}` (the snippet receives a computed `selected` flag that is index-accurate, so with `allowDuplicates` only the first matching slot is marked) so screen readers expose the slot as a selectable option. A `slot` that ignores `tabindex` keeps working but stays a separate tab stop.
 >
 > The `beforeSlot` and `afterSlot` snippets render **outside** the `listbox`, stacked before and after the slot grid, so they are not options and are **not** part of the arrow-key navigation. Render them as plain elements (e.g. a `<div>`, **not** an `<li>`), keep any interactive content they hold reachable with `Tab`, and do not give it `role="option"`. The `transparentSlot` snippet, by contrast, replaces the leading option _inside_ the listbox and now receives `tabindex` and `selected`: forward `role="option"`, the `tabindex` argument, and `aria-selected={selected}` onto your element so it stays the single leading tab stop and part of arrow-key navigation.
 

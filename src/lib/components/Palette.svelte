@@ -303,16 +303,39 @@
 		_isSettingsOn = false
 	}
 
-	const _getOptions = (): HTMLElement[] =>
-		_listboxEl
-			? [..._listboxEl.querySelectorAll<HTMLElement>('.palette__cells__cell')]
-					.map(
-						(cell) =>
-							cell.querySelector<HTMLElement>('[role="option"]:not([disabled])') ??
-							cell.querySelector<HTMLElement>('[tabindex]:not([disabled])')
-					)
-					.filter((el): el is HTMLElement => el != null)
-			: []
+	// Cache the resolved option elements so arrow-key navigation does not re-query the DOM
+	// on every keystroke. The cache is dropped whenever the rendered option set can change.
+	let _cachedOptions: HTMLElement[] | null = null
+
+	$effect(() => {
+		// Track the state that drives which slots are rendered so the cache is invalidated.
+		// `selectedColor` is included because a custom `slot` may swap its focusable node
+		// when it becomes selected, which would otherwise leave detached nodes cached.
+		void _colors
+		void _colorGroups
+		void showTransparentSlot
+		void presentational
+		void _isCompact
+		void selectedColor
+		_cachedOptions = null
+	})
+
+	const _getOptions = (): HTMLElement[] => {
+		if (_cachedOptions) {
+			return _cachedOptions
+		}
+		if (!_listboxEl) {
+			return []
+		}
+		_cachedOptions = [..._listboxEl.querySelectorAll<HTMLElement>('.palette__cells__cell')]
+			.map(
+				(cell) =>
+					cell.querySelector<HTMLElement>('[role="option"]:not([disabled])') ??
+					cell.querySelector<HTMLElement>('[tabindex]:not([disabled])')
+			)
+			.filter((el): el is HTMLElement => el != null)
+		return _cachedOptions
+	}
 
 	const _rowStep = (options: HTMLElement[], from: number, dir: number): number => {
 		if (!_colorGroups) {
@@ -420,7 +443,6 @@
 									data-testid="__palette-cell__"
 									class="palette__cells__cell"
 									role="presentation"
-									tabindex="-1"
 									use:useDeletion={{
 										deletionMode,
 										onDelete: () => _removeGroupColor(groupIndex, colorIndex),
@@ -434,6 +456,7 @@
 											colorName: color.name,
 											groupName: group.name,
 											selectedColor,
+											selected: optionIndex === _selectedIndex,
 											transition,
 											isCompact: false,
 											index: colorIndex,
@@ -494,7 +517,6 @@
 							data-testid="__palette-cell__"
 							class="palette__cells__cell"
 							role="presentation"
-							tabindex="-1"
 							use:useDeletion={{
 								deletionMode,
 								onDelete: () => _onDelete(index),
@@ -507,6 +529,7 @@
 									color: color.value,
 									colorName: color.name,
 									selectedColor,
+									selected: optionIndex === _selectedIndex,
 									transition,
 									isCompact: _isCompact,
 									index,

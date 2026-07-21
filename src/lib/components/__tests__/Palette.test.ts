@@ -612,6 +612,45 @@ test('Forwards the roving tabindex to custom slot snippets', async () => {
 	expect(custom[2]).toHaveAttribute('data-tabindex', '-1')
 })
 
+test('Forwards a computed selected flag to custom slot snippets, marking only the first duplicate', async () => {
+	const slotSnippet = createRawSnippet((getProps) => ({
+		render: () => `<span data-testid="__sel-slot__" data-selected="${getProps().selected}"></span>`,
+	}))
+	const colors = ['#ff0', '#f0f', '#f0f']
+	setup(Palette, { props: { colors, allowDuplicates: true, selectedColor: '#f0f', slot: slotSnippet } })
+
+	const custom = await screen.findAllByTestId('__sel-slot__')
+	expect(custom).toHaveLength(3)
+	expect(custom[0]).toHaveAttribute('data-selected', 'false')
+	expect(custom[1]).toHaveAttribute('data-selected', 'true')
+	expect(custom[2]).toHaveAttribute('data-selected', 'false')
+})
+
+test('Forwards the computed selected flag to custom slots in group mode', async () => {
+	const slotSnippet = createRawSnippet((getProps) => ({
+		render: () => `<span data-testid="__grp-sel-slot__" data-selected="${getProps().selected}"></span>`,
+	}))
+	const colors = [
+		{ name: 'Reds', colors: ['#f00', '#f11'] },
+		{ name: 'Blues', colors: ['#00f', '#11f'] },
+	]
+	setup(Palette, { props: { colors, selectedColor: '#11f', slot: slotSnippet } })
+
+	const custom = await screen.findAllByTestId('__grp-sel-slot__')
+	expect(custom).toHaveLength(4)
+	expect(custom.filter((el) => el.getAttribute('data-selected') === 'true')).toHaveLength(1)
+	expect(custom[3]).toHaveAttribute('data-selected', 'true')
+})
+
+test('Does not make the cell wrappers focusable', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	setup(Palette, { props: { colors, showTransparentSlot: true } })
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells.length).toBeGreaterThan(0)
+	cells.forEach((cell) => expect(cell).not.toHaveAttribute('tabindex'))
+})
+
 test('Keeps exactly one tabbable slot after the colors change', async () => {
 	const colors = ['#100', '#200', '#300', '#400', '#500', '#600']
 	const { rerender } = setup(Palette, { props: { colors, numColumns: 3 } })
@@ -628,6 +667,44 @@ test('Keeps exactly one tabbable slot after the colors change', async () => {
 		expect(slots.filter((slot) => slot.getAttribute('tabindex') === '0')).toHaveLength(1)
 		expect(slots[0]).toHaveAttribute('tabindex', '0')
 	})
+})
+
+test('Navigates the remaining slots after the colors shrink', async () => {
+	const colors = ['#100', '#200', '#300', '#400']
+	const { rerender, user } = setup(Palette, { props: { colors, numColumns: 4 } })
+
+	let slots = await screen.findAllByTestId('__palette-slot__')
+	slots[0].focus()
+	await user.keyboard('{End}')
+	expect(slots[3]).toHaveFocus()
+
+	rerender({ colors: ['#aa0', '#bb0'], numColumns: 4 })
+	await waitFor(async () => {
+		slots = await screen.findAllByTestId('__palette-slot__')
+		expect(slots).toHaveLength(2)
+	})
+
+	slots[0].focus()
+	await user.keyboard('{End}')
+	expect(slots[1]).toHaveFocus()
+})
+
+test('Reaches a newly added slot with keyboard navigation after the colors grow', async () => {
+	const colors = ['#100', '#200']
+	const { rerender, user } = setup(Palette, { props: { colors, numColumns: 5 } })
+
+	let slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(2)
+
+	rerender({ colors: ['#100', '#200', '#300', '#400'], numColumns: 5 })
+	await waitFor(async () => {
+		slots = await screen.findAllByTestId('__palette-slot__')
+		expect(slots).toHaveLength(4)
+	})
+
+	slots[0].focus()
+	await user.keyboard('{End}')
+	expect(slots[3]).toHaveFocus()
 })
 
 test('Renders the edge slots outside the listbox', async () => {

@@ -37,14 +37,8 @@
 					</div>
 				{/snippet}
 				{#snippet tools()}{/snippet}
-				{#snippet slot({ color, tabindex })}
-					<PaletteSlot
-						{color}
-						{tabindex}
-						role="option"
-						class="slot__custom"
-						selected={color === selectedColor}
-						onselect={_onSelect}
+				{#snippet slot({ color, tabindex, selected })}
+					<PaletteSlot {color} {tabindex} {selected} role="option" class="slot__custom" onselect={_onSelect}
 					></PaletteSlot>
 				{/snippet}
 				{#snippet afterSlot()}

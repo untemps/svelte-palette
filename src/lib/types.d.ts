@@ -138,6 +138,8 @@ export interface SlotSnippetProps {
 	groupName?: string
 	/** The currently selected color, or `null` when none is selected. */
 	selectedColor: ColorValue | null
+	/** Whether this slot is the selected one. Index-accurate: with `allowDuplicates`, only the first matching slot is `true`. */
+	selected: boolean
 	/** The transition applied to the slot, if any. */
 	transition: Transition | null
 	/** Whether the palette is displayed in compact mode. */
