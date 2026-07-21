@@ -254,6 +254,11 @@
 
 	const _optionRole = $derived(presentational ? undefined : 'option')
 
+	// Announce the keyboard deletion affordance on deletable options. Absent when deletion is off
+	// or the grid is presentational (no keydown handler), and never set on the transparent slot,
+	// which is not a deletable color. Mirrors the `Delete`/`Backspace` handling in `_deleteOption`.
+	const _deleteShortcut = $derived(!presentational && deletionMode !== NONE ? 'Delete Backspace' : undefined)
+
 	const _selectColor = (color: ColorValue | null) => {
 		selectedColor = color
 		onselect?.({ color })
@@ -521,6 +526,7 @@
 											index: colorIndex,
 											tabindex: _rovingTabindex(optionIndex),
 											focusColor,
+											ariaKeyShortcuts: _deleteShortcut,
 										})}
 									{:else}
 										<PaletteSlot
@@ -528,6 +534,7 @@
 											role={_optionRole}
 											selected={optionIndex === _selectedIndex}
 											tabindex={_rovingTabindex(optionIndex)}
+											aria-keyshortcuts={_deleteShortcut}
 											{transition}
 											{focusColor}
 											onselect={_onSlotSelect}
@@ -598,6 +605,7 @@
 									index,
 									tabindex: _rovingTabindex(optionIndex),
 									focusColor,
+									ariaKeyShortcuts: _deleteShortcut,
 								})}
 							{:else}
 								<PaletteSlot
@@ -605,6 +613,7 @@
 									role={_optionRole}
 									selected={optionIndex === _selectedIndex}
 									tabindex={_rovingTabindex(optionIndex)}
+									aria-keyshortcuts={_deleteShortcut}
 									{transition}
 									{focusColor}
 									onselect={_onSlotSelect}
