@@ -78,6 +78,7 @@ yarn add @untemps/svelte-palette
 | `numColumns`             | number                                                                                                  | 5             | Number of columns of the palette grid. This value can't exceed the number of maximum colors defined in `maxColors` and can't be lower than 1. Set this value to `0` to display the slots on a single row.                                          |
 | `maxColumns`             | number                                                                                                  | 0             | Maximum number of columns when `numColumns` is set to `0`. Once reached, additional slots wrap to a new row. Set this value to `0` to allow unlimited columns.                                                                                     |
 | `transition`             | object                                                                                                  | null          | Animation when a slot is rendered (see [Transition](#transition)).                                                                                                                                                                                 |
+| `focusColor`             | string                                                                                                  | "blue"        | Color of the focus outline drawn on a slot when it receives keyboard focus. Can also be set through the `--focusColor` CSS variable (see [Styles](#focus-outline-color)).                                                                          |
 | `label`                  | string                                                                                                  | "Color slots" | Accessible name announced for the slot listbox (see [Accessibility](#accessibility)).                                                                                                                                                              |
 | `presentational`         | boolean                                                                                                 | false         | Renders the slot grid as a purely visual display: drops the `listbox`/`option` roles, the single tab stop and the arrow-key navigation. Use it for decorative palettes that are not meant to be picked from (see [Accessibility](#accessibility)). |
 
@@ -307,6 +308,37 @@ The slot grid (columns, gaps) is laid out on the `listbox` element, `.palette__l
 ```
 
 When colors are grouped, each group keeps its own `.palette__cells` grid instead.
+
+### Focus Outline Color
+
+Slots draw a focus outline when they receive keyboard focus. Its color defaults to `blue` and can be customized in two ways:
+
+- Set the `focusColor` prop on `<Palette>` to apply a color to every slot.
+- Set the `--focusColor` CSS variable on the palette (or any ancestor): it cascades down to the slots, so it also applies when you render `<PaletteSlot>` on your own.
+
+The `focusColor` prop takes precedence over the `--focusColor` variable, which itself takes precedence over the `blue` default.
+
+#### Example
+
+```svelte
+<script>
+	import { Palette } from '@untemps/svelte-palette'
+
+	const colors = ['#865C54', '#8F5447', '#A65846', '#A9715E', '#AD8C72']
+</script>
+
+<!-- Through the prop -->
+<Palette {colors} focusColor="#0066ff" />
+
+<!-- Or through the CSS variable -->
+<Palette {colors} class="palette__custom" />
+
+<style>
+	:global(.palette[data-palette].palette__custom) {
+		--focusColor: #0066ff;
+	}
+</style>
+```
 
 ### Deletion Tooltip Class
 

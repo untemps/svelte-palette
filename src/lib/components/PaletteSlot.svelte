@@ -75,7 +75,7 @@
 
 	button:focus {
 		outline: 2px solid var(--focusColor, blue);
-		outline-offset: 5px;
+		outline-offset: 6px;
 	}
 
 	button.selected {
