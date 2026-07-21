@@ -139,11 +139,29 @@
 		border-radius: 50%;
 	}
 
-	/* These slots are large (2rem) and tightly packed, so the default outward focus ring
-	   (outline-offset: 6px) would overlap the neighbouring slots. Draw it inset instead so
-	   it hugs the inside of the slot and stays clear of its neighbours. */
+	/*
+	 * These slots are large (2rem) and tightly packed, so swap the default focus/selection
+	 * treatments: the selection ring is drawn INSIDE the slot (white), while the keyboard
+	 * focus ring is drawn OUTSIDE like a classic selection ring (in the focus color). Both
+	 * use box-shadow so a slot that is selected AND focused shows both rings at once, and
+	 * the outward focus ring (4px) stays clear of the neighbouring slots.
+	 */
+	.example4 :global(button.slot__custom.selected) {
+		box-shadow: inset 0 0 0 2px #fff;
+	}
+
 	.example4 :global(button.slot__custom:focus) {
-		outline-offset: -4px;
+		outline: none;
+		box-shadow:
+			0 0 0 2px #fafafa,
+			0 0 0 4px var(--focusColor, blue);
+	}
+
+	.example4 :global(button.slot__custom.selected:focus) {
+		box-shadow:
+			inset 0 0 0 2px #fff,
+			0 0 0 2px #fafafa,
+			0 0 0 4px var(--focusColor, blue);
 	}
 
 	.example4 .slot__add {
