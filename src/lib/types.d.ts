@@ -150,6 +150,12 @@ export interface SlotSnippetProps {
 	 * it explicitly (e.g. onto a `<PaletteSlot>`) only when you need the raw value.
 	 */
 	focusColor?: string
+	/**
+	 * The `aria-keyshortcuts` value announcing keyboard deletion (`"Delete Backspace"` when a `deletionMode`
+	 * is set, `undefined` otherwise). Forward it onto your focusable element (e.g. `aria-keyshortcuts={ariaKeyShortcuts}`)
+	 * so screen readers announce that `Delete`/`Backspace` removes the focused slot.
+	 */
+	ariaKeyShortcuts?: string
 }
 
 /**

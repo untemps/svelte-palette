@@ -1162,3 +1162,97 @@ test('Removes the first color of a group that follows an empty group', async () 
 	})
 	expect(slots[0]).toHaveAttribute('aria-label', '#11f')
 })
+
+test('Announces the Delete shortcut on the slots when a deletionMode is set', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	setup(Palette, { props: { colors, deletionMode: TOOLTIP } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	slots.forEach((slot) => expect(slot).toHaveAttribute('aria-keyshortcuts', 'Delete Backspace'))
+})
+
+test('Announces the Delete shortcut on the slots in drop deletion mode', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	setup(Palette, { props: { colors, deletionMode: DROP } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	slots.forEach((slot) => expect(slot).toHaveAttribute('aria-keyshortcuts', 'Delete Backspace'))
+})
+
+test('Does not announce the Delete shortcut when the deletion mode is none', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	setup(Palette, { colors })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	slots.forEach((slot) => expect(slot).not.toHaveAttribute('aria-keyshortcuts'))
+})
+
+test('Does not announce the Delete shortcut on the non-deletable transparent slot', async () => {
+	const colors = ['#ff0', '#0ff']
+	setup(Palette, { props: { colors, showTransparentSlot: true, deletionMode: TOOLTIP } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(3)
+	expect(slots[0]).toHaveAttribute('aria-label', 'Transparent slot')
+	expect(slots[0]).not.toHaveAttribute('aria-keyshortcuts')
+	expect(slots[1]).toHaveAttribute('aria-keyshortcuts', 'Delete Backspace')
+	expect(slots[2]).toHaveAttribute('aria-keyshortcuts', 'Delete Backspace')
+})
+
+test('Announces the Delete shortcut on grouped slots', async () => {
+	const colors = [
+		{ name: 'Reds', colors: ['#f00', '#f11'] },
+		{ name: 'Blues', colors: ['#00f'] },
+	]
+	setup(Palette, { props: { colors, deletionMode: TOOLTIP } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(3)
+	slots.forEach((slot) => expect(slot).toHaveAttribute('aria-keyshortcuts', 'Delete Backspace'))
+})
+
+test('Does not announce the Delete shortcut in presentational mode', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	setup(Palette, { props: { colors, deletionMode: TOOLTIP, presentational: true } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	slots.forEach((slot) => expect(slot).not.toHaveAttribute('aria-keyshortcuts'))
+})
+
+test('Forwards the Delete shortcut to custom slot snippets when a deletionMode is set', async () => {
+	const slotSnippet = createRawSnippet((getProps) => ({
+		render: () => `<span data-testid="__ks-slot__" data-shortcut="${getProps().ariaKeyShortcuts}"></span>`,
+	}))
+	const colors = ['#ff0', '#0ff', '#f0f']
+	setup(Palette, { props: { colors, deletionMode: TOOLTIP, slot: slotSnippet } })
+
+	const custom = await screen.findAllByTestId('__ks-slot__')
+	expect(custom).toHaveLength(3)
+	custom.forEach((el) => expect(el).toHaveAttribute('data-shortcut', 'Delete Backspace'))
+})
+
+test('Forwards the Delete shortcut to custom slots in group mode', async () => {
+	const slotSnippet = createRawSnippet((getProps) => ({
+		render: () => `<span data-testid="__ks-grp-slot__" data-shortcut="${getProps().ariaKeyShortcuts}"></span>`,
+	}))
+	const colors = [
+		{ name: 'Reds', colors: ['#f00', '#f11'] },
+		{ name: 'Blues', colors: ['#00f'] },
+	]
+	setup(Palette, { props: { colors, deletionMode: TOOLTIP, slot: slotSnippet } })
+
+	const custom = await screen.findAllByTestId('__ks-grp-slot__')
+	expect(custom).toHaveLength(3)
+	custom.forEach((el) => expect(el).toHaveAttribute('data-shortcut', 'Delete Backspace'))
+})
+
+test('Leaves the forwarded Delete shortcut undefined on custom slots when deletion is off', async () => {
+	const slotSnippet = createRawSnippet((getProps) => ({
+		render: () => `<span data-testid="__ks-unset__" data-shortcut="${getProps().ariaKeyShortcuts}"></span>`,
+	}))
+	const colors = ['#ff0', '#0ff']
+	setup(Palette, { props: { colors, slot: slotSnippet } })
+
+	const custom = await screen.findAllByTestId('__ks-unset__')
+	custom.forEach((el) => expect(el).toHaveAttribute('data-shortcut', 'undefined'))
+})
