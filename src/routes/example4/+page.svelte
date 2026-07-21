@@ -36,7 +36,7 @@
 				numColumns={5}
 				{showInput}
 				allowDuplicates
-				focusColor="#ffffff"
+				focusColor="#6200ea"
 				onselect={_onSelect}
 			>
 				{#snippet header({ selectedColor })}
