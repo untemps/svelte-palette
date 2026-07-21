@@ -1,3 +1,20 @@
+# [6.0.0-beta.1](https://github.com/untemps/svelte-palette/compare/v5.4.1...v6.0.0-beta.1) (2026-07-21)
+
+
+### Features
+
+* Add listbox semantics and keyboard navigation to the slot grid ([#219](https://github.com/untemps/svelte-palette/issues/219)) ([ef997c5](https://github.com/untemps/svelte-palette/commit/ef997c56f4be1ee1c91b06a8fbd4211d1f0f48d0))
+
+
+### BREAKING CHANGES
+
+* The slot grid is now an ARIA listbox with a roving tabindex, which changes the palette's DOM structure, roles and tab behaviour.
+Migrate as follows:
+- Root landmark removed. The palette root no longer carries `role="main"`. Style overrides written against `.palette[role="main"]` must migrate to `.palette[data-palette]`, and code selecting the root by its `main` role must use the `data-palette` / `__palette__` hook instead.
+- Grid layout moved. The flat-mode swatch grid (columns and gaps) is now laid  out on `.palette__listbox` instead of `.palette__cells`, which becomes a flex  wrapper. Style overrides targeting the grid via `.palette__cells` must move to  `.palette__cells > .palette__listbox`.
+- Single tab stop. The grid now exposes a single tab stop (roving tabindex) instead of one per slot. `Tab` moves onto the selected slot (or the first one) and then out of the grid; arrow keys move within it.
+- Slot snippet contract. Consumers rendering custom `slot` / `transparentSlot` snippets must forward the provided `tabindex` (and, for screen-reader parity, `role="option"` and `aria-selected={selected}`) onto their own focusable element to join the arrow-key navigation. `beforeSlot` / `afterSlot` snippets now render outside the listbox and must be a plain element (e.g. a `<div>`, not an `<li>`).
+
 ## [5.4.1](https://github.com/untemps/svelte-palette/compare/v5.4.0...v5.4.1) (2026-07-18)
 
 
