@@ -41,7 +41,7 @@
 
 <main class="example3" style="--bgColor:#000">
 	<div class="content">
-		<Palette class="palette__custom" colors={blueColors} numColumns="10">
+		<Palette class="palette__custom" colors={blueColors} numColumns="10" presentational>
 			{#snippet header()}
 				<div class="header">
 					<h1>Blue</h1>
@@ -59,7 +59,7 @@
 			{#snippet input()}{/snippet}
 			{#snippet tools()}{/snippet}
 		</Palette>
-		<Palette class="palette__custom" colors={purpleColors} numColumns="10">
+		<Palette class="palette__custom" colors={purpleColors} numColumns="10" presentational>
 			{#snippet header()}
 				<div class="header">
 					<h1>Purple</h1>
@@ -77,7 +77,7 @@
 			{#snippet input()}{/snippet}
 			{#snippet tools()}{/snippet}
 		</Palette>
-		<Palette class="palette__custom" colors={redColors} numColumns="10">
+		<Palette class="palette__custom" colors={redColors} numColumns="10" presentational>
 			{#snippet header()}
 				<div class="header">
 					<h1>Red</h1>
@@ -121,12 +121,12 @@
 		row-gap: 1px;
 	}
 
-	.example3 :global(.palette[role='main'].palette__custom) {
+	.example3 :global(.palette[data-palette].palette__custom) {
 		background-color: #fff;
 	}
 
 	@media screen and (max-width: 640px) {
-		.example3 :global(.palette[role='main'].palette__custom .palette__cells) {
+		.example3 :global(.palette[data-palette].palette__custom .palette__cells > .palette__listbox) {
 			grid-template-columns: repeat(var(--num-columns), minmax(1rem, 1fr));
 			column-gap: 0;
 		}

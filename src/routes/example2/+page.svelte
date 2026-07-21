@@ -12,7 +12,7 @@
 <main class="example2" style="--bgColor:{bgColor}">
 	<div class="content">
 		<div class="content__grid">
-			<Palette class="palette__custom" colors={colors1} numColumns="5">
+			<Palette class="palette__custom" colors={colors1} numColumns="5" presentational>
 				{#snippet slot({ color })}
 					<div style="--color: {color}" class="slot"></div>
 				{/snippet}
@@ -25,7 +25,7 @@
 					</div>
 				{/snippet}
 			</Palette>
-			<Palette class="palette__custom" colors={colors2} numColumns="5">
+			<Palette class="palette__custom" colors={colors2} numColumns="5" presentational>
 				{#snippet slot({ color })}
 					<div style="--color: {color}" class="slot"></div>
 				{/snippet}
@@ -38,7 +38,7 @@
 					</div>
 				{/snippet}
 			</Palette>
-			<Palette class="palette__custom" colors={colors3} numColumns="5">
+			<Palette class="palette__custom" colors={colors3} numColumns="5" presentational>
 				{#snippet slot({ color })}
 					<div style="--color: {color}" class="slot"></div>
 				{/snippet}
@@ -51,7 +51,7 @@
 					</div>
 				{/snippet}
 			</Palette>
-			<Palette class="palette__custom" colors={colors4} numColumns="5">
+			<Palette class="palette__custom" colors={colors4} numColumns="5" presentational>
 				{#snippet slot({ color })}
 					<div style="--color: {color}" class="slot"></div>
 				{/snippet}
@@ -103,26 +103,40 @@
 		}
 	}
 
-	.example2 :global(.palette[role='main'].palette__custom) {
+	.example2 :global(.palette[data-palette].palette__custom) {
 		background-color: #fff;
 		border-radius: 1rem;
 	}
 
-	.example2 :global(.palette[role='main'].palette__custom > .palette__content) {
+	.example2 :global(.palette[data-palette].palette__custom > .palette__content) {
 		padding: 0;
 	}
 
-	:global(.palette[role='main'].palette__custom > .palette__content > .palette__cells) {
+	:global(.palette[data-palette].palette__custom > .palette__content > .palette__cells > .palette__listbox) {
 		column-gap: 0;
 	}
 
 	.example2
-		:global(.palette[role='main'].palette__custom > .palette__content > .palette__cells > li:first-child > .slot) {
+		:global(
+			.palette[data-palette].palette__custom
+				> .palette__content
+				> .palette__cells
+				> .palette__listbox
+				> li:first-child
+				> .slot
+		) {
 		border-top-left-radius: 1rem;
 	}
 
 	.example2
-		:global(.palette[role='main'].palette__custom > .palette__content > .palette__cells > li:last-child > .slot) {
+		:global(
+			.palette[data-palette].palette__custom
+				> .palette__content
+				> .palette__cells
+				> .palette__listbox
+				> li:last-child
+				> .slot
+		) {
 		border-top-right-radius: 1rem;
 	}
 

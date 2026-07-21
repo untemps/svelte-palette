@@ -128,6 +128,8 @@ export interface EdgeSlotSnippetProps {
 export interface SlotSnippetProps {
 	/** Index of the color within its list (or group). */
 	index: number
+	/** Roving tab index to forward to the custom slot so it joins arrow-key navigation (`0` when active, `-1` otherwise). */
+	tabindex: number
 	/** The color value of the slot. */
 	color: ColorValue
 	/** The color name, when the color was provided as an object; `undefined` for bare color values. */
@@ -136,10 +138,33 @@ export interface SlotSnippetProps {
 	groupName?: string
 	/** The currently selected color, or `null` when none is selected. */
 	selectedColor: ColorValue | null
+	/** Whether this slot is the selected one. Index-accurate: with `allowDuplicates`, only the first matching slot is `true`. */
+	selected: boolean
 	/** The transition applied to the slot, if any. */
 	transition: Transition | null
 	/** Whether the palette is displayed in compact mode. */
 	isCompact: boolean
+	/**
+	 * The focus outline color configured on the palette (the `focusColor` prop), or `undefined` when unset.
+	 * Slots inherit it automatically through the `--focusColor` CSS variable set on the palette root; forward
+	 * it explicitly (e.g. onto a `<PaletteSlot>`) only when you need the raw value.
+	 */
+	focusColor?: string
+}
+
+/**
+ * Properties passed to the `transparentSlot` snippet that replaces the default transparent slot.
+ */
+export interface TransparentSlotSnippetProps {
+	/** Roving tab index to forward so the transparent option keeps the single tab stop (`0` when active, `-1` otherwise). */
+	tabindex: number
+	/** Whether the transparent (no-color) option is currently selected, i.e. `selectedColor === null`. */
+	selected: boolean
+	/**
+	 * The focus outline color configured on the palette (the `focusColor` prop), or `undefined` when unset.
+	 * Inherited automatically through the `--focusColor` CSS variable; forward it explicitly only when needed.
+	 */
+	focusColor?: string
 }
 
 /**

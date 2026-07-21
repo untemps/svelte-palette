@@ -30,19 +30,34 @@
 <main class="example4" style="--bgColor:#000">
 	<div class="content">
 		<div>
-			<Palette {colors} {selectedColor} numColumns={5} {showInput} allowDuplicates onselect={_onSelect}>
+			<Palette
+				{colors}
+				{selectedColor}
+				numColumns={5}
+				{showInput}
+				allowDuplicates
+				focusColor="#6200ea"
+				onselect={_onSelect}
+			>
 				{#snippet header({ selectedColor })}
 					<div class="header" style="--color:{selectedColor}; --textColor: {textColor}">
 						{selectedColor ?? ''}
 					</div>
 				{/snippet}
 				{#snippet tools()}{/snippet}
-				{#snippet slot({ color })}
-					<PaletteSlot {color} class="slot__custom" selected={color === selectedColor} onselect={_onSelect}
+				{#snippet slot({ color, tabindex, selected, focusColor })}
+					<PaletteSlot
+						{color}
+						{tabindex}
+						{selected}
+						{focusColor}
+						role="option"
+						class="slot__custom"
+						onselect={_onSelect}
 					></PaletteSlot>
 				{/snippet}
 				{#snippet afterSlot()}
-					<li class="slot__add">
+					<div class="slot__add">
 						<button class="icon-button" aria-label="Open" onclick={_onOpen}>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -55,7 +70,7 @@
 								></path></svg
 							>
 						</button>
-					</li>
+					</div>
 				{/snippet}
 				{#snippet input()}
 					<div class="input">
@@ -122,6 +137,31 @@
 		height: 2rem;
 		border: 1px solid #aaa;
 		border-radius: 50%;
+	}
+
+	/*
+	 * These slots are large (2rem) and tightly packed, so swap the default focus/selection
+	 * treatments: the selection ring is drawn INSIDE the slot (white), while the keyboard
+	 * focus ring is drawn OUTSIDE like a classic selection ring (in the focus color). Both
+	 * use box-shadow so a slot that is selected AND focused shows both rings at once, and
+	 * the outward focus ring (4px) stays clear of the neighbouring slots.
+	 */
+	.example4 :global(button.slot__custom.selected) {
+		box-shadow: inset 0 0 0 2px #fff;
+	}
+
+	.example4 :global(button.slot__custom:focus) {
+		outline: none;
+		box-shadow:
+			0 0 0 2px #fafafa,
+			0 0 0 4px var(--focusColor, blue);
+	}
+
+	.example4 :global(button.slot__custom.selected:focus) {
+		box-shadow:
+			inset 0 0 0 2px #fff,
+			0 0 0 2px #fafafa,
+			0 0 0 4px var(--focusColor, blue);
 	}
 
 	.example4 .slot__add {
