@@ -30,15 +30,30 @@
 <main class="example4" style="--bgColor:#000">
 	<div class="content">
 		<div>
-			<Palette {colors} {selectedColor} numColumns={5} {showInput} allowDuplicates onselect={_onSelect}>
+			<Palette
+				{colors}
+				{selectedColor}
+				numColumns={5}
+				{showInput}
+				allowDuplicates
+				focusColor="#ffffff"
+				onselect={_onSelect}
+			>
 				{#snippet header({ selectedColor })}
 					<div class="header" style="--color:{selectedColor}; --textColor: {textColor}">
 						{selectedColor ?? ''}
 					</div>
 				{/snippet}
 				{#snippet tools()}{/snippet}
-				{#snippet slot({ color, tabindex, selected })}
-					<PaletteSlot {color} {tabindex} {selected} role="option" class="slot__custom" onselect={_onSelect}
+				{#snippet slot({ color, tabindex, selected, focusColor })}
+					<PaletteSlot
+						{color}
+						{tabindex}
+						{selected}
+						{focusColor}
+						role="option"
+						class="slot__custom"
+						onselect={_onSelect}
 					></PaletteSlot>
 				{/snippet}
 				{#snippet afterSlot()}

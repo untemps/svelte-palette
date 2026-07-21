@@ -82,7 +82,12 @@
 		presentational?: boolean
 		/** Class name applied to the root element. */
 		class?: string
-		/** Color of the focus outline on color slots. Defaults to `blue`; can also be set through the `--focusColor` CSS variable. */
+		/**
+		 * Color of the focus outline on color slots, including custom `slot`/`transparentSlot` snippets
+		 * (applied through a `--focusColor` CSS variable set on the palette root, which those snippets
+		 * inherit and also receive as a `focusColor` argument). Defaults to `blue`; can also be set
+		 * through the `--focusColor` CSS variable directly.
+		 */
 		focusColor?: string
 		/** Replaces the header. */
 		header?: Snippet<[HeaderSnippetProps]>
@@ -408,7 +413,7 @@
 	}
 </script>
 
-<div class="palette {className}" data-testid="__palette__" data-palette>
+<div class="palette {className}" data-testid="__palette__" data-palette style:--focusColor={focusColor}>
 	<section class="palette__content" class:palette__content--compact={_isCompact} style="--num-columns: {_numColumns}">
 		{#if !_isCompact}
 			{@render header?.({ selectedColor })}
@@ -464,6 +469,7 @@
 											isCompact: false,
 											index: colorIndex,
 											tabindex: _rovingTabindex(optionIndex),
+											focusColor,
 										})}
 									{:else}
 										<PaletteSlot
@@ -503,6 +509,7 @@
 								{@render transparentSlot({
 									tabindex: _rovingTabindex(0),
 									selected: selectedColor === null,
+									focusColor,
 								})}
 							{:else}
 								<PaletteSlot
@@ -539,6 +546,7 @@
 									isCompact: _isCompact,
 									index,
 									tabindex: _rovingTabindex(optionIndex),
+									focusColor,
 								})}
 							{:else}
 								<PaletteSlot
