@@ -139,6 +139,13 @@
 		border-radius: 50%;
 	}
 
+	/* These slots are large (2rem) and tightly packed, so the default outward focus ring
+	   (outline-offset: 6px) would overlap the neighbouring slots. Draw it inset instead so
+	   it hugs the inside of the slot and stays clear of its neighbours. */
+	.example4 :global(button.slot__custom:focus) {
+		outline-offset: -4px;
+	}
+
 	.example4 .slot__add {
 		display: flex;
 		align-items: center;
