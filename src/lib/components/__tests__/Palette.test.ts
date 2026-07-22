@@ -1406,7 +1406,6 @@ test('Fires ondelete and propagates a compact-mode deletion to the full list', a
 	const trash = await screen.findByTestId('__trash-icon__')
 	await user.click(trash)
 
-	// The visible slot maps back to full index 0; the reported list is the shrunk full list.
 	expect(onDelete).toHaveBeenCalledTimes(1)
 	expect(onDelete).toHaveBeenCalledWith({
 		color: '#000000',
@@ -1426,7 +1425,7 @@ test('Deletes the mapped color when compactColorIndices are unsorted', async () 
 		props: {
 			colors,
 			isCompact: true,
-			compactColorIndices: [3, 0], // extractByIndices keeps original order -> visible: #a00 (0), #dd0 (3)
+			compactColorIndices: [3, 0],
 			deletionMode: TOOLTIP,
 			ondelete: onDelete,
 		},
@@ -1435,7 +1434,7 @@ test('Deletes the mapped color when compactColorIndices are unsorted', async () 
 	let cells = await screen.findAllByTestId('__palette-cell__')
 	expect(cells).toHaveLength(2)
 
-	await user.hover(cells[1]) // #dd0, real full index 3
+	await user.hover(cells[1])
 	const trash = await screen.findByTestId('__trash-icon__')
 	await user.click(trash)
 
@@ -1446,7 +1445,7 @@ test('Deletes the mapped color when compactColorIndices are unsorted', async () 
 	})
 
 	cells = await screen.findAllByTestId('__palette-cell__')
-	expect(cells).toHaveLength(1) // only #a00 (index 0) remains picked
+	expect(cells).toHaveLength(1)
 })
 
 test('Falls back to a local removal without ondelete when compact is toggled at runtime', async () => {
@@ -1456,22 +1455,20 @@ test('Falls back to a local removal without ondelete when compact is toggled at 
 	const { user } = setup(Palette, {
 		props: {
 			colors,
-			compactColorIndices: [1, 3], // not prefix-aligned, so the toggled view never matches the picks
+			compactColorIndices: [1, 3],
 			deletionMode: TOOLTIP,
 			ondelete: onDelete,
 		},
 	})
 
 	let cells = await screen.findAllByTestId('__palette-cell__')
-	expect(cells).toHaveLength(5) // expanded: full list rendered
+	expect(cells).toHaveLength(5)
 
-	// Toggle into compact at runtime; `_colors` is not re-extracted (pre-existing), so the view diverges
-	// from the picked subset and the deletion must not corrupt the list.
 	const toggle = await screen.findByTestId('__palette-compact-toggle-button__')
 	await user.click(toggle)
 
 	cells = await screen.findAllByTestId('__palette-cell__')
-	await user.hover(cells[0]) // rendered #a00, but pick[0] maps to #0b0 -> mismatch -> safe fallback
+	await user.hover(cells[0])
 	const trash = await screen.findByTestId('__trash-icon__')
 	await user.click(trash)
 
@@ -1515,9 +1512,9 @@ test('Reflects a compact-mode deletion back through bind:colors and re-indexes c
 	const boundIndices = await screen.findByTestId('__bound-indices__')
 
 	let cells = await screen.findAllByTestId('__palette-cell__')
-	expect(cells).toHaveLength(2) // picked #0ff (1), #f0f (2)
+	expect(cells).toHaveLength(2)
 
-	await user.hover(cells[0]) // #0ff -> full index 1
+	await user.hover(cells[0])
 	const trash = await screen.findByTestId('__trash-icon__')
 	await user.click(trash)
 
@@ -1527,5 +1524,5 @@ test('Reflects a compact-mode deletion back through bind:colors and re-indexes c
 	await waitFor(() => expect(JSON.parse(boundIndices.textContent ?? '')).toEqual([1]))
 
 	cells = await screen.findAllByTestId('__palette-cell__')
-	expect(cells).toHaveLength(1) // only #f0f (now index 1) remains picked
+	expect(cells).toHaveLength(1)
 })

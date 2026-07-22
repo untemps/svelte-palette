@@ -376,9 +376,6 @@
 	const _removeCompactColor = (index: number) => {
 		const target = _compactPicked()[index]
 		const rendered = (_colors ?? [])[index]
-		// Only propagate when the resolved compact subset still matches what is rendered. If the two have
-		// diverged (e.g. a runtime compact toggle that never re-extracted `_colors`), fall back to a local
-		// removal so the bound `colors` is not corrupted with a mis-mapped deletion.
 		if (!target || !rendered || target.color.value !== rendered.value) {
 			_colors = (_colors ?? []).filter((c, i) => i !== index)
 			return
