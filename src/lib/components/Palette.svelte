@@ -413,8 +413,8 @@
 			gi === groupIndex ? { ...g, colors: g.colors.filter((_, ci) => ci !== colorIndex) } : g
 		)
 		_colorGroups = nextColorGroups
-		_syncColorGroups(nextColorGroups)
 		if (removed) {
+			_syncColorGroups(nextColorGroups)
 			ondelete?.({
 				color: removed.value,
 				index: colorIndex,
