@@ -159,6 +159,12 @@
 	let _isCompact = $state(untrack(() => isCompact))
 	let _listboxEl = $state<HTMLElement | null>(null)
 	let _focusedIndex = $state<number | null>(null)
+	/**
+	 * One-shot guard set by the write-back helpers (`_syncColors`/`_syncColorGroups`) so the resolver
+	 * `$effect` skips the component's own mutation of the bound `colors` instead of re-normalizing it.
+	 * It is consumed (reset to `false`) on the next effect run. Being one-shot, reassigning `colors`
+	 * synchronously from within `onadd`/`ondelete` is dropped until the next external change.
+	 */
 	let _skipColorsSync = $state(false)
 
 	$effect(() => {
@@ -289,7 +295,7 @@
 	}
 
 	const _addColor = (color: ColorValue) => {
-		if (_colorGroups != null) {
+		if (_colorGroups != null || _isCompact) {
 			return
 		}
 		const previousLength = (_colors ?? []).length
