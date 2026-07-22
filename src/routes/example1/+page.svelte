@@ -61,8 +61,6 @@
 
 	let bgColor = $state(_initialColors[Math.round(Math.random() * (_initialColors.length - 1))])
 
-	// Showcase the add/delete callbacks and `bind:colors`: the palette owns the list, and every add or
-	// delete flows back into this component through the binding and the callbacks below.
 	let lastEvent = $state('')
 	let boundColorCount = $derived(Array.isArray(colors) ? colors.length : 0)
 

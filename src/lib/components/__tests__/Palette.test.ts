@@ -1310,9 +1310,6 @@ test('Triggers ondelete with the group identity in group mode', async () => {
 		props: { colors, deletionMode: TOOLTIP, ondelete: onDelete },
 	})
 
-	// cells[4] is the second color of the second group: its group-local index (1) differs from its
-	// global cell index (4) and its group index (1) differs from the first group, so a global/local or
-	// group-index mix-up would be observable.
 	const cells = await screen.findAllByTestId('__palette-cell__')
 	await user.hover(cells[4])
 
@@ -1384,7 +1381,6 @@ test('Does not add or fire onadd through the input in grouped mode', async () =>
 	await user.click(submit)
 
 	expect(onAdd).not.toHaveBeenCalled()
-	// The group structure is preserved (no collapse to a flat list).
 	const groups = await screen.findAllByTestId('__palette-group__')
 	expect(groups).toHaveLength(2)
 })
@@ -1410,7 +1406,6 @@ test('Does not fire ondelete for a compact-mode deletion', async () => {
 	const trash = await screen.findByTestId('__trash-icon__')
 	await user.click(trash)
 
-	// The compact deletion stays local: the color set is a derived subset, so nothing propagates out.
 	expect(onDelete).not.toHaveBeenCalled()
 	cells = await screen.findAllByTestId('__palette-cell__')
 	expect(cells).toHaveLength(2)
