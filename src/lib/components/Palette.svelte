@@ -54,7 +54,7 @@
 		selectedColor?: ColorValue | null
 		/** Whether the palette is displayed in compact mode. */
 		isCompact?: boolean
-		/** Indices picked from `colors` when in compact mode. Supports `bind:compactColorIndices`; re-indexed when a compact swatch is deleted. */
+		/** Indices picked from `colors` when in compact mode. Supports `bind:compactColorIndices`; re-indexed when a compact slot is deleted. */
 		compactColorIndices?: number[]
 		/** Whether duplicate colors are allowed. */
 		allowDuplicates?: boolean
@@ -350,7 +350,7 @@
 	/**
 	 * Replays `calculateColors`' compact pipeline (extract → dedupe → cap) while carrying each color's index
 	 * in `_fullColors`, so a compact view index maps back to the real full-list color unambiguously — even
-	 * when deduplication collapses same-valued swatches (the first occurrence wins, matching the rendered
+	 * when deduplication collapses same-valued slots (the first occurrence wins, matching the rendered
 	 * list). Mirrors the ordering in `calculateColors` exactly.
 	 */
 	const _compactPicked = (): { color: NormalizedColor; index: number }[] => {

@@ -1406,7 +1406,7 @@ test('Fires ondelete and propagates a compact-mode deletion to the full list', a
 	const trash = await screen.findByTestId('__trash-icon__')
 	await user.click(trash)
 
-	// The visible swatch maps back to full index 0; the reported list is the shrunk full list.
+	// The visible slot maps back to full index 0; the reported list is the shrunk full list.
 	expect(onDelete).toHaveBeenCalledTimes(1)
 	expect(onDelete).toHaveBeenCalledWith({
 		color: '#000000',
