@@ -130,7 +130,7 @@
 						preselectColor = !!bgColor
 					}}
 					onadd={({ color, colors: next }) => {
-						lastEvent = `Added ${color} (${Array.isArray(next) ? next.length : 0} entries)`
+						lastEvent = `Added ${color} (${Array.isArray(next) ? next.length : 0} slots)`
 					}}
 					ondelete={({ color, index, groupName }) => {
 						lastEvent = `Deleted ${color}${groupName ? ` from ${groupName}` : ''} at index ${index}`
@@ -279,7 +279,7 @@
 		</div>
 	</div>
 	<div class="events" data-testid="__example-events__">
-		<span class="events__count">Bound entries: {boundColorCount}</span>
+		<span class="events__count">Bound slots: {boundColorCount}</span>
 		{#if lastEvent}<span class="events__last">{lastEvent}</span>{/if}
 	</div>
 </main>
