@@ -1526,3 +1526,60 @@ test('Reflects a compact-mode deletion back through bind:colors and re-indexes c
 	cells = await screen.findAllByTestId('__palette-cell__')
 	expect(cells).toHaveLength(1)
 })
+
+test('Does not resurrect a flat-deleted color through a compact deletion after a runtime toggle', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#a00', '#0b0'], initialCompactColorIndices: [0] },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+
+	let cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	await user.hover(cells[1])
+	let trash = await screen.findByTestId('__trash-icon__')
+	await user.click(trash)
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#a00' }]))
+
+	const toggle = await screen.findByTestId('__palette-compact-toggle-button__')
+	await user.click(toggle)
+
+	cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(1)
+
+	await user.hover(cells[0])
+	trash = await screen.findByTestId('__trash-icon__')
+	await user.click(trash)
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual([]))
+})
+
+test('Keeps a flat-added color in the bound list through a compact deletion after a runtime toggle', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#a00', '#0b0'], initialCompactColorIndices: [0, 1] },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+
+	const input = await screen.findByTestId('__palette-input-input__')
+	await user.type(input, '00c')
+
+	const submit = await screen.findByTestId('__palette-input-submit__')
+	await user.click(submit)
+
+	await waitFor(() =>
+		expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#a00' }, { value: '#0b0' }, { value: '#00c' }])
+	)
+
+	const toggle = await screen.findByTestId('__palette-compact-toggle-button__')
+	await user.click(toggle)
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[0])
+	const trash = await screen.findByTestId('__trash-icon__')
+	await user.click(trash)
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#0b0' }, { value: '#00c' }]))
+})

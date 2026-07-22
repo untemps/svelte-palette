@@ -163,6 +163,8 @@
 	 * The full resolved and transformed flat list — before compact extraction, deduplication or capping —
 	 * that `compactColorIndices` index into. Retained so a compact-mode deletion can map a view index back
 	 * to the real color and write the shrunk full list back to the bound `colors`. Null in grouped mode.
+	 * Reassigned by `_syncColors` on every flat write-back (the written-back list becomes the new full
+	 * list), so a later runtime compact toggle never maps deletions against pre-mutation data.
 	 */
 	let _fullColors = $state<NormalizedColor[] | null>(null)
 	let _colorGroups = $state<NormalizedColorGroup[] | null>(null)
@@ -299,6 +301,7 @@
 	}
 
 	const _syncColors = (nextColors: NormalizedColor[]) => {
+		_fullColors = nextColors
 		_skipColorsSync = true
 		colors = nextColors
 	}
@@ -382,7 +385,6 @@
 		}
 		const { color: removed, index: fullIndex } = target
 		const nextFull = (_fullColors ?? []).filter((c, i) => i !== fullIndex)
-		_fullColors = nextFull
 		compactColorIndices = (compactColorIndices ?? [])
 			.filter((n) => n !== fullIndex)
 			.map((n) => (n > fullIndex ? n - 1 : n))
