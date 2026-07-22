@@ -1,3 +1,15 @@
+# [6.0.0-beta.3](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.2...v6.0.0-beta.3) (2026-07-22)
+
+
+### Features
+
+* Emit add/delete callbacks and bindable colors ([#220](https://github.com/untemps/svelte-palette/issues/220)) ([5da4405](https://github.com/untemps/svelte-palette/commit/5da4405e01c71e41f6126c1b9699bbd84f26f915))
+
+
+### BREAKING CHANGES
+
+* AddEventArgs renamed to InputAddEventArgs; AddEventArgs now names the palette-level onadd argument
+
 # [6.0.0-beta.2](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.1...v6.0.0-beta.2) (2026-07-21)
 
 
