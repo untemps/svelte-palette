@@ -306,9 +306,9 @@
 		colors = nextColors
 	}
 
-	const _syncColorGroups = (nextGroups: NormalizedColorGroup[]) => {
+	const _syncColorGroups = (nextColorGroups: NormalizedColorGroup[]) => {
 		_skipColorsSync = true
-		colors = nextGroups
+		colors = nextColorGroups
 	}
 
 	const _addColor = (color: ColorValue) => {
@@ -384,11 +384,11 @@
 			return
 		}
 		const { color: removed, index: fullIndex } = target
-		const nextFull = (_fullColors ?? []).filter((c, i) => i !== fullIndex)
+		const nextFullColors = (_fullColors ?? []).filter((c, i) => i !== fullIndex)
 		compactColorIndices = (compactColorIndices ?? [])
 			.filter((n) => n !== fullIndex)
 			.map((n) => (n > fullIndex ? n - 1 : n))
-		const nextColors = calculateColors(nextFull, {
+		const nextColors = calculateColors(nextFullColors, {
 			isCompact: true,
 			compactColorIndices,
 			allowDuplicates,
@@ -402,23 +402,23 @@
 			numColumns,
 			maxColumns,
 		})
-		_syncColors(nextFull)
-		ondelete?.({ color: removed.value, index: fullIndex, colors: nextFull })
+		_syncColors(nextFullColors)
+		ondelete?.({ color: removed.value, index: fullIndex, colors: nextFullColors })
 	}
 
 	const _removeGroupColor = (groupIndex: number, colorIndex: number) => {
 		const group = (_colorGroups ?? [])[groupIndex]
 		const removed = group?.colors[colorIndex]
-		const nextGroups = (_colorGroups ?? []).map((g, gi) =>
+		const nextColorGroups = (_colorGroups ?? []).map((g, gi) =>
 			gi === groupIndex ? { ...g, colors: g.colors.filter((_, ci) => ci !== colorIndex) } : g
 		)
-		_colorGroups = nextGroups
-		_syncColorGroups(nextGroups)
+		_colorGroups = nextColorGroups
+		_syncColorGroups(nextColorGroups)
 		if (removed) {
 			ondelete?.({
 				color: removed.value,
 				index: colorIndex,
-				colors: nextGroups,
+				colors: nextColorGroups,
 				groupIndex,
 				...(group?.name != null && { groupName: group.name }),
 			})
