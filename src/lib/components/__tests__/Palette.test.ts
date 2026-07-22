@@ -1385,7 +1385,7 @@ test('Does not add or fire onadd through the input in grouped mode', async () =>
 	expect(groups).toHaveLength(2)
 })
 
-test('Does not fire ondelete for a compact-mode deletion', async () => {
+test('Fires ondelete and propagates a compact-mode deletion to the full list', async () => {
 	const onDelete = vi.fn()
 	const colors = Array.from({ length: 10 }, (_, i) => `#${i.toString(16).padStart(6, '0')}`)
 
@@ -1406,9 +1406,78 @@ test('Does not fire ondelete for a compact-mode deletion', async () => {
 	const trash = await screen.findByTestId('__trash-icon__')
 	await user.click(trash)
 
-	expect(onDelete).not.toHaveBeenCalled()
+	// The visible swatch maps back to full index 0; the reported list is the shrunk full list.
+	expect(onDelete).toHaveBeenCalledTimes(1)
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#000000',
+		index: 0,
+		colors: colors.slice(1).map((value) => ({ value })),
+	})
+
 	cells = await screen.findAllByTestId('__palette-cell__')
 	expect(cells).toHaveLength(2)
+})
+
+test('Deletes the mapped color when compactColorIndices are unsorted', async () => {
+	const onDelete = vi.fn()
+	const colors = ['#a00', '#0b0', '#00c', '#dd0', '#0ee']
+
+	const { user } = setup(Palette, {
+		props: {
+			colors,
+			isCompact: true,
+			compactColorIndices: [3, 0], // extractByIndices keeps original order -> visible: #a00 (0), #dd0 (3)
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	let cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	await user.hover(cells[1]) // #dd0, real full index 3
+	const trash = await screen.findByTestId('__trash-icon__')
+	await user.click(trash)
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#dd0',
+		index: 3,
+		colors: [{ value: '#a00' }, { value: '#0b0' }, { value: '#00c' }, { value: '#0ee' }],
+	})
+
+	cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(1) // only #a00 (index 0) remains picked
+})
+
+test('Falls back to a local removal without ondelete when compact is toggled at runtime', async () => {
+	const onDelete = vi.fn()
+	const colors = ['#a00', '#0b0', '#00c', '#dd0', '#0ee']
+
+	const { user } = setup(Palette, {
+		props: {
+			colors,
+			compactColorIndices: [1, 3], // not prefix-aligned, so the toggled view never matches the picks
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	let cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(5) // expanded: full list rendered
+
+	// Toggle into compact at runtime; `_colors` is not re-extracted (pre-existing), so the view diverges
+	// from the picked subset and the deletion must not corrupt the list.
+	const toggle = await screen.findByTestId('__palette-compact-toggle-button__')
+	await user.click(toggle)
+
+	cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[0]) // rendered #a00, but pick[0] maps to #0b0 -> mismatch -> safe fallback
+	const trash = await screen.findByTestId('__trash-icon__')
+	await user.click(trash)
+
+	expect(onDelete).not.toHaveBeenCalled()
+	cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(4)
 })
 
 test('Reflects an add and a delete back through bind:colors', async () => {
@@ -1435,4 +1504,28 @@ test('Reflects an add and a delete back through bind:colors', async () => {
 	await user.click(trash)
 
 	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#0ff' }, { value: '#0f0' }]))
+})
+
+test('Reflects a compact-mode deletion back through bind:colors and re-indexes compactColorIndices', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#ff0', '#0ff', '#f0f', '#00f'], isCompact: true, initialCompactColorIndices: [1, 2] },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	const boundIndices = await screen.findByTestId('__bound-indices__')
+
+	let cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2) // picked #0ff (1), #f0f (2)
+
+	await user.hover(cells[0]) // #0ff -> full index 1
+	const trash = await screen.findByTestId('__trash-icon__')
+	await user.click(trash)
+
+	await waitFor(() =>
+		expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#ff0' }, { value: '#f0f' }, { value: '#00f' }])
+	)
+	await waitFor(() => expect(JSON.parse(boundIndices.textContent ?? '')).toEqual([1]))
+
+	cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(1) // only #f0f (now index 1) remains picked
 })

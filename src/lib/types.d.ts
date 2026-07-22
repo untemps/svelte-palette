@@ -79,9 +79,9 @@ export interface SelectEventArgs {
 }
 
 /**
- * Argument passed to the `onadd` callback when a color is added through the input or the eye dropper.
+ * Argument passed to the input/eye-dropper `onadd` callback when a color is submitted.
  */
-export interface AddEventArgs {
+export interface InputAddEventArgs {
 	/** The color value being added. */
 	color: ColorValue
 }
@@ -89,7 +89,7 @@ export interface AddEventArgs {
 /**
  * Argument passed to the palette-level `onadd` callback once a color has been added to the list.
  */
-export interface PaletteAddEventArgs {
+export interface AddEventArgs {
 	/** The color value that was added. */
 	color: ColorValue
 	/** The resulting color list, resolved to its normalized form. */
@@ -99,7 +99,7 @@ export interface PaletteAddEventArgs {
 /**
  * Argument passed to the palette-level `ondelete` callback once a color has been removed from the list.
  */
-export interface PaletteDeleteEventArgs {
+export interface DeleteEventArgs {
 	/** The color value that was removed. */
 	color: ColorValue
 	/** The index of the removed color within its list (or group in grouped mode). */

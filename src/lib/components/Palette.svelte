@@ -1,7 +1,13 @@
 <script lang="ts">
 	import { tick, untrack } from 'svelte'
 
-	import { calculateColorGroups, calculateColors, calculateNumColumns, isColorGroups } from '../utils/utils.js'
+	import {
+		calculateColorGroups,
+		calculateColors,
+		calculateNumColumns,
+		isColorGroups,
+		transformColors,
+	} from '../utils/utils.js'
 
 	import { NONE } from '../enums/PaletteDeletionMode'
 	import { COMPACT, SETTINGS } from '$lib/enums/PaletteTool.js'
@@ -24,13 +30,13 @@
 		AddEventArgs,
 		ColorValue,
 		ColorsProp,
+		DeleteEventArgs,
 		DeletionMode,
 		EdgeSlotSnippetProps,
 		HeaderSnippetProps,
+		InputAddEventArgs,
 		InputSnippetProps,
 		InputType,
-		PaletteAddEventArgs,
-		PaletteDeleteEventArgs,
 		PaletteToolName,
 		SelectEventArgs,
 		SettingsSnippetProps,
@@ -48,7 +54,7 @@
 		selectedColor?: ColorValue | null
 		/** Whether the palette is displayed in compact mode. */
 		isCompact?: boolean
-		/** Indices picked from `colors` when in compact mode. */
+		/** Indices picked from `colors` when in compact mode. Supports `bind:compactColorIndices`; re-indexed when a compact swatch is deleted. */
 		compactColorIndices?: number[]
 		/** Whether duplicate colors are allowed. */
 		allowDuplicates?: boolean
@@ -75,9 +81,9 @@
 		/** Called whenever a color is selected. */
 		onselect?: (args: SelectEventArgs) => void
 		/** Called once a color has been added to the list through the input. */
-		onadd?: (args: PaletteAddEventArgs) => void
+		onadd?: (args: AddEventArgs) => void
 		/** Called once a color has been removed from the list through the deletion gesture. */
-		ondelete?: (args: PaletteDeleteEventArgs) => void
+		ondelete?: (args: DeleteEventArgs) => void
 		/** Accessible name announced for the color slot listbox. */
 		label?: string
 		/**
@@ -121,7 +127,7 @@
 		colors = $bindable(null),
 		selectedColor = $bindable(null),
 		isCompact = false,
-		compactColorIndices = [],
+		compactColorIndices = $bindable([]),
 		allowDuplicates = false,
 		deletionMode = NONE,
 		tooltipClassName = null,
@@ -153,6 +159,12 @@
 	}: Props = $props()
 
 	let _colors = $state<NormalizedColor[] | null>(null)
+	/**
+	 * The full resolved and transformed flat list — before compact extraction, deduplication or capping —
+	 * that `compactColorIndices` index into. Retained so a compact-mode deletion can map a view index back
+	 * to the real color and write the shrunk full list back to the bound `colors`. Null in grouped mode.
+	 */
+	let _fullColors = $state<NormalizedColor[] | null>(null)
 	let _colorGroups = $state<NormalizedColorGroup[] | null>(null)
 	let _numColumns = $state(untrack(() => numColumns))
 	let _isSettingsOn = $state(false)
@@ -195,6 +207,7 @@
 					})
 					_colorGroups = newColorGroups
 					_colors = null
+					_fullColors = null
 					const maxGroupLength = newColorGroups.reduce((max, g) => Math.max(max, g.colors.length), 0)
 					_numColumns = calculateNumColumns(maxGroupLength, { numColumns: _numCols })
 				} else {
@@ -206,6 +219,7 @@
 					})
 					_colors = newColors
 					_colorGroups = null
+					_fullColors = transformColors(Array.isArray(results) ? results : [])
 					_numColumns = calculateNumColumns(newColors.length, {
 						isCompact: _isCompact,
 						compactColorIndices,
@@ -320,13 +334,77 @@
 	}
 
 	const _removeColor = (index: number) => {
+		if (_isCompact) {
+			_removeCompactColor(index)
+			return
+		}
 		const removed = (_colors ?? [])[index]
 		const nextColors = (_colors ?? []).filter((c, i) => i !== index)
 		_colors = nextColors
-		if (!_isCompact && removed) {
+		if (removed) {
 			_syncColors(nextColors)
 			ondelete?.({ color: removed.value, index, colors: nextColors })
 		}
+	}
+
+	/**
+	 * Replays `calculateColors`' compact pipeline (extract → dedupe → cap) while carrying each color's index
+	 * in `_fullColors`, so a compact view index maps back to the real full-list color unambiguously — even
+	 * when deduplication collapses same-valued swatches (the first occurrence wins, matching the rendered
+	 * list). Mirrors the ordering in `calculateColors` exactly.
+	 */
+	const _compactPicked = (): { color: NormalizedColor; index: number }[] => {
+		const full = _fullColors ?? []
+		const indices = compactColorIndices ?? []
+		let picked = full.map((color, index) => ({ color, index })).filter(({ index }) => indices.includes(index))
+		if (!allowDuplicates) {
+			picked = picked.filter((item, i) => picked.findIndex((o) => o.color.value === item.color.value) === i)
+		}
+		if (maxColors >= 0 && picked.length > maxColors) {
+			picked = picked.slice(0, maxColors)
+		}
+		return picked
+	}
+
+	/**
+	 * A compact deletion mutates the underlying full list, not the extracted subset `_colors`: it removes the
+	 * mapped color, re-indexes `compactColorIndices` onto the shrunk list, recomputes the view and writes the
+	 * full list back through `bind:colors`. The `ondelete` `index` is the removed color's position in that
+	 * full list. Guarded against a view index that maps to nothing (e.g. a runtime compact toggle whose
+	 * `_colors` was never re-extracted).
+	 */
+	const _removeCompactColor = (index: number) => {
+		const target = _compactPicked()[index]
+		const rendered = (_colors ?? [])[index]
+		// Only propagate when the resolved compact subset still matches what is rendered. If the two have
+		// diverged (e.g. a runtime compact toggle that never re-extracted `_colors`), fall back to a local
+		// removal so the bound `colors` is not corrupted with a mis-mapped deletion.
+		if (!target || !rendered || target.color.value !== rendered.value) {
+			_colors = (_colors ?? []).filter((c, i) => i !== index)
+			return
+		}
+		const { color: removed, index: fullIndex } = target
+		const nextFull = (_fullColors ?? []).filter((c, i) => i !== fullIndex)
+		_fullColors = nextFull
+		compactColorIndices = (compactColorIndices ?? [])
+			.filter((n) => n !== fullIndex)
+			.map((n) => (n > fullIndex ? n - 1 : n))
+		const nextColors = calculateColors(nextFull, {
+			isCompact: true,
+			compactColorIndices,
+			allowDuplicates,
+			maxColors,
+		})
+		_colors = nextColors
+		_numColumns = calculateNumColumns(nextColors.length, {
+			isCompact: true,
+			compactColorIndices,
+			showTransparentSlot,
+			numColumns,
+			maxColumns,
+		})
+		_syncColors(nextFull)
+		ondelete?.({ color: removed.value, index: fullIndex, colors: nextFull })
 	}
 
 	const _removeGroupColor = (groupIndex: number, colorIndex: number) => {
@@ -350,7 +428,7 @@
 
 	const _onSlotSelect = ({ color }: SelectEventArgs) => _selectColor(color)
 
-	const _onInputAdd = ({ color }: AddEventArgs) => _addColor(color)
+	const _onInputAdd = ({ color }: InputAddEventArgs) => _addColor(color)
 
 	const _onDelete = (index: number) => _removeColor(index)
 

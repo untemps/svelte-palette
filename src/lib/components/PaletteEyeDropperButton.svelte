@@ -5,11 +5,11 @@
 
 	import type { HTMLButtonAttributes } from 'svelte/elements'
 
-	import type { AddEventArgs, ErrorEventArgs } from '../types'
+	import type { InputAddEventArgs, ErrorEventArgs } from '../types'
 
 	interface Props {
 		/** Called when a color is picked with the eye dropper. */
-		onadd?: (args: AddEventArgs) => void
+		onadd?: (args: InputAddEventArgs) => void
 		/** Called when the eye dropper fails or is dismissed. */
 		onerror?: (args: ErrorEventArgs) => void
 	}
