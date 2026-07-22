@@ -5,6 +5,7 @@ import { standby } from '@untemps/utils/async/standby'
 import { createRawSnippet } from 'svelte'
 
 import Palette from '../Palette.svelte'
+import PaletteBind from './PaletteBind.test.svelte'
 
 import { TOOLTIP, DROP } from '../../enums/PaletteDeletionMode'
 
@@ -1255,4 +1256,330 @@ test('Leaves the forwarded Delete shortcut undefined on custom slots when deleti
 
 	const custom = await screen.findAllByTestId('__ks-unset__')
 	custom.forEach((el) => expect(el).toHaveAttribute('data-shortcut', 'undefined'))
+})
+
+test('Triggers onadd with the added color and the resulting list', async () => {
+	const onAdd = vi.fn()
+	const colors = ['#ff0', '#0ff', '#f0f']
+
+	const { user } = setup(Palette, {
+		props: { colors, showInput: true, onadd: onAdd },
+	})
+
+	const input = await screen.findByTestId('__palette-input-input__')
+	await user.type(input, '0f0')
+
+	const submit = await screen.findByTestId('__palette-input-submit__')
+	await user.click(submit)
+
+	expect(onAdd).toHaveBeenCalledWith({
+		color: '#0f0',
+		colors: [{ value: '#ff0' }, { value: '#0ff' }, { value: '#f0f' }, { value: '#0f0' }],
+	})
+})
+
+test('Triggers ondelete with the removed color and the resulting list in flat mode', async () => {
+	const onDelete = vi.fn()
+	const colors = ['#ff0', '#0ff', '#f0f']
+
+	const { user } = setup(Palette, {
+		props: { colors, deletionMode: TOOLTIP, ondelete: onDelete },
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[0])
+
+	const trash = await screen.findByTestId('__trash-icon__')
+	await user.click(trash)
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#ff0',
+		index: 0,
+		colors: [{ value: '#0ff' }, { value: '#f0f' }],
+	})
+})
+
+test('Triggers ondelete with the group identity in group mode', async () => {
+	const onDelete = vi.fn()
+	const colors = [
+		{ name: 'Reds', colors: ['#f00', '#f11', '#f22'] },
+		{ name: 'Blues', colors: ['#00f', '#11f'] },
+	]
+
+	const { user } = setup(Palette, {
+		props: { colors, deletionMode: TOOLTIP, ondelete: onDelete },
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[4])
+
+	const trash = await screen.findByTestId('__trash-icon__')
+	await user.click(trash)
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#11f',
+		index: 1,
+		groupIndex: 1,
+		groupName: 'Blues',
+		colors: [
+			{ name: 'Reds', colors: [{ value: '#f00' }, { value: '#f11' }, { value: '#f22' }] },
+			{ name: 'Blues', colors: [{ value: '#00f' }] },
+		],
+	})
+})
+
+test('Omits groupName in ondelete when the group has no name', async () => {
+	const onDelete = vi.fn()
+	const colors = [{ colors: ['#f00', '#0f0'] }]
+
+	const { user } = setup(Palette, {
+		props: { colors, deletionMode: TOOLTIP, ondelete: onDelete },
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[0])
+
+	const trash = await screen.findByTestId('__trash-icon__')
+	await user.click(trash)
+
+	expect(onDelete).toHaveBeenCalledWith(expect.objectContaining({ color: '#f00', index: 0, groupIndex: 0 }))
+	expect(onDelete).toHaveBeenCalledWith(expect.not.objectContaining({ groupName: expect.anything() }))
+})
+
+test('Does not fire onadd when the color is a rejected duplicate', async () => {
+	const onAdd = vi.fn()
+	const colors = ['#ff0', '#0ff', '#f0f']
+
+	const { user } = setup(Palette, {
+		props: { colors, showInput: true, onadd: onAdd },
+	})
+
+	const input = await screen.findByTestId('__palette-input-input__')
+	await user.type(input, 'f0f')
+
+	const submit = await screen.findByTestId('__palette-input-submit__')
+	await user.click(submit)
+
+	expect(onAdd).not.toHaveBeenCalled()
+})
+
+test('Does not add or fire onadd through the input in grouped mode', async () => {
+	const onAdd = vi.fn()
+	const colors = [
+		{ name: 'Reds', colors: ['#f00'] },
+		{ name: 'Blues', colors: ['#00f'] },
+	]
+
+	const { user } = setup(Palette, {
+		props: { colors, showInput: true, onadd: onAdd },
+	})
+
+	const input = await screen.findByTestId('__palette-input-input__')
+	await user.type(input, '0f0')
+
+	const submit = await screen.findByTestId('__palette-input-submit__')
+	await user.click(submit)
+
+	expect(onAdd).not.toHaveBeenCalled()
+	const groups = await screen.findAllByTestId('__palette-group__')
+	expect(groups).toHaveLength(2)
+})
+
+test('Fires ondelete and propagates a compact-mode deletion to the full list', async () => {
+	const onDelete = vi.fn()
+	const colors = Array.from({ length: 10 }, (_, i) => `#${i.toString(16).padStart(6, '0')}`)
+
+	const { user } = setup(Palette, {
+		props: {
+			colors,
+			isCompact: true,
+			compactColorIndices: [0, 1, 2],
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	let cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[0])
+	const trash = await screen.findByTestId('__trash-icon__')
+	await user.click(trash)
+
+	expect(onDelete).toHaveBeenCalledTimes(1)
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#000000',
+		index: 0,
+		colors: colors.slice(1).map((value) => ({ value })),
+	})
+
+	cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+})
+
+test('Deletes the mapped color when compactColorIndices are unsorted', async () => {
+	const onDelete = vi.fn()
+	const colors = ['#a00', '#0b0', '#00c', '#dd0', '#0ee']
+
+	const { user } = setup(Palette, {
+		props: {
+			colors,
+			isCompact: true,
+			compactColorIndices: [3, 0],
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	let cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	await user.hover(cells[1])
+	const trash = await screen.findByTestId('__trash-icon__')
+	await user.click(trash)
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#dd0',
+		index: 3,
+		colors: [{ value: '#a00' }, { value: '#0b0' }, { value: '#00c' }, { value: '#0ee' }],
+	})
+
+	cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(1)
+})
+
+test('Falls back to a local removal without ondelete when compact is toggled at runtime', async () => {
+	const onDelete = vi.fn()
+	const colors = ['#a00', '#0b0', '#00c', '#dd0', '#0ee']
+
+	const { user } = setup(Palette, {
+		props: {
+			colors,
+			compactColorIndices: [1, 3],
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	let cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(5)
+
+	const toggle = await screen.findByTestId('__palette-compact-toggle-button__')
+	await user.click(toggle)
+
+	cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[0])
+	const trash = await screen.findByTestId('__trash-icon__')
+	await user.click(trash)
+
+	expect(onDelete).not.toHaveBeenCalled()
+	cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(4)
+})
+
+test('Reflects an add and a delete back through bind:colors', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#ff0', '#0ff'] },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+
+	const input = await screen.findByTestId('__palette-input-input__')
+	await user.type(input, '0f0')
+
+	const submit = await screen.findByTestId('__palette-input-submit__')
+	await user.click(submit)
+
+	await waitFor(() =>
+		expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#ff0' }, { value: '#0ff' }, { value: '#0f0' }])
+	)
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[0])
+
+	const trash = await screen.findByTestId('__trash-icon__')
+	await user.click(trash)
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#0ff' }, { value: '#0f0' }]))
+})
+
+test('Reflects a compact-mode deletion back through bind:colors and re-indexes compactColorIndices', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#ff0', '#0ff', '#f0f', '#00f'], isCompact: true, initialCompactColorIndices: [1, 2] },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	const boundIndices = await screen.findByTestId('__bound-indices__')
+
+	let cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	await user.hover(cells[0])
+	const trash = await screen.findByTestId('__trash-icon__')
+	await user.click(trash)
+
+	await waitFor(() =>
+		expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#ff0' }, { value: '#f0f' }, { value: '#00f' }])
+	)
+	await waitFor(() => expect(JSON.parse(boundIndices.textContent ?? '')).toEqual([1]))
+
+	cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(1)
+})
+
+test('Does not resurrect a flat-deleted color through a compact deletion after a runtime toggle', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#a00', '#0b0'], initialCompactColorIndices: [0] },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+
+	let cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	await user.hover(cells[1])
+	let trash = await screen.findByTestId('__trash-icon__')
+	await user.click(trash)
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#a00' }]))
+
+	const toggle = await screen.findByTestId('__palette-compact-toggle-button__')
+	await user.click(toggle)
+
+	cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(1)
+
+	await user.hover(cells[0])
+	trash = await screen.findByTestId('__trash-icon__')
+	await user.click(trash)
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual([]))
+})
+
+test('Keeps a flat-added color in the bound list through a compact deletion after a runtime toggle', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#a00', '#0b0'], initialCompactColorIndices: [0, 1] },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+
+	const input = await screen.findByTestId('__palette-input-input__')
+	await user.type(input, '00c')
+
+	const submit = await screen.findByTestId('__palette-input-submit__')
+	await user.click(submit)
+
+	await waitFor(() =>
+		expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#a00' }, { value: '#0b0' }, { value: '#00c' }])
+	)
+
+	const toggle = await screen.findByTestId('__palette-compact-toggle-button__')
+	await user.click(toggle)
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[0])
+	const trash = await screen.findByTestId('__trash-icon__')
+	await user.click(trash)
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#0b0' }, { value: '#00c' }]))
 })

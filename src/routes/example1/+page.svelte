@@ -7,8 +7,10 @@
 
 	import { Palette } from '$lib'
 
+	import type { ColorsProp } from '$lib/types'
+
 	let unique = $state({})
-	let colors = $state(null)
+	let colors = $state<ColorsProp | null>(null)
 
 	/*onMount(() => {
 		colors = fetch('https://www.colr.org/json/colors/random/30')
@@ -59,6 +61,9 @@
 
 	let bgColor = $state(_initialColors[Math.round(Math.random() * (_initialColors.length - 1))])
 
+	let lastEvent = $state('')
+	let boundColorCount = $derived(Array.isArray(colors) ? colors.length : 0)
+
 	let preselectColor = $state(true)
 	let allowDuplicates = $state(true)
 	let deletionMode = $state('tooltip')
@@ -104,7 +109,7 @@
 				<Palette
 					class="palette__custom"
 					label="Background color slots"
-					{colors}
+					bind:colors
 					compactColorIndices={showCompactControl ? compactIndices : null}
 					selectedColor={preselectColor ? bgColor : null}
 					{allowDuplicates}
@@ -121,6 +126,12 @@
 					onselect={({ color }) => {
 						bgColor = color
 						preselectColor = !!bgColor
+					}}
+					onadd={({ color, colors: next }) => {
+						lastEvent = `Added ${color} (${Array.isArray(next) ? next.length : 0} slots)`
+					}}
+					ondelete={({ color, index, groupName }) => {
+						lastEvent = `Deleted ${color}${groupName ? ` from ${groupName}` : ''} at index ${index}`
 					}}
 				>
 					{#snippet settings({ onClose })}
@@ -265,6 +276,10 @@
 			{/key}
 		</div>
 	</div>
+	<div class="events" data-testid="__example-events__">
+		<span class="events__count">Bound slots: {boundColorCount}</span>
+		{#if lastEvent}<span class="events__last">{lastEvent}</span>{/if}
+	</div>
 </main>
 
 <style>
@@ -286,6 +301,28 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
+	}
+
+	.events {
+		position: fixed;
+		left: 1rem;
+		bottom: 1rem;
+		z-index: 10;
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+		max-width: 18rem;
+		padding: 0.5rem 0.75rem;
+		font-family: Helvetica, sans-serif;
+		font-size: 0.75rem;
+		color: #fff;
+		background-color: rgba(0, 0, 0, 0.6);
+		border-radius: 0.25rem;
+		pointer-events: none;
+	}
+
+	.events__count {
+		font-weight: 600;
 	}
 
 	.example1 :global(.palette[data-palette].palette__custom) {

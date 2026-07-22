@@ -9,7 +9,7 @@
 
 	import { COLOR_REGEX, isColorValid } from '../utils/utils'
 
-	import type { AddEventArgs, ColorValue, InputType } from '../types'
+	import type { InputAddEventArgs, ColorValue, InputType } from '../types'
 
 	interface Props {
 		/** The color pre-filled in the input. */
@@ -17,7 +17,7 @@
 		/** Type of the input. */
 		inputType?: InputType
 		/** Called when a color is submitted. */
-		onadd?: (args: AddEventArgs) => void
+		onadd?: (args: InputAddEventArgs) => void
 		/** Class name applied to the root element. */
 		class?: string
 	}
@@ -59,7 +59,7 @@
 		document?.removeEventListener('keypress', _onKeyPress)
 	}
 
-	const _onEyeDropperAdd = ({ color: value }: AddEventArgs) => {
+	const _onEyeDropperAdd = ({ color: value }: InputAddEventArgs) => {
 		color = value
 	}
 
