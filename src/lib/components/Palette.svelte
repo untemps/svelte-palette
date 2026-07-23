@@ -195,6 +195,23 @@
 		const _source = colors
 		const _numCols = numColumns
 		const _maxCols = maxColumns
+		/**
+		 * Snapshot every remaining input synchronously: reads inside the `.then()` callback happen in a
+		 * microtask, outside Svelte's dependency-tracking window, so they would never re-trigger this
+		 * effect. Only these snapshots may be used below the promise.
+		 */
+		const _colorParams = {
+			isCompact: _isCompact,
+			compactColorIndices,
+			allowDuplicates,
+			maxColors,
+		}
+		const _columnParams = {
+			..._colorParams,
+			showTransparentSlot,
+			numColumns: _numCols,
+			maxColumns: _maxCols,
+		}
 		if (untrack(() => _skipColorsSync)) {
 			_skipColorsSync = false
 			return
@@ -204,8 +221,8 @@
 				_focusedIndex = null
 				if (isColorGroups(results)) {
 					const newColorGroups = calculateColorGroups(results, {
-						allowDuplicates,
-						maxColors,
+						allowDuplicates: _colorParams.allowDuplicates,
+						maxColors: _colorParams.maxColors,
 					})
 					_colorGroups = newColorGroups
 					_colors = null
@@ -213,22 +230,11 @@
 					const maxGroupLength = newColorGroups.reduce((max, g) => Math.max(max, g.colors.length), 0)
 					_numColumns = calculateNumColumns(maxGroupLength, { numColumns: _numCols })
 				} else {
-					const newColors = calculateColors(results, {
-						isCompact: _isCompact,
-						compactColorIndices,
-						allowDuplicates,
-						maxColors,
-					})
+					const newColors = calculateColors(results, _colorParams)
 					_colors = newColors
 					_colorGroups = null
 					_fullColors = transformColors(Array.isArray(results) ? results : [])
-					_numColumns = calculateNumColumns(newColors.length, {
-						isCompact: _isCompact,
-						compactColorIndices,
-						showTransparentSlot,
-						numColumns: _numCols,
-						maxColumns: _maxCols,
-					})
+					_numColumns = calculateNumColumns(newColors.length, _columnParams)
 				}
 			}
 		})
