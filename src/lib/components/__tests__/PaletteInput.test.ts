@@ -11,11 +11,19 @@ const setup = (component: Parameters<typeof render>[0], options?: Parameters<typ
 	}
 }
 
-const originalEyeDropper = window.EyeDropper
+// Each test installs its own EyeDropper stub; vi.unstubAllGlobals() restores the
+// jsdom baseline (no EyeDropper at all) so no test depends on the order of the others.
+const stubEyeDropper = (sRGBHex: string) =>
+	vi.stubGlobal(
+		'EyeDropper',
+		class {
+			open = () => Promise.resolve({ sRGBHex })
+		}
+	)
 
 afterEach(() => {
 	cleanup()
-	window.EyeDropper = originalEyeDropper
+	vi.unstubAllGlobals()
 })
 
 test('Enables submit button when input color is valid', async () => {
@@ -54,9 +62,7 @@ test('Prevents native form submission to avoid a page reload', async () => {
 })
 
 test('Does not render the eyedropper as a submit button', async () => {
-	window.EyeDropper = function () {
-		this.open = () => Promise.resolve({ sRGBHex: '#ff0' })
-	}
+	stubEyeDropper('#ff0')
 	setup(PaletteInput)
 	const button = await screen.findByTestId('__palette-eyedropper-button__')
 	expect(button).toHaveAttribute('type', 'button')
@@ -116,7 +122,7 @@ test('Does not display slot if inputType is "color"', async () => {
 })
 
 test('Does not display EyeDropper button if API is not available', async () => {
-	window.EyeDropper = undefined
+	vi.stubGlobal('EyeDropper', undefined)
 	setup(PaletteInput, {
 		color: 'ff',
 		inputType: 'foo',
@@ -126,9 +132,7 @@ test('Does not display EyeDropper button if API is not available', async () => {
 })
 
 test('Updates input value with color from eyedropper', async () => {
-	window.EyeDropper = function () {
-		this.open = () => Promise.resolve({ sRGBHex: '#ff0' })
-	}
+	stubEyeDropper('#ff0')
 	const { user } = setup(PaletteInput)
 	const button = await screen.findByTestId('__palette-eyedropper-button__')
 	await user.click(button)
