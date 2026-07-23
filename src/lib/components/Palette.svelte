@@ -379,8 +379,9 @@
 	 * A compact deletion mutates the underlying full list, not the extracted subset `_colors`: it removes the
 	 * mapped color, re-indexes `compactColorIndices` onto the shrunk list, recomputes the view and writes the
 	 * full list back through `bind:colors`. The `ondelete` `index` is the removed color's position in that
-	 * full list. Guarded against a view index that maps to nothing (e.g. a runtime compact toggle whose
-	 * `_colors` was never re-extracted).
+	 * full list. The mismatch guard is defense in depth: the resolver re-extracts `_colors` whenever
+	 * `_isCompact` or `compactColorIndices` change, so a view index only maps to nothing if the rendered
+	 * subset drifted from `_fullColors` (e.g. through a stale async resolution).
 	 */
 	const _removeCompactColor = (index: number) => {
 		const target = _compactPicked()[index]
@@ -437,6 +438,15 @@
 
 	const _onDelete = (index: number) => _removeColor(index)
 
+	/**
+	 * Flipping `_isCompact` is all a toggle needs: the resolver `$effect` tracks it and recomputes
+	 * `_colors` and `_numColumns` together from the current `colors` source, so the column count is
+	 * derived (transparent slot included) rather than remembered across toggles.
+	 */
+	const _toggleCompact = () => {
+		_isCompact = !_isCompact
+	}
+
 	const _onToolSelect = (args: ToolSelectEventArgs | PaletteToolName) => {
 		const tool = typeof args === 'string' ? args : args.tool
 		switch (tool) {
@@ -444,16 +454,12 @@
 				_isSettingsOn = true
 				break
 			case COMPACT:
-				_isCompact = !_isCompact
-				_numColumns = _isCompact ? compactColorIndices.length : _numColumns
+				_toggleCompact()
 				break
 		}
 	}
 
-	const _onExpand = () => {
-		_isCompact = !_isCompact
-		_numColumns = _isCompact ? compactColorIndices.length : _numColumns
-	}
+	const _onExpand = () => _toggleCompact()
 
 	const _onSettingsClose = () => {
 		_isSettingsOn = false

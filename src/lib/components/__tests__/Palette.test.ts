@@ -213,14 +213,17 @@ test('Expands palette when compact toggle button is clicked', async () => {
 	const cells = await screen.findAllByTestId('__palette-cell__')
 	expect(cells).toHaveLength(2)
 
+	const content = document.querySelector('.palette__content')
+	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 2'))
+
 	const toggleButton = await screen.findByTestId('__palette-compact-toggle-button__')
 	expect(toggleButton).toBeInTheDocument()
 
 	await user.click(toggleButton)
 
-	const content = document.querySelector('.palette__content')
 	await waitFor(() => expect(content).not.toHaveClass('palette__content--compact'))
 	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(3))
+	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 5'))
 })
 
 test('Extracts the compact subset when the palette is collapsed at runtime', async () => {
@@ -234,12 +237,34 @@ test('Extracts the compact subset when the palette is collapsed at runtime', asy
 	const cells = await screen.findAllByTestId('__palette-cell__')
 	expect(cells).toHaveLength(3)
 
+	const content = document.querySelector('.palette__content')
+	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 5'))
+
+	const toggleButton = await screen.findByTestId('__palette-compact-toggle-button__')
+	await user.click(toggleButton)
+
+	await waitFor(() => expect(content).toHaveClass('palette__content--compact'))
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
+	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 2'))
+})
+
+test('Accounts for the transparent slot in the compact column count when collapsed at runtime', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const compactColorIndices = [0, 1]
+
+	const { user } = setup(Palette, {
+		props: { colors, compactColorIndices, showTransparentSlot: true },
+	})
+
+	await screen.findAllByTestId('__palette-cell__')
+
 	const toggleButton = await screen.findByTestId('__palette-compact-toggle-button__')
 	await user.click(toggleButton)
 
 	const content = document.querySelector('.palette__content')
 	await waitFor(() => expect(content).toHaveClass('palette__content--compact'))
-	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(3))
+	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 3'))
 })
 
 test('Closes settings panel when onClose is called', async () => {
