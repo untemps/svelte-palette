@@ -1586,6 +1586,39 @@ test('Does not render the input in grouped mode', async () => {
 	expect(screen.queryByTestId('__palette-input-input__')).not.toBeInTheDocument()
 })
 
+test('Does not render the input once async colors resolve to groups', async () => {
+	const colors = Promise.resolve([
+		{ name: 'Reds', colors: ['#f00'] },
+		{ name: 'Blues', colors: ['#00f'] },
+	])
+
+	setup(Palette, {
+		props: { colors, showInput: true },
+	})
+
+	const groups = await screen.findAllByTestId('__palette-group__')
+	expect(groups).toHaveLength(2)
+	expect(screen.queryByTestId('__palette-input-input__')).not.toBeInTheDocument()
+})
+
+test('Does not render a custom input snippet in grouped mode', async () => {
+	const input = createRawSnippet(() => ({
+		render: () => `<div data-testid="__custom-input__"></div>`,
+	}))
+	const colors = [
+		{ name: 'Reds', colors: ['#f00'] },
+		{ name: 'Blues', colors: ['#00f'] },
+	]
+
+	setup(Palette, {
+		props: { colors, showInput: true, input },
+	})
+
+	const groups = await screen.findAllByTestId('__palette-group__')
+	expect(groups).toHaveLength(2)
+	expect(screen.queryByTestId('__custom-input__')).not.toBeInTheDocument()
+})
+
 test('Fires ondelete and propagates a compact-mode deletion to the full list', async () => {
 	const onDelete = vi.fn()
 	const colors = Array.from({ length: 10 }, (_, i) => `#${i.toString(16).padStart(6, '0')}`)
