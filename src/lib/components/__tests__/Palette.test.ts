@@ -1,11 +1,11 @@
 import { afterEach, expect, test, vi } from 'vitest'
 import { cleanup, render, screen, waitFor } from '@testing-library/svelte/svelte5'
 import userEvent from '@testing-library/user-event'
-import { standby } from '@untemps/utils/async/standby'
 import { createRawSnippet } from 'svelte'
 
 import Palette from '../Palette.svelte'
 import PaletteBind from './PaletteBind.test.svelte'
+import PaletteReactive from './PaletteReactive.test.svelte'
 
 import { TOOLTIP, DROP } from '../../enums/PaletteDeletionMode'
 
@@ -210,13 +210,61 @@ test('Expands palette when compact toggle button is clicked', async () => {
 		props: { colors, compactColorIndices, isCompact: true },
 	})
 
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	const content = document.querySelector('.palette__content')
+	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 2'))
+
 	const toggleButton = await screen.findByTestId('__palette-compact-toggle-button__')
 	expect(toggleButton).toBeInTheDocument()
 
 	await user.click(toggleButton)
 
-	const content = document.querySelector('.palette__content')
 	await waitFor(() => expect(content).not.toHaveClass('palette__content--compact'))
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(3))
+	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 5'))
+})
+
+test('Extracts the compact subset when the palette is collapsed at runtime', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const compactColorIndices = [0, 1]
+
+	const { user } = setup(Palette, {
+		props: { colors, compactColorIndices },
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	const content = document.querySelector('.palette__content')
+	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 5'))
+
+	const toggleButton = await screen.findByTestId('__palette-compact-toggle-button__')
+	await user.click(toggleButton)
+
+	await waitFor(() => expect(content).toHaveClass('palette__content--compact'))
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
+	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 2'))
+})
+
+test('Accounts for the transparent slot in the compact column count when collapsed at runtime', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const compactColorIndices = [0, 1]
+
+	const { user } = setup(Palette, {
+		props: { colors, compactColorIndices, showTransparentSlot: true },
+	})
+
+	await screen.findAllByTestId('__palette-cell__')
+
+	const toggleButton = await screen.findByTestId('__palette-compact-toggle-button__')
+	await user.click(toggleButton)
+
+	const content = document.querySelector('.palette__content')
+	await waitFor(() => expect(content).toHaveClass('palette__content--compact'))
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(3))
+	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 3'))
 })
 
 test('Closes settings panel when onClose is called', async () => {
@@ -344,27 +392,165 @@ test('Updates num-columns when numColumns changes to 0', async () => {
 	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 25'))
 })
 
+// The reactivity tests below drive the palette through PaletteReactive, a parent wrapper holding
+// each prop in its own $state. Testing Library's `rerender` funnels every prop through a single
+// signal, so re-passing `colors` re-triggers the resolver and would mask a prop left untracked.
 test('Removes duplicates when updating allowDuplicates value', async () => {
-	let slots = null
 	const colors = ['#ff0', '#0ff', '#f0f', '#f0f', '#f0f']
 
-	const { rerender } = setup(Palette, {
-		colors,
-		allowDuplicates: true,
+	const { component } = setup(PaletteReactive, {
+		props: { initialColors: colors, initialAllowDuplicates: true },
 	})
 
-	slots = await screen.findAllByTestId('__palette-slot__')
+	const slots = await screen.findAllByTestId('__palette-slot__')
 	expect(slots).toHaveLength(colors.length)
 
-	rerender({
-		colors,
-		allowDuplicates: false,
+	component.setAllowDuplicates(false)
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-slot__')).toHaveLength(3))
+})
+
+test('Applies maxColors when it changes from a reactive parent', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f', '#00f']
+
+	const { component } = setup(PaletteReactive, {
+		props: { initialColors: colors, initialMaxColors: 4 },
 	})
 
-	await standby(1000)
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(4)
 
-	slots = await screen.findAllByTestId('__palette-slot__')
-	expect(slots).toHaveLength(3)
+	component.setMaxColors(2)
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
+})
+
+test('Applies the compact subset when isCompact changes from a reactive parent', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+
+	const { component } = setup(PaletteReactive, {
+		props: { initialColors: colors, initialCompactColorIndices: [0, 1] },
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	component.setIsCompact(true)
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
+
+	component.setIsCompact(false)
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(3))
+})
+
+test('Re-extracts the compact subset when compactColorIndices change', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+
+	const { component } = setup(PaletteReactive, {
+		props: { initialColors: colors, initialIsCompact: true, initialCompactColorIndices: [0, 1] },
+	})
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(2)
+
+	component.setCompactColorIndices([2])
+
+	await waitFor(() => {
+		const remaining = screen.getAllByTestId('__palette-slot__')
+		expect(remaining).toHaveLength(1)
+		expect(remaining[0]).toHaveAttribute('aria-label', '#f0f')
+	})
+})
+
+test('Re-extracts the compact subset when compactColorIndices are mutated in place', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+
+	const { component } = setup(PaletteReactive, {
+		props: { initialColors: colors, initialIsCompact: true, initialCompactColorIndices: [0, 1] },
+	})
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(2)
+
+	component.appendCompactColorIndex(2)
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-slot__')).toHaveLength(3))
+})
+
+test('Recomputes the compact column count when showTransparentSlot changes', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+
+	const { component } = setup(PaletteReactive, {
+		props: { initialColors: colors, initialIsCompact: true, initialCompactColorIndices: [0, 1] },
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	const content = document.querySelector('.palette__content')
+	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 2'))
+
+	component.setShowTransparentSlot(true)
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(3))
+	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 3'))
+})
+
+test('Falls back to a local removal when the rendered subset drifts from the full list', async () => {
+	const onDelete = vi.fn()
+
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#00c'],
+			initialIsCompact: true,
+			initialCompactColorIndices: [0, 1],
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	// Freeze the resolver on a never-resolving source, then desync the indices: the rendered
+	// subset can no longer be re-extracted and stops matching _compactPicked's mapping.
+	component.setColors(new Promise(() => {}))
+	component.setCompactColorIndices([2])
+
+	await user.hover(cells[0])
+	const trash = await screen.findByTestId('__trash-icon__')
+	await user.click(trash)
+
+	expect(onDelete).not.toHaveBeenCalled()
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(1))
+})
+
+test('Applies an isCompact change made inside ondelete alongside the write-back', async () => {
+	const colors = ['#a00', '#0b0', '#00c', '#dd0']
+
+	let palette: { setIsCompact: (value: boolean) => void } | undefined
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: colors,
+			initialCompactColorIndices: [0, 1],
+			deletionMode: TOOLTIP,
+			ondelete: () => palette?.setIsCompact(true),
+		},
+	})
+	palette = component
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(4)
+
+	await user.hover(cells[3])
+	const trash = await screen.findByTestId('__trash-icon__')
+	await user.click(trash)
+
+	const content = document.querySelector('.palette__content')
+	await waitFor(() => expect(content).toHaveClass('palette__content--compact'))
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
+	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 2'))
 })
 
 test('Does not expose a main landmark on the root', async () => {
@@ -1448,7 +1634,7 @@ test('Deletes the mapped color when compactColorIndices are unsorted', async () 
 	expect(cells).toHaveLength(1)
 })
 
-test('Falls back to a local removal without ondelete when compact is toggled at runtime', async () => {
+test('Propagates a compact deletion to the full list when compact is toggled at runtime', async () => {
 	const onDelete = vi.fn()
 	const colors = ['#a00', '#0b0', '#00c', '#dd0', '#0ee']
 
@@ -1467,14 +1653,21 @@ test('Falls back to a local removal without ondelete when compact is toggled at 
 	const toggle = await screen.findByTestId('__palette-compact-toggle-button__')
 	await user.click(toggle)
 
-	cells = await screen.findAllByTestId('__palette-cell__')
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
+
+	cells = screen.getAllByTestId('__palette-cell__')
 	await user.hover(cells[0])
 	const trash = await screen.findByTestId('__trash-icon__')
 	await user.click(trash)
 
-	expect(onDelete).not.toHaveBeenCalled()
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#0b0',
+		index: 1,
+		colors: [{ value: '#a00' }, { value: '#00c' }, { value: '#dd0' }, { value: '#0ee' }],
+	})
+
 	cells = await screen.findAllByTestId('__palette-cell__')
-	expect(cells).toHaveLength(4)
+	expect(cells).toHaveLength(1)
 })
 
 test('Reflects an add and a delete back through bind:colors', async () => {

@@ -176,10 +176,41 @@
 	/**
 	 * One-shot guard set by the write-back helpers (`_syncColors`/`_syncColorGroups`) so the resolver
 	 * `$effect` skips the component's own mutation of the bound `colors` instead of re-normalizing it.
-	 * It is consumed (reset to `false`) on the next effect run. Being one-shot, reassigning `colors`
-	 * synchronously from within `onadd`/`ondelete` is dropped until the next external change.
+	 * It is consumed (reset to `false`) on the next effect run, which compares the current view params
+	 * against `_syncedViewParams` — the values captured when the guard was armed — and only skips while
+	 * they still match, so a view input mutated from within `onadd`/`ondelete` (e.g. flipping
+	 * `isCompact`) is recomputed instead of dropped. Being one-shot, reassigning `colors` itself
+	 * synchronously from within `onadd`/`ondelete` is still dropped until the next external change.
 	 */
 	let _skipColorsSync = $state(false)
+	let _syncedViewParams: ReturnType<typeof _viewParams> | null = null
+
+	/**
+	 * Reads every input that shapes the rendered view — synchronously, so a `$effect` calling it
+	 * tracks them all. `compactColorIndices` is copied by value: spreading reads its elements
+	 * synchronously, so in-place mutations of a bound `$state` array are tracked too, and the copy
+	 * freezes the indices against mutations that land before an async `colors` source resolves.
+	 */
+	const _viewParams = () => ({
+		isCompact: _isCompact,
+		compactColorIndices: [...(compactColorIndices ?? [])],
+		allowDuplicates,
+		maxColors,
+		showTransparentSlot,
+		numColumns,
+		maxColumns,
+	})
+
+	const _sameViewParams = (a: ReturnType<typeof _viewParams> | null, b: ReturnType<typeof _viewParams>): boolean =>
+		a != null &&
+		a.isCompact === b.isCompact &&
+		a.allowDuplicates === b.allowDuplicates &&
+		a.maxColors === b.maxColors &&
+		a.showTransparentSlot === b.showTransparentSlot &&
+		a.numColumns === b.numColumns &&
+		a.maxColumns === b.maxColumns &&
+		a.compactColorIndices.length === b.compactColorIndices.length &&
+		a.compactColorIndices.every((index, i) => index === b.compactColorIndices[i])
 
 	$effect(() => {
 		_isCompact = isCompact
@@ -193,42 +224,42 @@
 
 	$effect(() => {
 		const _source = colors
-		const _numCols = numColumns
-		const _maxCols = maxColumns
+		/**
+		 * Snapshot every remaining input synchronously: reads inside the `.then()` callback happen in a
+		 * microtask, outside Svelte's dependency-tracking window, so they would never re-trigger this
+		 * effect. Only this snapshot may be used below the promise.
+		 */
+		const _params = _viewParams()
 		if (untrack(() => _skipColorsSync)) {
 			_skipColorsSync = false
-			return
+			/**
+			 * Skip only while the view still matches what the write-back rendered: when `onadd`/`ondelete`
+			 * mutates a view input (e.g. flips `isCompact`) in the same flush as the write-back, fall
+			 * through and recompute from the just-written-back source instead of dropping the change.
+			 */
+			if (_sameViewParams(_syncedViewParams, _params)) {
+				return
+			}
 		}
 		Promise.resolve(_source).then((results) => {
 			if (!!results) {
 				_focusedIndex = null
 				if (isColorGroups(results)) {
 					const newColorGroups = calculateColorGroups(results, {
-						allowDuplicates,
-						maxColors,
+						allowDuplicates: _params.allowDuplicates,
+						maxColors: _params.maxColors,
 					})
 					_colorGroups = newColorGroups
 					_colors = null
 					_fullColors = null
 					const maxGroupLength = newColorGroups.reduce((max, g) => Math.max(max, g.colors.length), 0)
-					_numColumns = calculateNumColumns(maxGroupLength, { numColumns: _numCols })
+					_numColumns = calculateNumColumns(maxGroupLength, { numColumns: _params.numColumns })
 				} else {
-					const newColors = calculateColors(results, {
-						isCompact: _isCompact,
-						compactColorIndices,
-						allowDuplicates,
-						maxColors,
-					})
+					const newColors = calculateColors(results, _params)
 					_colors = newColors
 					_colorGroups = null
 					_fullColors = transformColors(Array.isArray(results) ? results : [])
-					_numColumns = calculateNumColumns(newColors.length, {
-						isCompact: _isCompact,
-						compactColorIndices,
-						showTransparentSlot,
-						numColumns: _numCols,
-						maxColumns: _maxCols,
-					})
+					_numColumns = calculateNumColumns(newColors.length, _params)
 				}
 			}
 		})
@@ -303,11 +334,13 @@
 	const _syncColors = (nextColors: NormalizedColor[]) => {
 		_fullColors = nextColors
 		_skipColorsSync = true
+		_syncedViewParams = _viewParams()
 		colors = nextColors
 	}
 
 	const _syncColorGroups = (nextColorGroups: NormalizedColorGroup[]) => {
 		_skipColorsSync = true
+		_syncedViewParams = _viewParams()
 		colors = nextColorGroups
 	}
 
@@ -373,8 +406,9 @@
 	 * A compact deletion mutates the underlying full list, not the extracted subset `_colors`: it removes the
 	 * mapped color, re-indexes `compactColorIndices` onto the shrunk list, recomputes the view and writes the
 	 * full list back through `bind:colors`. The `ondelete` `index` is the removed color's position in that
-	 * full list. Guarded against a view index that maps to nothing (e.g. a runtime compact toggle whose
-	 * `_colors` was never re-extracted).
+	 * full list. The mismatch guard is defense in depth: the resolver re-extracts `_colors` whenever
+	 * `_isCompact` or `compactColorIndices` change, so a view index only maps to nothing if the rendered
+	 * subset drifted from `_fullColors` (e.g. through a stale async resolution).
 	 */
 	const _removeCompactColor = (index: number) => {
 		const target = _compactPicked()[index]
@@ -431,6 +465,15 @@
 
 	const _onDelete = (index: number) => _removeColor(index)
 
+	/**
+	 * Flipping `_isCompact` is all a toggle needs: the resolver `$effect` tracks it and recomputes
+	 * `_colors` and `_numColumns` together from the current `colors` source, so the column count is
+	 * derived (transparent slot included) rather than remembered across toggles.
+	 */
+	const _toggleCompact = () => {
+		_isCompact = !_isCompact
+	}
+
 	const _onToolSelect = (args: ToolSelectEventArgs | PaletteToolName) => {
 		const tool = typeof args === 'string' ? args : args.tool
 		switch (tool) {
@@ -438,16 +481,12 @@
 				_isSettingsOn = true
 				break
 			case COMPACT:
-				_isCompact = !_isCompact
-				_numColumns = _isCompact ? compactColorIndices.length : _numColumns
+				_toggleCompact()
 				break
 		}
 	}
 
-	const _onExpand = () => {
-		_isCompact = !_isCompact
-		_numColumns = _isCompact ? compactColorIndices.length : _numColumns
-	}
+	const _onExpand = () => _toggleCompact()
 
 	const _onSettingsClose = () => {
 		_isSettingsOn = false
