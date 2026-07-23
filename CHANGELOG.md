@@ -1,3 +1,10 @@
+# [6.0.0-beta.4](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.3...v6.0.0-beta.4) (2026-07-23)
+
+
+### Bug Fixes
+
+* Make the compact toggle and resolver inputs fully reactive ([#225](https://github.com/untemps/svelte-palette/issues/225)) ([ae05b27](https://github.com/untemps/svelte-palette/commit/ae05b27c8ee059aa817346e9c056ede26750c01b))
+
 # [6.0.0-beta.3](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.2...v6.0.0-beta.3) (2026-07-22)
 
 
