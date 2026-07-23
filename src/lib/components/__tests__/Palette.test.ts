@@ -553,6 +553,28 @@ test('Applies an isCompact change made inside ondelete alongside the write-back'
 	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 2'))
 })
 
+test('Toggles the input when colors switch between grouped and flat', async () => {
+	const groups = [
+		{ name: 'Reds', colors: ['#f00'] },
+		{ name: 'Blues', colors: ['#00f'] },
+	]
+
+	const { component } = setup(PaletteReactive, {
+		props: { initialColors: groups, initialShowInput: true },
+	})
+
+	await screen.findAllByTestId('__palette-group__')
+	expect(screen.queryByTestId('__palette-input-input__')).not.toBeInTheDocument()
+
+	component.setColors(['#ff0', '#0ff'])
+
+	await waitFor(() => expect(screen.getByTestId('__palette-input-input__')).toBeInTheDocument())
+
+	component.setColors(groups)
+
+	await waitFor(() => expect(screen.queryByTestId('__palette-input-input__')).not.toBeInTheDocument())
+})
+
 test('Does not expose a main landmark on the root', async () => {
 	const colors = ['#ff0', '#0ff', '#f0f']
 	setup(Palette, { colors })
@@ -1549,26 +1571,19 @@ test('Does not fire onadd when the color is a rejected duplicate', async () => {
 	expect(onAdd).not.toHaveBeenCalled()
 })
 
-test('Does not add or fire onadd through the input in grouped mode', async () => {
-	const onAdd = vi.fn()
+test('Does not render the input in grouped mode', async () => {
 	const colors = [
 		{ name: 'Reds', colors: ['#f00'] },
 		{ name: 'Blues', colors: ['#00f'] },
 	]
 
-	const { user } = setup(Palette, {
-		props: { colors, showInput: true, onadd: onAdd },
+	setup(Palette, {
+		props: { colors, showInput: true },
 	})
 
-	const input = await screen.findByTestId('__palette-input-input__')
-	await user.type(input, '0f0')
-
-	const submit = await screen.findByTestId('__palette-input-submit__')
-	await user.click(submit)
-
-	expect(onAdd).not.toHaveBeenCalled()
 	const groups = await screen.findAllByTestId('__palette-group__')
 	expect(groups).toHaveLength(2)
+	expect(screen.queryByTestId('__palette-input-input__')).not.toBeInTheDocument()
 })
 
 test('Fires ondelete and propagates a compact-mode deletion to the full list', async () => {

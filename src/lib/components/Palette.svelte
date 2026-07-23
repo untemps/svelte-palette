@@ -814,7 +814,7 @@
 			<PaletteCompactToggleButton isCompact={true} onclick={_onExpand} />
 		{/if}
 	</section>
-	{#if !_isCompact && showInput}
+	{#if !_isCompact && showInput && _colorGroups == null}
 		{#if input}
 			{@render input({ selectedColor, inputType })}
 		{:else}

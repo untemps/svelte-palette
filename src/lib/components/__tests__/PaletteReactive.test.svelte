@@ -15,6 +15,7 @@
 		initialMaxColors = 30,
 		initialShowTransparentSlot = false,
 		initialNumColumns = 5,
+		initialShowInput = false,
 		deletionMode = NONE,
 		ondelete = undefined,
 	}: {
@@ -25,6 +26,7 @@
 		initialMaxColors?: number
 		initialShowTransparentSlot?: boolean
 		initialNumColumns?: number
+		initialShowInput?: boolean
 		deletionMode?: DeletionMode
 		ondelete?: (args: DeleteEventArgs) => void
 	} = $props()
@@ -36,6 +38,7 @@
 	let maxColors = $state<number>(untrack(() => initialMaxColors))
 	let showTransparentSlot = $state<boolean>(untrack(() => initialShowTransparentSlot))
 	let numColumns = $state<number>(untrack(() => initialNumColumns))
+	let showInput = $state<boolean>(untrack(() => initialShowInput))
 
 	export const setColors = (value: ColorsProp | null) => (colors = value)
 	export const setIsCompact = (value: boolean) => (isCompact = value)
@@ -56,6 +59,7 @@
 	{maxColors}
 	{showTransparentSlot}
 	{numColumns}
+	{showInput}
 	{deletionMode}
 	{ondelete}
 />
