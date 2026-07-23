@@ -1619,6 +1619,47 @@ test('Does not render a custom input snippet in grouped mode', async () => {
 	expect(screen.queryByTestId('__custom-input__')).not.toBeInTheDocument()
 })
 
+test('Renders the input only once a pending colors source resolves', async () => {
+	let resolveColors: (value: string[]) => void = () => {}
+	const colors = new Promise<string[]>((resolve) => (resolveColors = resolve))
+
+	setup(Palette, {
+		props: { colors, showInput: true },
+	})
+
+	await screen.findByTestId('__palette__')
+	expect(screen.queryByTestId('__palette-input-input__')).not.toBeInTheDocument()
+
+	resolveColors(['#ff0', '#0ff'])
+
+	await waitFor(() => expect(screen.getByTestId('__palette-input-input__')).toBeInTheDocument())
+})
+
+test('Renders the compact tool only once a pending colors source resolves', async () => {
+	let resolveColors: (value: string[]) => void = () => {}
+	const colors = new Promise<string[]>((resolve) => (resolveColors = resolve))
+
+	setup(Palette, {
+		props: { colors, compactColorIndices: [0, 1] },
+	})
+
+	await screen.findByTestId('__palette__')
+	expect(screen.queryByTestId('__palette-compact-toggle-button__')).not.toBeInTheDocument()
+
+	resolveColors(['#ff0', '#0ff', '#f0f'])
+
+	await waitFor(() => expect(screen.getByTestId('__palette-compact-toggle-button__')).toBeInTheDocument())
+})
+
+test('Does not render the input when colors is null', async () => {
+	setup(Palette, {
+		props: { colors: null, showInput: true },
+	})
+
+	await screen.findByTestId('__palette__')
+	expect(screen.queryByTestId('__palette-input-input__')).not.toBeInTheDocument()
+})
+
 test('Fires ondelete and propagates a compact-mode deletion to the full list', async () => {
 	const onDelete = vi.fn()
 	const colors = Array.from({ length: 10 }, (_, i) => `#${i.toString(16).padStart(6, '0')}`)
