@@ -208,7 +208,7 @@ When groups are used, compact mode and the color input are not available. The `c
 
 A promise to be resolved with an array of color strings, objects, or groups can be passed as well (see [Use an API to fill the palette](#use-an-api-to-fill-the-palette))
 
-While the promise is pending, the palette displays the loader and the color-bound footer affordances (the color input and the compact toggle) are not rendered — they appear once the promise has resolved.
+While the promise is pending, the palette displays the loader and the color-bound footer affordances (the color input and the compact toggle) are not rendered — they appear once the promise has resolved. If the palette already displays a resolved list and `colors` is then replaced by a new pending source, the previous list and its affordances stay displayed and interactive until the new source resolves.
 
 # Deletion Modes
 

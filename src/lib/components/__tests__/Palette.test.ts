@@ -1660,6 +1660,85 @@ test('Does not render the input when colors is null', async () => {
 	expect(screen.queryByTestId('__palette-input-input__')).not.toBeInTheDocument()
 })
 
+test('Renders the expand button only once a pending colors source resolves in compact mode', async () => {
+	let resolveColors: (value: string[]) => void = () => {}
+	const colors = new Promise<string[]>((resolve) => (resolveColors = resolve))
+
+	setup(Palette, {
+		props: { colors, isCompact: true, compactColorIndices: [0, 1] },
+	})
+
+	await screen.findByTestId('__palette__')
+	expect(screen.queryByTestId('__palette-compact-toggle-button__')).not.toBeInTheDocument()
+
+	resolveColors(['#ff0', '#0ff', '#f0f'])
+
+	await waitFor(() => expect(screen.getByTestId('__palette-compact-toggle-button__')).toBeInTheDocument())
+})
+
+test('Does not render the expand button in grouped mode when isCompact is set', async () => {
+	const colors = [
+		{ name: 'Reds', colors: ['#f00'] },
+		{ name: 'Blues', colors: ['#00f'] },
+	]
+
+	setup(Palette, {
+		props: { colors, isCompact: true },
+	})
+
+	const groups = await screen.findAllByTestId('__palette-group__')
+	expect(groups).toHaveLength(2)
+	expect(screen.queryByTestId('__palette-compact-toggle-button__')).not.toBeInTheDocument()
+})
+
+test('Ignores a compact tool selection from a custom tools snippet while colors are unresolved', async () => {
+	let resolveColors: (value: string[]) => void = () => {}
+	const colors = new Promise<string[]>((resolve) => (resolveColors = resolve))
+
+	const toolsSnippet = createRawSnippet((getProps) => ({
+		render: () => `<button data-testid="__custom-compact-tool__">Compact</button>`,
+		setup: (element) => {
+			element.addEventListener('click', () => getProps().onSelect('compact'))
+		},
+	}))
+	const settingsSnippet = createRawSnippet(() => ({
+		render: () => `<div data-testid="__custom-settings__"></div>`,
+	}))
+
+	const { user } = setup(Palette, {
+		props: { colors, tools: toolsSnippet, settings: settingsSnippet },
+	})
+
+	const content = document.querySelector('.palette__content')
+	const tool = await screen.findByTestId('__custom-compact-tool__')
+
+	await user.click(tool)
+	expect(content).not.toHaveClass('palette__content--compact')
+
+	resolveColors(['#ff0', '#0ff'])
+	await waitFor(() => expect(screen.getAllByTestId('__palette-slot__')).toHaveLength(2))
+
+	await user.click(tool)
+	await waitFor(() => expect(content).toHaveClass('palette__content--compact'))
+})
+
+test('Keeps the previous list and its affordances while a replacement source is pending', async () => {
+	const { component } = setup(PaletteReactive, {
+		props: { initialColors: ['#ff0', '#0ff'], initialShowInput: true },
+	})
+
+	await screen.findAllByTestId('__palette-slot__')
+	await screen.findByTestId('__palette-input-input__')
+
+	component.setColors(new Promise<string[]>(() => {}))
+	await new Promise((resolve) => setTimeout(resolve, 0))
+
+	// The resolver deliberately keeps the previous resolved view while a replacement source
+	// loads (stale-while-revalidate): the slots and the input stay rendered and interactive.
+	expect(screen.getAllByTestId('__palette-slot__')).toHaveLength(2)
+	expect(screen.getByTestId('__palette-input-input__')).toBeInTheDocument()
+})
+
 test('Fires ondelete and propagates a compact-mode deletion to the full list', async () => {
 	const onDelete = vi.fn()
 	const colors = Array.from({ length: 10 }, (_, i) => `#${i.toString(16).padStart(6, '0')}`)
