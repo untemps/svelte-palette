@@ -478,6 +478,54 @@ test('Re-extracts the compact subset when compactColorIndices are mutated in pla
 	await waitFor(() => expect(screen.getAllByTestId('__palette-slot__')).toHaveLength(3))
 })
 
+test('Recomputes the compact column count when showTransparentSlot changes', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+
+	const { component } = setup(PaletteReactive, {
+		props: { initialColors: colors, initialIsCompact: true, initialCompactColorIndices: [0, 1] },
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	const content = document.querySelector('.palette__content')
+	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 2'))
+
+	component.setShowTransparentSlot(true)
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(3))
+	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 3'))
+})
+
+test('Falls back to a local removal when the rendered subset drifts from the full list', async () => {
+	const onDelete = vi.fn()
+
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#00c'],
+			initialIsCompact: true,
+			initialCompactColorIndices: [0, 1],
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	// Freeze the resolver on a never-resolving source, then desync the indices: the rendered
+	// subset can no longer be re-extracted and stops matching _compactPicked's mapping.
+	component.setColors(new Promise(() => {}))
+	component.setCompactColorIndices([2])
+
+	await user.hover(cells[0])
+	const trash = await screen.findByTestId('__trash-icon__')
+	await user.click(trash)
+
+	expect(onDelete).not.toHaveBeenCalled()
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(1))
+})
+
 test('Applies an isCompact change made inside ondelete alongside the write-back', async () => {
 	const colors = ['#a00', '#0b0', '#00c', '#dd0']
 

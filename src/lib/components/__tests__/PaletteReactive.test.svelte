@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { untrack } from 'svelte'
+
 	import Palette from '../Palette.svelte'
 
 	import { NONE } from '../../enums/PaletteDeletionMode'
@@ -27,14 +29,15 @@
 		ondelete?: (args: DeleteEventArgs) => void
 	} = $props()
 
-	let colors = $state<ColorsProp | null>(initialColors)
-	let isCompact = $state<boolean>(initialIsCompact)
-	let compactColorIndices = $state<number[]>(initialCompactColorIndices)
-	let allowDuplicates = $state<boolean>(initialAllowDuplicates)
-	let maxColors = $state<number>(initialMaxColors)
-	let showTransparentSlot = $state<boolean>(initialShowTransparentSlot)
-	let numColumns = $state<number>(initialNumColumns)
+	let colors = $state<ColorsProp | null>(untrack(() => initialColors))
+	let isCompact = $state<boolean>(untrack(() => initialIsCompact))
+	let compactColorIndices = $state<number[]>(untrack(() => initialCompactColorIndices))
+	let allowDuplicates = $state<boolean>(untrack(() => initialAllowDuplicates))
+	let maxColors = $state<number>(untrack(() => initialMaxColors))
+	let showTransparentSlot = $state<boolean>(untrack(() => initialShowTransparentSlot))
+	let numColumns = $state<number>(untrack(() => initialNumColumns))
 
+	export const setColors = (value: ColorsProp | null) => (colors = value)
 	export const setIsCompact = (value: boolean) => (isCompact = value)
 	export const setCompactColorIndices = (value: number[]) => (compactColorIndices = value)
 	export const appendCompactColorIndex = (value: number) => {
