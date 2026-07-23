@@ -31,6 +31,9 @@
 
 	export const setIsCompact = (value: boolean) => (isCompact = value)
 	export const setCompactColorIndices = (value: number[]) => (compactColorIndices = value)
+	export const appendCompactColorIndex = (value: number) => {
+		compactColorIndices.push(value)
+	}
 	export const setAllowDuplicates = (value: boolean) => (allowDuplicates = value)
 	export const setMaxColors = (value: number) => (maxColors = value)
 	export const setShowTransparentSlot = (value: boolean) => (showTransparentSlot = value)

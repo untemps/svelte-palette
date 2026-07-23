@@ -198,11 +198,14 @@
 		/**
 		 * Snapshot every remaining input synchronously: reads inside the `.then()` callback happen in a
 		 * microtask, outside Svelte's dependency-tracking window, so they would never re-trigger this
-		 * effect. Only these snapshots may be used below the promise.
+		 * effect. Only these snapshots may be used below the promise. `compactColorIndices` is copied by
+		 * value: spreading reads its elements synchronously, so in-place mutations of a bound `$state`
+		 * array are tracked too, and the copy freezes the indices against mutations that land before an
+		 * async `colors` source resolves.
 		 */
 		const _colorParams = {
 			isCompact: _isCompact,
-			compactColorIndices,
+			compactColorIndices: [...(compactColorIndices ?? [])],
 			allowDuplicates,
 			maxColors,
 		}

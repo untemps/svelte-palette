@@ -463,6 +463,21 @@ test('Re-extracts the compact subset when compactColorIndices change', async () 
 	})
 })
 
+test('Re-extracts the compact subset when compactColorIndices are mutated in place', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+
+	const { component } = setup(PaletteReactive, {
+		props: { initialColors: colors, initialIsCompact: true, initialCompactColorIndices: [0, 1] },
+	})
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(2)
+
+	component.appendCompactColorIndex(2)
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-slot__')).toHaveLength(3))
+})
+
 test('Does not expose a main landmark on the root', async () => {
 	const colors = ['#ff0', '#0ff', '#f0f']
 	setup(Palette, { colors })
