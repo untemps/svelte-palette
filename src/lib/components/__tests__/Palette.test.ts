@@ -478,6 +478,33 @@ test('Re-extracts the compact subset when compactColorIndices are mutated in pla
 	await waitFor(() => expect(screen.getAllByTestId('__palette-slot__')).toHaveLength(3))
 })
 
+test('Applies an isCompact change made inside ondelete alongside the write-back', async () => {
+	const colors = ['#a00', '#0b0', '#00c', '#dd0']
+
+	let palette: { setIsCompact: (value: boolean) => void } | undefined
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: colors,
+			initialCompactColorIndices: [0, 1],
+			deletionMode: TOOLTIP,
+			ondelete: () => palette?.setIsCompact(true),
+		},
+	})
+	palette = component
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(4)
+
+	await user.hover(cells[3])
+	const trash = await screen.findByTestId('__trash-icon__')
+	await user.click(trash)
+
+	const content = document.querySelector('.palette__content')
+	await waitFor(() => expect(content).toHaveClass('palette__content--compact'))
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
+	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 2'))
+})
+
 test('Does not expose a main landmark on the root', async () => {
 	const colors = ['#ff0', '#0ff', '#f0f']
 	setup(Palette, { colors })

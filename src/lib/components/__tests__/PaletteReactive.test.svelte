@@ -1,7 +1,9 @@
 <script lang="ts">
 	import Palette from '../Palette.svelte'
 
-	import type { ColorsProp } from '../../types'
+	import { NONE } from '../../enums/PaletteDeletionMode'
+
+	import type { ColorsProp, DeleteEventArgs, DeletionMode } from '../../types'
 
 	let {
 		initialColors,
@@ -11,6 +13,8 @@
 		initialMaxColors = 30,
 		initialShowTransparentSlot = false,
 		initialNumColumns = 5,
+		deletionMode = NONE,
+		ondelete = undefined,
 	}: {
 		initialColors: ColorsProp
 		initialIsCompact?: boolean
@@ -19,6 +23,8 @@
 		initialMaxColors?: number
 		initialShowTransparentSlot?: boolean
 		initialNumColumns?: number
+		deletionMode?: DeletionMode
+		ondelete?: (args: DeleteEventArgs) => void
 	} = $props()
 
 	let colors = $state<ColorsProp | null>(initialColors)
@@ -47,4 +53,6 @@
 	{maxColors}
 	{showTransparentSlot}
 	{numColumns}
+	{deletionMode}
+	{ondelete}
 />
