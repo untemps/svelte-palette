@@ -89,13 +89,10 @@ test('Throws error', async () => {
 	await waitFor(() => expect(onError).toHaveBeenCalled())
 })
 
-// EyeDropper API is not available
-test('Renders nothing', async () => {
+// The component only touches the EyeDropper API on click: availability gating
+// lives in PaletteInput, so the button itself renders even without the API.
+test('Renders even when the EyeDropper API is not available', () => {
 	vi.stubGlobal('EyeDropper', undefined)
 	setup(PaletteEyeDropperButton)
-	try {
-		await screen.findByTestId('__palette-eyedropper-button__')
-	} catch (e) {
-		expect(e).not.toBeUndefined()
-	}
+	expect(screen.getByTestId('__palette-eyedropper-button__')).toBeInTheDocument()
 })
