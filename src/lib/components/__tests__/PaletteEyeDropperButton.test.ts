@@ -11,11 +11,30 @@ const setup = (component: Parameters<typeof render>[0], options?: Parameters<typ
 	}
 }
 
-afterEach(() => cleanup())
+// Each test installs its own EyeDropper stub; vi.unstubAllGlobals() restores the
+// jsdom baseline (no EyeDropper at all) so no test depends on the order of the others.
+const stubEyeDropper = (sRGBHex: string) =>
+	vi.stubGlobal(
+		'EyeDropper',
+		class {
+			open = () => Promise.resolve({ sRGBHex })
+		}
+	)
 
-window.EyeDropper = function () {
-	this.open = () => Promise.resolve({ sRGBHex: '#ff0' })
-}
+const stubEyeDropperThrowing = () =>
+	vi.stubGlobal(
+		'EyeDropper',
+		class {
+			open = () => {
+				throw new Error('Error')
+			}
+		}
+	)
+
+afterEach(() => {
+	cleanup()
+	vi.unstubAllGlobals()
+})
 
 test('Renders eye dropper button', async () => {
 	setup(PaletteEyeDropperButton)
@@ -31,6 +50,7 @@ test('Sets eye dropper button aria-label', () => {
 })
 
 test('Retrieves color from EyeDropper selection', async () => {
+	stubEyeDropper('#ff0')
 	const onAdd = vi.fn()
 	const { user } = setup(PaletteEyeDropperButton, { props: { onadd: onAdd } })
 	const button = screen.getByTestId('__palette-eyedropper-button__')
@@ -39,9 +59,7 @@ test('Retrieves color from EyeDropper selection', async () => {
 })
 
 test('Normalizes rgb color from EyeDropper selection to hex', async () => {
-	window.EyeDropper = function () {
-		this.open = () => Promise.resolve({ sRGBHex: 'rgb(255, 0, 0)' })
-	}
+	stubEyeDropper('rgb(255, 0, 0)')
 	const onAdd = vi.fn()
 	const { user } = setup(PaletteEyeDropperButton, { props: { onadd: onAdd } })
 	const button = screen.getByTestId('__palette-eyedropper-button__')
@@ -50,9 +68,7 @@ test('Normalizes rgb color from EyeDropper selection to hex', async () => {
 })
 
 test('Normalizes rgba color from EyeDropper selection to hex', async () => {
-	window.EyeDropper = function () {
-		this.open = () => Promise.resolve({ sRGBHex: 'rgba(0, 128, 0, 1)' })
-	}
+	stubEyeDropper('rgba(0, 128, 0, 1)')
 	const onAdd = vi.fn()
 	const { user } = setup(PaletteEyeDropperButton, { props: { onadd: onAdd } })
 	const button = screen.getByTestId('__palette-eyedropper-button__')
@@ -62,12 +78,7 @@ test('Normalizes rgba color from EyeDropper selection to hex', async () => {
 
 // EyeDropper API is invalid
 test('Throws error', async () => {
-	window.EyeDropper = function () {
-		this.open = () => {
-			throw new Error('Error')
-		}
-	}
-
+	stubEyeDropperThrowing()
 	const onError = vi.fn(() => 0)
 	const ariaLabel = 'Foo'
 	const { user } = setup(PaletteEyeDropperButton, {
@@ -80,7 +91,7 @@ test('Throws error', async () => {
 
 // EyeDropper API is not available
 test('Renders nothing', async () => {
-	window.EyeDropper = null
+	vi.stubGlobal('EyeDropper', undefined)
 	setup(PaletteEyeDropperButton)
 	try {
 		await screen.findByTestId('__palette-eyedropper-button__')
