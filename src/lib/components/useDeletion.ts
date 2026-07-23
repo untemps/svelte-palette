@@ -11,6 +11,12 @@ export interface UseDeletionOptions {
 	onDelete?: () => void
 	tooltipContentSelector?: string | null
 	tooltipClassName?: string | null
+	/**
+	 * Selector of the element treated as the "inside" area in `drop` mode. Resolved through a
+	 * document-wide `document.querySelector`, so callers rendering several palettes must pass a
+	 * selector unique to the owning instance. Defaults to `.palette` for direct action users.
+	 */
+	areaSelector?: string | null
 }
 
 export interface UseDeletionParameter extends UseDeletionOptions {
@@ -47,7 +53,7 @@ const createAction = (node: HTMLElement, deletionMode: DeletionMode | undefined,
 				dragImage.removeAttribute('data-testid')
 			}
 			return useDropOutside(node, {
-				areaSelector: '.palette',
+				areaSelector: options.areaSelector || '.palette',
 				animate: true,
 				dragImage,
 				dragHandleCentered: true,
