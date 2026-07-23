@@ -1,3 +1,11 @@
+<script module lang="ts">
+	// Monotonic per-instance counter used to build a unique id for each palette root. The drop
+	// deletion area is resolved through a document-wide `document.querySelector`, so every mounted
+	// palette needs its own selector — otherwise all instances would test "inside vs. outside"
+	// against the first `.palette` element on the page.
+	let _instanceCount = 0
+</script>
+
 <script lang="ts">
 	import { tick, untrack } from 'svelte'
 
@@ -157,6 +165,10 @@
 		tools = undefined,
 		settings = undefined,
 	}: Props = $props()
+
+	// Unique id for this palette root, threaded down to `useDeletion` as the drop area selector so
+	// each instance scopes deletion to its own root (see `_instanceCount` above).
+	const _paletteId = `palette-${_instanceCount++}`
 
 	let _colors = $state<NormalizedColor[] | null>(null)
 	/**
@@ -645,7 +657,7 @@
 	}
 </script>
 
-<div class="palette {className}" data-testid="__palette__" data-palette style:--focusColor={focusColor}>
+<div id={_paletteId} class="palette {className}" data-testid="__palette__" data-palette style:--focusColor={focusColor}>
 	<section class="palette__content" class:palette__content--compact={_isCompact} style="--num-columns: {_numColumns}">
 		{#if !_isCompact}
 			{@render header?.({ selectedColor })}
@@ -685,6 +697,7 @@
 									role="presentation"
 									use:useDeletion={{
 										deletionMode,
+										areaSelector: `#${_paletteId}`,
 										onDelete: () => _removeGroupColor(groupIndex, colorIndex),
 										tooltipContentSelector,
 										tooltipClassName,
@@ -765,6 +778,7 @@
 							role="presentation"
 							use:useDeletion={{
 								deletionMode,
+								areaSelector: `#${_paletteId}`,
 								onDelete: () => _onDelete(index),
 								tooltipContentSelector,
 								tooltipClassName,
