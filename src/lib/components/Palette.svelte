@@ -129,6 +129,7 @@
 	let _focusedIndex = $state<number | null>(null)
 	let _skipColorsSync = $state(false)
 	let _syncedViewParams: ReturnType<typeof _viewParams> | null = null
+	let _colorsGeneration = 0
 
 	const _viewParams = () => ({
 		isCompact: _isCompact,
@@ -164,6 +165,7 @@
 	$effect(() => {
 		const _source = colors
 		const _params = _viewParams()
+		const generation = ++_colorsGeneration
 		if (untrack(() => _skipColorsSync)) {
 			_skipColorsSync = false
 			if (_sameViewParams(_syncedViewParams, _params)) {
@@ -171,6 +173,9 @@
 			}
 		}
 		Promise.resolve(_source).then((results) => {
+			if (generation !== _colorsGeneration) {
+				return
+			}
 			if (!!results) {
 				_focusedIndex = null
 				if (isColorGroups(results)) {
