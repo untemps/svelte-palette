@@ -68,10 +68,7 @@
 		showTransparentSlot?: boolean
 		/** Maximum number of slots. Set to `-1` for no limit. */
 		maxColors?: number
-		/**
-		 * Whether to display the color input within the footer. The input is not rendered in compact
-		 * mode, in grouped mode, or while an async `colors` source is still unresolved.
-		 */
+		/** Whether to display the color input within the footer. */
 		showInput?: boolean
 		/** Type of the color input. */
 		inputType?: InputType
@@ -269,8 +266,6 @@
 	})
 
 	let _tools: PaletteToolName[] = $derived([
-		// `_colors != null` (resolved flat mode) keeps the compact toggle out of grouped mode and
-		// out of the initial-load window of an async source, where there is nothing to compact yet.
 		...(_colors != null && compactColorIndices?.length ? [COMPACT] : []),
 		...(settings ? [SETTINGS] : []),
 	] as PaletteToolName[])
@@ -350,9 +345,6 @@
 	}
 
 	const _addColor = (color: ColorValue) => {
-		// `_colors == null` covers grouped mode, a null source and the initial-load window of an
-		// async source alike: in all three there is no flat list to append to, and writing one back
-		// would clobber the source.
 		if (_colors == null || _isCompact) {
 			return
 		}
@@ -477,11 +469,6 @@
 	 * Flipping `_isCompact` is all a toggle needs: the resolver `$effect` tracks it and recomputes
 	 * `_colors` and `_numColumns` together from the current `colors` source, so the column count is
 	 * derived (transparent slot included) rather than remembered across toggles.
-	 *
-	 * The `_colors == null` guard mirrors `_addColor`: the built-in COMPACT tool is already hidden
-	 * in grouped mode and before a source has resolved, but a custom `tools` snippet receives
-	 * `onSelect` unconditionally and could otherwise flip the palette into compact chrome around
-	 * the loader or the groups.
 	 */
 	const _toggleCompact = () => {
 		if (_colors == null) {
@@ -826,18 +813,10 @@
 		{#if !_isCompact}
 			{@render footer?.({ selectedColor })}
 		{/if}
-		<!-- `_colors != null` keeps the expand button from rendering next to the loader when
-		     `isCompact` is set while an async source is still loading, or next to groups, where
-		     compact mode is not available. -->
 		{#if _isCompact && _colors != null}
 			<PaletteCompactToggleButton isCompact={true} onclick={_onExpand} />
 		{/if}
 	</section>
-	<!-- `_colors != null` means a source has resolved to a flat list: it keeps the input out of
-	     grouped mode, away from a null source and out of the initial-load window of an async
-	     source, where an add would have no defined target to write back to. When a resolved list
-	     is later replaced by a new pending source, the previous view — input included — stays
-	     rendered and interactive until the new source resolves, like the rest of the palette. -->
 	{#if !_isCompact && showInput && _colors != null}
 		{#if input}
 			{@render input({ selectedColor, inputType })}

@@ -1733,8 +1733,6 @@ test('Keeps the previous list and its affordances while a replacement source is 
 	component.setColors(new Promise<string[]>(() => {}))
 	await new Promise((resolve) => setTimeout(resolve, 0))
 
-	// The resolver deliberately keeps the previous resolved view while a replacement source
-	// loads (stale-while-revalidate): the slots and the input stay rendered and interactive.
 	expect(screen.getAllByTestId('__palette-slot__')).toHaveLength(2)
 	expect(screen.getByTestId('__palette-input-input__')).toBeInTheDocument()
 })
