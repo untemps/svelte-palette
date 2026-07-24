@@ -392,9 +392,6 @@ test('Updates num-columns when numColumns changes to 0', async () => {
 	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 25'))
 })
 
-// The reactivity tests below drive the palette through PaletteReactive, a parent wrapper holding
-// each prop in its own $state. Testing Library's `rerender` funnels every prop through a single
-// signal, so re-passing `colors` re-triggers the resolver and would mask a prop left untracked.
 test('Removes duplicates when updating allowDuplicates value', async () => {
 	const colors = ['#ff0', '#0ff', '#f0f', '#f0f', '#f0f']
 
@@ -513,8 +510,6 @@ test('Falls back to a local removal when the rendered subset drifts from the ful
 	const cells = await screen.findAllByTestId('__palette-cell__')
 	expect(cells).toHaveLength(2)
 
-	// Freeze the resolver on a never-resolving source, then desync the indices: the rendered
-	// subset can no longer be re-extracted and stops matching _compactPicked's mapping.
 	component.setColors(new Promise(() => {}))
 	component.setCompactColorIndices([2])
 

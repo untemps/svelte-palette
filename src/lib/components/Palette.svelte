@@ -48,78 +48,37 @@
 	} from '../types'
 
 	interface Props {
-		/** Colors to display, or a promise resolving to them. Accepts color strings, color objects or color groups. */
 		colors?: ColorsProp | null
-		/** Selected color. Supports `bind:selectedColor`. */
 		selectedColor?: ColorValue | null
-		/** Whether the palette is displayed in compact mode. */
 		isCompact?: boolean
-		/** Indices picked from `colors` when in compact mode. Supports `bind:compactColorIndices`; re-indexed when a compact slot is deleted. */
 		compactColorIndices?: number[]
-		/** Whether duplicate colors are allowed. */
 		allowDuplicates?: boolean
-		/** Slot deletion mode. */
 		deletionMode?: DeletionMode
-		/** Class name applied to the deletion tooltip. */
 		tooltipClassName?: string | null
-		/** Selector of the deletion tooltip content. */
 		tooltipContentSelector?: string | null
-		/** Whether to display a transparent slot at the start of the list. */
 		showTransparentSlot?: boolean
-		/** Maximum number of slots. Set to `-1` for no limit. */
 		maxColors?: number
-		/** Whether to display the color input within the footer. */
 		showInput?: boolean
-		/** Type of the color input. */
 		inputType?: InputType
-		/** Number of grid columns. Set to `0` to display slots on a single row. */
 		numColumns?: number
-		/** Maximum number of columns when `numColumns` is `0`. Set to `0` for no limit. */
 		maxColumns?: number
-		/** Animation applied when a slot is rendered. */
 		transition?: Transition | null
-		/** Called whenever a color is selected. */
 		onselect?: (args: SelectEventArgs) => void
-		/** Called once a color has been added to the list through the input. */
 		onadd?: (args: AddEventArgs) => void
-		/** Called once a color has been removed from the list through the deletion gesture. */
 		ondelete?: (args: DeleteEventArgs) => void
-		/** Accessible name announced for the color slot listbox. */
 		label?: string
-		/**
-		 * Renders the slot grid as a purely visual display instead of a listbox:
-		 * drops the `listbox`/`option` roles, the roving tab stop and the arrow-key
-		 * navigation. Use it for decorative palettes that are not meant to be picked from.
-		 */
 		presentational?: boolean
-		/** Class name applied to the root element. */
 		class?: string
-		/**
-		 * Color of the focus outline on color slots, including custom `slot`/`transparentSlot` snippets
-		 * (applied through a `--focusColor` CSS variable set on the palette root, which those snippets
-		 * inherit and also receive as a `focusColor` argument). Defaults to `blue`; can also be set
-		 * through the `--focusColor` CSS variable directly.
-		 */
 		focusColor?: string
-		/** Replaces the header. */
 		header?: Snippet<[HeaderSnippetProps]>
-		/** Rendered before the color slots. */
 		beforeSlot?: Snippet<[EdgeSlotSnippetProps]>
-		/** Replaces the transparent slot. */
 		transparentSlot?: Snippet<[TransparentSlotSnippetProps]>
-		/** Replaces the default color slots. */
 		slot?: Snippet<[SlotSnippetProps]>
-		/** Rendered after the color slots. */
 		afterSlot?: Snippet<[EdgeSlotSnippetProps]>
-		/** Replaces the loader shown while colors resolve. */
 		loader?: Snippet
-		/** Replaces the footer. */
 		footer?: Snippet<[HeaderSnippetProps]>
-		/** Replaces the footer input. */
 		input?: Snippet<[InputSnippetProps]>
-		/** Replaces the tools panel. */
 		tools?: Snippet<[ToolsSnippetProps]>
-		/** Replaces the settings panel content. */
 		settings?: Snippet<[SettingsSnippetProps]>
 	}
 
@@ -159,13 +118,6 @@
 	}: Props = $props()
 
 	let _colors = $state<NormalizedColor[] | null>(null)
-	/**
-	 * The full resolved and transformed flat list — before compact extraction, deduplication or capping —
-	 * that `compactColorIndices` index into. Retained so a compact-mode deletion can map a view index back
-	 * to the real color and write the shrunk full list back to the bound `colors`. Null in grouped mode.
-	 * Reassigned by `_syncColors` on every flat write-back (the written-back list becomes the new full
-	 * list), so a later runtime compact toggle never maps deletions against pre-mutation data.
-	 */
 	let _fullColors = $state<NormalizedColor[] | null>(null)
 	let _colorGroups = $state<NormalizedColorGroup[] | null>(null)
 	let _numColumns = $state(untrack(() => numColumns))
@@ -173,24 +125,9 @@
 	let _isCompact = $state(untrack(() => isCompact))
 	let _listboxEl = $state<HTMLElement | null>(null)
 	let _focusedIndex = $state<number | null>(null)
-	/**
-	 * One-shot guard set by the write-back helpers (`_syncColors`/`_syncColorGroups`) so the resolver
-	 * `$effect` skips the component's own mutation of the bound `colors` instead of re-normalizing it.
-	 * It is consumed (reset to `false`) on the next effect run, which compares the current view params
-	 * against `_syncedViewParams` — the values captured when the guard was armed — and only skips while
-	 * they still match, so a view input mutated from within `onadd`/`ondelete` (e.g. flipping
-	 * `isCompact`) is recomputed instead of dropped. Being one-shot, reassigning `colors` itself
-	 * synchronously from within `onadd`/`ondelete` is still dropped until the next external change.
-	 */
 	let _skipColorsSync = $state(false)
 	let _syncedViewParams: ReturnType<typeof _viewParams> | null = null
 
-	/**
-	 * Reads every input that shapes the rendered view — synchronously, so a `$effect` calling it
-	 * tracks them all. `compactColorIndices` is copied by value: spreading reads its elements
-	 * synchronously, so in-place mutations of a bound `$state` array are tracked too, and the copy
-	 * freezes the indices against mutations that land before an async `colors` source resolves.
-	 */
 	const _viewParams = () => ({
 		isCompact: _isCompact,
 		compactColorIndices: [...(compactColorIndices ?? [])],
@@ -224,19 +161,9 @@
 
 	$effect(() => {
 		const _source = colors
-		/**
-		 * Snapshot every remaining input synchronously: reads inside the `.then()` callback happen in a
-		 * microtask, outside Svelte's dependency-tracking window, so they would never re-trigger this
-		 * effect. Only this snapshot may be used below the promise.
-		 */
 		const _params = _viewParams()
 		if (untrack(() => _skipColorsSync)) {
 			_skipColorsSync = false
-			/**
-			 * Skip only while the view still matches what the write-back rendered: when `onadd`/`ondelete`
-			 * mutates a view input (e.g. flips `isCompact`) in the same flush as the write-back, fall
-			 * through and recompute from the just-written-back source instead of dropping the change.
-			 */
 			if (_sameViewParams(_syncedViewParams, _params)) {
 				return
 			}
@@ -321,9 +248,6 @@
 
 	const _optionRole = $derived(presentational ? undefined : 'option')
 
-	// Announce the keyboard deletion affordance on deletable options. Absent when deletion is off
-	// or the grid is presentational (no keydown handler), and never set on the transparent slot,
-	// which is not a deletable color. Mirrors the `Delete`/`Backspace` handling in `_deleteOption`.
 	const _deleteShortcut = $derived(!presentational && deletionMode !== NONE ? 'Delete Backspace' : undefined)
 
 	const _selectColor = (color: ColorValue | null) => {
@@ -383,12 +307,6 @@
 		}
 	}
 
-	/**
-	 * Replays `calculateColors`' compact pipeline (extract → dedupe → cap) while carrying each color's index
-	 * in `_fullColors`, so a compact view index maps back to the real full-list color unambiguously — even
-	 * when deduplication collapses same-valued slots (the first occurrence wins, matching the rendered
-	 * list). Mirrors the ordering in `calculateColors` exactly.
-	 */
 	const _compactPicked = (): { color: NormalizedColor; index: number }[] => {
 		const full = _fullColors ?? []
 		const indices = compactColorIndices ?? []
@@ -402,14 +320,6 @@
 		return picked
 	}
 
-	/**
-	 * A compact deletion mutates the underlying full list, not the extracted subset `_colors`: it removes the
-	 * mapped color, re-indexes `compactColorIndices` onto the shrunk list, recomputes the view and writes the
-	 * full list back through `bind:colors`. The `ondelete` `index` is the removed color's position in that
-	 * full list. The mismatch guard is defense in depth: the resolver re-extracts `_colors` whenever
-	 * `_isCompact` or `compactColorIndices` change, so a view index only maps to nothing if the rendered
-	 * subset drifted from `_fullColors` (e.g. through a stale async resolution).
-	 */
 	const _removeCompactColor = (index: number) => {
 		const target = _compactPicked()[index]
 		const rendered = (_colors ?? [])[index]
@@ -465,11 +375,6 @@
 
 	const _onDelete = (index: number) => _removeColor(index)
 
-	/**
-	 * Flipping `_isCompact` is all a toggle needs: the resolver `$effect` tracks it and recomputes
-	 * `_colors` and `_numColumns` together from the current `colors` source, so the column count is
-	 * derived (transparent slot included) rather than remembered across toggles.
-	 */
 	const _toggleCompact = () => {
 		if (_colors == null) {
 			return
@@ -495,14 +400,9 @@
 		_isSettingsOn = false
 	}
 
-	// Cache the resolved option elements so arrow-key navigation does not re-query the DOM
-	// on every keystroke. The cache is dropped whenever the rendered option set can change.
 	let _cachedOptions: HTMLElement[] | null = null
 
 	$effect(() => {
-		// Track the state that drives which slots are rendered so the cache is invalidated.
-		// `selectedColor` is included because a custom `slot` may swap its focusable node
-		// when it becomes selected, which would otherwise leave detached nodes cached.
 		void _colors
 		void _colorGroups
 		void showTransparentSlot
@@ -553,8 +453,6 @@
 		return targetRow[Math.min(column, targetRow.length - 1)]
 	}
 
-	// Delete the color under the focused option, the keyboard counterpart of the pointer-only
-	// tooltip/drop deletion affordances. Focus stays on the neighbour that shifts into place.
 	const _deleteOption = async (from: number) => {
 		if (deletionMode === NONE) {
 			return
@@ -575,18 +473,14 @@
 		} else {
 			const colorIndex = from - (showTransparentSlot ? 1 : 0)
 			if (colorIndex < 0) {
-				// The leading transparent slot clears the selection; it is not a deletable color.
 				return
 			}
 			_onDelete(colorIndex)
 		}
-		// The option set has been replaced; drop the cache and move focus to the neighbour.
 		await tick()
 		_cachedOptions = null
 		const options = _getOptions()
 		if (options.length === 0) {
-			// Nothing left to focus: keep focus on the listbox container rather than
-			// letting it fall back to <body> now that the deleted option is gone.
 			_focusedIndex = null
 			_listboxEl?.focus()
 			return
