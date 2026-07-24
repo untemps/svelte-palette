@@ -392,9 +392,6 @@ test('Updates num-columns when numColumns changes to 0', async () => {
 	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 25'))
 })
 
-// The reactivity tests below drive the palette through PaletteReactive, a parent wrapper holding
-// each prop in its own $state. Testing Library's `rerender` funnels every prop through a single
-// signal, so re-passing `colors` re-triggers the resolver and would mask a prop left untracked.
 test('Removes duplicates when updating allowDuplicates value', async () => {
 	const colors = ['#ff0', '#0ff', '#f0f', '#f0f', '#f0f']
 
@@ -513,8 +510,6 @@ test('Falls back to a local removal when the rendered subset drifts from the ful
 	const cells = await screen.findAllByTestId('__palette-cell__')
 	expect(cells).toHaveLength(2)
 
-	// Freeze the resolver on a never-resolving source, then desync the indices: the rendered
-	// subset can no longer be re-extracted and stops matching _compactPicked's mapping.
 	component.setColors(new Promise(() => {}))
 	component.setCompactColorIndices([2])
 
@@ -551,6 +546,28 @@ test('Applies an isCompact change made inside ondelete alongside the write-back'
 	await waitFor(() => expect(content).toHaveClass('palette__content--compact'))
 	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
 	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 2'))
+})
+
+test('Toggles the input when colors switch between grouped and flat', async () => {
+	const groups = [
+		{ name: 'Reds', colors: ['#f00'] },
+		{ name: 'Blues', colors: ['#00f'] },
+	]
+
+	const { component } = setup(PaletteReactive, {
+		props: { initialColors: groups, initialShowInput: true },
+	})
+
+	await screen.findAllByTestId('__palette-group__')
+	expect(screen.queryByTestId('__palette-input-input__')).not.toBeInTheDocument()
+
+	component.setColors(['#ff0', '#0ff'])
+
+	await waitFor(() => expect(screen.getByTestId('__palette-input-input__')).toBeInTheDocument())
+
+	component.setColors(groups)
+
+	await waitFor(() => expect(screen.queryByTestId('__palette-input-input__')).not.toBeInTheDocument())
 })
 
 test('Does not expose a main landmark on the root', async () => {
@@ -1549,26 +1566,170 @@ test('Does not fire onadd when the color is a rejected duplicate', async () => {
 	expect(onAdd).not.toHaveBeenCalled()
 })
 
-test('Does not add or fire onadd through the input in grouped mode', async () => {
-	const onAdd = vi.fn()
+test('Does not render the input in grouped mode', async () => {
 	const colors = [
 		{ name: 'Reds', colors: ['#f00'] },
 		{ name: 'Blues', colors: ['#00f'] },
 	]
 
-	const { user } = setup(Palette, {
-		props: { colors, showInput: true, onadd: onAdd },
+	setup(Palette, {
+		props: { colors, showInput: true },
 	})
 
-	const input = await screen.findByTestId('__palette-input-input__')
-	await user.type(input, '0f0')
-
-	const submit = await screen.findByTestId('__palette-input-submit__')
-	await user.click(submit)
-
-	expect(onAdd).not.toHaveBeenCalled()
 	const groups = await screen.findAllByTestId('__palette-group__')
 	expect(groups).toHaveLength(2)
+	expect(screen.queryByTestId('__palette-input-input__')).not.toBeInTheDocument()
+})
+
+test('Does not render the input once async colors resolve to groups', async () => {
+	const colors = Promise.resolve([
+		{ name: 'Reds', colors: ['#f00'] },
+		{ name: 'Blues', colors: ['#00f'] },
+	])
+
+	setup(Palette, {
+		props: { colors, showInput: true },
+	})
+
+	const groups = await screen.findAllByTestId('__palette-group__')
+	expect(groups).toHaveLength(2)
+	expect(screen.queryByTestId('__palette-input-input__')).not.toBeInTheDocument()
+})
+
+test('Does not render a custom input snippet in grouped mode', async () => {
+	const input = createRawSnippet(() => ({
+		render: () => `<div data-testid="__custom-input__"></div>`,
+	}))
+	const colors = [
+		{ name: 'Reds', colors: ['#f00'] },
+		{ name: 'Blues', colors: ['#00f'] },
+	]
+
+	setup(Palette, {
+		props: { colors, showInput: true, input },
+	})
+
+	const groups = await screen.findAllByTestId('__palette-group__')
+	expect(groups).toHaveLength(2)
+	expect(screen.queryByTestId('__custom-input__')).not.toBeInTheDocument()
+})
+
+test('Renders the input only once a pending colors source resolves', async () => {
+	let resolveColors: (value: string[]) => void = () => {}
+	const colors = new Promise<string[]>((resolve) => (resolveColors = resolve))
+
+	setup(Palette, {
+		props: { colors, showInput: true },
+	})
+
+	await screen.findByTestId('__palette__')
+	expect(screen.queryByTestId('__palette-input-input__')).not.toBeInTheDocument()
+
+	resolveColors(['#ff0', '#0ff'])
+
+	await waitFor(() => expect(screen.getByTestId('__palette-input-input__')).toBeInTheDocument())
+})
+
+test('Renders the compact tool only once a pending colors source resolves', async () => {
+	let resolveColors: (value: string[]) => void = () => {}
+	const colors = new Promise<string[]>((resolve) => (resolveColors = resolve))
+
+	setup(Palette, {
+		props: { colors, compactColorIndices: [0, 1] },
+	})
+
+	await screen.findByTestId('__palette__')
+	expect(screen.queryByTestId('__palette-compact-toggle-button__')).not.toBeInTheDocument()
+
+	resolveColors(['#ff0', '#0ff', '#f0f'])
+
+	await waitFor(() => expect(screen.getByTestId('__palette-compact-toggle-button__')).toBeInTheDocument())
+})
+
+test('Does not render the input when colors is null', async () => {
+	setup(Palette, {
+		props: { colors: null, showInput: true },
+	})
+
+	await screen.findByTestId('__palette__')
+	expect(screen.queryByTestId('__palette-input-input__')).not.toBeInTheDocument()
+})
+
+test('Renders the expand button only once a pending colors source resolves in compact mode', async () => {
+	let resolveColors: (value: string[]) => void = () => {}
+	const colors = new Promise<string[]>((resolve) => (resolveColors = resolve))
+
+	setup(Palette, {
+		props: { colors, isCompact: true, compactColorIndices: [0, 1] },
+	})
+
+	await screen.findByTestId('__palette__')
+	expect(screen.queryByTestId('__palette-compact-toggle-button__')).not.toBeInTheDocument()
+
+	resolveColors(['#ff0', '#0ff', '#f0f'])
+
+	await waitFor(() => expect(screen.getByTestId('__palette-compact-toggle-button__')).toBeInTheDocument())
+})
+
+test('Does not render the expand button in grouped mode when isCompact is set', async () => {
+	const colors = [
+		{ name: 'Reds', colors: ['#f00'] },
+		{ name: 'Blues', colors: ['#00f'] },
+	]
+
+	setup(Palette, {
+		props: { colors, isCompact: true },
+	})
+
+	const groups = await screen.findAllByTestId('__palette-group__')
+	expect(groups).toHaveLength(2)
+	expect(screen.queryByTestId('__palette-compact-toggle-button__')).not.toBeInTheDocument()
+})
+
+test('Ignores a compact tool selection from a custom tools snippet while colors are unresolved', async () => {
+	let resolveColors: (value: string[]) => void = () => {}
+	const colors = new Promise<string[]>((resolve) => (resolveColors = resolve))
+
+	const toolsSnippet = createRawSnippet((getProps) => ({
+		render: () => `<button data-testid="__custom-compact-tool__">Compact</button>`,
+		setup: (element) => {
+			element.addEventListener('click', () => getProps().onSelect('compact'))
+		},
+	}))
+	const settingsSnippet = createRawSnippet(() => ({
+		render: () => `<div data-testid="__custom-settings__"></div>`,
+	}))
+
+	const { user } = setup(Palette, {
+		props: { colors, tools: toolsSnippet, settings: settingsSnippet },
+	})
+
+	const content = document.querySelector('.palette__content')
+	const tool = await screen.findByTestId('__custom-compact-tool__')
+
+	await user.click(tool)
+	expect(content).not.toHaveClass('palette__content--compact')
+
+	resolveColors(['#ff0', '#0ff'])
+	await waitFor(() => expect(screen.getAllByTestId('__palette-slot__')).toHaveLength(2))
+
+	await user.click(tool)
+	await waitFor(() => expect(content).toHaveClass('palette__content--compact'))
+})
+
+test('Keeps the previous list and its affordances while a replacement source is pending', async () => {
+	const { component } = setup(PaletteReactive, {
+		props: { initialColors: ['#ff0', '#0ff'], initialShowInput: true },
+	})
+
+	await screen.findAllByTestId('__palette-slot__')
+	await screen.findByTestId('__palette-input-input__')
+
+	component.setColors(new Promise<string[]>(() => {}))
+	await new Promise((resolve) => setTimeout(resolve, 0))
+
+	expect(screen.getAllByTestId('__palette-slot__')).toHaveLength(2)
+	expect(screen.getByTestId('__palette-input-input__')).toBeInTheDocument()
 })
 
 test('Fires ondelete and propagates a compact-mode deletion to the full list', async () => {
