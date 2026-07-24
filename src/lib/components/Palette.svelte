@@ -1,7 +1,3 @@
-<script module lang="ts">
-	let _instanceCount = 0
-</script>
-
 <script lang="ts">
 	import { tick, untrack } from 'svelte'
 
@@ -121,7 +117,7 @@
 		settings = undefined,
 	}: Props = $props()
 
-	const _paletteId = `palette-${_instanceCount++}`
+	const _paletteId = $props.id()
 
 	let _colors = $state<NormalizedColor[] | null>(null)
 	let _fullColors = $state<NormalizedColor[] | null>(null)
@@ -545,7 +541,13 @@
 	}
 </script>
 
-<div id={_paletteId} class="palette {className}" data-testid="__palette__" data-palette style:--focusColor={focusColor}>
+<div
+	data-palette-id={_paletteId}
+	class="palette {className}"
+	data-testid="__palette__"
+	data-palette
+	style:--focusColor={focusColor}
+>
 	<section class="palette__content" class:palette__content--compact={_isCompact} style="--num-columns: {_numColumns}">
 		{#if !_isCompact}
 			{@render header?.({ selectedColor })}
@@ -585,7 +587,7 @@
 									role="presentation"
 									use:useDeletion={{
 										deletionMode,
-										areaSelector: `#${_paletteId}`,
+										areaSelector: `[data-palette-id="${_paletteId}"]`,
 										onDelete: () => _removeGroupColor(groupIndex, colorIndex),
 										tooltipContentSelector,
 										tooltipClassName,
@@ -666,7 +668,7 @@
 							role="presentation"
 							use:useDeletion={{
 								deletionMode,
-								areaSelector: `#${_paletteId}`,
+								areaSelector: `[data-palette-id="${_paletteId}"]`,
 								onDelete: () => _onDelete(index),
 								tooltipContentSelector,
 								tooltipClassName,
