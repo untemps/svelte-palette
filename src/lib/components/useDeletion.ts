@@ -11,6 +11,7 @@ export interface UseDeletionOptions {
 	onDelete?: () => void
 	tooltipContentSelector?: string | null
 	tooltipClassName?: string | null
+	areaSelector?: string | null
 }
 
 export interface UseDeletionParameter extends UseDeletionOptions {
@@ -31,11 +32,6 @@ const createAction = (node: HTMLElement, deletionMode: DeletionMode | undefined,
 				},
 				containerClassName: options.tooltipClassName,
 				portal: false,
-				// Trigger the deletion tooltip on pointer hover only. The library also opens on
-				// `focusin` by default, which would pop the tooltip on every slot the grid's
-				// roving tabindex moves focus to during keyboard navigation. Keyboard users
-				// delete the focused slot with `Delete`/`Backspace` instead (handled by the
-				// listbox in `Palette.svelte`).
 				showOn: ['mouseenter'],
 				hideOn: ['mouseleave'],
 			})
@@ -47,7 +43,7 @@ const createAction = (node: HTMLElement, deletionMode: DeletionMode | undefined,
 				dragImage.removeAttribute('data-testid')
 			}
 			return useDropOutside(node, {
-				areaSelector: '.palette',
+				areaSelector: options.areaSelector || '.palette',
 				animate: true,
 				dragImage,
 				dragHandleCentered: true,

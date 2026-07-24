@@ -18,6 +18,9 @@ const setup = (component: Parameters<typeof render>[0], options?: Parameters<typ
 
 afterEach(() => cleanup())
 
+const boundingRect = (left: number, top: number, right: number, bottom: number) =>
+	({ left, top, right, bottom, width: right - left, height: bottom - top }) as DOMRect
+
 test('Displays as many color slots as set', async () => {
 	let cells = null
 	const colors = ['#ff0', '#0ff', '#f0f']
@@ -123,6 +126,52 @@ test('Deletes slot if deletionMode is set to "drop"', async () => {
 	await user.pointer('[/MouseLeft]')
 
 	expect(cell).not.toBeInTheDocument()
+})
+
+test('Scopes the drop deletion area to the owning palette when several are mounted', async () => {
+	const colorsA = ['#ff0', '#0ff', '#f0f']
+	const colorsB = ['#111', '#222', '#333']
+
+	const { user } = setup(Palette, { props: { colors: colorsA, deletionMode: DROP } })
+	const { container: containerB } = render(Palette, { props: { colors: colorsB, deletionMode: DROP } })
+
+	await screen.findAllByTestId('__palette-slot__')
+
+	const [rootA, rootB] = screen.getAllByTestId('__palette__')
+	rootA.getBoundingClientRect = () => boundingRect(0, 0, 100, 100)
+	rootB.getBoundingClientRect = () => boundingRect(200, 200, 300, 300)
+
+	const cellB = containerB.querySelector('[data-testid="__palette-cell__"]') as HTMLElement
+
+	await user.pointer({ keys: '[MouseLeft>]', target: cellB })
+	const drag = document.querySelector('#drag') as HTMLElement
+	drag.getBoundingClientRect = () => boundingRect(250, 250, 260, 260)
+	await user.pointer('[/MouseLeft]')
+
+	expect(cellB).toBeInTheDocument()
+})
+
+test('Deletes a swatch dropped outside its own palette even over another palette', async () => {
+	const colorsA = ['#ff0', '#0ff', '#f0f']
+	const colorsB = ['#111', '#222', '#333']
+
+	const { user } = setup(Palette, { props: { colors: colorsA, deletionMode: DROP } })
+	const { container: containerB } = render(Palette, { props: { colors: colorsB, deletionMode: DROP } })
+
+	await screen.findAllByTestId('__palette-slot__')
+
+	const [rootA, rootB] = screen.getAllByTestId('__palette__')
+	rootA.getBoundingClientRect = () => boundingRect(0, 0, 100, 100)
+	rootB.getBoundingClientRect = () => boundingRect(200, 200, 300, 300)
+
+	const cellB = containerB.querySelector('[data-testid="__palette-cell__"]') as HTMLElement
+
+	await user.pointer({ keys: '[MouseLeft>]', target: cellB })
+	const drag = document.querySelector('#drag') as HTMLElement
+	drag.getBoundingClientRect = () => boundingRect(50, 50, 60, 60)
+	await user.pointer('[/MouseLeft]')
+
+	expect(cellB).not.toBeInTheDocument()
 })
 
 test('Displays transparent slot if showTransparentSlot is truthy', async () => {

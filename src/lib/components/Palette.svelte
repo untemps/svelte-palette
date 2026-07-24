@@ -117,6 +117,8 @@
 		settings = undefined,
 	}: Props = $props()
 
+	const _paletteId = $props.id()
+
 	let _colors = $state<NormalizedColor[] | null>(null)
 	let _fullColors = $state<NormalizedColor[] | null>(null)
 	let _colorGroups = $state<NormalizedColorGroup[] | null>(null)
@@ -542,7 +544,13 @@
 	}
 </script>
 
-<div class="palette {className}" data-testid="__palette__" data-palette style:--focusColor={focusColor}>
+<div
+	data-palette-id={_paletteId}
+	class="palette {className}"
+	data-testid="__palette__"
+	data-palette
+	style:--focusColor={focusColor}
+>
 	<section class="palette__content" class:palette__content--compact={_isCompact} style="--num-columns: {_numColumns}">
 		{#if !_isCompact}
 			{@render header?.({ selectedColor })}
@@ -582,6 +590,7 @@
 									role="presentation"
 									use:useDeletion={{
 										deletionMode,
+										areaSelector: `[data-palette-id="${_paletteId}"]`,
 										onDelete: () => _removeGroupColor(groupIndex, colorIndex),
 										tooltipContentSelector,
 										tooltipClassName,
@@ -662,6 +671,7 @@
 							role="presentation"
 							use:useDeletion={{
 								deletionMode,
+								areaSelector: `[data-palette-id="${_paletteId}"]`,
 								onDelete: () => _onDelete(index),
 								tooltipContentSelector,
 								tooltipClassName,
