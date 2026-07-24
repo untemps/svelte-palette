@@ -1,3 +1,10 @@
+# [6.0.0-beta.5](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.4...v6.0.0-beta.5) (2026-07-24)
+
+
+### Bug Fixes
+
+* Crash when showInput is used with color groups ([#226](https://github.com/untemps/svelte-palette/issues/226)) ([5cd0273](https://github.com/untemps/svelte-palette/commit/5cd0273fc93c8cdedfd06f14ed6955a277ef09ce))
+
 # [6.0.0-beta.4](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.3...v6.0.0-beta.4) (2026-07-23)
 
 
