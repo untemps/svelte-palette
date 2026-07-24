@@ -18,7 +18,6 @@ const setup = (component: Parameters<typeof render>[0], options?: Parameters<typ
 
 afterEach(() => cleanup())
 
-// Minimal DOMRect stand-in: the drop library only reads left/right/top/bottom to test overlap.
 const boundingRect = (left: number, top: number, right: number, bottom: number) =>
 	({ left, top, right, bottom, width: right - left, height: bottom - top }) as DOMRect
 
@@ -138,15 +137,12 @@ test('Scopes the drop deletion area to the owning palette when several are mount
 
 	await screen.findAllByTestId('__palette-slot__')
 
-	// Two non-overlapping palette areas on the page.
 	const [rootA, rootB] = screen.getAllByTestId('__palette__')
 	rootA.getBoundingClientRect = () => boundingRect(0, 0, 100, 100)
 	rootB.getBoundingClientRect = () => boundingRect(200, 200, 300, 300)
 
 	const cellB = containerB.querySelector('[data-testid="__palette-cell__"]') as HTMLElement
 
-	// Drop a swatch of palette B inside palette B's own area (but outside palette A's). Scoped to its
-	// own root this is a no-op; resolving the area to the first `.palette` would delete it (the bug).
 	await user.pointer({ keys: '[MouseLeft>]', target: cellB })
 	const drag = document.querySelector('#drag') as HTMLElement
 	drag.getBoundingClientRect = () => boundingRect(250, 250, 260, 260)
@@ -170,7 +166,6 @@ test('Deletes a swatch dropped outside its own palette even over another palette
 
 	const cellB = containerB.querySelector('[data-testid="__palette-cell__"]') as HTMLElement
 
-	// Drop over palette A's area — that is outside palette B's own root, so the swatch must be deleted.
 	await user.pointer({ keys: '[MouseLeft>]', target: cellB })
 	const drag = document.querySelector('#drag') as HTMLElement
 	drag.getBoundingClientRect = () => boundingRect(50, 50, 60, 60)
@@ -446,9 +441,6 @@ test('Updates num-columns when numColumns changes to 0', async () => {
 	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 25'))
 })
 
-// The reactivity tests below drive the palette through PaletteReactive, a parent wrapper holding
-// each prop in its own $state. Testing Library's `rerender` funnels every prop through a single
-// signal, so re-passing `colors` re-triggers the resolver and would mask a prop left untracked.
 test('Removes duplicates when updating allowDuplicates value', async () => {
 	const colors = ['#ff0', '#0ff', '#f0f', '#f0f', '#f0f']
 
@@ -567,8 +559,6 @@ test('Falls back to a local removal when the rendered subset drifts from the ful
 	const cells = await screen.findAllByTestId('__palette-cell__')
 	expect(cells).toHaveLength(2)
 
-	// Freeze the resolver on a never-resolving source, then desync the indices: the rendered
-	// subset can no longer be re-extracted and stops matching _compactPicked's mapping.
 	component.setColors(new Promise(() => {}))
 	component.setCompactColorIndices([2])
 

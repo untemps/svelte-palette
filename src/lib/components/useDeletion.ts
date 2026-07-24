@@ -11,11 +11,6 @@ export interface UseDeletionOptions {
 	onDelete?: () => void
 	tooltipContentSelector?: string | null
 	tooltipClassName?: string | null
-	/**
-	 * Selector of the element treated as the "inside" area in `drop` mode. Resolved through a
-	 * document-wide `document.querySelector`, so callers rendering several palettes must pass a
-	 * selector unique to the owning instance. Defaults to `.palette` for direct action users.
-	 */
 	areaSelector?: string | null
 }
 
@@ -37,11 +32,6 @@ const createAction = (node: HTMLElement, deletionMode: DeletionMode | undefined,
 				},
 				containerClassName: options.tooltipClassName,
 				portal: false,
-				// Trigger the deletion tooltip on pointer hover only. The library also opens on
-				// `focusin` by default, which would pop the tooltip on every slot the grid's
-				// roving tabindex moves focus to during keyboard navigation. Keyboard users
-				// delete the focused slot with `Delete`/`Backspace` instead (handled by the
-				// listbox in `Palette.svelte`).
 				showOn: ['mouseenter'],
 				hideOn: ['mouseleave'],
 			})
