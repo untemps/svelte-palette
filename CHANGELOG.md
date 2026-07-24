@@ -1,3 +1,10 @@
+# [6.0.0-beta.6](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.5...v6.0.0-beta.6) (2026-07-24)
+
+
+### Bug Fixes
+
+* Scope drop deletion area to the owning palette ([#227](https://github.com/untemps/svelte-palette/issues/227)) ([b1d03b4](https://github.com/untemps/svelte-palette/commit/b1d03b4d841615d91615ec2e0feed7f85bd860fd))
+
 # [6.0.0-beta.5](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.4...v6.0.0-beta.5) (2026-07-24)
 
 
