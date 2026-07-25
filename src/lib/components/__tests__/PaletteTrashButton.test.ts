@@ -30,5 +30,13 @@ test('Triggers click event', async () => {
 test('Attaches active class when isActive is true', () => {
 	setup(PaletteTrashButton, { props: { isActive: true } })
 	const button = screen.getByTestId('__palette-trash-button__')
-	expect(button).toHaveClass('icon_button__button--active')
+	// The class must match the component's own scoped rule, not PaletteIconButton's namespace (#175).
+	expect(button).toHaveClass('trash_button__button--active')
+	expect(button).not.toHaveClass('icon_button__button--active')
+})
+
+test('Does not attach active class when isActive is false', () => {
+	setup(PaletteTrashButton, { props: { isActive: false } })
+	const button = screen.getByTestId('__palette-trash-button__')
+	expect(button).not.toHaveClass('trash_button__button--active')
 })
