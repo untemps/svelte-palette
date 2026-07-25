@@ -1,3 +1,10 @@
+# [6.0.0-beta.9](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.8...v6.0.0-beta.9) (2026-07-25)
+
+
+### Bug Fixes
+
+* Unify keyboard focus outline across all focusable elements ([#231](https://github.com/untemps/svelte-palette/issues/231)) ([ac1b8ff](https://github.com/untemps/svelte-palette/commit/ac1b8ff9407d6aa7b882d8c94a7650ce9cf55485))
+
 # [6.0.0-beta.8](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.7...v6.0.0-beta.8) (2026-07-25)
 
 
