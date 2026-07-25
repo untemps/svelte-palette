@@ -158,11 +158,19 @@
 		opacity: 0.5;
 	}
 
-	.palette_input__input:focus {
-		border-right-width: 1px;
-		border-color: #bdbdbd;
-		outline: none;
-		z-index: 2;
+	.palette_input__input:focus-visible {
+		outline: 2px solid #1a1a1a;
+		outline-offset: 2px;
+		/* Lift above the adjoining submit button (which is position: relative) so the
+		   ring shows on all four sides instead of being covered at the shared edge. */
+		position: relative;
+		z-index: 1;
+	}
+
+	@media (forced-colors: active) {
+		.palette_input__input:focus-visible {
+			outline-color: Highlight;
+		}
 	}
 
 	.palette_input__input--color {
