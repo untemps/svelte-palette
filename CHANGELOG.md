@@ -1,3 +1,10 @@
+# [6.0.0-beta.8](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.7...v6.0.0-beta.8) (2026-07-25)
+
+
+### Bug Fixes
+
+* Accept 4-digit #RGBA shorthand in COLOR_REGEX ([#230](https://github.com/untemps/svelte-palette/issues/230)) ([56d6f84](https://github.com/untemps/svelte-palette/commit/56d6f84d5ff115459c9e1b250e70d6481f668abd)), closes [#RGBA](https://github.com/untemps/svelte-palette/issues/RGBA)
+
 # [6.0.0-beta.7](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.6...v6.0.0-beta.7) (2026-07-25)
 
 
