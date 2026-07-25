@@ -78,7 +78,6 @@ yarn add @untemps/svelte-palette
 | `numColumns`             | number                                                                                                  | 5             | Number of columns of the palette grid. This value can't exceed the number of maximum colors defined in `maxColors` and can't be lower than 1. Set this value to `0` to display the slots on a single row.                                                                                                                                                                                   |
 | `maxColumns`             | number                                                                                                  | 0             | Maximum number of columns when `numColumns` is set to `0`. Once reached, additional slots wrap to a new row. Set this value to `0` to allow unlimited columns.                                                                                                                                                                                                                              |
 | `transition`             | object                                                                                                  | null          | Animation when a slot is rendered (see [Transition](#transition)).                                                                                                                                                                                                                                                                                                                          |
-| `focusColor`             | string                                                                                                  | "blue"        | Color of the focus outline drawn on a slot when it receives keyboard focus. Can also be set through the `--focusColor` CSS variable (see [Styles](#focus-outline-color)).                                                                                                                                                                                                                   |
 | `label`                  | string                                                                                                  | "Color slots" | Accessible name announced for the slot listbox (see [Accessibility](#accessibility)).                                                                                                                                                                                                                                                                                                       |
 | `presentational`         | boolean                                                                                                 | false         | Renders the slot grid as a purely visual display: drops the `listbox`/`option` roles, the single tab stop and the arrow-key navigation. Use it for decorative palettes that are not meant to be picked from (see [Accessibility](#accessibility)).                                                                                                                                          |
 
@@ -102,18 +101,18 @@ yarn add @untemps/svelte-palette
 
 Snippets replace the Svelte 4 named slots API. Pass them as children of `<Palette>` using the `{#snippet name(props)}` syntax.
 
-| Snippet           | Description                                                                           | Available Properties                                                                                                                             |
-| ----------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `header`          | Allow to add a header to the palette. By default, it is empty.                        | `selectedColor`                                                                                                                                  |
-| `footer`          | Allow to add a footer to the palette. By default, it contains an input to add colors. | `selectedColor`                                                                                                                                  |
-| `slot`            | Allow to replace the default color slots.                                             | `index`, `color`, `colorName`, `groupName`, `selectedColor`, `selected`, `transition`, `isCompact`, `tabindex`, `focusColor`, `ariaKeyShortcuts` |
-| `transparentSlot` | Allow to replace the default transparent slot.                                        | `tabindex`, `selected`, `focusColor`                                                                                                             |
-| `beforeSlot`      | Allow to add an element before the color slots.                                       | `selectedColor`, `transition`, `isCompact`                                                                                                       |
-| `afterSlot`       | Allow to add an element after the color slots.                                        | `selectedColor`, `transition`, `isCompact`                                                                                                       |
-| `input`           | Allow to replace the input in the footer if the default footer snippet is kept as is. | `selectedColor`, `inputType`                                                                                                                     |
-| `settings`        | Allow to replace the settings panel. See the demo to grab a usage example.            | `onClose`                                                                                                                                        |
-| `tools`           | Allow to replace the tools panel.                                                     | `isCompact`, `compactColorIndices`, `onSelect`                                                                                                   |
-| `loader`          | Allow to replace the loader displayed during the colors async retrieving.             | -                                                                                                                                                |
+| Snippet           | Description                                                                           | Available Properties                                                                                                               |
+| ----------------- | ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `header`          | Allow to add a header to the palette. By default, it is empty.                        | `selectedColor`                                                                                                                    |
+| `footer`          | Allow to add a footer to the palette. By default, it contains an input to add colors. | `selectedColor`                                                                                                                    |
+| `slot`            | Allow to replace the default color slots.                                             | `index`, `color`, `colorName`, `groupName`, `selectedColor`, `selected`, `transition`, `isCompact`, `tabindex`, `ariaKeyShortcuts` |
+| `transparentSlot` | Allow to replace the default transparent slot.                                        | `tabindex`, `selected`                                                                                                             |
+| `beforeSlot`      | Allow to add an element before the color slots.                                       | `selectedColor`, `transition`, `isCompact`                                                                                         |
+| `afterSlot`       | Allow to add an element after the color slots.                                        | `selectedColor`, `transition`, `isCompact`                                                                                         |
+| `input`           | Allow to replace the input in the footer if the default footer snippet is kept as is. | `selectedColor`, `inputType`                                                                                                       |
+| `settings`        | Allow to replace the settings panel. See the demo to grab a usage example.            | `onClose`                                                                                                                          |
+| `tools`           | Allow to replace the tools panel.                                                     | `isCompact`, `compactColorIndices`, `onSelect`                                                                                     |
+| `loader`          | Allow to replace the loader displayed during the colors async retrieving.             | -                                                                                                                                  |
 
 ## Example
 
@@ -325,38 +324,16 @@ The slot grid (columns, gaps) is laid out on the `listbox` element, `.palette__l
 
 When colors are grouped, each group keeps its own `.palette__cells` grid instead.
 
-### Focus Outline Color
+### Focus Outline
 
-Slots draw a focus outline when they receive keyboard focus. Its color defaults to `blue` and can be customized in two ways:
+Every focusable control in the palette shares the same keyboard focus ring: a `2px` solid outline with a `2px` offset, shown only on `:focus-visible` (keyboard interaction, not mouse click). This covers the color slots, the toolbar icon buttons (settings, compact toggle, eye dropper, input submit) and the deletion trash button.
 
-- Set the `focusColor` prop on `<Palette>` to apply a color to every slot — the default slots **and** custom ones. The palette writes the value to the `--focusColor` CSS variable on its root, so it cascades down to whatever your `slot` / `transparentSlot` snippets render. Those snippets also receive the value as a `focusColor` argument, so you can forward it explicitly (e.g. onto a `<PaletteSlot>`) when you need the raw value.
-- Set the `--focusColor` CSS variable on the palette (or any ancestor) yourself: it cascades down the same way, so it also applies when you render `<PaletteSlot>` on your own.
+The ring color is fixed for a consistent, WCAG-compliant contrast rather than themeable:
 
-The `focusColor` prop takes precedence over a `--focusColor` variable you set on the palette root or an ancestor, which in turn takes precedence over the `blue` default. (Custom slots receive the prop by inheriting that root variable, so a `--focusColor` you set directly on — or forward onto — a custom slot node wins locally for that slot, as usual for CSS.)
+- **Dark `#1a1a1a`** on the light `#fafafa` palette and toolbar surfaces. For a slot the ring is drawn in the 2px offset gap over the palette background, so it stays ~17:1 whatever the swatch color.
+- **Light `#fff`** on the dark deletion tooltip that hosts the trash button (~21:1).
 
-#### Example
-
-```svelte
-<script>
-	import { Palette } from '@untemps/svelte-palette'
-
-	const colors = ['#865C54', '#8F5447', '#A65846', '#A9715E', '#AD8C72']
-</script>
-
-<!-- Through the prop -->
-<Palette {colors} focusColor="#0066ff" />
-
-<!-- Or through the CSS variable -->
-<Palette {colors} class="palette__custom" />
-
-<style>
-	:global(.palette[data-palette].palette__custom) {
-		--focusColor: #0066ff;
-	}
-</style>
-```
-
-> **Toolbar buttons** — the settings, compact-toggle, eye-dropper and input-submit icon buttons (and the deletion trash button) draw their own keyboard focus ring: a 2px outline shown on `:focus-visible`. It uses a fixed high-contrast color rather than `focusColor` — a dark ring on the light `#fafafa` toolbar surface, and a light ring on the dark deletion tooltip that hosts the trash button — so every control stays keyboard-visible at a WCAG-compliant contrast regardless of the palette theme.
+Under Windows High Contrast (`forced-colors`), the ring switches to the system `Highlight` color.
 
 ### Deletion Tooltip Class
 

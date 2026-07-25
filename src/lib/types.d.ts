@@ -171,12 +171,6 @@ export interface SlotSnippetProps {
 	/** Whether the palette is displayed in compact mode. */
 	isCompact: boolean
 	/**
-	 * The focus outline color configured on the palette (the `focusColor` prop), or `undefined` when unset.
-	 * Slots inherit it automatically through the `--focusColor` CSS variable set on the palette root; forward
-	 * it explicitly (e.g. onto a `<PaletteSlot>`) only when you need the raw value.
-	 */
-	focusColor?: string
-	/**
 	 * The `aria-keyshortcuts` value announcing keyboard deletion (`"Delete Backspace"` when a `deletionMode`
 	 * is set, `undefined` otherwise). Forward it onto your focusable element (e.g. `aria-keyshortcuts={ariaKeyShortcuts}`)
 	 * so screen readers announce that `Delete`/`Backspace` removes the focused slot.
@@ -192,11 +186,6 @@ export interface TransparentSlotSnippetProps {
 	tabindex: number
 	/** Whether the transparent (no-color) option is currently selected, i.e. `selectedColor === null`. */
 	selected: boolean
-	/**
-	 * The focus outline color configured on the palette (the `focusColor` prop), or `undefined` when unset.
-	 * Inherited automatically through the `--focusColor` CSS variable; forward it explicitly only when needed.
-	 */
-	focusColor?: string
 }
 
 /**
