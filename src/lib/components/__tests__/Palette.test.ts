@@ -936,6 +936,20 @@ test('Does not make the cell wrappers focusable', async () => {
 	cells.forEach((cell) => expect(cell).not.toHaveAttribute('tabindex'))
 })
 
+test('Keeps deletion cells out of the tab order', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	setup(Palette, { props: { colors, deletionMode: TOOLTIP } })
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells.length).toBeGreaterThan(0)
+	// The deletion tooltip would otherwise mark each cell tabindex="0"; the explicit
+	// tabindex="-1" keeps the listbox a single tab stop and blocks that.
+	cells.forEach((cell) => {
+		expect(cell).toHaveAttribute('tabindex', '-1')
+		expect(cell).not.toHaveAttribute('tabindex', '0')
+	})
+})
+
 test('Keeps exactly one tabbable slot after the colors change', async () => {
 	const colors = ['#100', '#200', '#300', '#400', '#500', '#600']
 	const { rerender } = setup(Palette, { props: { colors, numColumns: 3 } })

@@ -585,6 +585,7 @@
 									data-testid="__palette-cell__"
 									class="palette__cells__cell"
 									role="presentation"
+									tabindex={deletionMode === NONE ? undefined : -1}
 									use:useDeletion={{
 										deletionMode,
 										areaSelector: `[data-palette-id="${_paletteId}"]`,
@@ -662,6 +663,7 @@
 							data-testid="__palette-cell__"
 							class="palette__cells__cell"
 							role="presentation"
+							tabindex={deletionMode === NONE ? undefined : -1}
 							use:useDeletion={{
 								deletionMode,
 								areaSelector: `[data-palette-id="${_paletteId}"]`,
