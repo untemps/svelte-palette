@@ -25,7 +25,7 @@
 	type="button"
 	{...restProps}
 	class="trash_button__button {className}"
-	class:icon_button__button--active={isActive}
+	class:trash_button__button--active={isActive}
 	{onclick}
 >
 	<TrashIcon />
