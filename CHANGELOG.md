@@ -1,3 +1,10 @@
+# [6.0.0-beta.7](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.6...v6.0.0-beta.7) (2026-07-25)
+
+
+### Bug Fixes
+
+* Discard superseded async colors resolutions ([#228](https://github.com/untemps/svelte-palette/issues/228)) ([27d72ce](https://github.com/untemps/svelte-palette/commit/27d72cebbbdfe07963122e3f34f4b029659876aa))
+
 # [6.0.0-beta.6](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.5...v6.0.0-beta.6) (2026-07-24)
 
 
