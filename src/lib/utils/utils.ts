@@ -123,7 +123,7 @@ export const calculateColorGroups = (
 		}))
 }
 
-export const COLOR_REGEX = /^#?(([0-9a-f]{2}){3,4}|([0-9a-f]){3})$/i
+export const COLOR_REGEX = /^#?(([0-9a-f]{2}){3,4}|([0-9a-f]){3,4})$/i
 
 export const isColorValid = ($color: string): boolean => {
 	return COLOR_REGEX.test($color)
