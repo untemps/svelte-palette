@@ -364,11 +364,15 @@
 		overflow: hidden auto;
 		width: 320px;
 		min-width: 320px;
-		min-height: 100%;
+		/* Bound the height to the viewport so the box actually scrolls when the form
+		   overflows; `min-height` let it grow to fit the content, defeating overflow. */
+		height: 100%;
 		display: flex;
 		flex-direction: column;
 		align-items: flex-end;
-		justify-content: center;
+		/* `safe` falls back to flex-start on overflow so the top of the form stays
+		   reachable — plain `center` pushes it above the scroll origin and clips it. */
+		justify-content: safe center;
 		background-color: black;
 		padding: 2rem;
 	}
