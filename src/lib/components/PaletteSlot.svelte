@@ -47,7 +47,7 @@
 	class:empty={!color}
 	class:selected
 	class:clickable={!disabled}
-	style="--color:{color}; --outerBorderColor:{color || '#aaa'};"
+	style="--color:{color};"
 	{disabled}
 	{tabindex}
 	in:enter
@@ -81,11 +81,11 @@
 	}
 
 	button.selected {
-		/* Selection halo drawn as a box-shadow; the #fafafa layer keeps a 2px gap
-		   between the swatch and the same-coloured ring. */
+		/* Selection ring drawn as a box-shadow; the #fafafa layer keeps a 2px gap
+		   between the swatch and the grey ring. */
 		box-shadow:
 			0 0 0 2px #fafafa,
-			0 0 0 4px var(--outerBorderColor);
+			0 0 0 4px #9e9e9e;
 	}
 
 	button.clickable {
