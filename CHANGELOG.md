@@ -1,3 +1,10 @@
+# [6.0.0-beta.10](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.9...v6.0.0-beta.10) (2026-07-25)
+
+
+### Bug Fixes
+
+* Apply the component's own active class for isActive ([#232](https://github.com/untemps/svelte-palette/issues/232)) ([72d1de8](https://github.com/untemps/svelte-palette/commit/72d1de8d365a7011576fe0e1c645e7b3e9f8a2a9))
+
 # [6.0.0-beta.9](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.8...v6.0.0-beta.9) (2026-07-25)
 
 
