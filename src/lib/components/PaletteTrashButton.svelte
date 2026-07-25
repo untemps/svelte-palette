@@ -47,14 +47,20 @@
 		opacity: 0.5;
 	}
 
-	.trash_button__button:focus {
-		border-color: #bdbdbd;
-		outline: none;
+	.trash_button__button:focus-visible {
+		outline: 2px solid #fff;
+		outline-offset: 2px;
 	}
 
 	.trash_button__button--active {
 		background-color: #e5e5e5;
 		outline: none;
+	}
+
+	@media (forced-colors: active) {
+		.trash_button__button:focus-visible {
+			outline-color: Highlight;
+		}
 	}
 
 	:global(.trash_button__button > svg) {

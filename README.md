@@ -356,6 +356,8 @@ The `focusColor` prop takes precedence over a `--focusColor` variable you set on
 </style>
 ```
 
+> **Toolbar buttons** — the settings, compact-toggle, eye-dropper and input-submit icon buttons (and the deletion trash button) draw their own keyboard focus ring: a 2px outline shown on `:focus-visible`. It uses a fixed high-contrast color rather than `focusColor` — a dark ring on the light `#fafafa` toolbar surface, and a light ring on the dark deletion tooltip that hosts the trash button — so every control stays keyboard-visible at a WCAG-compliant contrast regardless of the palette theme.
+
 ### Deletion Tooltip Class
 
 If you set `deletionMode` to `"tooltip"`, you can pass a class name that is set to the tooltip shown when hovering a slot.

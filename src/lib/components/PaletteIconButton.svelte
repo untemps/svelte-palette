@@ -74,14 +74,19 @@
 		cursor: auto;
 	}
 
-	.icon_button__button:focus {
-		border-color: #bdbdbd;
-		outline: none;
+	.icon_button__button:focus-visible {
+		outline: 2px solid #1a1a1a;
+		outline-offset: 2px;
 	}
 
 	.icon_button__button--active {
 		background-color: #e5e5e5;
-		outline: none;
+	}
+
+	@media (forced-colors: active) {
+		.icon_button__button:focus-visible {
+			outline-color: Highlight;
+		}
 	}
 
 	:global(.icon_button__button > svg) {
