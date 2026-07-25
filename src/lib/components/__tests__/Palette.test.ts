@@ -1,7 +1,7 @@
 import { afterEach, expect, test, vi } from 'vitest'
 import { cleanup, render, screen, waitFor } from '@testing-library/svelte/svelte5'
 import userEvent from '@testing-library/user-event'
-import { createRawSnippet } from 'svelte'
+import { createRawSnippet, tick } from 'svelte'
 
 import Palette from '../Palette.svelte'
 import PaletteBind from './PaletteBind.test.svelte'
@@ -53,6 +53,39 @@ test('Displays as many color slots as set in async mode', async () => {
 
 	cells = await screen.findAllByTestId('__palette-cell__')
 	waitFor(() => expect(cells).toHaveLength(3))
+})
+
+test('Discards a stale async colors promise that settles after a newer one', async () => {
+	let resolveStale!: (value: string[]) => void
+	let resolveFresh!: (value: string[]) => void
+	const stalePromise = new Promise<string[]>((resolve) => (resolveStale = resolve))
+	const freshPromise = new Promise<string[]>((resolve) => (resolveFresh = resolve))
+
+	const { component } = setup(PaletteReactive, {
+		props: { initialColors: stalePromise },
+	})
+
+	// The first (slow) request is in flight; nothing is painted yet.
+	await tick()
+	expect(screen.queryAllByTestId('__palette-slot__')).toHaveLength(0)
+
+	// A newer request supersedes it before either settles.
+	component.setColors(freshPromise)
+	await tick()
+
+	// The newer request wins the race and paints its colors.
+	resolveFresh(['#111', '#222'])
+	await waitFor(() => expect(screen.getAllByTestId('__palette-slot__')).toHaveLength(2))
+
+	// The stale request settles last; it must not clobber the newer result.
+	resolveStale(['#aaa', '#bbb', '#ccc'])
+	await stalePromise
+	await tick()
+	await tick()
+
+	const slots = screen.getAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(2)
+	expect(slots.map((slot) => slot.getAttribute('aria-label'))).toEqual(['#111', '#222'])
 })
 
 test('Triggers select with color', async () => {
