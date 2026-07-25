@@ -69,7 +69,6 @@
 		label?: string
 		presentational?: boolean
 		class?: string
-		focusColor?: string
 		header?: Snippet<[HeaderSnippetProps]>
 		beforeSlot?: Snippet<[EdgeSlotSnippetProps]>
 		transparentSlot?: Snippet<[TransparentSlotSnippetProps]>
@@ -104,7 +103,6 @@
 		label = 'Color slots',
 		presentational = false,
 		class: className = '',
-		focusColor = undefined,
 		header = undefined,
 		beforeSlot = undefined,
 		transparentSlot = undefined,
@@ -549,13 +547,7 @@
 	}
 </script>
 
-<div
-	data-palette-id={_paletteId}
-	class="palette {className}"
-	data-testid="__palette__"
-	data-palette
-	style:--focusColor={focusColor}
->
+<div data-palette-id={_paletteId} class="palette {className}" data-testid="__palette__" data-palette>
 	<section class="palette__content" class:palette__content--compact={_isCompact} style="--num-columns: {_numColumns}">
 		{#if !_isCompact}
 			{@render header?.({ selectedColor })}
@@ -593,6 +585,7 @@
 									data-testid="__palette-cell__"
 									class="palette__cells__cell"
 									role="presentation"
+									tabindex={deletionMode === NONE ? undefined : -1}
 									use:useDeletion={{
 										deletionMode,
 										areaSelector: `[data-palette-id="${_paletteId}"]`,
@@ -612,7 +605,6 @@
 											isCompact: false,
 											index: colorIndex,
 											tabindex: _rovingTabindex(optionIndex),
-											focusColor,
 											ariaKeyShortcuts: _deleteShortcut,
 										})}
 									{:else}
@@ -623,7 +615,6 @@
 											tabindex={_rovingTabindex(optionIndex)}
 											aria-keyshortcuts={_deleteShortcut}
 											{transition}
-											{focusColor}
 											onselect={_onSlotSelect}
 										/>
 									{/if}
@@ -654,7 +645,6 @@
 								{@render transparentSlot({
 									tabindex: _rovingTabindex(0),
 									selected: selectedColor === null,
-									focusColor,
 								})}
 							{:else}
 								<PaletteSlot
@@ -662,7 +652,6 @@
 									role={_optionRole}
 									selected={selectedColor === null}
 									tabindex={_rovingTabindex(0)}
-									{focusColor}
 									onselect={_onSlotSelect}
 								/>
 							{/if}
@@ -674,6 +663,7 @@
 							data-testid="__palette-cell__"
 							class="palette__cells__cell"
 							role="presentation"
+							tabindex={deletionMode === NONE ? undefined : -1}
 							use:useDeletion={{
 								deletionMode,
 								areaSelector: `[data-palette-id="${_paletteId}"]`,
@@ -692,7 +682,6 @@
 									isCompact: _isCompact,
 									index,
 									tabindex: _rovingTabindex(optionIndex),
-									focusColor,
 									ariaKeyShortcuts: _deleteShortcut,
 								})}
 							{:else}
@@ -703,7 +692,6 @@
 									tabindex={_rovingTabindex(optionIndex)}
 									aria-keyshortcuts={_deleteShortcut}
 									{transition}
-									{focusColor}
 									onselect={_onSlotSelect}
 								/>
 							{/if}

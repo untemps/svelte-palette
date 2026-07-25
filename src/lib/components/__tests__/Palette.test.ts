@@ -936,6 +936,20 @@ test('Does not make the cell wrappers focusable', async () => {
 	cells.forEach((cell) => expect(cell).not.toHaveAttribute('tabindex'))
 })
 
+test('Keeps deletion cells out of the tab order', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	setup(Palette, { props: { colors, deletionMode: TOOLTIP } })
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells.length).toBeGreaterThan(0)
+	// The deletion tooltip would otherwise mark each cell tabindex="0"; the explicit
+	// tabindex="-1" keeps the listbox a single tab stop and blocks that.
+	cells.forEach((cell) => {
+		expect(cell).toHaveAttribute('tabindex', '-1')
+		expect(cell).not.toHaveAttribute('tabindex', '0')
+	})
+})
+
 test('Keeps exactly one tabbable slot after the colors change', async () => {
 	const colors = ['#100', '#200', '#300', '#400', '#500', '#600']
 	const { rerender } = setup(Palette, { props: { colors, numColumns: 3 } })
@@ -1168,105 +1182,6 @@ test('Drops the group roles and reveals the group name in presentational mode', 
 
 	const name = screen.getAllByTestId('__palette-group-name__')[0]
 	expect(name).not.toHaveAttribute('aria-hidden')
-})
-
-test('Propagates focusColor to the color slots and the transparent slot', async () => {
-	const colors = ['#ff0', '#0ff', '#f0f']
-	setup(Palette, { props: { colors, showTransparentSlot: true, focusColor: 'red' } })
-
-	const slots = await screen.findAllByTestId('__palette-slot__')
-	expect(slots).toHaveLength(colors.length + 1)
-	slots.forEach((slot) => expect(slot.getAttribute('style')).toMatch(/--focusColor:\s*red/))
-})
-
-test('Propagates focusColor to grouped slots', async () => {
-	const colors = [
-		{ name: 'Reds', colors: ['#f00', '#f11'] },
-		{ name: 'Blues', colors: ['#00f'] },
-	]
-	setup(Palette, { props: { colors, focusColor: 'red' } })
-
-	const slots = await screen.findAllByTestId('__palette-slot__')
-	expect(slots).toHaveLength(3)
-	slots.forEach((slot) => expect(slot.getAttribute('style')).toMatch(/--focusColor:\s*red/))
-})
-
-test('Leaves the slot focus color to its default when focusColor is unset', async () => {
-	const colors = ['#ff0', '#0ff']
-	setup(Palette, { props: { colors } })
-
-	const slots = await screen.findAllByTestId('__palette-slot__')
-	slots.forEach((slot) => expect(slot.getAttribute('style') ?? '').not.toContain('--focusColor'))
-})
-
-test('Sets the --focusColor variable on the root so it cascades to custom slots', async () => {
-	const slotSnippet = createRawSnippet(() => ({
-		render: () => `<div data-testid="__custom-slot__" class="slot"></div>`,
-	}))
-	const colors = ['#ff0', '#0ff', '#f0f']
-	setup(Palette, { props: { colors, focusColor: 'red', slot: slotSnippet } })
-
-	await screen.findAllByTestId('__custom-slot__')
-	const root = screen.getByTestId('__palette__')
-	expect(root.getAttribute('style')).toMatch(/--focusColor:\s*red/)
-})
-
-test('Does not set the --focusColor variable on the root when focusColor is unset', async () => {
-	const colors = ['#ff0', '#0ff']
-	setup(Palette, { props: { colors } })
-
-	await screen.findAllByTestId('__palette-slot__')
-	const root = screen.getByTestId('__palette__')
-	expect(root.getAttribute('style') ?? '').not.toContain('--focusColor')
-})
-
-test('Forwards focusColor to custom slot snippets', async () => {
-	const slotSnippet = createRawSnippet((getProps) => ({
-		render: () => `<span data-testid="__fc-slot__" data-focuscolor="${getProps().focusColor}"></span>`,
-	}))
-	const colors = ['#ff0', '#0ff', '#f0f']
-	setup(Palette, { props: { colors, focusColor: 'red', slot: slotSnippet } })
-
-	const custom = await screen.findAllByTestId('__fc-slot__')
-	expect(custom).toHaveLength(3)
-	custom.forEach((el) => expect(el).toHaveAttribute('data-focuscolor', 'red'))
-})
-
-test('Forwards focusColor to custom slots in group mode', async () => {
-	const slotSnippet = createRawSnippet((getProps) => ({
-		render: () => `<span data-testid="__fc-grp-slot__" data-focuscolor="${getProps().focusColor}"></span>`,
-	}))
-	const colors = [
-		{ name: 'Reds', colors: ['#f00', '#f11'] },
-		{ name: 'Blues', colors: ['#00f'] },
-	]
-	setup(Palette, { props: { colors, focusColor: 'red', slot: slotSnippet } })
-
-	const custom = await screen.findAllByTestId('__fc-grp-slot__')
-	expect(custom).toHaveLength(3)
-	custom.forEach((el) => expect(el).toHaveAttribute('data-focuscolor', 'red'))
-})
-
-test('Forwards focusColor to a custom transparent slot', async () => {
-	const transparentSlot = createRawSnippet((getProps) => ({
-		render: () => `<span data-testid="__fc-transparent__" data-focuscolor="${getProps().focusColor}"></span>`,
-	}))
-	const colors = ['#ff0', '#0ff']
-	setup(Palette, { props: { colors, showTransparentSlot: true, focusColor: 'red', transparentSlot } })
-
-	const custom = await screen.findByTestId('__fc-transparent__')
-	expect(custom).toHaveAttribute('data-focuscolor', 'red')
-})
-
-test('Leaves the forwarded focusColor undefined on custom slots when unset', async () => {
-	const slotSnippet = createRawSnippet((getProps) => ({
-		render: () => `<span data-testid="__fc-unset__" data-focuscolor="${getProps().focusColor}"></span>`,
-	}))
-	const colors = ['#ff0', '#0ff']
-	setup(Palette, { props: { colors, slot: slotSnippet } })
-
-	const custom = await screen.findAllByTestId('__fc-unset__')
-	custom.forEach((el) => expect(el).toHaveAttribute('data-focuscolor', 'undefined'))
 })
 
 test('Removes the focused slot with Delete in tooltip deletion mode', async () => {
