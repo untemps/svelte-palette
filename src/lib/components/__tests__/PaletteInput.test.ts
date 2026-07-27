@@ -68,6 +68,16 @@ test('Does not render the eyedropper as a submit button', async () => {
 	expect(button).toHaveAttribute('type', 'button')
 })
 
+// The bundled path no longer passes an aria-label; it inherits the component
+// default. Assert the inherited accessible name so dropping the override cannot
+// silently regress the label a screen reader announces.
+test('Inherits the default eyedropper accessible name', async () => {
+	stubEyeDropper('#ff0')
+	setup(PaletteInput)
+	const button = await screen.findByRole('button', { name: 'Pick a color from the screen' })
+	expect(button).toBeInTheDocument()
+})
+
 test('Does not render the add button as a submit button', async () => {
 	setup(PaletteInput)
 	const button = screen.getByTestId('__palette-input-submit__')
