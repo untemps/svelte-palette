@@ -1,6 +1,6 @@
 <script lang="ts">
 	interface Props {
-		/** Accessible name announced while the palette colors are loading. */
+		/** Text announced by assistive tech while the palette colors are loading. */
 		label?: string
 	}
 

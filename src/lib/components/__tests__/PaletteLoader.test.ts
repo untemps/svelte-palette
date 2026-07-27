@@ -9,8 +9,6 @@ test('Exposes a live status region', () => {
 
 test('Announces the default loading label', () => {
 	render(PaletteLoader)
-	// role="status" is a polite live region: screen readers announce its text
-	// content, so the label must be exposed as real text (not just an aria name).
 	expect(screen.getByRole('status')).toHaveTextContent('Loading colors')
 })
 
