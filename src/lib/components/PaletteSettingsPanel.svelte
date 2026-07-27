@@ -3,7 +3,7 @@
 
 	export const usePortal: Action<HTMLElement, { target?: string; visible?: boolean }> = (
 		node,
-		{ target = 'body', visible = false }
+		{ target = 'body', visible = false } = {}
 	) => {
 		const getTargetEl = (selector: string): Element | null => {
 			if (!!selector) {
@@ -22,16 +22,23 @@
 			node.parentNode?.removeChild(node)
 		}
 
-		let targetEl = getTargetEl(target)
-		visible ? show() : hide()
+		let currentTarget = target
+		let currentVisible = visible
+		let targetEl = getTargetEl(currentTarget)
+		currentVisible ? show() : hide()
 
 		return {
-			update: ({ target: newTarget = target, visible: newVisible = visible }) => {
-				if (newTarget !== target) {
-					targetEl = getTargetEl(newTarget)
+			update: ({ target: newTarget = currentTarget, visible: newVisible = currentVisible } = {}) => {
+				if (newTarget !== currentTarget) {
+					currentTarget = newTarget
+					targetEl = getTargetEl(currentTarget)
+					if (currentVisible) {
+						show()
+					}
 				}
-				if (newVisible !== visible) {
-					newVisible ? show() : hide()
+				if (newVisible !== currentVisible) {
+					currentVisible = newVisible
+					currentVisible ? show() : hide()
 				}
 			},
 			destroy: () => {

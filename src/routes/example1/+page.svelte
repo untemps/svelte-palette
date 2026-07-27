@@ -355,27 +355,31 @@
 	.palette__settings {
 		position: absolute;
 		right: 0;
-		top: 0;
+		top: 3rem;
 		bottom: 0;
+		overflow: hidden;
 		z-index: 999;
 	}
 
 	.settings {
 		overflow: hidden auto;
+		scrollbar-gutter: stable;
+		scrollbar-width: thin;
+		scrollbar-color: #555 transparent;
 		width: 320px;
 		min-width: 320px;
-		min-height: 100%;
+		height: 100%;
 		display: flex;
 		flex-direction: column;
 		align-items: flex-end;
-		justify-content: center;
+		justify-content: safe center;
 		background-color: black;
 		padding: 2rem;
 	}
 
-	:global(.bx--btn.bx--btn--icon-only.bx--tooltip__trigger) {
-		position: absolute !important;
-		right: 12px !important;
+	:global(.settings__close-button.bx--btn.bx--btn--icon-only.bx--tooltip__trigger) {
+		position: fixed !important;
+		right: calc(320px + 0.75rem) !important;
 		top: 60px !important;
 	}
 
