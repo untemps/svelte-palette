@@ -33,10 +33,6 @@ test('Enables submit button when input color is valid', async () => {
 	expect(button).toBeDisabled()
 	await user.type(input, 'ff')
 	expect(button).toBeDisabled()
-	// _onInputChange reformats to "#$1" on each keystroke, so the typed digits land as
-	// "#ffff00" — a valid 6-digit hex. Typing "ff0" here would stop at "#ffff0" (5 digits,
-	// invalid), leaving the button disabled. The waitFor must be awaited so the assertion
-	// actually runs instead of floating as an unhandled rejection.
 	await user.type(input, 'ff00')
 	await waitFor(() => expect(button).toBeEnabled())
 })
@@ -72,9 +68,6 @@ test('Does not render the eyedropper as a submit button', async () => {
 	expect(button).toHaveAttribute('type', 'button')
 })
 
-// The bundled path no longer passes an aria-label; it inherits the component
-// default. Assert the inherited accessible name so dropping the override cannot
-// silently regress the label a screen reader announces.
 test('Inherits the default eyedropper accessible name', async () => {
 	stubEyeDropper('#ff0')
 	setup(PaletteInput)
