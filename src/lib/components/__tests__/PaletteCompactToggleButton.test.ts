@@ -1,5 +1,4 @@
-import { afterEach, expect, test, vi } from 'vitest'
-import { cleanup, render, screen } from '@testing-library/svelte/svelte5'
+import { render, screen } from '@testing-library/svelte/svelte5'
 import userEvent from '@testing-library/user-event'
 
 import PaletteCompactToggleButton from '../PaletteCompactToggleButton.svelte'
@@ -10,8 +9,6 @@ const setup = (component: Parameters<typeof render>[0], options?: Parameters<typ
 		...render(component, options),
 	}
 }
-
-afterEach(() => cleanup())
 
 test('Displays enlarge icon', () => {
 	const isCompact = false

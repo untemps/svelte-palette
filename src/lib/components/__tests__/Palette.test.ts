@@ -1,5 +1,4 @@
-import { afterEach, expect, test, vi } from 'vitest'
-import { cleanup, render, screen, waitFor } from '@testing-library/svelte/svelte5'
+import { render, screen, waitFor } from '@testing-library/svelte/svelte5'
 import userEvent from '@testing-library/user-event'
 import { createRawSnippet, tick } from 'svelte'
 
@@ -15,8 +14,6 @@ const setup = (component: Parameters<typeof render>[0], options?: Parameters<typ
 		...render(component, options),
 	}
 }
-
-afterEach(() => cleanup())
 
 const boundingRect = (left: number, top: number, right: number, bottom: number) =>
 	({ left, top, right, bottom, width: right - left, height: bottom - top }) as DOMRect
