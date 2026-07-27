@@ -355,15 +355,18 @@
 	.palette__settings {
 		position: absolute;
 		right: 0;
-		top: 0;
+		/* Start below the fixed 3rem app header, and clip the panel so its inner
+		   scroll never leaks a second scrollbar onto the page. */
+		top: 3rem;
 		bottom: 0;
+		overflow: hidden;
 		z-index: 999;
 	}
 
 	.settings {
+		/* This box is the only scroller; keep the bar thin and reserve its gutter so
+		   the layout doesn't shift when it appears. */
 		overflow: hidden auto;
-		/* Reserve the scrollbar space so content doesn't shift, and keep it thin and
-		   subtle rather than a heavy always-on bar butting against the close button. */
 		scrollbar-gutter: stable;
 		scrollbar-width: thin;
 		scrollbar-color: #555 transparent;
@@ -379,16 +382,15 @@
 		   reachable — plain `center` pushes it above the scroll origin and clips it. */
 		justify-content: safe center;
 		background-color: black;
-		/* Extra top padding clears the fixed app header and the absolutely positioned
-		   close button so the first control is never hidden beneath them. */
-		padding: 7rem 2rem 2rem;
+		padding: 2rem;
 	}
 
-	:global(.bx--btn.bx--btn--icon-only.bx--tooltip__trigger) {
-		position: absolute !important;
-		/* Sit just below the header and clear of the reserved scrollbar gutter. */
-		right: 22px !important;
-		top: 56px !important;
+	:global(.settings__close-button.bx--btn.bx--btn--icon-only.bx--tooltip__trigger) {
+		/* Fixed to the viewport just left of the 320px panel: the panel's own scroll
+		   then never runs the settings content under the close button. */
+		position: fixed !important;
+		right: calc(320px + 0.75rem) !important;
+		top: 60px !important;
 	}
 
 	:global(.settings--collapsed > .bx--btn.bx--btn--icon-only.bx--tooltip__trigger.settings__close-button) {
