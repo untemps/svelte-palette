@@ -1,5 +1,4 @@
-import { afterEach, expect, test } from 'vitest'
-import { cleanup, render } from '@testing-library/svelte/svelte5'
+import { render } from '@testing-library/svelte/svelte5'
 import { tick } from 'svelte'
 
 import PaletteSettingsPanelReactive from './PaletteSettingsPanel.test.svelte'
@@ -7,8 +6,6 @@ import PaletteSettingsPanelReactive from './PaletteSettingsPanel.test.svelte'
 const PANEL_SELECTOR = '.palette__settings__panel'
 
 const panelInDocument = () => document.querySelector(PANEL_SELECTOR) !== null
-
-afterEach(() => cleanup())
 
 test('Renders the panel content', () => {
 	render(PaletteSettingsPanelReactive, { props: { initialIsVisible: true } })

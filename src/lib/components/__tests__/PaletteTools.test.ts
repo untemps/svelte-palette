@@ -1,5 +1,4 @@
-import { afterEach, expect, test, vi } from 'vitest'
-import { cleanup, render, screen } from '@testing-library/svelte/svelte5'
+import { render, screen } from '@testing-library/svelte/svelte5'
 import userEvent from '@testing-library/user-event'
 
 import { COMPACT, SETTINGS } from '../../enums/PaletteTool.js'
@@ -12,8 +11,6 @@ const setup = (component: Parameters<typeof render>[0], options?: Parameters<typ
 		...render(component, options),
 	}
 }
-
-afterEach(() => cleanup())
 
 test('Renders no buttons when tools is empty', () => {
 	setup(PaletteTools, { props: { tools: [] } })
