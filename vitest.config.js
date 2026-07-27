@@ -3,7 +3,7 @@ import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
 	test: {
-		global: true,
+		globals: true,
 		environment: 'jsdom',
 		// Automatically restore globals stubbed with vi.stubGlobal after each test,
 		// so no test file can leak a stub into the tests that follow it.
