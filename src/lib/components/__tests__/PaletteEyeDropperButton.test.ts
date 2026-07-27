@@ -42,6 +42,15 @@ test('Renders eye dropper button', async () => {
 	expect(button).toBeInTheDocument()
 })
 
+// The icon-only button has no text content, so its aria-label is the sole source of
+// its accessible name. Assert the default (no props) so a regression to a mislabeled
+// value — e.g. the old "Submit the hex color value" — is caught rather than passing CI.
+test('Sets a default aria-label describing the pick action', () => {
+	setup(PaletteEyeDropperButton)
+	const button = screen.getByRole('button', { name: 'Pick a color from the screen' })
+	expect(button).toBeInTheDocument()
+})
+
 test('Sets eye dropper button aria-label', () => {
 	const ariaLabel = 'Foo'
 	setup(PaletteEyeDropperButton, { ['aria-label']: ariaLabel })
