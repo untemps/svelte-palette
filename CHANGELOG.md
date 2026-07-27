@@ -1,3 +1,10 @@
+# [6.0.0-beta.11](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.10...v6.0.0-beta.11) (2026-07-27)
+
+
+### Bug Fixes
+
+* Fix usePortal stale closure that breaks the settings panel ([#234](https://github.com/untemps/svelte-palette/issues/234)) ([983e0f5](https://github.com/untemps/svelte-palette/commit/983e0f5e8089b7e327c7d5031603cf93fbb23a45))
+
 # [6.0.0-beta.10](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.9...v6.0.0-beta.10) (2026-07-25)
 
 
