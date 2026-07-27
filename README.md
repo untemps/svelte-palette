@@ -435,6 +435,8 @@ In case you want to call an API to fetch the palette colors, you may pass a prom
 
 The component displays a customizable loader waiting to the promise to be resolved. Be aware that the result of the promise must be an array of color strings as well. The color input and the compact toggle only appear once the promise has resolved.
 
+The default loader (`PaletteLoader`) is an accessible live region: it exposes a `role="status"` so screen readers announce the loading state, and its spinner is driven by a CSS animation that is disabled under `prefers-reduced-motion: reduce`. When you render `PaletteLoader` directly, its announced text comes from a `label` prop (defaults to `Loading colors`). Through `<Palette>` the default loader announces that English default, so to localize the loading announcement — or to replace the loader entirely — supply your own `loader` snippet.
+
 #### Example
 
 ```svelte
