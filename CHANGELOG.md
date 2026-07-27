@@ -1,3 +1,10 @@
+# [6.0.0-beta.12](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.11...v6.0.0-beta.12) (2026-07-27)
+
+
+### Bug Fixes
+
+* Announce loading state and honor reduced motion ([#238](https://github.com/untemps/svelte-palette/issues/238)) ([37ca4b6](https://github.com/untemps/svelte-palette/commit/37ca4b670b3e991c279ab9ce1050923e2369da21))
+
 # [6.0.0-beta.11](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.10...v6.0.0-beta.11) (2026-07-27)
 
 
