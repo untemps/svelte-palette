@@ -106,7 +106,7 @@
 			/>
 		</span>
 		{#if _isEyeDropperAvailable && inputType !== 'color'}
-			<PaletteEyeDropperButton aria-label="Pick a color from the screen" onadd={_onEyeDropperAdd} />
+			<PaletteEyeDropperButton onadd={_onEyeDropperAdd} />
 		{/if}
 	</form>
 </section>

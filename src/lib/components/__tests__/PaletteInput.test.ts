@@ -33,8 +33,8 @@ test('Enables submit button when input color is valid', async () => {
 	expect(button).toBeDisabled()
 	await user.type(input, 'ff')
 	expect(button).toBeDisabled()
-	await user.type(input, 'ff0')
-	waitFor(() => expect(button).toBeEnabled())
+	await user.type(input, 'ff00')
+	await waitFor(() => expect(button).toBeEnabled())
 })
 
 test('Enables submit button when set color is valid', async () => {
@@ -66,6 +66,13 @@ test('Does not render the eyedropper as a submit button', async () => {
 	setup(PaletteInput)
 	const button = await screen.findByTestId('__palette-eyedropper-button__')
 	expect(button).toHaveAttribute('type', 'button')
+})
+
+test('Inherits the default eyedropper accessible name', async () => {
+	stubEyeDropper('#ff0')
+	setup(PaletteInput)
+	const button = await screen.findByRole('button', { name: 'Pick a color from the screen' })
+	expect(button).toBeInTheDocument()
 })
 
 test('Does not render the add button as a submit button', async () => {

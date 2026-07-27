@@ -42,6 +42,12 @@ test('Renders eye dropper button', async () => {
 	expect(button).toBeInTheDocument()
 })
 
+test('Sets a default aria-label describing the pick action', () => {
+	setup(PaletteEyeDropperButton)
+	const button = screen.getByRole('button', { name: 'Pick a color from the screen' })
+	expect(button).toBeInTheDocument()
+})
+
 test('Sets eye dropper button aria-label', () => {
 	const ariaLabel = 'Foo'
 	setup(PaletteEyeDropperButton, { ['aria-label']: ariaLabel })
