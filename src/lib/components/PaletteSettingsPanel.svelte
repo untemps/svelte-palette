@@ -22,8 +22,6 @@
 			node.parentNode?.removeChild(node)
 		}
 
-		// Track the current parameters so `update` compares against the value from the
-		// previous invocation rather than the (never-reassigned) mount-time value.
 		let currentTarget = target
 		let currentVisible = visible
 		let targetEl = getTargetEl(currentTarget)
@@ -34,7 +32,6 @@
 				if (newTarget !== currentTarget) {
 					currentTarget = newTarget
 					targetEl = getTargetEl(currentTarget)
-					// Re-parent an already-visible node into the newly resolved target.
 					if (currentVisible) {
 						show()
 					}

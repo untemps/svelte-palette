@@ -355,8 +355,6 @@
 	.palette__settings {
 		position: absolute;
 		right: 0;
-		/* Start below the fixed 3rem app header, and clip the panel so its inner
-		   scroll never leaks a second scrollbar onto the page. */
 		top: 3rem;
 		bottom: 0;
 		overflow: hidden;
@@ -364,30 +362,22 @@
 	}
 
 	.settings {
-		/* This box is the only scroller; keep the bar thin and reserve its gutter so
-		   the layout doesn't shift when it appears. */
 		overflow: hidden auto;
 		scrollbar-gutter: stable;
 		scrollbar-width: thin;
 		scrollbar-color: #555 transparent;
 		width: 320px;
 		min-width: 320px;
-		/* Bound the height to the viewport so the box actually scrolls when the form
-		   overflows; `min-height` let it grow to fit the content, defeating overflow. */
 		height: 100%;
 		display: flex;
 		flex-direction: column;
 		align-items: flex-end;
-		/* `safe` falls back to flex-start on overflow so the top of the form stays
-		   reachable — plain `center` pushes it above the scroll origin and clips it. */
 		justify-content: safe center;
 		background-color: black;
 		padding: 2rem;
 	}
 
 	:global(.settings__close-button.bx--btn.bx--btn--icon-only.bx--tooltip__trigger) {
-		/* Fixed to the viewport just left of the 320px panel: the panel's own scroll
-		   then never runs the settings content under the close button. */
 		position: fixed !important;
 		right: calc(320px + 0.75rem) !important;
 		top: 60px !important;

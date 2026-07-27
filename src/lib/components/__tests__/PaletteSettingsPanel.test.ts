@@ -6,10 +6,6 @@ import PaletteSettingsPanelReactive from './PaletteSettingsPanel.test.svelte'
 
 const PANEL_SELECTOR = '.palette__settings__panel'
 
-// The portal detaches the node from the document when hidden, so a plain
-// `querySelector` (which only walks the live document tree) is null exactly when
-// the panel is not mounted. This asserts on real presence rather than the
-// `--visible` class, which stays applied even when the hide path is dead.
 const panelInDocument = () => document.querySelector(PANEL_SELECTOR) !== null
 
 afterEach(() => cleanup())
