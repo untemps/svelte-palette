@@ -219,7 +219,7 @@ The `deletionMode` prop allows to define the way users can delete (or not) the c
 | `tooltip` | A tooltip is displayed when hovering a color slot, a click within deletes the slot <br/>(You can control tooltip display though the `tooltipClassName` and `tooltipContentSelector` props) |
 | `drop`    | Colors slots are draggable, a drop outside the palette deletes the slot                                                                                                                    |
 
-As an helper, deletion mode enums are exported in `PaletteDeletionMode`.
+As a helper, the deletion mode values are exported as named constants: `NONE`, `TOOLTIP` and `DROP`.
 
 # Compact Mode
 
@@ -510,13 +510,13 @@ The tools panel is a container for two actions:
 
 For some use cases, you may want to provide your own controls by using the `tools` snippet.
 
-To access each tool behaviours, the Palette component exports a `onSelect` function that has to be called with the name of the tool (use the enums from the exported `PaletteTool`).
+To access each tool behaviours, the Palette component exports a `onSelect` function that has to be called with the name of the tool (use the exported `SETTINGS` and `COMPACT` constants).
 
 #### Example
 
 ```svelte
 <script>
-	import { Palette, PaletteTool } from '@untemps/svelte-palette'
+	import { Palette, SETTINGS, COMPACT } from '@untemps/svelte-palette'
 
 	const colors = ['#865C54', '#8F5447', '#A65846', '#A9715E', '#AD8C72']
 </script>
@@ -524,8 +524,8 @@ To access each tool behaviours, the Palette component exports a `onSelect` funct
 <Palette {colors}>
 	{#snippet tools({ onSelect, isCompact })}
 		<div>
-			<button onclick={() => onSelect(PaletteTool.SETTINGS)}>Settings</button>
-			<button onclick={() => onSelect(PaletteTool.COMPACT)}>{isCompact ? 'Expand' : 'Compact'}</button>
+			<button onclick={() => onSelect(SETTINGS)}>Settings</button>
+			<button onclick={() => onSelect(COMPACT)}>{isCompact ? 'Expand' : 'Compact'}</button>
 		</div>
 	{/snippet}
 </Palette>
