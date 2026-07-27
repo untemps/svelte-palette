@@ -33,8 +33,12 @@ test('Enables submit button when input color is valid', async () => {
 	expect(button).toBeDisabled()
 	await user.type(input, 'ff')
 	expect(button).toBeDisabled()
-	await user.type(input, 'ff0')
-	waitFor(() => expect(button).toBeEnabled())
+	// _onInputChange reformats to "#$1" on each keystroke, so the typed digits land as
+	// "#ffff00" — a valid 6-digit hex. Typing "ff0" here would stop at "#ffff0" (5 digits,
+	// invalid), leaving the button disabled. The waitFor must be awaited so the assertion
+	// actually runs instead of floating as an unhandled rejection.
+	await user.type(input, 'ff00')
+	await waitFor(() => expect(button).toBeEnabled())
 })
 
 test('Enables submit button when set color is valid', async () => {
