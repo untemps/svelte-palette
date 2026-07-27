@@ -362,6 +362,11 @@
 
 	.settings {
 		overflow: hidden auto;
+		/* Reserve the scrollbar space so content doesn't shift, and keep it thin and
+		   subtle rather than a heavy always-on bar butting against the close button. */
+		scrollbar-gutter: stable;
+		scrollbar-width: thin;
+		scrollbar-color: #555 transparent;
 		width: 320px;
 		min-width: 320px;
 		/* Bound the height to the viewport so the box actually scrolls when the form
@@ -374,13 +379,16 @@
 		   reachable — plain `center` pushes it above the scroll origin and clips it. */
 		justify-content: safe center;
 		background-color: black;
-		padding: 2rem;
+		/* Extra top padding clears the fixed app header and the absolutely positioned
+		   close button so the first control is never hidden beneath them. */
+		padding: 7rem 2rem 2rem;
 	}
 
 	:global(.bx--btn.bx--btn--icon-only.bx--tooltip__trigger) {
 		position: absolute !important;
-		right: 12px !important;
-		top: 60px !important;
+		/* Sit just below the header and clear of the reserved scrollbar gutter. */
+		right: 22px !important;
+		top: 56px !important;
 	}
 
 	:global(.settings--collapsed > .bx--btn.bx--btn--icon-only.bx--tooltip__trigger.settings__close-button) {
