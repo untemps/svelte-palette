@@ -123,6 +123,19 @@ test('Does not display slot if inputType is "color"', async () => {
 	expect(button).not.toBeInTheDocument()
 })
 
+test('Replaces an unsupported but valid input type with "text"', async () => {
+	// `number` is a real HTML input type, so without sanitization it would reach the DOM
+	// verbatim and render a number spinner. The documented contract only allows text/color.
+	setup(PaletteInput, {
+		color: '#ff0',
+		inputType: 'number',
+	})
+	const input = screen.getByTestId('__palette-input-input__')
+	expect(input).toHaveAttribute('type', 'text')
+	// The preview slot is gated on the text branch, so it must still render.
+	expect(screen.getByTestId('__palette-input-slot__')).toBeInTheDocument()
+})
+
 test('Hides the decorative preview swatch from the accessibility tree', async () => {
 	// The swatch is purely decorative; `role="presentation"` would be ignored because
 	// PaletteSlot always carries a global `aria-label`, so it must use `aria-hidden` to
