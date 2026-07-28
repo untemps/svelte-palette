@@ -105,7 +105,7 @@ Snippets replace the Svelte 4 named slots API. Pass them as children of `<Palett
 | ----------------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 | `header`          | Allow to add a header to the palette. By default, it is empty.                      | `selectedColor`                                                                                                                    |
 | `footer`          | Allow to add a footer to the palette. By default, it is empty.                      | `selectedColor`                                                                                                                    |
-| `slot`            | Allow to replace the default color slots.                                           | `index`, `color`, `colorName`, `groupName`, `selectedColor`, `selected`, `transition`, `isCompact`, `tabindex`, `ariaKeyShortcuts` |
+| `slot`            | Allow to replace the default color slots. `groupName` is only set in grouped mode.  | `index`, `color`, `colorName`, `groupName`, `selectedColor`, `selected`, `transition`, `isCompact`, `tabindex`, `ariaKeyShortcuts` |
 | `transparentSlot` | Allow to replace the default transparent slot.                                      | `tabindex`, `selected`                                                                                                             |
 | `beforeSlot`      | Allow to add an element before the color slots.                                     | `selectedColor`, `transition`, `isCompact`                                                                                         |
 | `afterSlot`       | Allow to add an element after the color slots.                                      | `selectedColor`, `transition`, `isCompact`                                                                                         |
@@ -201,7 +201,7 @@ Each group has:
 - `name` (optional) — displayed as a label above the group
 - `colors` — array of color strings or color objects
 
-When groups are used, compact mode and the color input are not available. The `colorSlot` snippet receives an additional `groupName` parameter.
+When groups are used, compact mode and the color input are not available. The `slot` snippet receives an additional `groupName` parameter.
 
 ## Promise
 
