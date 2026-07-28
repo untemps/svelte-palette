@@ -7,7 +7,7 @@
 	import PaletteSlot from './PaletteSlot.svelte'
 	import PaletteEyeDropperButton from './PaletteEyeDropperButton.svelte'
 
-	import { COLOR_REGEX, isColorValid } from '../utils/utils'
+	import { COLOR_REGEX, isColorValid, normalizeInputType } from '../utils/utils'
 
 	import type { InputAddEventArgs, ColorValue, InputType } from '../types'
 
@@ -31,8 +31,9 @@
 		color = colorProp?.replace(COLOR_REGEX, '#$1') || ''
 	})
 
-	let _gridColumnStart = $derived(2 - Number(inputType === 'color'))
-	let _gridColumnEnd = $derived((_isEyeDropperAvailable ? 5 : 6) + Number(inputType === 'color'))
+	let _inputType = $derived(normalizeInputType(inputType))
+	let _gridColumnStart = $derived(2 - Number(_inputType === 'color'))
+	let _gridColumnEnd = $derived((_isEyeDropperAvailable ? 5 : 6) + Number(_inputType === 'color'))
 
 	let isValid = $derived(isColorValid(color))
 
@@ -75,7 +76,7 @@
 	style="--grid-column-start: {_gridColumnStart}; --grid-column-end: {_gridColumnEnd}"
 >
 	<form onsubmit={(e) => e.preventDefault()}>
-		{#if inputType !== 'color'}<PaletteSlot
+		{#if _inputType !== 'color'}<PaletteSlot
 				data-testid="__palette-input-slot__"
 				{color}
 				aria-hidden="true"
@@ -85,12 +86,12 @@
 		<span class="palette_input__adder">
 			<input
 				data-testid="__palette-input-input__"
-				type={inputType}
+				type={_inputType}
 				value={color}
 				aria-label="Enter an hex color value"
 				title="'The value must be a valid hex color'"
 				class="palette_input__input"
-				class:palette_input__input--color={inputType === 'color'}
+				class:palette_input__input--color={_inputType === 'color'}
 				onfocus={_onInputFocus}
 				onblur={_onInputBlur}
 				oninput={_onInputChange}
@@ -105,7 +106,7 @@
 				onclick={_onSubmit}
 			/>
 		</span>
-		{#if _isEyeDropperAvailable && inputType !== 'color'}
+		{#if _isEyeDropperAvailable && _inputType !== 'color'}
 			<PaletteEyeDropperButton onadd={_onEyeDropperAdd} />
 		{/if}
 	</form>

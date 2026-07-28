@@ -6,6 +6,7 @@
 		calculateColors,
 		calculateNumColumns,
 		isColorGroups,
+		normalizeInputType,
 		transformColors,
 	} from '../utils/utils.js'
 
@@ -128,6 +129,8 @@
 	let _skipColorsSync = $state(false)
 	let _syncedViewParams: ReturnType<typeof _viewParams> | null = null
 	let _colorsGeneration = 0
+
+	let _inputType = $derived(normalizeInputType(inputType))
 
 	const _viewParams = () => ({
 		isCompact: _isCompact,
@@ -716,9 +719,9 @@
 	</section>
 	{#if !_isCompact && showInput && _colors != null}
 		{#if input}
-			{@render input({ selectedColor, inputType })}
+			{@render input({ selectedColor, inputType: _inputType })}
 		{:else}
-			<PaletteInput color={selectedColor} {inputType} onadd={_onInputAdd} />
+			<PaletteInput color={selectedColor} inputType={_inputType} onadd={_onInputAdd} />
 		{/if}
 	{/if}
 	{#if !_isCompact && !!_tools?.length}

@@ -5,6 +5,7 @@ import {
 	isColorGroups,
 	isColorValid,
 	normalizeColor,
+	normalizeInputType,
 	transformColors,
 } from '../utils.js'
 
@@ -254,6 +255,23 @@ describe('utils', () => {
 			[0, false],
 		])('color:%j, expected:%j', (color, expected) => {
 			expect(isColorValid(color)).toBe(expected)
+		})
+	})
+
+	describe('normalizeInputType', () => {
+		test.each([
+			['text', 'text'],
+			['color', 'color'],
+			['foo', 'text'],
+			['number', 'text'],
+			['checkbox', 'text'],
+			['range', 'text'],
+			['password', 'text'],
+			['', 'text'],
+			[null, 'text'],
+			[undefined, 'text'],
+		])('type:%j, expected:%j', (type, expected) => {
+			expect(normalizeInputType(type)).toBe(expected)
 		})
 	})
 })

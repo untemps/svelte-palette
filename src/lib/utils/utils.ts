@@ -1,6 +1,6 @@
 import { extractByIndices } from '@untemps/utils/array/extractByIndices'
 
-import type { ColorGroup, ColorInput, ColorValue } from '../types'
+import type { ColorGroup, ColorInput, ColorValue, InputType } from '../types'
 
 /**
  * A color normalized to an object shape, as consumed internally by the components.
@@ -138,3 +138,8 @@ export const normalizeColor = ($color: string): string => {
 	}
 	return $color
 }
+
+export const PALETTE_INPUT_TYPES = ['text', 'color'] as const satisfies readonly InputType[]
+
+export const normalizeInputType = ($type: string | null | undefined): InputType =>
+	PALETTE_INPUT_TYPES.includes($type as InputType) ? ($type as InputType) : 'text'
