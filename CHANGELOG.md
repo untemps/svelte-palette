@@ -1,3 +1,10 @@
+# [6.0.0-beta.14](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.13...v6.0.0-beta.14) (2026-07-28)
+
+
+### Bug Fixes
+
+* Sanitize unsupported inputType values to text ([#247](https://github.com/untemps/svelte-palette/issues/247)) ([89749e9](https://github.com/untemps/svelte-palette/commit/89749e9af74f742310f36c64ea289550561be645))
+
 # [6.0.0-beta.13](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.12...v6.0.0-beta.13) (2026-07-28)
 
 
