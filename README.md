@@ -54,7 +54,7 @@ yarn add @untemps/svelte-palette
 </style>
 ```
 
-## API
+## Palette API
 
 | Props                    | Type                                                                                                    | Default       | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | ------------------------ | ------------------------------------------------------------------------------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -96,18 +96,18 @@ yarn add @untemps/svelte-palette
 
 Snippets replace the Svelte 4 named slots API. Pass them as children of `<Palette>` using the `{#snippet name(props)}` syntax.
 
-| Snippet           | Description                                                                         | Available Properties                                                                                                               |
-| ----------------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `header`          | Allow to add a header to the palette. By default, it is empty.                      | `selectedColor`                                                                                                                    |
-| `footer`          | Allow to add a footer to the palette. By default, it is empty.                      | `selectedColor`                                                                                                                    |
-| `slot`            | Allow to replace the default color slots. `groupName` is only set in grouped mode.  | `index`, `color`, `colorName`, `groupName`, `selectedColor`, `selected`, `transition`, `isCompact`, `tabindex`, `ariaKeyShortcuts` |
-| `transparentSlot` | Allow to replace the default transparent slot.                                      | `tabindex`, `selected`                                                                                                             |
-| `beforeSlot`      | Allow to add an element before the color slots.                                     | `selectedColor`, `transition`, `isCompact`                                                                                         |
-| `afterSlot`       | Allow to add an element after the color slots.                                      | `selectedColor`, `transition`, `isCompact`                                                                                         |
-| `input`           | Allow to replace the default color input. Only rendered when `showInput` is `true`. | `selectedColor`, `inputType`                                                                                                       |
-| `settings`        | Allow to replace the settings panel. See the demo to grab a usage example.          | `onClose`                                                                                                                          |
-| `tools`           | Allow to replace the tools panel.                                                   | `isCompact`, `compactColorIndices`, `onSelect`                                                                                     |
-| `loader`          | Allow to replace the loader displayed during the colors async retrieving.           | -                                                                                                                                  |
+| Snippet           | Description                                                                                                                      | Available Properties                                                                                                               |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `header`          | Allow to add a header to the palette. By default, it is empty.                                                                   | `selectedColor`                                                                                                                    |
+| `footer`          | Allow to add a footer to the palette. By default, it is empty.                                                                   | `selectedColor`                                                                                                                    |
+| `slot`            | Allow to replace the default color slots. `groupName` is only set in grouped mode. Compose [`PaletteSlot`](#paletteslot).        | `index`, `color`, `colorName`, `groupName`, `selectedColor`, `selected`, `transition`, `isCompact`, `tabindex`, `ariaKeyShortcuts` |
+| `transparentSlot` | Allow to replace the default transparent slot.                                                                                   | `tabindex`, `selected`                                                                                                             |
+| `beforeSlot`      | Allow to add an element before the color slots.                                                                                  | `selectedColor`, `transition`, `isCompact`                                                                                         |
+| `afterSlot`       | Allow to add an element after the color slots.                                                                                   | `selectedColor`, `transition`, `isCompact`                                                                                         |
+| `input`           | Allow to replace the default color input (see [`PaletteInput`](#paletteinput)). Only rendered when `showInput` is `true`.        | `selectedColor`, `inputType`                                                                                                       |
+| `settings`        | Allow to replace the settings panel (see [`PaletteSettingsPanel`](#palettesettingspanel)). See the demo to grab a usage example. | `onClose`                                                                                                                          |
+| `tools`           | Allow to replace the tools panel (see [`PaletteTools`](#palettetools)).                                                          | `isCompact`, `compactColorIndices`, `onSelect`                                                                                     |
+| `loader`          | Allow to replace the loader displayed during the colors async retrieving (see [`PaletteLoader`](#paletteloader)).                | -                                                                                                                                  |
 
 ## Example
 
@@ -158,6 +158,158 @@ Snippets replace the Svelte 4 named slots API. Pass them as children of `<Palett
 	}
 </style>
 ```
+
+# Components
+
+The package exports eleven components from its entry point, alongside the [deletion-mode](#deletion-modes) and [tool](#customize-the-tools-panel) enums. [`Palette`](#palette-api) is the top-level component; the others are the primitives it composes, exported so you can build your own snippets (`slot`, `input`, `settings`, `tools`, `loader`) or reuse a single control on its own.
+
+```js
+import {
+	Palette,
+	PaletteSlot,
+	PaletteInput,
+	PaletteEyeDropperButton,
+	PaletteTrashButton,
+	PaletteCompactToggleButton,
+	PaletteIconButton,
+	PaletteLoader,
+	PaletteSettingsButton,
+	PaletteSettingsPanel,
+	PaletteTools,
+} from '@untemps/svelte-palette'
+```
+
+| Component                                                   | Purpose                                                                                         |
+| ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| [`Palette`](#palette-api)                                   | The main color-picker component (documented in [Palette API](#palette-api)).                    |
+| [`PaletteSlot`](#paletteslot)                               | A single color slot button as rendered in the grid.                                             |
+| [`PaletteInput`](#paletteinput)                             | The color input used to add a new slot (default `input` snippet).                               |
+| [`PaletteEyeDropperButton`](#paletteeyedropperbutton)       | Button that opens the browser EyeDropper to pick a color from the screen.                       |
+| [`PaletteTrashButton`](#palettetrashbutton)                 | The trash button shown in the deletion tooltip.                                                 |
+| [`PaletteCompactToggleButton`](#palettecompacttogglebutton) | Toggles the palette between compact and full modes.                                             |
+| [`PaletteIconButton`](#paletteiconbutton)                   | The base icon button every toolbar button is built on.                                          |
+| [`PaletteLoader`](#paletteloader)                           | The accessible loader shown while an async `colors` source resolves (default `loader` snippet). |
+| [`PaletteSettingsButton`](#palettesettingsbutton)           | Button that opens the settings panel.                                                           |
+| [`PaletteSettingsPanel`](#palettesettingspanel)             | A panel portalled into the DOM, used to host settings content.                                  |
+| [`PaletteTools`](#palettetools)                             | The tools panel wiring the settings and compact-toggle buttons (default `tools` snippet).       |
+
+Each button component below forwards any extra attributes (`...restProps`) to its underlying `<button>`, so attributes such as `aria-label` or `data-*` pass straight through.
+
+## PaletteSlot
+
+A single color slot rendered as a `<button>`, as displayed inside the palette grid.
+
+| Prop         | Type           | Default | Description                                                                  |
+| ------------ | -------------- | ------- | ---------------------------------------------------------------------------- |
+| `color`      | string \| null | null    | The color value of the slot.                                                 |
+| `selected`   | boolean        | false   | Whether the slot is selected.                                                |
+| `disabled`   | boolean        | false   | Whether the slot is disabled. A disabled slot ignores clicks.                |
+| `tabindex`   | number         | 0       | Tab index applied to the button; used to build the grid roving tab index.    |
+| `transition` | object \| null | null    | Animation applied when the slot is rendered (see [Transition](#transition)). |
+
+| Callback   | Arguments   | Description                      |
+| ---------- | ----------- | -------------------------------- |
+| `onselect` | `{ color }` | Called when the slot is clicked. |
+
+## PaletteInput
+
+The color input used to add a new color to the palette. Implements the default [`input`](#snippets) snippet, and renders the [`PaletteEyeDropperButton`](#paletteeyedropperbutton) when the EyeDropper API is available and `inputType` is `"text"`.
+
+| Prop        | Type              | Default | Description                                                |
+| ----------- | ----------------- | ------- | ---------------------------------------------------------- |
+| `color`     | string \| null    | null    | The color pre-filled in the input.                         |
+| `inputType` | "text" \| "color" | "text"  | Type of the input. Any other value falls back to `"text"`. |
+| `class`     | string            | ''      | Class name applied to the root element.                    |
+
+| Callback | Arguments   | Description                       |
+| -------- | ----------- | --------------------------------- |
+| `onadd`  | `{ color }` | Called when a color is submitted. |
+
+## PaletteEyeDropperButton
+
+Button that opens the browser [EyeDropper API](#eyedropper-api-support) to pick a color from the screen. It always renders when mounted directly — the default input is what hides it when the API is unavailable — so guard on EyeDropper support yourself when using it standalone.
+
+| Callback  | Arguments   | Description                                         |
+| --------- | ----------- | --------------------------------------------------- |
+| `onadd`   | `{ color }` | Called when a color is picked with the eye dropper. |
+| `onerror` | `{ error }` | Called when the eye dropper fails or is dismissed.  |
+
+## PaletteTrashButton
+
+The trash button shown inside the deletion tooltip when `deletionMode` is `"tooltip"`.
+
+| Prop       | Type    | Default | Description                                |
+| ---------- | ------- | ------- | ------------------------------------------ |
+| `isActive` | boolean | false   | Whether the button is in its active state. |
+| `class`    | string  | ''      | Class name applied to the button.          |
+
+| Callback  | Arguments    | Description                        |
+| --------- | ------------ | ---------------------------------- |
+| `onclick` | `MouseEvent` | Called when the button is clicked. |
+
+## PaletteCompactToggleButton
+
+Toggles the palette between its compact and full modes. Renders the compact or enlarge icon depending on `isCompact`.
+
+| Prop        | Type    | Default | Description                               |
+| ----------- | ------- | ------- | ----------------------------------------- |
+| `isCompact` | boolean | false   | Whether the palette is currently compact. |
+
+| Callback  | Arguments    | Description                        |
+| --------- | ------------ | ---------------------------------- |
+| `onclick` | `MouseEvent` | Called when the button is clicked. |
+
+## PaletteIconButton
+
+The base icon button every toolbar button (settings, compact toggle, eye dropper, input submit) is built on. Renders the icon matching the `icon` value.
+
+| Prop       | Type           | Default | Description                                                                                         |
+| ---------- | -------------- | ------- | --------------------------------------------------------------------------------------------------- |
+| `icon`     | string \| null | null    | Icon to render. One of `'compact'`, `'enlarge'`, `'eyeDropper'`, `'plus'`, `'settings'`, `'trash'`. |
+| `isActive` | boolean        | false   | Whether the button is in its active state.                                                          |
+| `class`    | string         | ''      | Class name applied to the button.                                                                   |
+
+| Callback  | Arguments    | Description                        |
+| --------- | ------------ | ---------------------------------- |
+| `onclick` | `MouseEvent` | Called when the button is clicked. |
+
+## PaletteLoader
+
+The loader shown while an async `colors` source resolves; it is the default [`loader`](#snippets) snippet content. It is an accessible live region: it exposes `role="status"` and its spinner is disabled under `prefers-reduced-motion: reduce` (see [Use an API to Fill the Palette](#use-an-api-to-fill-the-palette)).
+
+| Prop    | Type   | Default          | Description                                                     |
+| ------- | ------ | ---------------- | --------------------------------------------------------------- |
+| `label` | string | "Loading colors" | Text announced by assistive tech while the palette colors load. |
+
+## PaletteSettingsButton
+
+Button that opens the settings panel. Renders the settings icon with a `"Go to settings"` accessible name.
+
+| Callback  | Arguments    | Description                        |
+| --------- | ------------ | ---------------------------------- |
+| `onclick` | `MouseEvent` | Called when the button is clicked. |
+
+## PaletteSettingsPanel
+
+A panel that portals its content into another element of the DOM. Used to host the settings content outside the palette's own subtree.
+
+| Prop        | Type    | Default | Description                                          |
+| ----------- | ------- | ------- | ---------------------------------------------------- |
+| `target`    | string  | "body"  | Selector of the element the panel is portalled into. |
+| `isVisible` | boolean | false   | Whether the panel is visible.                        |
+| `children`  | snippet | —       | Panel content, rendered into `target`.               |
+
+## PaletteTools
+
+The tools panel wiring the settings and compact-toggle buttons; it is the default [`tools`](#snippets) snippet content.
+
+| Prop    | Type     | Default | Description                                                             |
+| ------- | -------- | ------- | ----------------------------------------------------------------------- |
+| `tools` | string[] | []      | Tools to display, from the exported `COMPACT` and `SETTINGS` constants. |
+
+| Callback   | Arguments  | Description                     |
+| ---------- | ---------- | ------------------------------- |
+| `onselect` | `{ tool }` | Called when a tool is selected. |
 
 # Colors Setting
 
@@ -244,7 +396,7 @@ Deleting a compact slot removes the mapped color from the underlying full `color
 
 The slot grid follows the [ARIA listbox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/) so it behaves as a single composite widget for keyboard and screen-reader users.
 
-- **Listbox semantics** — the grid is exposed as a `listbox` and each slot as an `option` whose selection state is reflected through `aria-selected`. Name the listbox with the [`label`](#api) prop (defaults to `"Color slots"`). When colors are grouped, each group is a labelled `group` associated with its name.
+- **Listbox semantics** — the grid is exposed as a `listbox` and each slot as an `option` whose selection state is reflected through `aria-selected`. Name the listbox with the [`label`](#palette-api) prop (defaults to `"Color slots"`). When colors are grouped, each group is a labelled `group` associated with its name.
 - **Single tab stop** — the whole grid takes a single tab stop instead of one per slot. `Tab` moves focus onto the selected slot (or the first one when nothing is selected), then out of the grid.
 - **Arrow-key navigation** — once a slot is focused, move within the grid with the keyboard:
 
@@ -266,7 +418,7 @@ When a `deletionMode` (`"tooltip"` or `"drop"`) is set, `Delete` or `Backspace` 
 
 ## Display-only palettes
 
-If a palette is purely decorative — a slot board or a color reference that is not meant to be picked from — set the [`presentational`](#api) prop. The grid then renders as a plain container: no `listbox`/`option` roles, no tab stop and no arrow-key navigation. This avoids exposing an empty `listbox` when you replace the slots with non-interactive `slot` content (e.g. bare `<div>`s). Grouped palettes keep their visible group names as regular text.
+If a palette is purely decorative — a slot board or a color reference that is not meant to be picked from — set the [`presentational`](#palette-api) prop. The grid then renders as a plain container: no `listbox`/`option` roles, no tab stop and no arrow-key navigation. This avoids exposing an empty `listbox` when you replace the slots with non-interactive `slot` content (e.g. bare `<div>`s). Grouped palettes keep their visible group names as regular text.
 
 ```svelte
 <Palette {colors} presentational>
@@ -383,7 +535,7 @@ If the API is not available, nothing will be rendered.
 
 > **Browser compatibility note:** The EyeDropper API specification defines `sRGBHex` as returning a hexadecimal color string (e.g. `#rrggbb`). However, some browsers return an `rgb()` or `rgba()` string instead. The component normalizes the value to hex format automatically.
 
-> The PaletteEyeDropper component can be used on its own anywhere within a snippet or in an external component as it is exported from this lib.
+> The [`PaletteEyeDropperButton`](#paletteeyedropperbutton) component can be used on its own anywhere within a snippet or in an external component as it is exported from this lib.
 
 ## Transition
 
