@@ -32,15 +32,9 @@ yarn add @untemps/svelte-palette
 
 ```svelte
 <script>
-    import { Palette } from '@untemps/svelte-palette'
+	import { Palette } from '@untemps/svelte-palette'
 
-    const colors = [
-		'#865C54',
-		'#8F5447',
-		'#A65846',
-		'#A9715E',
-		'#AD8C72',
-    ]
+	const colors = ['#865C54', '#8F5447', '#A65846', '#A9715E', '#AD8C72']
 
 	let bgColor = colors[0]
 </script>
@@ -57,6 +51,7 @@ yarn add @untemps/svelte-palette
 		height: 100%;
 		background-color: var(--bgColor);
 	}
+</style>
 ```
 
 ## API
