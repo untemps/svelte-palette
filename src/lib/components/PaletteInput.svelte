@@ -78,7 +78,7 @@
 		{#if inputType !== 'color'}<PaletteSlot
 				data-testid="__palette-input-slot__"
 				{color}
-				role="presentation"
+				aria-hidden="true"
 				tabindex={-1}
 				disabled
 			/>{/if}

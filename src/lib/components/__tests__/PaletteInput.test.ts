@@ -123,6 +123,21 @@ test('Does not display slot if inputType is "color"', async () => {
 	expect(button).not.toBeInTheDocument()
 })
 
+test('Hides the decorative preview swatch from the accessibility tree', async () => {
+	// The swatch is purely decorative; `role="presentation"` would be ignored because
+	// PaletteSlot always carries a global `aria-label`, so it must use `aria-hidden` to
+	// actually leave the accessibility tree. This attribute is the load-bearing assertion:
+	// it is absent on the old `role="presentation"` markup, so this test fails against it.
+	setup(PaletteInput, { color: '#ff0' })
+	const slot = screen.getByTestId('__palette-input-slot__')
+	expect(slot).toHaveAttribute('aria-hidden', 'true')
+	// Sanity check that the preview is not exposed as a second button beside the submit
+	// control. jsdom already excluded the old presentation-role swatch here (it does not
+	// model the browser-only presentational-conflict rule), so this guards the new
+	// behaviour rather than reproducing the original leak.
+	expect(screen.queryAllByRole('button')).toEqual([screen.getByTestId('__palette-input-submit__')])
+})
+
 test('Does not display EyeDropper button if API is not available', async () => {
 	vi.stubGlobal('EyeDropper', undefined)
 	setup(PaletteInput, {
