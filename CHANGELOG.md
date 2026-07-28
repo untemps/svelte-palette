@@ -1,3 +1,10 @@
+# [6.0.0-beta.13](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.12...v6.0.0-beta.13) (2026-07-28)
+
+
+### Bug Fixes
+
+* Hide the color preview swatch from assistive tech ([#241](https://github.com/untemps/svelte-palette/issues/241)) ([cdae1f3](https://github.com/untemps/svelte-palette/commit/cdae1f3314d78bc96acaa0080e5fae1fc1ae12a2))
+
 # [6.0.0-beta.12](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.11...v6.0.0-beta.12) (2026-07-27)
 
 
