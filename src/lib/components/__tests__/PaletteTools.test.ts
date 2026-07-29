@@ -32,6 +32,25 @@ test('Renders settings button when tools contains settings', () => {
 	expect(button).toBeInTheDocument()
 })
 
+test('Names the tools section with the default label', () => {
+	setup(PaletteTools, { props: { tools: [COMPACT, SETTINGS] } })
+	expect(screen.getByRole('region', { name: 'Palette tools' })).toBeInTheDocument()
+})
+
+test('Names the tools section, compact and settings buttons with custom labels', () => {
+	setup(PaletteTools, {
+		props: {
+			tools: [COMPACT, SETTINGS],
+			label: 'Outils de la palette',
+			compactLabel: 'Réduire la palette',
+			settingsLabel: 'Aller aux paramètres',
+		},
+	})
+	expect(screen.getByRole('region', { name: 'Outils de la palette' })).toBeInTheDocument()
+	expect(screen.getByLabelText('Réduire la palette')).toBeInTheDocument()
+	expect(screen.getByLabelText('Aller aux paramètres')).toBeInTheDocument()
+})
+
 test('Calls onselect with compact tool when compact button is clicked', async () => {
 	const onSelect = vi.fn(() => 0)
 	const { user } = setup(PaletteTools, { props: { tools: [COMPACT], onselect: onSelect } })

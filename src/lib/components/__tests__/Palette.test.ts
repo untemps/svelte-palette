@@ -835,14 +835,6 @@ test('Exposes the slot grid as a listbox', async () => {
 	expect(listbox).toHaveAttribute('aria-label', 'Color slots')
 })
 
-test('Names the listbox with the label prop', async () => {
-	const colors = ['#ff0', '#0ff', '#f0f']
-	setup(Palette, { props: { colors, label: 'Brand colors' } })
-
-	const listbox = await screen.findByRole('listbox')
-	expect(listbox).toHaveAttribute('aria-label', 'Brand colors')
-})
-
 test('Groups slots and associates each group with its name', async () => {
 	const colors = [
 		{ name: 'Reds', colors: ['#f00', '#f11'] },
@@ -2097,4 +2089,113 @@ test('Keeps a flat-added color in the bound list through a compact deletion afte
 	await user.click(trash)
 
 	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#0b0' }, { value: '#00c' }]))
+})
+
+describe('Built-in label overrides', () => {
+	test('Keeps every default string when labels is omitted', async () => {
+		const colors = ['#ff0', '#0ff']
+		setup(Palette, { props: { colors } })
+		const listbox = await screen.findByRole('listbox')
+		expect(listbox).toHaveAttribute('aria-label', 'Color slots')
+	})
+
+	test('Overrides the listbox name through labels.slots', async () => {
+		const colors = ['#ff0', '#0ff']
+		setup(Palette, { props: { colors, labels: { slots: 'Palette de marque' } } })
+		const listbox = await screen.findByRole('listbox')
+		expect(listbox).toHaveAttribute('aria-label', 'Palette de marque')
+	})
+
+	test('Overrides the loader label without a loader snippet', async () => {
+		setup(Palette, { props: { colors: null, labels: { loader: 'Chargement des couleurs' } } })
+		expect(await screen.findByRole('status')).toHaveTextContent('Chargement des couleurs')
+	})
+
+	test('Overrides the error headline without an error snippet', async () => {
+		let rejectColors!: (reason?: unknown) => void
+		const colors = new Promise<string[]>((_, reject) => (rejectColors = reject))
+		setup(Palette, { props: { colors, labels: { error: 'Échec du chargement des couleurs' } } })
+
+		rejectColors(new Error('Network down'))
+
+		const alert = await screen.findByRole('alert')
+		expect(alert).toHaveTextContent('Échec du chargement des couleurs')
+	})
+
+	test('Overrides the transparent slot name', async () => {
+		const colors = ['#ff0', '#0ff']
+		setup(Palette, {
+			props: { colors, showTransparentSlot: true, labels: { transparentSlot: 'Emplacement transparent' } },
+		})
+		const slots = await screen.findAllByTestId('__palette-slot__')
+		expect(slots[0]).toHaveAttribute('aria-label', 'Emplacement transparent')
+	})
+
+	test('Overrides the enlarge button name in compact mode', async () => {
+		const colors = ['#ff0', '#0ff', '#f0f']
+		setup(Palette, {
+			props: { colors, compactColorIndices: [0, 1], isCompact: true, labels: { enlarge: 'Agrandir la palette' } },
+		})
+		const toggle = await screen.findByTestId('__palette-compact-toggle-button__')
+		expect(toggle).toHaveAttribute('aria-label', 'Agrandir la palette')
+	})
+
+	test('Overrides the compact tool and tools section names', async () => {
+		const colors = ['#ff0', '#0ff', '#f0f']
+		setup(Palette, {
+			props: {
+				colors,
+				compactColorIndices: [0, 1],
+				labels: { compact: 'Réduire la palette', tools: 'Outils de la palette' },
+			},
+		})
+		expect(await screen.findByRole('region', { name: 'Outils de la palette' })).toBeInTheDocument()
+		expect(screen.getByLabelText('Réduire la palette')).toBeInTheDocument()
+	})
+
+	test('Overrides the input, title and submit names', async () => {
+		const colors = ['#ff0', '#0ff']
+		setup(Palette, {
+			props: {
+				colors,
+				showInput: true,
+				labels: { inputHex: 'Saisir une couleur', inputHexError: 'Couleur invalide', submitHex: 'Ajouter' },
+			},
+		})
+		const input = await screen.findByTestId('__palette-input-input__')
+		expect(input).toHaveAttribute('aria-label', 'Saisir une couleur')
+		expect(input).toHaveAttribute('title', 'Couleur invalide')
+		expect(screen.getByTestId('__palette-input-submit__')).toHaveAttribute('aria-label', 'Ajouter')
+	})
+
+	test('Overrides the eyedropper name', async () => {
+		vi.stubGlobal(
+			'EyeDropper',
+			class {
+				open = () => Promise.resolve({ sRGBHex: '#fff' })
+			}
+		)
+		const colors = ['#ff0', '#0ff']
+		setup(Palette, { props: { colors, showInput: true, labels: { eyeDropper: "Prélever une couleur à l'écran" } } })
+		expect(await screen.findByRole('button', { name: "Prélever une couleur à l'écran" })).toBeInTheDocument()
+	})
+
+	test('Overrides the settings button name', async () => {
+		const colors = ['#ff0', '#0ff']
+		const settingsSnippet = createRawSnippet(() => ({
+			render: () => `<span data-testid="__settings-content__"></span>`,
+		}))
+		setup(Palette, { props: { colors, settings: settingsSnippet, labels: { settings: 'Aller aux paramètres' } } })
+		expect(await screen.findByLabelText('Aller aux paramètres')).toBeInTheDocument()
+	})
+
+	test('Overrides the deletion button name in the tooltip template', async () => {
+		const colors = ['#ff0', '#0ff']
+		setup(Palette, { props: { colors, deletionMode: TOOLTIP, labels: { trash: 'Supprimer la couleur' } } })
+		await screen.findAllByTestId('__palette-cell__')
+
+		const template = document.getElementById('tooltip-template') as HTMLTemplateElement
+		const trash = template.content.querySelector('[data-testid="__palette-trash-button__"]')
+		expect(trash?.getAttribute('aria-label')).toBe('Supprimer la couleur')
+	})
 })

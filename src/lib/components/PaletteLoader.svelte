@@ -1,10 +1,12 @@
 <script lang="ts">
+	import { DEFAULT_LABELS } from '../labels'
+
 	interface Props {
 		/** Text announced by assistive tech while the palette colors are loading. */
 		label?: string
 	}
 
-	let { label = 'Loading colors' }: Props = $props()
+	let { label = DEFAULT_LABELS.loader }: Props = $props()
 </script>
 
 <div class="palette__loader" role="status">

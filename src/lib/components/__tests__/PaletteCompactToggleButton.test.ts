@@ -31,6 +31,26 @@ test('Sets aria-label', () => {
 	expect(button).toBeInTheDocument()
 })
 
+test('Names the button with the default compact label when full', () => {
+	setup(PaletteCompactToggleButton, { isCompact: false })
+	expect(screen.getByLabelText('Compact the palette')).toBeInTheDocument()
+})
+
+test('Names the button with the default enlarge label when compact', () => {
+	setup(PaletteCompactToggleButton, { isCompact: true })
+	expect(screen.getByLabelText('Enlarge the palette')).toBeInTheDocument()
+})
+
+test('Names the button with a custom compact label when full', () => {
+	setup(PaletteCompactToggleButton, { isCompact: false, compactLabel: 'Réduire la palette' })
+	expect(screen.getByLabelText('Réduire la palette')).toBeInTheDocument()
+})
+
+test('Names the button with a custom enlarge label when compact', () => {
+	setup(PaletteCompactToggleButton, { isCompact: true, enlargeLabel: 'Agrandir la palette' })
+	expect(screen.getByLabelText('Agrandir la palette')).toBeInTheDocument()
+})
+
 test('Triggers click event with current state', async () => {
 	const onClick = vi.fn(() => 0)
 	const { user } = setup(PaletteCompactToggleButton, { props: { onclick: onClick } })

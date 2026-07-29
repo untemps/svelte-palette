@@ -24,6 +24,8 @@
 
 	import useDeletion from './useDeletion'
 
+	import { DEFAULT_LABELS } from '../labels'
+
 	import type { Snippet } from 'svelte'
 
 	import type { NormalizedColor, NormalizedColorGroup } from '../utils/utils.js'
@@ -41,6 +43,7 @@
 		InputAddEventArgs,
 		InputSnippetProps,
 		InputType,
+		PaletteLabels,
 		PaletteToolName,
 		SelectEventArgs,
 		SettingsSnippetProps,
@@ -71,7 +74,7 @@
 		onadd?: (args: AddEventArgs) => void
 		ondelete?: (args: DeleteEventArgs) => void
 		onerror?: (args: ErrorEventArgs) => void
-		label?: string
+		labels?: Partial<PaletteLabels>
 		presentational?: boolean
 		class?: string
 		header?: Snippet<[HeaderSnippetProps]>
@@ -107,7 +110,7 @@
 		onadd = undefined,
 		ondelete = undefined,
 		onerror = undefined,
-		label = 'Color slots',
+		labels = undefined,
 		presentational = false,
 		class: className = '',
 		header = undefined,
@@ -141,6 +144,8 @@
 	let _colorsSource: ColorsProp | null = null
 
 	let _inputType = $derived(normalizeInputType(inputType))
+
+	const _labels = $derived<PaletteLabels>({ ...DEFAULT_LABELS, ...labels })
 
 	const _viewParams = () => ({
 		isCompact: _isCompact,
@@ -596,7 +601,7 @@
 				bind:this={_listboxEl}
 				class="palette__groups"
 				role={presentational ? undefined : 'listbox'}
-				aria-label={presentational ? undefined : label}
+				aria-label={presentational ? undefined : _labels.slots}
 				tabindex={-1}
 				onkeydown={presentational ? undefined : _onListboxKeydown}
 				onfocusin={presentational ? undefined : _onListboxFocusin}
@@ -672,7 +677,7 @@
 					bind:this={_listboxEl}
 					class="palette__listbox"
 					role={presentational ? 'presentation' : 'listbox'}
-					aria-label={presentational ? undefined : label}
+					aria-label={presentational ? undefined : _labels.slots}
 					tabindex={-1}
 					onkeydown={presentational ? undefined : _onListboxKeydown}
 					onfocusin={presentational ? undefined : _onListboxFocusin}
@@ -686,7 +691,7 @@
 								})}
 							{:else}
 								<PaletteSlot
-									aria-label="Transparent slot"
+									aria-label={_labels.transparentSlot}
 									role={_optionRole}
 									selected={selectedColor === null}
 									tabindex={_rovingTabindex(0)}
@@ -744,32 +749,51 @@
 			{#if error}
 				{@render error({ error: _error })}
 			{:else}
-				<PaletteError error={_error} />
+				<PaletteError error={_error} label={_labels.error} />
 			{/if}
 		{:else if loader}
 			{@render loader()}
 		{:else}
-			<PaletteLoader />
+			<PaletteLoader label={_labels.loader} />
 		{/if}
 		{#if !_isCompact}
 			{@render footer?.({ selectedColor })}
 		{/if}
 		{#if _isCompact && _colors != null}
-			<PaletteCompactToggleButton isCompact={true} onclick={_onExpand} />
+			<PaletteCompactToggleButton
+				isCompact={true}
+				compactLabel={_labels.compact}
+				enlargeLabel={_labels.enlarge}
+				onclick={_onExpand}
+			/>
 		{/if}
 	</section>
 	{#if !_isCompact && showInput && _colors != null}
 		{#if input}
 			{@render input({ selectedColor, inputType: _inputType })}
 		{:else}
-			<PaletteInput color={selectedColor} inputType={_inputType} onadd={_onInputAdd} />
+			<PaletteInput
+				color={selectedColor}
+				inputType={_inputType}
+				hexLabel={_labels.inputHex}
+				hexErrorLabel={_labels.inputHexError}
+				submitLabel={_labels.submitHex}
+				eyeDropperLabel={_labels.eyeDropper}
+				onadd={_onInputAdd}
+			/>
 		{/if}
 	{/if}
 	{#if !_isCompact && !!_tools?.length}
 		{#if tools}
 			{@render tools({ compactColorIndices, isCompact: _isCompact, onSelect: _onToolSelect })}
 		{:else}
-			<PaletteTools tools={_tools} onselect={_onToolSelect} />
+			<PaletteTools
+				tools={_tools}
+				label={_labels.tools}
+				compactLabel={_labels.compact}
+				settingsLabel={_labels.settings}
+				onselect={_onToolSelect}
+			/>
 		{/if}
 	{/if}
 </div>
@@ -780,7 +804,7 @@
 {/if}
 
 <template id="tooltip-template">
-	<PaletteTrashButton />
+	<PaletteTrashButton deleteLabel={_labels.trash} />
 </template>
 
 <style>

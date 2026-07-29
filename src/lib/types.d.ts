@@ -71,6 +71,40 @@ export type PaletteIconName = 'compact' | 'enlarge' | 'eyeDropper' | 'plus' | 's
 export type InputType = 'text' | 'color'
 
 /**
+ * Overridable built-in text and accessibility labels of the palette. Pass a `Partial<PaletteLabels>` to the
+ * `labels` prop of `Palette` to localize the whole set or tweak individual strings; every key defaults to the
+ * value held in `DEFAULT_LABELS`.
+ */
+export interface PaletteLabels {
+	/** Accessible name of the slot listbox. */
+	slots: string
+	/** Text announced while an async `colors` source is loading. */
+	loader: string
+	/** Headline announced when an async `colors` source rejects. */
+	error: string
+	/** Accessible name of the leading transparent (no-color) slot. */
+	transparentSlot: string
+	/** Accessible name of the tools compact button (shrinks the palette). */
+	compact: string
+	/** Accessible name of the compact-mode enlarge button (restores the full palette). */
+	enlarge: string
+	/** Accessible name of the hex color input. */
+	inputHex: string
+	/** Validation hint shown as the hex input `title`. */
+	inputHexError: string
+	/** Accessible name of the input submit button. */
+	submitHex: string
+	/** Accessible name of the eye-dropper button. */
+	eyeDropper: string
+	/** Accessible name of the tools panel section. */
+	tools: string
+	/** Accessible name of the settings button. */
+	settings: string
+	/** Accessible name of the deletion (trash) button shown in the tooltip. */
+	trash: string
+}
+
+/**
  * Argument passed to the `onselect` callback when a color is picked.
  */
 export interface SelectEventArgs {

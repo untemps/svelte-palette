@@ -56,25 +56,25 @@ yarn add @untemps/svelte-palette
 
 ## Palette API
 
-| Props                    | Type                                                                                                    | Default       | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| ------------------------ | ------------------------------------------------------------------------------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `colors`                 | string[] or Promise<string[]> or object[] or Promise<object[]> or ColorGroup[] or Promise<ColorGroup[]> | null          | Array of colors to be displayed in the palette. Pass an array of `{ name, colors }` objects to display grouped collections. Supports `bind:colors`: internal add/delete mutations are written back in the resolved, normalized `{ value, name? }` form (a passed `Promise` or `string[]` is replaced by that value). Omitting `colors` (or passing `null`) leaves the palette in its loading state — this is the intended behaviour while an async source is pending; pass `[]` explicitly to render an empty palette. See more about colors in the [Colors Setting](#colors-setting) section |
-| `selectedColor`          | string                                                                                                  | null          | Default selected color. The color must be included in the `colors` prop. Supports `bind:selectedColor`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| `isCompact`              | boolean                                                                                                 | false         | Flag to display the palette in compact mode.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `compactColorIndices`    | number[]                                                                                                | []            | Array of indices to pick from the `colors` array to be displayed in the compacted palette (see [Compact Mode](#compact-mode)). Supports `bind:compactColorIndices`: it is re-indexed when a compact slot is deleted.                                                                                                                                                                                                                                                                                                                                                                          |
-| `allowDuplicates`        | boolean                                                                                                 | false         | Flag to allow color duplication.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `deletionMode`           | string                                                                                                  | "none"        | Mode of slot deletion, between `"none"` and `"tooltip"` and `"drop"` (see [Deletion Modes](#deletion-modes)).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `tooltipClassName`       | string                                                                                                  | null          | Class name to pass down to the deletion tooltip (see [Styles](#styles)).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| `tooltipContentSelector` | string                                                                                                  | null          | Selector of the deletion tooltip content (see [Customize the Content of the Deletion Tooltip](#customize-the-content-of-the-deletion-tooltip)).                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `showTransparentSlot`    | boolean                                                                                                 | false         | Flag to display a transparent slot at the start of the slot list.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| `maxColors`              | number                                                                                                  | 30            | Maximum number of slots to be displayed in the palette. Set this value to `-1` to allow infinite number of slots.                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| `showInput`              | boolean                                                                                                 | false         | Flag to display an input to add colors below the palette. The input is not rendered in compact mode, in grouped mode, or while an async `colors` source is still unresolved.                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `inputType`              | string                                                                                                  | "text"        | Type of the color input. Only "text" and "color" are allowed. Any other value will be replaced by "text".                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `numColumns`             | number                                                                                                  | 5             | Number of columns of the palette grid. Set this value to `0` to display the slots on a single row (see `maxColumns`). Values lower than `0` are treated the same as `0`.                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| `maxColumns`             | number                                                                                                  | 0             | Maximum number of columns when `numColumns` is set to `0`. Once reached, additional slots wrap to a new row. Set this value to `0` to allow unlimited columns.                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| `transition`             | object                                                                                                  | null          | Animation when a slot is rendered (see [Transition](#transition)).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| `label`                  | string                                                                                                  | "Color slots" | Accessible name announced for the slot listbox (see [Accessibility](#accessibility)).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| `presentational`         | boolean                                                                                                 | false         | Renders the slot grid as a purely visual display: drops the `listbox`/`option` roles, the single tab stop and the arrow-key navigation. Use it for decorative palettes that are not meant to be picked from (see [Accessibility](#accessibility)).                                                                                                                                                                                                                                                                                                                                            |
+| Props                    | Type                                                                                                    | Default | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------ | ------------------------------------------------------------------------------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `colors`                 | string[] or Promise<string[]> or object[] or Promise<object[]> or ColorGroup[] or Promise<ColorGroup[]> | null    | Array of colors to be displayed in the palette. Pass an array of `{ name, colors }` objects to display grouped collections. Supports `bind:colors`: internal add/delete mutations are written back in the resolved, normalized `{ value, name? }` form (a passed `Promise` or `string[]` is replaced by that value). Omitting `colors` (or passing `null`) leaves the palette in its loading state — this is the intended behaviour while an async source is pending; pass `[]` explicitly to render an empty palette. See more about colors in the [Colors Setting](#colors-setting) section |
+| `selectedColor`          | string                                                                                                  | null    | Default selected color. The color must be included in the `colors` prop. Supports `bind:selectedColor`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `isCompact`              | boolean                                                                                                 | false   | Flag to display the palette in compact mode.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `compactColorIndices`    | number[]                                                                                                | []      | Array of indices to pick from the `colors` array to be displayed in the compacted palette (see [Compact Mode](#compact-mode)). Supports `bind:compactColorIndices`: it is re-indexed when a compact slot is deleted.                                                                                                                                                                                                                                                                                                                                                                          |
+| `allowDuplicates`        | boolean                                                                                                 | false   | Flag to allow color duplication.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `deletionMode`           | string                                                                                                  | "none"  | Mode of slot deletion, between `"none"` and `"tooltip"` and `"drop"` (see [Deletion Modes](#deletion-modes)).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `tooltipClassName`       | string                                                                                                  | null    | Class name to pass down to the deletion tooltip (see [Styles](#styles)).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `tooltipContentSelector` | string                                                                                                  | null    | Selector of the deletion tooltip content (see [Customize the Content of the Deletion Tooltip](#customize-the-content-of-the-deletion-tooltip)).                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `showTransparentSlot`    | boolean                                                                                                 | false   | Flag to display a transparent slot at the start of the slot list.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `maxColors`              | number                                                                                                  | 30      | Maximum number of slots to be displayed in the palette. Set this value to `-1` to allow infinite number of slots.                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `showInput`              | boolean                                                                                                 | false   | Flag to display an input to add colors below the palette. The input is not rendered in compact mode, in grouped mode, or while an async `colors` source is still unresolved.                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `inputType`              | string                                                                                                  | "text"  | Type of the color input. Only "text" and "color" are allowed. Any other value will be replaced by "text".                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `numColumns`             | number                                                                                                  | 5       | Number of columns of the palette grid. Set this value to `0` to display the slots on a single row (see `maxColumns`). Values lower than `0` are treated the same as `0`.                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `maxColumns`             | number                                                                                                  | 0       | Maximum number of columns when `numColumns` is set to `0`. Once reached, additional slots wrap to a new row. Set this value to `0` to allow unlimited columns.                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `transition`             | object                                                                                                  | null    | Animation when a slot is rendered (see [Transition](#transition)).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `labels`                 | Partial\<PaletteLabels\>                                                                                | {}      | Overrides for the built-in text and accessibility labels. Every key is optional and defaults to the matching `DEFAULT_LABELS` string, so this is a fully additive way to localize the palette or tweak individual labels without replacing any snippet (see [Internationalization](#internationalization)).                                                                                                                                                                                                                                                                                   |
+| `presentational`         | boolean                                                                                                 | false   | Renders the slot grid as a purely visual display: drops the `listbox`/`option` roles, the single tab stop and the arrow-key navigation. Use it for decorative palettes that are not meant to be picked from (see [Accessibility](#accessibility)).                                                                                                                                                                                                                                                                                                                                            |
 
 ## Callbacks
 
@@ -164,7 +164,7 @@ Snippets replace the Svelte 4 named slots API. Pass them as children of `<Palett
 
 # Components
 
-The package exports twelve components from its entry point, alongside the [deletion-mode](#deletion-modes) and [tool](#customize-the-tools-panel) enums. [`Palette`](#palette-api) is the top-level component; the others are the primitives it composes, exported so you can build your own snippets (`slot`, `input`, `settings`, `tools`, `loader`) or reuse a single control on its own.
+The package exports twelve components from its entry point, alongside the [deletion-mode](#deletion-modes) and [tool](#customize-the-tools-panel) enums and the `DEFAULT_LABELS` set with its `PaletteLabels` type (see [Internationalization](#internationalization)). [`Palette`](#palette-api) is the top-level component; the others are the primitives it composes, exported so you can build your own snippets (`slot`, `input`, `settings`, `tools`, `loader`) or reuse a single control on its own.
 
 ```js
 import {
@@ -220,11 +220,15 @@ A single color slot rendered as a `<button>`, as displayed inside the palette gr
 
 The color input used to add a new color to the palette. Implements the default [`input`](#snippets) snippet, and renders the [`PaletteEyeDropperButton`](#paletteeyedropperbutton) when the EyeDropper API is available and `inputType` is `"text"`.
 
-| Prop        | Type              | Default | Description                                                |
-| ----------- | ----------------- | ------- | ---------------------------------------------------------- |
-| `color`     | string \| null    | null    | The color pre-filled in the input.                         |
-| `inputType` | "text" \| "color" | "text"  | Type of the input. Any other value falls back to `"text"`. |
-| `class`     | string            | ''      | Class name applied to the root element.                    |
+| Prop              | Type              | Default                               | Description                                                |
+| ----------------- | ----------------- | ------------------------------------- | ---------------------------------------------------------- |
+| `color`           | string \| null    | null                                  | The color pre-filled in the input.                         |
+| `inputType`       | "text" \| "color" | "text"                                | Type of the input. Any other value falls back to `"text"`. |
+| `hexLabel`        | string            | "Enter a hex color value"             | Accessible name of the hex color input.                    |
+| `hexErrorLabel`   | string            | "The value must be a valid hex color" | Validation hint shown as the input `title`.                |
+| `submitLabel`     | string            | "Submit the hex color value"          | Accessible name of the submit button.                      |
+| `eyeDropperLabel` | string            | "Pick a color from the screen"        | Accessible name of the eye-dropper button.                 |
+| `class`           | string            | ''                                    | Class name applied to the root element.                    |
 
 | Callback | Arguments   | Description                       |
 | -------- | ----------- | --------------------------------- |
@@ -233,6 +237,10 @@ The color input used to add a new color to the palette. Implements the default [
 ## PaletteEyeDropperButton
 
 Button that opens the browser [EyeDropper API](#eyedropper-api-support) to pick a color from the screen. It always renders when mounted directly — the default input is what hides it when the API is unavailable — so guard on EyeDropper support yourself when using it standalone.
+
+| Prop              | Type   | Default                        | Description                                 |
+| ----------------- | ------ | ------------------------------ | ------------------------------------------- |
+| `eyeDropperLabel` | string | "Pick a color from the screen" | Accessible name of the eye-dropper button.  |
 
 | Callback  | Arguments   | Description                                         |
 | --------- | ----------- | --------------------------------------------------- |
@@ -243,10 +251,11 @@ Button that opens the browser [EyeDropper API](#eyedropper-api-support) to pick 
 
 The trash button shown inside the deletion tooltip when `deletionMode` is `"tooltip"`.
 
-| Prop       | Type    | Default | Description                                |
-| ---------- | ------- | ------- | ------------------------------------------ |
-| `isActive` | boolean | false   | Whether the button is in its active state. |
-| `class`    | string  | ''      | Class name applied to the button.          |
+| Prop          | Type    | Default        | Description                                                      |
+| ------------- | ------- | -------------- | ---------------------------------------------------------------- |
+| `isActive`    | boolean | false          | Whether the button is in its active state.                       |
+| `deleteLabel` | string  | "Delete color" | Accessible name of the button, so the deletion control is named. |
+| `class`       | string  | ''             | Class name applied to the button.                                |
 
 | Callback  | Arguments    | Description                        |
 | --------- | ------------ | ---------------------------------- |
@@ -256,9 +265,11 @@ The trash button shown inside the deletion tooltip when `deletionMode` is `"tool
 
 Toggles the palette between its compact and full modes. Renders the compact or enlarge icon depending on `isCompact`.
 
-| Prop        | Type    | Default | Description                               |
-| ----------- | ------- | ------- | ----------------------------------------- |
-| `isCompact` | boolean | false   | Whether the palette is currently compact. |
+| Prop           | Type    | Default               | Description                                                      |
+| -------------- | ------- | --------------------- | ---------------------------------------------------------------- |
+| `isCompact`    | boolean | false                 | Whether the palette is currently compact.                        |
+| `compactLabel` | string  | "Compact the palette" | Accessible name when the palette is full (clicking compacts).    |
+| `enlargeLabel` | string  | "Enlarge the palette" | Accessible name when the palette is compact (clicking enlarges). |
 
 | Callback  | Arguments    | Description                        |
 | --------- | ------------ | ---------------------------------- |
@@ -282,22 +293,26 @@ The base icon button every toolbar button (settings, compact toggle, eye dropper
 
 The loader shown while an async `colors` source resolves; it is the default [`loader`](#snippets) snippet content. It is an accessible live region: it exposes `role="status"` and its spinner is disabled under `prefers-reduced-motion: reduce` (see [Use an API to Fill the Palette](#use-an-api-to-fill-the-palette)).
 
-| Prop    | Type   | Default          | Description                                                     |
-| ------- | ------ | ---------------- | --------------------------------------------------------------- |
-| `label` | string | "Loading colors" | Text announced by assistive tech while the palette colors load. |
+| Prop    | Type   | Default          | Description                                                                                                                                                    |
+| ------- | ------ | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `label` | string | "Loading colors" | Text announced by assistive tech while the palette colors load. `<Palette>` forwards `labels.loader` here (see [Internationalization](#internationalization)). |
 
 ## PaletteError
 
 The error state shown when an async `colors` source rejects; it is the default [`error`](#snippets) snippet content. It is an assertive live region (`role="alert"`) that announces a headline label and, when the rejection reason yields readable text, the message. Restyle it or supply your own `error` snippet to replace it (see [Use an API to Fill the Palette](#use-an-api-to-fill-the-palette)).
 
-| Prop    | Type    | Default                 | Description                                                               |
-| ------- | ------- | ----------------------- | ------------------------------------------------------------------------- |
-| `error` | unknown | null                    | The rejection reason. Rendered as a message when it yields readable text. |
-| `label` | string  | "Colors failed to load" | Text announced by assistive tech and shown as the headline.               |
+| Prop    | Type    | Default                 | Description                                                                                                                                               |
+| ------- | ------- | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `error` | unknown | null                    | The rejection reason. Rendered as a message when it yields readable text.                                                                                 |
+| `label` | string  | "Colors failed to load" | Text announced by assistive tech and shown as the headline. `<Palette>` forwards `labels.error` here (see [Internationalization](#internationalization)). |
 
 ## PaletteSettingsButton
 
 Button that opens the settings panel. Renders the settings icon with a `"Go to settings"` accessible name.
+
+| Prop            | Type   | Default          | Description                              |
+| --------------- | ------ | ---------------- | ---------------------------------------- |
+| `settingsLabel` | string | "Go to settings" | Accessible name of the settings button.  |
 
 | Callback  | Arguments    | Description                        |
 | --------- | ------------ | ---------------------------------- |
@@ -317,9 +332,12 @@ A panel that portals its content into another element of the DOM. Used to host t
 
 The tools panel wiring the settings and compact-toggle buttons; it is the default [`tools`](#snippets) snippet content.
 
-| Prop    | Type     | Default | Description                                                             |
-| ------- | -------- | ------- | ----------------------------------------------------------------------- |
-| `tools` | string[] | []      | Tools to display, from the exported `COMPACT` and `SETTINGS` constants. |
+| Prop            | Type     | Default               | Description                                                             |
+| --------------- | -------- | --------------------- | ----------------------------------------------------------------------- |
+| `tools`         | string[] | []                    | Tools to display, from the exported `COMPACT` and `SETTINGS` constants. |
+| `label`         | string   | "Palette tools"       | Accessible name of the tools panel section.                             |
+| `compactLabel`  | string   | "Compact the palette" | Accessible name forwarded to the compact toggle.                        |
+| `settingsLabel` | string   | "Go to settings"      | Accessible name of the settings button.                                 |
 
 | Callback   | Arguments  | Description                     |
 | ---------- | ---------- | ------------------------------- |
@@ -410,7 +428,7 @@ Deleting a compact slot removes the mapped color from the underlying full `color
 
 The slot grid follows the [ARIA listbox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/) so it behaves as a single composite widget for keyboard and screen-reader users.
 
-- **Listbox semantics** — the grid is exposed as a `listbox` and each slot as an `option` whose selection state is reflected through `aria-selected`. Name the listbox with the [`label`](#palette-api) prop (defaults to `"Color slots"`). When colors are grouped, each group is a labelled `group` associated with its name.
+- **Listbox semantics** — the grid is exposed as a `listbox` and each slot as an `option` whose selection state is reflected through `aria-selected`. Name the listbox with `labels.slots` (defaults to `"Color slots"` — see [Internationalization](#internationalization)). When colors are grouped, each group is a labelled `group` associated with its name.
 - **Single tab stop** — the whole grid takes a single tab stop instead of one per slot. `Tab` moves focus onto the selected slot (or the first one when nothing is selected), then out of the grid.
 - **Arrow-key navigation** — once a slot is focused, move within the grid with the keyboard:
 
@@ -445,6 +463,48 @@ If a palette is purely decorative — a slot board or a color reference that is 
 ## Landmark
 
 The root element is a generic container and does not expose a landmark role. Wrap `<Palette />` in your own `<main>`, `<section aria-label="…">` or other landmark if your page needs one.
+
+# Internationalization
+
+Every built-in text and accessibility label of `<Palette>` (and the default primitives it renders) is overridable through a single optional `labels` prop typed as `Partial<PaletteLabels>`. It is fully additive: every key defaults to the matching string in the exported `DEFAULT_LABELS`, so omitting `labels` — or any individual key — reproduces the current defaults. Swap the whole object per locale, or override a single key for a one-off tweak, without re-implementing any snippet.
+
+| Key               | Default                               | Applies to                                                 |
+| ----------------- | ------------------------------------- | ---------------------------------------------------------- |
+| `slots`           | "Color slots"                         | The slot listbox accessible name.                          |
+| `loader`          | "Loading colors"                      | The default [`PaletteLoader`](#paletteloader) live region. |
+| `error`           | "Colors failed to load"               | The default [`PaletteError`](#paletteerror) headline.      |
+| `transparentSlot` | "Transparent slot"                    | The leading transparent slot accessible name.              |
+| `compact`         | "Compact the palette"                 | The tools compact button.                                  |
+| `enlarge`         | "Enlarge the palette"                 | The compact-mode enlarge button.                           |
+| `inputHex`        | "Enter a hex color value"             | The [`PaletteInput`](#paletteinput) hex field.             |
+| `inputHexError`   | "The value must be a valid hex color" | The hex field `title` (validation hint).                   |
+| `submitHex`       | "Submit the hex color value"          | The input submit button.                                   |
+| `eyeDropper`      | "Pick a color from the screen"        | The [`PaletteEyeDropperButton`](#paletteeyedropperbutton). |
+| `tools`           | "Palette tools"                       | The [`PaletteTools`](#palettetools) section.               |
+| `settings`        | "Go to settings"                      | The [`PaletteSettingsButton`](#palettesettingsbutton).     |
+| `trash`           | "Delete color"                        | The deletion [`PaletteTrashButton`](#palettetrashbutton).  |
+
+If you replace a region with your own snippet (`loader`, `error`, `input`, `tools`, …), that snippet owns its own text and the matching `labels` key no longer applies.
+
+```svelte
+<script>
+	import { Palette, DEFAULT_LABELS } from '@untemps/svelte-palette'
+
+	const fr = {
+		...DEFAULT_LABELS,
+		slots: 'Emplacements de couleur',
+		loader: 'Chargement des couleurs',
+		error: 'Échec du chargement des couleurs',
+		trash: 'Supprimer la couleur',
+	}
+</script>
+
+<!-- Localize the whole palette -->
+<Palette {colors} labels={fr} />
+
+<!-- Or override a single label -->
+<Palette {colors} labels={{ trash: 'Remove this color' }} />
+```
 
 # Styles
 
@@ -598,7 +658,7 @@ In case you want to call an API to fetch the palette colors, you may pass a prom
 
 The component displays a customizable loader waiting to the promise to be resolved. Be aware that the result of the promise must be an array of color strings as well. The color input and the compact toggle only appear once the promise has resolved.
 
-The default loader (`PaletteLoader`) is an accessible live region: it exposes a `role="status"` so screen readers announce the loading state, and its spinner is driven by a CSS animation that is disabled under `prefers-reduced-motion: reduce`. When you render `PaletteLoader` directly, its announced text comes from a `label` prop (defaults to `Loading colors`). Through `<Palette>` the default loader announces that English default, so to localize the loading announcement — or to replace the loader entirely — supply your own `loader` snippet.
+The default loader (`PaletteLoader`) is an accessible live region: it exposes a `role="status"` so screen readers announce the loading state, and its spinner is driven by a CSS animation that is disabled under `prefers-reduced-motion: reduce`. When you render `PaletteLoader` directly, its announced text comes from a `label` prop (defaults to `Loading colors`). Through `<Palette>`, localize the loading announcement with `labels.loader` (see [Internationalization](#internationalization)) — or replace the loader entirely with your own `loader` snippet.
 
 Network calls fail, so the promise-based pattern should handle rejection too. When the `colors` promise rejects, the palette catches it and renders an error state instead of spinning forever: the bundled [`PaletteError`](#paletteerror) by default, or your own `error` snippet. The rejection reason is also delivered to the `onerror` callback, and supplying a fresh `colors` promise clears the error and returns to the loader.
 

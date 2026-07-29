@@ -22,6 +22,12 @@ test('Renders with correct aria-label', () => {
 	expect(button).toBeInTheDocument()
 })
 
+test('Names the button with a custom settings label', () => {
+	setup(PaletteSettingsButton, { props: { settingsLabel: 'Aller aux paramètres' } })
+	const button = screen.getByLabelText('Aller aux paramètres')
+	expect(button).toBeInTheDocument()
+})
+
 test('Calls onclick when clicked', async () => {
 	const onClick = vi.fn(() => 0)
 	const { user } = setup(PaletteSettingsButton, { props: { onclick: onClick } })

@@ -70,6 +70,35 @@ test('Inherits the default eyedropper accessible name', async () => {
 	expect(button).toBeInTheDocument()
 })
 
+test('Names the hex input and submit button with default labels', () => {
+	setup(PaletteInput)
+	const input = screen.getByTestId('__palette-input-input__')
+	expect(input).toHaveAttribute('aria-label', 'Enter a hex color value')
+	expect(input).toHaveAttribute('title', 'The value must be a valid hex color')
+	expect(screen.getByTestId('__palette-input-submit__')).toHaveAttribute('aria-label', 'Submit the hex color value')
+})
+
+test('Names the hex input, its title and the submit button with custom labels', () => {
+	setup(PaletteInput, {
+		props: {
+			hexLabel: 'Saisir une couleur hexadécimale',
+			hexErrorLabel: 'La valeur doit être une couleur hexadécimale valide',
+			submitLabel: 'Ajouter la couleur',
+		},
+	})
+	const input = screen.getByTestId('__palette-input-input__')
+	expect(input).toHaveAttribute('aria-label', 'Saisir une couleur hexadécimale')
+	expect(input).toHaveAttribute('title', 'La valeur doit être une couleur hexadécimale valide')
+	expect(screen.getByTestId('__palette-input-submit__')).toHaveAttribute('aria-label', 'Ajouter la couleur')
+})
+
+test('Names the eyedropper button with a custom label', async () => {
+	stubEyeDropper('#ff0')
+	setup(PaletteInput, { props: { eyeDropperLabel: "Prélever une couleur à l'écran" } })
+	const button = await screen.findByRole('button', { name: "Prélever une couleur à l'écran" })
+	expect(button).toBeInTheDocument()
+})
+
 test('Does not render the add button as a submit button', async () => {
 	setup(PaletteInput)
 	const button = screen.getByTestId('__palette-input-submit__')

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { browser } from '$app/environment'
+
 	import { Palette } from '$lib'
 
 	import type { ColorsProp } from '$lib/types'
@@ -14,11 +16,11 @@
 			)
 		)
 
-	let colors = $state<ColorsProp | null>(_fetchColors(true))
+	let colors = $state<ColorsProp | null>(browser ? _fetchColors(true) : null)
 	let selectedColor = $state<string | null>(null)
 	let lastError = $state<string | null>(null)
 
-	const _failingSource = _fetchColors(true)
+	const _failingSource = browser ? _fetchColors(true) : null
 
 	const _loadFailing = () => {
 		lastError = null

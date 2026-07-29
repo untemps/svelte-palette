@@ -3,9 +3,13 @@
 
 	import TrashIcon from './icons/TrashIcon.svelte'
 
+	import { DEFAULT_LABELS } from '../labels'
+
 	interface Props {
 		/** Whether the button is in its active state. */
 		isActive?: boolean
+		/** Accessible name of the delete button. */
+		deleteLabel?: string
 		/** Class name applied to the button. */
 		class?: string
 		/** Called when the button is clicked. */
@@ -14,6 +18,7 @@
 
 	let {
 		isActive = false,
+		deleteLabel = DEFAULT_LABELS.trash,
 		class: className = '',
 		onclick = undefined,
 		...restProps
@@ -23,6 +28,7 @@
 <button
 	data-testid="__palette-trash-button__"
 	type="button"
+	aria-label={deleteLabel}
 	{...restProps}
 	class="trash_button__button {className}"
 	class:trash_button__button--active={isActive}

@@ -26,6 +26,7 @@
 		<HeaderNavItem href="/example4" text="Example 4" />
 		<HeaderNavItem href="/example5" text="Example 5" />
 		<HeaderNavItem href="/example6" text="Example 6" />
+		<HeaderNavItem href="/example7" text="Example 7" />
 	</HeaderNav>
 </Header>
 
@@ -37,6 +38,7 @@
 		<SideNavLink href="/example4" text="Example 4" />
 		<SideNavLink href="/example5" text="Example 5" />
 		<SideNavLink href="/example6" text="Example 6" />
+		<SideNavLink href="/example7" text="Example 7" />
 	</SideNavItems>
 </SideNav>
 

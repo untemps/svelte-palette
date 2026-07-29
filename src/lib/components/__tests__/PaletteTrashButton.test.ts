@@ -16,6 +16,18 @@ test('Renders trash button', () => {
 	expect(button).toBeInTheDocument()
 })
 
+test('Names the button with a default accessible name', () => {
+	setup(PaletteTrashButton)
+	const button = screen.getByRole('button', { name: 'Delete color' })
+	expect(button).toBeInTheDocument()
+})
+
+test('Names the button with a custom accessible name', () => {
+	setup(PaletteTrashButton, { props: { deleteLabel: 'Supprimer la couleur' } })
+	const button = screen.getByRole('button', { name: 'Supprimer la couleur' })
+	expect(button).toBeInTheDocument()
+})
+
 test('Triggers click event', async () => {
 	const onClick = vi.fn(() => 0)
 	const { user } = setup(PaletteTrashButton, { props: { onclick: onClick } })
