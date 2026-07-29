@@ -16,13 +16,30 @@
 		color?: ColorValue | null
 		/** Type of the input. */
 		inputType?: InputType
+		/** Accessible name of the hex color input. */
+		hexLabel?: string
+		/** Validation hint shown as the input `title`. */
+		hexErrorLabel?: string
+		/** Accessible name of the submit button. */
+		submitLabel?: string
+		/** Accessible name of the eye-dropper button. */
+		eyeDropperLabel?: string
 		/** Called when a color is submitted. */
 		onadd?: (args: InputAddEventArgs) => void
 		/** Class name applied to the root element. */
 		class?: string
 	}
 
-	let { color: colorProp = null, inputType = 'text', onadd = undefined, class: className = '' }: Props = $props()
+	let {
+		color: colorProp = null,
+		inputType = 'text',
+		hexLabel = 'Enter an hex color value',
+		hexErrorLabel = 'The value must be a valid hex color',
+		submitLabel = 'Submit the hex color value',
+		eyeDropperLabel = 'Pick a color from the screen',
+		onadd = undefined,
+		class: className = '',
+	}: Props = $props()
 
 	let color = $state(untrack(() => colorProp?.replace(COLOR_REGEX, '#$1') || ''))
 	let _isEyeDropperAvailable = $state(false)
@@ -88,8 +105,8 @@
 				data-testid="__palette-input-input__"
 				type={_inputType}
 				value={color}
-				aria-label="Enter an hex color value"
-				title="'The value must be a valid hex color'"
+				aria-label={hexLabel}
+				title={hexErrorLabel}
 				class="palette_input__input"
 				class:palette_input__input--color={_inputType === 'color'}
 				onfocus={_onInputFocus}
@@ -101,13 +118,13 @@
 				type="button"
 				icon={PLUS}
 				disabled={!isValid}
-				aria-label="Submit the hex color value"
+				aria-label={submitLabel}
 				class="palette_input__submit"
 				onclick={_onSubmit}
 			/>
 		</span>
 		{#if _isEyeDropperAvailable && _inputType !== 'color'}
-			<PaletteEyeDropperButton onadd={_onEyeDropperAdd} />
+			<PaletteEyeDropperButton aria-label={eyeDropperLabel} onadd={_onEyeDropperAdd} />
 		{/if}
 	</form>
 </section>

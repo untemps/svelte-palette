@@ -6,6 +6,8 @@
 	interface Props {
 		/** Whether the button is in its active state. */
 		isActive?: boolean
+		/** Accessible name of the delete button. */
+		'aria-label'?: string
 		/** Class name applied to the button. */
 		class?: string
 		/** Called when the button is clicked. */
@@ -14,6 +16,7 @@
 
 	let {
 		isActive = false,
+		'aria-label': ariaLabel = 'Delete color',
 		class: className = '',
 		onclick = undefined,
 		...restProps
@@ -23,6 +26,7 @@
 <button
 	data-testid="__palette-trash-button__"
 	type="button"
+	aria-label={ariaLabel}
 	{...restProps}
 	class="trash_button__button {className}"
 	class:trash_button__button--active={isActive}

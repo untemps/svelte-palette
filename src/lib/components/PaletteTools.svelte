@@ -9,16 +9,26 @@
 	interface Props {
 		/** Tools to display. */
 		tools?: PaletteToolName[]
+		/** Accessible name of the tools panel section. */
+		label?: string
+		/** Accessible name of the compact button (forwarded to the compact toggle). */
+		compactLabel?: string
+		/** Accessible name of the enlarge button (forwarded to the compact toggle). */
+		enlargeLabel?: string
+		/** Accessible name of the settings button. */
+		settingsLabel?: string
 		/** Called when a tool is selected. */
 		onselect?: (args: ToolSelectEventArgs) => void
 	}
 
-	let { tools = [], onselect = undefined }: Props = $props()
-
-	const TOOL_BUTTONS = {
-		[COMPACT]: PaletteCompactToggleButton,
-		[SETTINGS]: PaletteSettingsButton,
-	}
+	let {
+		tools = [],
+		label = 'Palette tools',
+		compactLabel = 'Compact the palette',
+		enlargeLabel = 'Enlarge the palette',
+		settingsLabel = 'Go to settings',
+		onselect = undefined,
+	}: Props = $props()
 
 	const _selectTool = (index: number) => {
 		onselect?.({ tool: tools[index] })
@@ -26,11 +36,12 @@
 </script>
 
 <hr class="palette__divider" />
-<section data-testid="__palette-tools__" aria-label="Palette tools" class="palette__tools">
+<section data-testid="__palette-tools__" aria-label={label} class="palette__tools">
 	{#each tools as tool, i (tool)}
-		{@const ToolComponent = TOOL_BUTTONS[tool]}
-		{#if ToolComponent}
-			<ToolComponent onclick={() => _selectTool(i)} />
+		{#if tool === COMPACT}
+			<PaletteCompactToggleButton {compactLabel} {enlargeLabel} onclick={() => _selectTool(i)} />
+		{:else if tool === SETTINGS}
+			<PaletteSettingsButton aria-label={settingsLabel} onclick={() => _selectTool(i)} />
 		{/if}
 	{/each}
 </section>
