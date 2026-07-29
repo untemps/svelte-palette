@@ -18,10 +18,31 @@ export interface UseDeletionParameter extends UseDeletionOptions {
 	deletionMode?: DeletionMode
 }
 
+const LEAKED_ARIA_ATTRIBUTES = ['aria-haspopup', 'aria-expanded', 'aria-describedby'] as const
+
+/**
+ * The tooltip library stamps disclosure semantics onto the presentational cell wrapper the
+ * deletion tooltip is bound to. When its content is interactive (the default template holds a
+ * focusable trash button) it sets `aria-haspopup="dialog"` and toggles `aria-expanded`; when it
+ * is non-interactive (a custom `tooltipContentSelector` whose content has no focusable element)
+ * it sets `aria-describedby` on open. The tooltip is pointer-only (`showOn: ['mouseenter']`), so
+ * on a `role="presentation"` cell these all announce an interaction that keyboard and
+ * assistive-technology users can never perform there — the keyboard path is the listbox-level
+ * Delete/Backspace shortcut instead. Strip them, and keep stripping: the library re-applies them
+ * on every open. Returns a disposer that stops the observer.
+ */
+const suppressAriaLeaks = (node: HTMLElement): (() => void) => {
+	const strip = () => LEAKED_ARIA_ATTRIBUTES.forEach((attribute) => node.removeAttribute(attribute))
+	strip()
+	const observer = new MutationObserver(strip)
+	observer.observe(node, { attributes: true, attributeFilter: [...LEAKED_ARIA_ATTRIBUTES] })
+	return () => observer.disconnect()
+}
+
 const createAction = (node: HTMLElement, deletionMode: DeletionMode | undefined, options: UseDeletionOptions) => {
 	switch (deletionMode) {
 		case TOOLTIP: {
-			return useTooltip(node, {
+			const action = useTooltip(node, {
 				contentSelector: options.tooltipContentSelector || '#tooltip-template',
 				contentActions: {
 					'*': {
@@ -35,6 +56,13 @@ const createAction = (node: HTMLElement, deletionMode: DeletionMode | undefined,
 				showOn: ['mouseenter'],
 				hideOn: ['mouseleave'],
 			})
+			const disposeAriaSuppression = suppressAriaLeaks(node)
+			return {
+				destroy: () => {
+					disposeAriaSuppression()
+					action?.destroy?.()
+				},
+			}
 		}
 		case DROP: {
 			const slotButton = node.querySelector('[data-testid="__palette-slot__"]')

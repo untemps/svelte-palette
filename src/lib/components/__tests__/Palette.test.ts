@@ -947,6 +947,70 @@ test('Keeps deletion cells out of the tab order', async () => {
 	})
 })
 
+test('Keeps disclosure ARIA off the presentational deletion cells', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const { user } = setup(Palette, { props: { colors, deletionMode: TOOLTIP } })
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells.length).toBeGreaterThan(0)
+
+	// The tooltip library treats the pointer-only deletion tooltip as an interactive disclosure
+	// and would stamp aria-haspopup/aria-expanded on the role="presentation" cells. Assert the
+	// attributes directly: role queries read `role` literally and ignore the presentational
+	// conflict these attributes trigger.
+	cells.forEach((cell) => {
+		expect(cell).not.toHaveAttribute('aria-haspopup')
+		expect(cell).not.toHaveAttribute('aria-expanded')
+	})
+
+	// The library re-applies aria-expanded every time the tooltip opens; opening it on hover
+	// must not leave disclosure semantics behind on the presentational cell.
+	const cell = cells[0]
+	await user.hover(cell)
+	await screen.findByTestId('__trash-icon__')
+	// role="dialog" + aria-modal="true" are set only when the library treats the tooltip as an
+	// interactive disclosure — the precondition that stamps aria-expanded on open. Asserting it
+	// keeps the strip check below from passing vacuously if the content ever stops being focusable.
+	expect(await screen.findByRole('dialog')).toHaveAttribute('aria-modal', 'true')
+	await waitFor(() => {
+		expect(cell).not.toHaveAttribute('aria-haspopup')
+		expect(cell).not.toHaveAttribute('aria-expanded')
+	})
+
+	await user.unhover(cell)
+	await waitFor(() => {
+		expect(cell).not.toHaveAttribute('aria-haspopup')
+		expect(cell).not.toHaveAttribute('aria-expanded')
+	})
+})
+
+test('Strips aria-describedby stamped by a non-interactive custom deletion tooltip', async () => {
+	// A custom tooltip whose content has no focusable element makes the library treat the tooltip
+	// as non-interactive; on open it then sets aria-describedby on the presentational cell instead
+	// of the interactive disclosure attributes. That is the same presentational-conflict leak.
+	const template = document.createElement('template')
+	template.id = 'custom-deletion-tooltip'
+	template.innerHTML = '<span>Remove</span>'
+	document.body.appendChild(template)
+
+	try {
+		const colors = ['#ff0', '#0ff', '#f0f']
+		const { user } = setup(Palette, {
+			props: { colors, deletionMode: TOOLTIP, tooltipContentSelector: '#custom-deletion-tooltip' },
+		})
+
+		const cells = await screen.findAllByTestId('__palette-cell__')
+		const cell = cells[0]
+		await user.hover(cell)
+		await screen.findByText('Remove') // the custom tooltip opened
+		await waitFor(() => {
+			expect(cell).not.toHaveAttribute('aria-describedby')
+		})
+	} finally {
+		template.remove()
+	}
+})
+
 test('Keeps exactly one tabbable slot after the colors change', async () => {
 	const colors = ['#100', '#200', '#300', '#400', '#500', '#600']
 	const { rerender } = setup(Palette, { props: { colors, numColumns: 3 } })
