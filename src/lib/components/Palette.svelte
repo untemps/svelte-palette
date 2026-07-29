@@ -17,6 +17,7 @@
 	import PaletteSlot from './PaletteSlot.svelte'
 	import PaletteTrashButton from './PaletteTrashButton.svelte'
 	import PaletteLoader from './PaletteLoader.svelte'
+	import PaletteError from './PaletteError.svelte'
 	import PaletteTools from './PaletteTools.svelte'
 	import PaletteSettingsPanel from './PaletteSettingsPanel.svelte'
 	import PaletteCompactToggleButton from './PaletteCompactToggleButton.svelte'
@@ -34,6 +35,8 @@
 		DeleteEventArgs,
 		DeletionMode,
 		EdgeSlotSnippetProps,
+		ErrorEventArgs,
+		ErrorSnippetProps,
 		HeaderSnippetProps,
 		InputAddEventArgs,
 		InputSnippetProps,
@@ -67,6 +70,7 @@
 		onselect?: (args: SelectEventArgs) => void
 		onadd?: (args: AddEventArgs) => void
 		ondelete?: (args: DeleteEventArgs) => void
+		onerror?: (args: ErrorEventArgs) => void
 		label?: string
 		presentational?: boolean
 		class?: string
@@ -76,6 +80,7 @@
 		slot?: Snippet<[SlotSnippetProps]>
 		afterSlot?: Snippet<[EdgeSlotSnippetProps]>
 		loader?: Snippet
+		error?: Snippet<[ErrorSnippetProps]>
 		footer?: Snippet<[HeaderSnippetProps]>
 		input?: Snippet<[InputSnippetProps]>
 		tools?: Snippet<[ToolsSnippetProps]>
@@ -101,6 +106,7 @@
 		onselect = undefined,
 		onadd = undefined,
 		ondelete = undefined,
+		onerror = undefined,
 		label = 'Color slots',
 		presentational = false,
 		class: className = '',
@@ -110,6 +116,7 @@
 		slot: colorSlot = undefined,
 		afterSlot = undefined,
 		loader = undefined,
+		error = undefined,
 		footer = undefined,
 		input = undefined,
 		tools = undefined,
@@ -121,6 +128,8 @@
 	let _colors = $state<NormalizedColor[] | null>(null)
 	let _fullColors = $state<NormalizedColor[] | null>(null)
 	let _colorGroups = $state<NormalizedColorGroup[] | null>(null)
+	let _error = $state<unknown>(null)
+	let _hasError = $state(false)
 	let _numColumns = $state(untrack(() => numColumns))
 	let _isSettingsOn = $state(false)
 	let _isCompact = $state(untrack(() => isCompact))
@@ -129,6 +138,7 @@
 	let _skipColorsSync = $state(false)
 	let _syncedViewParams: ReturnType<typeof _viewParams> | null = null
 	let _colorsGeneration = 0
+	let _colorsSource: ColorsProp | null = null
 
 	let _inputType = $derived(normalizeInputType(inputType))
 
@@ -167,37 +177,62 @@
 		const _source = colors
 		const _params = _viewParams()
 		const generation = ++_colorsGeneration
+		const _sourceChanged = _source !== _colorsSource
+		_colorsSource = _source
 		if (untrack(() => _skipColorsSync)) {
 			_skipColorsSync = false
 			if (_sameViewParams(_syncedViewParams, _params)) {
 				return
 			}
 		}
-		Promise.resolve(_source).then((results) => {
-			if (generation !== _colorsGeneration) {
-				return
-			}
-			if (!!results) {
+		if (_sourceChanged) {
+			_hasError = false
+			_error = null
+		}
+		Promise.resolve(_source).then(
+			(results) => {
+				if (generation !== _colorsGeneration) {
+					return
+				}
+				if (!!results) {
+					_hasError = false
+					_error = null
+					_focusedIndex = null
+					if (isColorGroups(results)) {
+						const newColorGroups = calculateColorGroups(results, {
+							allowDuplicates: _params.allowDuplicates,
+							maxColors: _params.maxColors,
+						})
+						_colorGroups = newColorGroups
+						_colors = null
+						_fullColors = null
+						const maxGroupLength = newColorGroups.reduce((max, g) => Math.max(max, g.colors.length), 0)
+						_numColumns = calculateNumColumns(maxGroupLength, { numColumns: _params.numColumns })
+					} else {
+						const newColors = calculateColors(results, _params)
+						_colors = newColors
+						_colorGroups = null
+						_fullColors = transformColors(Array.isArray(results) ? results : [])
+						_numColumns = calculateNumColumns(newColors.length, _params)
+					}
+				}
+			},
+			(reason) => {
+				if (generation !== _colorsGeneration) {
+					return
+				}
+				const _wasError = _hasError
+				_hasError = true
+				_error = reason
+				_colors = null
+				_colorGroups = null
+				_fullColors = null
 				_focusedIndex = null
-				if (isColorGroups(results)) {
-					const newColorGroups = calculateColorGroups(results, {
-						allowDuplicates: _params.allowDuplicates,
-						maxColors: _params.maxColors,
-					})
-					_colorGroups = newColorGroups
-					_colors = null
-					_fullColors = null
-					const maxGroupLength = newColorGroups.reduce((max, g) => Math.max(max, g.colors.length), 0)
-					_numColumns = calculateNumColumns(maxGroupLength, { numColumns: _params.numColumns })
-				} else {
-					const newColors = calculateColors(results, _params)
-					_colors = newColors
-					_colorGroups = null
-					_fullColors = transformColors(Array.isArray(results) ? results : [])
-					_numColumns = calculateNumColumns(newColors.length, _params)
+				if (!_wasError) {
+					onerror?.({ error: reason })
 				}
 			}
-		})
+		)
 	})
 
 	let _tools: PaletteToolName[] = $derived([
@@ -705,6 +740,12 @@
 					{@render afterSlot({ selectedColor, transition, isCompact: _isCompact })}
 				{/if}
 			</div>
+		{:else if _hasError}
+			{#if error}
+				{@render error({ error: _error })}
+			{:else}
+				<PaletteError error={_error} />
+			{/if}
 		{:else if loader}
 			{@render loader()}
 		{:else}
