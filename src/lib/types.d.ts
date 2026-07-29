@@ -76,7 +76,7 @@ export type InputType = 'text' | 'color'
  * value held in `DEFAULT_LABELS`.
  */
 export interface PaletteLabels {
-	/** Accessible name of the slot listbox. Aliased by the `label` prop, which wins when both are set. */
+	/** Accessible name of the slot listbox. */
 	slots: string
 	/** Text announced while an async `colors` source is loading. */
 	loader: string

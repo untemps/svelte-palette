@@ -108,7 +108,7 @@
 			{#key unique}
 				<Palette
 					class="palette__custom"
-					label="Background color slots"
+					labels={{ slots: 'Background color slots' }}
 					bind:colors
 					compactColorIndices={showCompactControl ? compactIndices : null}
 					selectedColor={preselectColor ? bgColor : null}

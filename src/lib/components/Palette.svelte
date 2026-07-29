@@ -75,7 +75,6 @@
 		ondelete?: (args: DeleteEventArgs) => void
 		onerror?: (args: ErrorEventArgs) => void
 		labels?: Partial<PaletteLabels>
-		label?: string
 		presentational?: boolean
 		class?: string
 		header?: Snippet<[HeaderSnippetProps]>
@@ -112,7 +111,6 @@
 		ondelete = undefined,
 		onerror = undefined,
 		labels = undefined,
-		label = undefined,
 		presentational = false,
 		class: className = '',
 		header = undefined,
@@ -147,10 +145,8 @@
 
 	let _inputType = $derived(normalizeInputType(inputType))
 
-	// Merge the overridable label bag over the defaults once; `label` stays a back-compat alias for
-	// `labels.slots` and wins for the listbox name when both are set.
+	// Merge the overridable label bag over the defaults once.
 	const _labels = $derived<PaletteLabels>({ ...DEFAULT_LABELS, ...labels })
-	const _slotsLabel = $derived(label ?? _labels.slots)
 
 	const _viewParams = () => ({
 		isCompact: _isCompact,
@@ -606,7 +602,7 @@
 				bind:this={_listboxEl}
 				class="palette__groups"
 				role={presentational ? undefined : 'listbox'}
-				aria-label={presentational ? undefined : _slotsLabel}
+				aria-label={presentational ? undefined : _labels.slots}
 				tabindex={-1}
 				onkeydown={presentational ? undefined : _onListboxKeydown}
 				onfocusin={presentational ? undefined : _onListboxFocusin}
@@ -682,7 +678,7 @@
 					bind:this={_listboxEl}
 					class="palette__listbox"
 					role={presentational ? 'presentation' : 'listbox'}
-					aria-label={presentational ? undefined : _slotsLabel}
+					aria-label={presentational ? undefined : _labels.slots}
 					tabindex={-1}
 					onkeydown={presentational ? undefined : _onListboxKeydown}
 					onfocusin={presentational ? undefined : _onListboxFocusin}

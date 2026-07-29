@@ -835,14 +835,6 @@ test('Exposes the slot grid as a listbox', async () => {
 	expect(listbox).toHaveAttribute('aria-label', 'Color slots')
 })
 
-test('Names the listbox with the label prop', async () => {
-	const colors = ['#ff0', '#0ff', '#f0f']
-	setup(Palette, { props: { colors, label: 'Brand colors' } })
-
-	const listbox = await screen.findByRole('listbox')
-	expect(listbox).toHaveAttribute('aria-label', 'Brand colors')
-})
-
 test('Groups slots and associates each group with its name', async () => {
 	const colors = [
 		{ name: 'Reds', colors: ['#f00', '#f11'] },
@@ -2112,13 +2104,6 @@ describe('Built-in label overrides', () => {
 		setup(Palette, { props: { colors, labels: { slots: 'Palette de marque' } } })
 		const listbox = await screen.findByRole('listbox')
 		expect(listbox).toHaveAttribute('aria-label', 'Palette de marque')
-	})
-
-	test('Prefers the label prop over labels.slots for the listbox name', async () => {
-		const colors = ['#ff0', '#0ff']
-		setup(Palette, { props: { colors, label: 'Legacy name', labels: { slots: 'Bag name' } } })
-		const listbox = await screen.findByRole('listbox')
-		expect(listbox).toHaveAttribute('aria-label', 'Legacy name')
 	})
 
 	test('Overrides the loader label without a loader snippet', async () => {
