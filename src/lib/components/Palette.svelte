@@ -804,7 +804,7 @@
 {/if}
 
 <template id="tooltip-template">
-	<PaletteTrashButton aria-label={_labels.trash} />
+	<PaletteTrashButton deleteLabel={_labels.trash} />
 </template>
 
 <style>

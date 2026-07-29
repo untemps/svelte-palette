@@ -247,11 +247,11 @@ Button that opens the browser [EyeDropper API](#eyedropper-api-support) to pick 
 
 The trash button shown inside the deletion tooltip when `deletionMode` is `"tooltip"`.
 
-| Prop         | Type    | Default        | Description                                                      |
-| ------------ | ------- | -------------- | ---------------------------------------------------------------- |
-| `isActive`   | boolean | false          | Whether the button is in its active state.                       |
-| `aria-label` | string  | "Delete color" | Accessible name of the button, so the deletion control is named. |
-| `class`      | string  | ''             | Class name applied to the button.                                |
+| Prop          | Type    | Default        | Description                                                      |
+| ------------- | ------- | -------------- | ---------------------------------------------------------------- |
+| `isActive`    | boolean | false          | Whether the button is in its active state.                       |
+| `deleteLabel` | string  | "Delete color" | Accessible name of the button, so the deletion control is named. |
+| `class`       | string  | ''             | Class name applied to the button.                                |
 
 | Callback  | Arguments    | Description                        |
 | --------- | ------------ | ---------------------------------- |

@@ -23,7 +23,7 @@ test('Names the button with a default accessible name', () => {
 })
 
 test('Names the button with a custom accessible name', () => {
-	setup(PaletteTrashButton, { props: { ['aria-label']: 'Supprimer la couleur' } })
+	setup(PaletteTrashButton, { props: { deleteLabel: 'Supprimer la couleur' } })
 	const button = screen.getByRole('button', { name: 'Supprimer la couleur' })
 	expect(button).toBeInTheDocument()
 })
