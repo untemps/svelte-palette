@@ -2194,8 +2194,6 @@ describe('Built-in label overrides', () => {
 		setup(Palette, { props: { colors, deletionMode: TOOLTIP, labels: { trash: 'Supprimer la couleur' } } })
 		await screen.findAllByTestId('__palette-cell__')
 
-		// The template content lives in a separate document fragment, so query it directly rather than
-		// through jest-dom matchers (which reject nodes from another document).
 		const template = document.getElementById('tooltip-template') as HTMLTemplateElement
 		const trash = template.content.querySelector('[data-testid="__palette-trash-button__"]')
 		expect(trash?.getAttribute('aria-label')).toBe('Supprimer la couleur')

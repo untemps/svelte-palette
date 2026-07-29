@@ -5,7 +5,6 @@
 
 	const _colors = ['#2ec4b6', '#e71d36', '#ff9f1c', '#011627', '#41ead4', '#f71735', '#3a86ff', '#8338ec']
 
-	// A full per-locale set. Any subset works too — every key defaults to DEFAULT_LABELS.
 	const _frLabels: PaletteLabels = {
 		slots: 'Emplacements de couleur',
 		loader: 'Chargement des couleurs',

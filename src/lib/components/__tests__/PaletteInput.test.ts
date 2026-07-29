@@ -74,7 +74,6 @@ test('Names the hex input and submit button with default labels', () => {
 	setup(PaletteInput)
 	const input = screen.getByTestId('__palette-input-input__')
 	expect(input).toHaveAttribute('aria-label', 'Enter an hex color value')
-	// The validation hint carries no stray quotes (#251).
 	expect(input).toHaveAttribute('title', 'The value must be a valid hex color')
 	expect(screen.getByTestId('__palette-input-submit__')).toHaveAttribute('aria-label', 'Submit the hex color value')
 })

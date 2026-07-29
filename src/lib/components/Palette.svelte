@@ -145,7 +145,6 @@
 
 	let _inputType = $derived(normalizeInputType(inputType))
 
-	// Merge the overridable label bag over the defaults once.
 	const _labels = $derived<PaletteLabels>({ ...DEFAULT_LABELS, ...labels })
 
 	const _viewParams = () => ({

@@ -16,9 +16,6 @@
 			)
 		)
 
-	// Only kick off the (rejecting) fetches in the browser. Created during SSR, their timer would reject on the
-	// server with no consumer attached — Palette's resolving effect runs on the client only — crashing the dev
-	// server with an unhandled rejection. Leaving `null` on the server keeps the palette in its loading state.
 	let colors = $state<ColorsProp | null>(browser ? _fetchColors(true) : null)
 	let selectedColor = $state<string | null>(null)
 	let lastError = $state<string | null>(null)

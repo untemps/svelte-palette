@@ -479,8 +479,6 @@ Every built-in text and accessibility label of `<Palette>` (and the default prim
 
 If you replace a region with your own snippet (`loader`, `error`, `input`, `tools`, …), that snippet owns its own text and the matching `labels` key no longer applies.
 
-> **Migration (6.0):** the standalone `label` prop was removed. Name the slot listbox with `labels={{ slots: '…' }}` instead of `label="…"`.
-
 ```svelte
 <script>
 	import { Palette, DEFAULT_LABELS } from '@untemps/svelte-palette'
