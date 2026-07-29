@@ -329,7 +329,6 @@ The tools panel wiring the settings and compact-toggle buttons; it is the defaul
 | `tools`         | string[] | []                    | Tools to display, from the exported `COMPACT` and `SETTINGS` constants. |
 | `label`         | string   | "Palette tools"       | Accessible name of the tools panel section.                             |
 | `compactLabel`  | string   | "Compact the palette" | Accessible name forwarded to the compact toggle.                        |
-| `enlargeLabel`  | string   | "Enlarge the palette" | Enlarge name forwarded to the compact toggle.                           |
 | `settingsLabel` | string   | "Go to settings"      | Accessible name of the settings button.                                 |
 
 | Callback   | Arguments  | Description                     |

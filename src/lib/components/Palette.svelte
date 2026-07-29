@@ -791,7 +791,6 @@
 				tools={_tools}
 				label={_labels.tools}
 				compactLabel={_labels.compact}
-				enlargeLabel={_labels.enlarge}
 				settingsLabel={_labels.settings}
 				onselect={_onToolSelect}
 			/>

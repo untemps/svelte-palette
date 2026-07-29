@@ -13,8 +13,6 @@
 		label?: string
 		/** Accessible name of the compact button (forwarded to the compact toggle). */
 		compactLabel?: string
-		/** Accessible name of the enlarge button (forwarded to the compact toggle). */
-		enlargeLabel?: string
 		/** Accessible name of the settings button. */
 		settingsLabel?: string
 		/** Called when a tool is selected. */
@@ -25,7 +23,6 @@
 		tools = [],
 		label = 'Palette tools',
 		compactLabel = 'Compact the palette',
-		enlargeLabel = 'Enlarge the palette',
 		settingsLabel = 'Go to settings',
 		onselect = undefined,
 	}: Props = $props()
@@ -39,7 +36,7 @@
 <section data-testid="__palette-tools__" aria-label={label} class="palette__tools">
 	{#each tools as tool, i (tool)}
 		{#if tool === COMPACT}
-			<PaletteCompactToggleButton {compactLabel} {enlargeLabel} onclick={() => _selectTool(i)} />
+			<PaletteCompactToggleButton {compactLabel} onclick={() => _selectTool(i)} />
 		{:else if tool === SETTINGS}
 			<PaletteSettingsButton aria-label={settingsLabel} onclick={() => _selectTool(i)} />
 		{/if}
