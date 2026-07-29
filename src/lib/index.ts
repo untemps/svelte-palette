@@ -12,3 +12,5 @@ export { default as PaletteSettingsPanel } from './components/PaletteSettingsPan
 export { default as PaletteTools } from './components/PaletteTools.svelte'
 export { NONE, TOOLTIP, DROP } from './enums/PaletteDeletionMode'
 export { COMPACT, SETTINGS } from './enums/PaletteTool'
+export { DEFAULT_LABELS } from './labels'
+export type { PaletteLabels } from './types'
