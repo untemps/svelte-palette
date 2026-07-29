@@ -91,6 +91,8 @@ yarn add @untemps/svelte-palette
 |            | `colors`     | object[] or ColorGroup[] | The resulting color list, in its resolved and normalized form.                       |
 |            | `groupIndex` | number                   | Index of the group the color was removed from (grouped mode only).                   |
 |            | `groupName`  | string                   | Name of the group the color was removed from (grouped mode only, when named).        |
+| `onerror`  |              |                          | **Called when an async `colors` source rejects.**                                    |
+|            | `error`      | unknown                  | The rejection reason of the `colors` promise.                                        |
 
 ## Snippets
 
@@ -108,6 +110,7 @@ Snippets replace the Svelte 4 named slots API. Pass them as children of `<Palett
 | `settings`        | Allow to replace the settings panel (see [`PaletteSettingsPanel`](#palettesettingspanel)). See the demo to grab a usage example. | `onClose`                                                                                                                          |
 | `tools`           | Allow to replace the tools panel (see [`PaletteTools`](#palettetools)).                                                          | `isCompact`, `compactColorIndices`, `onSelect`                                                                                     |
 | `loader`          | Allow to replace the loader displayed during the colors async retrieving (see [`PaletteLoader`](#paletteloader)).                | -                                                                                                                                  |
+| `error`           | Allow to replace the error state shown when an async `colors` source rejects (see [`PaletteError`](#paletteerror)).              | `error`                                                                                                                            |
 
 ## Example
 
@@ -161,7 +164,7 @@ Snippets replace the Svelte 4 named slots API. Pass them as children of `<Palett
 
 # Components
 
-The package exports eleven components from its entry point, alongside the [deletion-mode](#deletion-modes) and [tool](#customize-the-tools-panel) enums. [`Palette`](#palette-api) is the top-level component; the others are the primitives it composes, exported so you can build your own snippets (`slot`, `input`, `settings`, `tools`, `loader`) or reuse a single control on its own.
+The package exports twelve components from its entry point, alongside the [deletion-mode](#deletion-modes) and [tool](#customize-the-tools-panel) enums. [`Palette`](#palette-api) is the top-level component; the others are the primitives it composes, exported so you can build your own snippets (`slot`, `input`, `settings`, `tools`, `loader`) or reuse a single control on its own.
 
 ```js
 import {
@@ -173,25 +176,27 @@ import {
 	PaletteCompactToggleButton,
 	PaletteIconButton,
 	PaletteLoader,
+	PaletteError,
 	PaletteSettingsButton,
 	PaletteSettingsPanel,
 	PaletteTools,
 } from '@untemps/svelte-palette'
 ```
 
-| Component                                                   | Purpose                                                                                         |
-| ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| [`Palette`](#palette-api)                                   | The main color-picker component (documented in [Palette API](#palette-api)).                    |
-| [`PaletteSlot`](#paletteslot)                               | A single color slot button as rendered in the grid.                                             |
-| [`PaletteInput`](#paletteinput)                             | The color input used to add a new slot (default `input` snippet).                               |
-| [`PaletteEyeDropperButton`](#paletteeyedropperbutton)       | Button that opens the browser EyeDropper to pick a color from the screen.                       |
-| [`PaletteTrashButton`](#palettetrashbutton)                 | The trash button shown in the deletion tooltip.                                                 |
-| [`PaletteCompactToggleButton`](#palettecompacttogglebutton) | Toggles the palette between compact and full modes.                                             |
-| [`PaletteIconButton`](#paletteiconbutton)                   | The base icon button every toolbar button is built on.                                          |
-| [`PaletteLoader`](#paletteloader)                           | The accessible loader shown while an async `colors` source resolves (default `loader` snippet). |
-| [`PaletteSettingsButton`](#palettesettingsbutton)           | Button that opens the settings panel.                                                           |
-| [`PaletteSettingsPanel`](#palettesettingspanel)             | A panel portalled into the DOM, used to host settings content.                                  |
-| [`PaletteTools`](#palettetools)                             | The tools panel wiring the settings and compact-toggle buttons (default `tools` snippet).       |
+| Component                                                   | Purpose                                                                                           |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| [`Palette`](#palette-api)                                   | The main color-picker component (documented in [Palette API](#palette-api)).                      |
+| [`PaletteSlot`](#paletteslot)                               | A single color slot button as rendered in the grid.                                               |
+| [`PaletteInput`](#paletteinput)                             | The color input used to add a new slot (default `input` snippet).                                 |
+| [`PaletteEyeDropperButton`](#paletteeyedropperbutton)       | Button that opens the browser EyeDropper to pick a color from the screen.                         |
+| [`PaletteTrashButton`](#palettetrashbutton)                 | The trash button shown in the deletion tooltip.                                                   |
+| [`PaletteCompactToggleButton`](#palettecompacttogglebutton) | Toggles the palette between compact and full modes.                                               |
+| [`PaletteIconButton`](#paletteiconbutton)                   | The base icon button every toolbar button is built on.                                            |
+| [`PaletteLoader`](#paletteloader)                           | The accessible loader shown while an async `colors` source resolves (default `loader` snippet).   |
+| [`PaletteError`](#paletteerror)                             | The accessible error state shown when an async `colors` source rejects (default `error` snippet). |
+| [`PaletteSettingsButton`](#palettesettingsbutton)           | Button that opens the settings panel.                                                             |
+| [`PaletteSettingsPanel`](#palettesettingspanel)             | A panel portalled into the DOM, used to host settings content.                                    |
+| [`PaletteTools`](#palettetools)                             | The tools panel wiring the settings and compact-toggle buttons (default `tools` snippet).         |
 
 Each button component below forwards any extra attributes (`...restProps`) to its underlying `<button>`, so attributes such as `aria-label` or `data-*` pass straight through.
 
@@ -280,6 +285,15 @@ The loader shown while an async `colors` source resolves; it is the default [`lo
 | Prop    | Type   | Default          | Description                                                     |
 | ------- | ------ | ---------------- | --------------------------------------------------------------- |
 | `label` | string | "Loading colors" | Text announced by assistive tech while the palette colors load. |
+
+## PaletteError
+
+The error state shown when an async `colors` source rejects; it is the default [`error`](#snippets) snippet content. It is an assertive live region (`role="alert"`) that announces a headline label and, when the rejection reason yields readable text, the message. Restyle it or supply your own `error` snippet to replace it (see [Use an API to Fill the Palette](#use-an-api-to-fill-the-palette)).
+
+| Prop    | Type    | Default                 | Description                                                               |
+| ------- | ------- | ----------------------- | ------------------------------------------------------------------------- |
+| `error` | unknown | null                    | The rejection reason. Rendered as a message when it yields readable text. |
+| `label` | string  | "Colors failed to load" | Text announced by assistive tech and shown as the headline.               |
 
 ## PaletteSettingsButton
 
@@ -586,20 +600,31 @@ The component displays a customizable loader waiting to the promise to be resolv
 
 The default loader (`PaletteLoader`) is an accessible live region: it exposes a `role="status"` so screen readers announce the loading state, and its spinner is driven by a CSS animation that is disabled under `prefers-reduced-motion: reduce`. When you render `PaletteLoader` directly, its announced text comes from a `label` prop (defaults to `Loading colors`). Through `<Palette>` the default loader announces that English default, so to localize the loading announcement — or to replace the loader entirely — supply your own `loader` snippet.
 
+Network calls fail, so the promise-based pattern should handle rejection too. When the `colors` promise rejects, the palette catches it and renders an error state instead of spinning forever: the bundled [`PaletteError`](#paletteerror) by default, or your own `error` snippet. The rejection reason is also delivered to the `onerror` callback, and supplying a fresh `colors` promise clears the error and returns to the loader.
+
 #### Example
 
 ```svelte
 <script>
 	import { Palette } from '@untemps/svelte-palette'
 
-	const colors = fetch('https://www.colr.org/json/colors/random/30')
-		.then((result) => result.json())
-		.then((result) => result.colors.filter((c) => c.hex?.length).map((c) => `#${c.hex}`))
+	const fetchColors = () =>
+		fetch('https://www.colr.org/json/colors/random/30')
+			.then((result) => result.json())
+			.then((result) => result.colors.filter((c) => c.hex?.length).map((c) => `#${c.hex}`))
+
+	let colors = $state(fetchColors())
 </script>
 
-<Palette {colors}>
+<Palette {colors} onerror={({ error }) => console.error('Palette failed to load', error)}>
 	{#snippet loader()}
 		<p>Loading...</p>
+	{/snippet}
+	{#snippet error({ error })}
+		<div role="alert">
+			<p>Could not load colors: {error.message}</p>
+			<button onclick={() => (colors = fetchColors())}>Retry</button>
+		</div>
 	{/snippet}
 </Palette>
 ```

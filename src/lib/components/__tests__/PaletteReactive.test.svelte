@@ -5,7 +5,7 @@
 
 	import { NONE } from '../../enums/PaletteDeletionMode'
 
-	import type { ColorsProp, DeleteEventArgs, DeletionMode } from '../../types'
+	import type { ColorsProp, DeleteEventArgs, DeletionMode, ErrorEventArgs } from '../../types'
 
 	let {
 		initialColors,
@@ -18,6 +18,7 @@
 		initialShowInput = false,
 		deletionMode = NONE,
 		ondelete = undefined,
+		onerror = undefined,
 	}: {
 		initialColors: ColorsProp
 		initialIsCompact?: boolean
@@ -29,6 +30,7 @@
 		initialShowInput?: boolean
 		deletionMode?: DeletionMode
 		ondelete?: (args: DeleteEventArgs) => void
+		onerror?: (args: ErrorEventArgs) => void
 	} = $props()
 
 	let colors = $state<ColorsProp | null>(untrack(() => initialColors))
@@ -62,4 +64,5 @@
 	{showInput}
 	{deletionMode}
 	{ondelete}
+	{onerror}
 />

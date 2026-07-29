@@ -113,10 +113,11 @@ export interface DeleteEventArgs {
 }
 
 /**
- * Argument passed to the `onerror` callback when the eye dropper fails or is dismissed.
+ * Argument passed to an `onerror` callback carrying the underlying error. Used by the eye dropper when the
+ * EyeDropper API fails or is dismissed, and by the palette when an async `colors` source rejects.
  */
 export interface ErrorEventArgs {
-	/** The error thrown by the EyeDropper API. */
+	/** The error thrown by the EyeDropper API, or the rejection reason of an async `colors` source. */
 	error: unknown
 }
 
@@ -216,4 +217,13 @@ export interface ToolsSnippetProps {
 export interface SettingsSnippetProps {
 	/** Closes the settings panel. */
 	onClose: () => void
+}
+
+/**
+ * Properties passed to the `error` snippet that replaces the default error state shown when an async
+ * `colors` source rejects.
+ */
+export interface ErrorSnippetProps {
+	/** The rejection reason of the async `colors` source. */
+	error: unknown
 }

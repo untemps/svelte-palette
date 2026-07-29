@@ -85,6 +85,173 @@ test('Discards a stale async colors promise that settles after a newer one', asy
 	expect(slots.map((slot) => slot.getAttribute('aria-label'))).toEqual(['#111', '#222'])
 })
 
+test('Renders the default error state when the async colors promise rejects', async () => {
+	let rejectColors!: (reason?: unknown) => void
+	const colors = new Promise<string[]>((_, reject) => (rejectColors = reject))
+	setup(Palette, { props: { colors } })
+
+	expect(await screen.findByRole('status')).toBeInTheDocument()
+	expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+
+	rejectColors(new Error('Network down'))
+
+	const alert = await screen.findByRole('alert')
+	expect(alert).toHaveTextContent('Colors failed to load')
+	expect(alert).toHaveTextContent('Network down')
+	expect(screen.queryByRole('status')).not.toBeInTheDocument()
+	expect(screen.queryAllByTestId('__palette-slot__')).toHaveLength(0)
+})
+
+test('Surfaces an error state even when the rejection reason is falsy', async () => {
+	let rejectColors!: (reason?: unknown) => void
+	const colors = new Promise<string[]>((_, reject) => (rejectColors = reject))
+	setup(Palette, { props: { colors } })
+
+	rejectColors(undefined)
+
+	const alert = await screen.findByRole('alert')
+	expect(alert).toHaveTextContent('Colors failed to load')
+	expect(screen.queryByRole('status')).not.toBeInTheDocument()
+})
+
+test('Invokes onerror with the rejection reason', async () => {
+	const onerror = vi.fn()
+	let rejectColors!: (reason?: unknown) => void
+	const colors = new Promise<string[]>((_, reject) => (rejectColors = reject))
+	setup(Palette, { props: { colors, onerror } })
+
+	const reason = new Error('boom')
+	rejectColors(reason)
+
+	await waitFor(() => expect(onerror).toHaveBeenCalledTimes(1))
+	expect(onerror).toHaveBeenCalledWith({ error: reason })
+})
+
+test('Renders a custom error snippet in place of the default error state', async () => {
+	const errorSnippet = createRawSnippet((getProps) => ({
+		render: () => `<p data-testid="__custom-error__">${(getProps().error as Error).message}</p>`,
+	}))
+	let rejectColors!: (reason?: unknown) => void
+	const colors = new Promise<string[]>((_, reject) => (rejectColors = reject))
+	setup(Palette, { props: { colors, error: errorSnippet } })
+
+	rejectColors(new Error('Custom failure'))
+
+	const custom = await screen.findByTestId('__custom-error__')
+	expect(custom).toHaveTextContent('Custom failure')
+	expect(screen.queryByText('Colors failed to load')).not.toBeInTheDocument()
+})
+
+test('Clears the error state when a fresh colors promise resolves', async () => {
+	let rejectColors!: (reason?: unknown) => void
+	const failing = new Promise<string[]>((_, reject) => (rejectColors = reject))
+	const { component } = setup(PaletteReactive, { props: { initialColors: failing } })
+
+	rejectColors(new Error('temporary'))
+	await screen.findByRole('alert')
+
+	component.setColors(Promise.resolve(['#111', '#222']))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-slot__')).toHaveLength(2))
+	expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+})
+
+test('Notifies onerror once per failed source, not on later view-param changes', async () => {
+	const onerror = vi.fn()
+	let rejectColors!: (reason?: unknown) => void
+	const failing = new Promise<string[]>((_, reject) => (rejectColors = reject))
+	const { component } = setup(PaletteReactive, { props: { initialColors: failing, onerror } })
+
+	rejectColors(new Error('once'))
+	await screen.findByRole('alert')
+	expect(onerror).toHaveBeenCalledTimes(1)
+
+	component.setIsCompact(true)
+	await tick()
+	await tick()
+	expect(onerror).toHaveBeenCalledTimes(1)
+})
+
+test('Notifies onerror when a view param changes while the rejection is still pending', async () => {
+	const onerror = vi.fn()
+	let rejectColors!: (reason?: unknown) => void
+	const failing = new Promise<string[]>((_, reject) => (rejectColors = reject))
+	const { component } = setup(PaletteReactive, { props: { initialColors: failing, onerror } })
+
+	await tick()
+	component.setIsCompact(true)
+	await tick()
+
+	rejectColors(new Error('late'))
+	await waitFor(() => expect(onerror).toHaveBeenCalledTimes(1))
+	expect(await screen.findByRole('alert')).toBeInTheDocument()
+})
+
+test('Replaces a resolved palette with the error state when a new colors promise rejects', async () => {
+	let rejectColors!: (reason?: unknown) => void
+	const { component } = setup(PaletteReactive, { props: { initialColors: ['#a00', '#0b0', '#00c'] } })
+
+	expect(await screen.findAllByTestId('__palette-slot__')).toHaveLength(3)
+
+	const failing = new Promise<string[]>((_, reject) => (rejectColors = reject))
+	component.setColors(failing)
+	rejectColors(new Error('refetch failed'))
+
+	await screen.findByRole('alert')
+	expect(screen.queryAllByTestId('__palette-slot__')).toHaveLength(0)
+})
+
+test('Shows the loader again while a retry promise is pending, clearing the previous error', async () => {
+	let rejectColors!: (reason?: unknown) => void
+	const failing = new Promise<string[]>((_, reject) => (rejectColors = reject))
+	const { component } = setup(PaletteReactive, { props: { initialColors: failing } })
+
+	rejectColors(new Error('first failure'))
+	await screen.findByRole('alert')
+
+	let resolveRetry!: (value: string[]) => void
+	const retry = new Promise<string[]>((resolve) => (resolveRetry = resolve))
+	component.setColors(retry)
+
+	await waitFor(() => expect(screen.getByRole('status')).toBeInTheDocument())
+	expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+
+	resolveRetry(['#111', '#222'])
+	await waitFor(() => expect(screen.getAllByTestId('__palette-slot__')).toHaveLength(2))
+})
+
+test('Discards a stale rejecting colors promise that settles after a newer one', async () => {
+	const onerror = vi.fn()
+	let rejectStale!: (reason?: unknown) => void
+	let resolveFresh!: (value: string[]) => void
+	const stalePromise = new Promise<string[]>((_, reject) => (rejectStale = reject))
+	const freshPromise = new Promise<string[]>((resolve) => (resolveFresh = resolve))
+
+	const { component } = setup(PaletteReactive, {
+		props: { initialColors: stalePromise, onerror },
+	})
+
+	await tick()
+	expect(screen.queryAllByTestId('__palette-slot__')).toHaveLength(0)
+
+	component.setColors(freshPromise)
+	await tick()
+
+	resolveFresh(['#111', '#222'])
+	await waitFor(() => expect(screen.getAllByTestId('__palette-slot__')).toHaveLength(2))
+
+	rejectStale(new Error('stale failure'))
+	await stalePromise.catch(() => {})
+	await tick()
+	await tick()
+
+	expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+	expect(onerror).not.toHaveBeenCalled()
+	const slots = screen.getAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(2)
+	expect(slots.map((slot) => slot.getAttribute('aria-label'))).toEqual(['#111', '#222'])
+})
+
 test('Triggers select with color', async () => {
 	let cells,
 		cell = null
