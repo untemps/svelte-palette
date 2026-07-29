@@ -2,6 +2,8 @@
 	import { COMPACT, ENLARGE } from '../enums/PaletteIcon'
 	import PaletteIconButton from './PaletteIconButton.svelte'
 
+	import { DEFAULT_LABELS } from '../labels'
+
 	import type { HTMLButtonAttributes } from 'svelte/elements'
 
 	interface Props {
@@ -17,8 +19,8 @@
 
 	let {
 		isCompact = false,
-		compactLabel = 'Compact the palette',
-		enlargeLabel = 'Enlarge the palette',
+		compactLabel = DEFAULT_LABELS.compact,
+		enlargeLabel = DEFAULT_LABELS.enlarge,
 		onclick = undefined,
 		...restProps
 	}: Props & Omit<HTMLButtonAttributes, keyof Props> = $props()

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { DEFAULT_LABELS } from '../labels'
+
 	interface Props {
 		/** The error that caused the async `colors` source to reject. Rendered as a message when it yields readable text. */
 		error?: unknown
@@ -6,7 +8,7 @@
 		label?: string
 	}
 
-	let { error = null, label = 'Colors failed to load' }: Props = $props()
+	let { error = null, label = DEFAULT_LABELS.error }: Props = $props()
 
 	const _message = $derived.by(() => {
 		if (error == null) {

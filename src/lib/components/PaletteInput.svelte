@@ -9,6 +9,8 @@
 
 	import { COLOR_REGEX, isColorValid, normalizeInputType } from '../utils/utils'
 
+	import { DEFAULT_LABELS } from '../labels'
+
 	import type { InputAddEventArgs, ColorValue, InputType } from '../types'
 
 	interface Props {
@@ -33,10 +35,10 @@
 	let {
 		color: colorProp = null,
 		inputType = 'text',
-		hexLabel = 'Enter a hex color value',
-		hexErrorLabel = 'The value must be a valid hex color',
-		submitLabel = 'Submit the hex color value',
-		eyeDropperLabel = 'Pick a color from the screen',
+		hexLabel = DEFAULT_LABELS.inputHex,
+		hexErrorLabel = DEFAULT_LABELS.inputHexError,
+		submitLabel = DEFAULT_LABELS.submitHex,
+		eyeDropperLabel = DEFAULT_LABELS.eyeDropper,
 		onadd = undefined,
 		class: className = '',
 	}: Props = $props()

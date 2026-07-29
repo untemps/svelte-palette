@@ -4,6 +4,8 @@
 	import PaletteCompactToggleButton from './PaletteCompactToggleButton.svelte'
 	import PaletteSettingsButton from './PaletteSettingsButton.svelte'
 
+	import { DEFAULT_LABELS } from '../labels'
+
 	import type { PaletteToolName, ToolSelectEventArgs } from '../types'
 
 	interface Props {
@@ -21,9 +23,9 @@
 
 	let {
 		tools = [],
-		label = 'Palette tools',
-		compactLabel = 'Compact the palette',
-		settingsLabel = 'Go to settings',
+		label = DEFAULT_LABELS.tools,
+		compactLabel = DEFAULT_LABELS.compact,
+		settingsLabel = DEFAULT_LABELS.settings,
 		onselect = undefined,
 	}: Props = $props()
 

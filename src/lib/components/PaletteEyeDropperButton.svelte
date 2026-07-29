@@ -3,6 +3,8 @@
 	import PaletteIconButton from './PaletteIconButton.svelte'
 	import { normalizeColor } from '../utils/utils.js'
 
+	import { DEFAULT_LABELS } from '../labels'
+
 	import type { HTMLButtonAttributes } from 'svelte/elements'
 
 	import type { InputAddEventArgs, ErrorEventArgs } from '../types'
@@ -33,7 +35,7 @@
 
 <PaletteIconButton
 	data-testid="__palette-eyedropper-button__"
-	aria-label="Pick a color from the screen"
+	aria-label={DEFAULT_LABELS.eyeDropper}
 	{...restProps}
 	icon={EYE_DROPPER}
 	onclick={_onClick}
