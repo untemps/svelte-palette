@@ -1,3 +1,15 @@
+# [6.0.0-beta.16](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.15...v6.0.0-beta.16) (2026-07-29)
+
+
+### Features
+
+* Centralize built-in text labels for i18n and customization ([#252](https://github.com/untemps/svelte-palette/issues/252)) ([ffa4dcb](https://github.com/untemps/svelte-palette/commit/ffa4dcb30e5e2d51595c72c553fe5a693f4eaf58))
+
+
+### BREAKING CHANGES
+
+* The `label` prop of `<Palette>` has been removed. The slot listbox accessible name is now driven solely by `labels.slots`. Replace `label="My colors"` with `labels={{ slots: 'My colors' }}`.
+
 # [6.0.0-beta.15](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.14...v6.0.0-beta.15) (2026-07-29)
 
 
