@@ -40,7 +40,7 @@
 		{#if tool === COMPACT}
 			<PaletteCompactToggleButton {compactLabel} onclick={() => _selectTool(i)} />
 		{:else if tool === SETTINGS}
-			<PaletteSettingsButton aria-label={settingsLabel} onclick={() => _selectTool(i)} />
+			<PaletteSettingsButton {settingsLabel} onclick={() => _selectTool(i)} />
 		{/if}
 	{/each}
 </section>

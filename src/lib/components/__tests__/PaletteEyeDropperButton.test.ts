@@ -43,6 +43,12 @@ test('Sets a default aria-label describing the pick action', () => {
 	expect(button).toBeInTheDocument()
 })
 
+test('Names the button with a custom eye dropper label', () => {
+	setup(PaletteEyeDropperButton, { props: { eyeDropperLabel: "Prélever une couleur à l'écran" } })
+	const button = screen.getByLabelText("Prélever une couleur à l'écran")
+	expect(button).toBeInTheDocument()
+})
+
 test('Sets eye dropper button aria-label', () => {
 	const ariaLabel = 'Foo'
 	setup(PaletteEyeDropperButton, { ['aria-label']: ariaLabel })

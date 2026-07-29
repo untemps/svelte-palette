@@ -5,7 +5,7 @@ import type { PaletteLabels } from './types'
  * a subset through the `labels` prop of `Palette` (see the {@link PaletteLabels} interface) to localize the
  * palette or tweak individual strings without replacing any snippet.
  */
-export const DEFAULT_LABELS: PaletteLabels = {
+export const DEFAULT_LABELS: Readonly<PaletteLabels> = Object.freeze({
 	slots: 'Color slots',
 	loader: 'Loading colors',
 	error: 'Colors failed to load',
@@ -19,4 +19,4 @@ export const DEFAULT_LABELS: PaletteLabels = {
 	tools: 'Palette tools',
 	settings: 'Go to settings',
 	trash: 'Delete color',
-}
+})

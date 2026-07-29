@@ -10,6 +10,8 @@
 	import type { InputAddEventArgs, ErrorEventArgs } from '../types'
 
 	interface Props {
+		/** Accessible name of the eye-dropper button. */
+		eyeDropperLabel?: string
 		/** Called when a color is picked with the eye dropper. */
 		onadd?: (args: InputAddEventArgs) => void
 		/** Called when the eye dropper fails or is dismissed. */
@@ -17,6 +19,7 @@
 	}
 
 	let {
+		eyeDropperLabel = DEFAULT_LABELS.eyeDropper,
 		onadd = undefined,
 		onerror = undefined,
 		...restProps
@@ -35,7 +38,7 @@
 
 <PaletteIconButton
 	data-testid="__palette-eyedropper-button__"
-	aria-label={DEFAULT_LABELS.eyeDropper}
+	aria-label={eyeDropperLabel}
 	{...restProps}
 	icon={EYE_DROPPER}
 	onclick={_onClick}

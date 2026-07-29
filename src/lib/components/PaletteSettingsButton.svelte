@@ -8,16 +8,22 @@
 	import type { HTMLButtonAttributes } from 'svelte/elements'
 
 	interface Props {
+		/** Accessible name of the settings button. */
+		settingsLabel?: string
 		/** Called when the button is clicked. */
 		onclick?: (event: MouseEvent) => void
 	}
 
-	let { onclick = undefined, ...restProps }: Props & Omit<HTMLButtonAttributes, keyof Props> = $props()
+	let {
+		settingsLabel = DEFAULT_LABELS.settings,
+		onclick = undefined,
+		...restProps
+	}: Props & Omit<HTMLButtonAttributes, keyof Props> = $props()
 </script>
 
 <PaletteIconButton
 	data-testid="__palette-settings-button__"
-	aria-label={DEFAULT_LABELS.settings}
+	aria-label={settingsLabel}
 	{...restProps}
 	icon={SETTINGS}
 	{onclick}

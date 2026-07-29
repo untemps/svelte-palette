@@ -126,7 +126,7 @@
 			/>
 		</span>
 		{#if _isEyeDropperAvailable && _inputType !== 'color'}
-			<PaletteEyeDropperButton aria-label={eyeDropperLabel} onadd={_onEyeDropperAdd} />
+			<PaletteEyeDropperButton {eyeDropperLabel} onadd={_onEyeDropperAdd} />
 		{/if}
 	</form>
 </section>

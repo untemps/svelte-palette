@@ -238,6 +238,10 @@ The color input used to add a new color to the palette. Implements the default [
 
 Button that opens the browser [EyeDropper API](#eyedropper-api-support) to pick a color from the screen. It always renders when mounted directly — the default input is what hides it when the API is unavailable — so guard on EyeDropper support yourself when using it standalone.
 
+| Prop              | Type   | Default                        | Description                                 |
+| ----------------- | ------ | ------------------------------ | ------------------------------------------- |
+| `eyeDropperLabel` | string | "Pick a color from the screen" | Accessible name of the eye-dropper button.  |
+
 | Callback  | Arguments   | Description                                         |
 | --------- | ----------- | --------------------------------------------------- |
 | `onadd`   | `{ color }` | Called when a color is picked with the eye dropper. |
@@ -305,6 +309,10 @@ The error state shown when an async `colors` source rejects; it is the default [
 ## PaletteSettingsButton
 
 Button that opens the settings panel. Renders the settings icon with a `"Go to settings"` accessible name.
+
+| Prop            | Type   | Default          | Description                              |
+| --------------- | ------ | ---------------- | ---------------------------------------- |
+| `settingsLabel` | string | "Go to settings" | Accessible name of the settings button.  |
 
 | Callback  | Arguments    | Description                        |
 | --------- | ------------ | ---------------------------------- |
