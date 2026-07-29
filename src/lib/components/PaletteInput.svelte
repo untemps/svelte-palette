@@ -33,7 +33,7 @@
 	let {
 		color: colorProp = null,
 		inputType = 'text',
-		hexLabel = 'Enter an hex color value',
+		hexLabel = 'Enter a hex color value',
 		hexErrorLabel = 'The value must be a valid hex color',
 		submitLabel = 'Submit the hex color value',
 		eyeDropperLabel = 'Pick a color from the screen',

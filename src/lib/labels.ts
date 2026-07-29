@@ -12,7 +12,7 @@ export const DEFAULT_LABELS: PaletteLabels = {
 	transparentSlot: 'Transparent slot',
 	compact: 'Compact the palette',
 	enlarge: 'Enlarge the palette',
-	inputHex: 'Enter an hex color value',
+	inputHex: 'Enter a hex color value',
 	inputHexError: 'The value must be a valid hex color',
 	submitHex: 'Submit the hex color value',
 	eyeDropper: 'Pick a color from the screen',

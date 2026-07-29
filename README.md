@@ -224,7 +224,7 @@ The color input used to add a new color to the palette. Implements the default [
 | ----------------- | ----------------- | ------------------------------------- | ---------------------------------------------------------- |
 | `color`           | string \| null    | null                                  | The color pre-filled in the input.                         |
 | `inputType`       | "text" \| "color" | "text"                                | Type of the input. Any other value falls back to `"text"`. |
-| `hexLabel`        | string            | "Enter an hex color value"            | Accessible name of the hex color input.                    |
+| `hexLabel`        | string            | "Enter a hex color value"             | Accessible name of the hex color input.                    |
 | `hexErrorLabel`   | string            | "The value must be a valid hex color" | Validation hint shown as the input `title`.                |
 | `submitLabel`     | string            | "Submit the hex color value"          | Accessible name of the submit button.                      |
 | `eyeDropperLabel` | string            | "Pick a color from the screen"        | Accessible name of the eye-dropper button.                 |
@@ -468,7 +468,7 @@ Every built-in text and accessibility label of `<Palette>` (and the default prim
 | `transparentSlot` | "Transparent slot"                    | The leading transparent slot accessible name.              |
 | `compact`         | "Compact the palette"                 | The tools compact button.                                  |
 | `enlarge`         | "Enlarge the palette"                 | The compact-mode enlarge button.                           |
-| `inputHex`        | "Enter an hex color value"            | The [`PaletteInput`](#paletteinput) hex field.             |
+| `inputHex`        | "Enter a hex color value"             | The [`PaletteInput`](#paletteinput) hex field.             |
 | `inputHexError`   | "The value must be a valid hex color" | The hex field `title` (validation hint).                   |
 | `submitHex`       | "Submit the hex color value"          | The input submit button.                                   |
 | `eyeDropper`      | "Pick a color from the screen"        | The [`PaletteEyeDropperButton`](#paletteeyedropperbutton). |
