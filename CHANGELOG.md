@@ -1,3 +1,10 @@
+# [6.0.0-beta.15](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.14...v6.0.0-beta.15) (2026-07-29)
+
+
+### Features
+
+* Add an error state for async colors ([#250](https://github.com/untemps/svelte-palette/issues/250)) ([86265ba](https://github.com/untemps/svelte-palette/commit/86265ba188aa5369f86f237c73cfcdb9405925df))
+
 # [6.0.0-beta.14](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.13...v6.0.0-beta.14) (2026-07-28)
 
 
