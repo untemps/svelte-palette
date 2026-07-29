@@ -6,6 +6,7 @@ export { default as PaletteTrashButton } from './components/PaletteTrashButton.s
 export { default as PaletteCompactToggleButton } from './components/PaletteCompactToggleButton.svelte'
 export { default as PaletteIconButton } from './components/PaletteIconButton.svelte'
 export { default as PaletteLoader } from './components/PaletteLoader.svelte'
+export { default as PaletteError } from './components/PaletteError.svelte'
 export { default as PaletteSettingsButton } from './components/PaletteSettingsButton.svelte'
 export { default as PaletteSettingsPanel } from './components/PaletteSettingsPanel.svelte'
 export { default as PaletteTools } from './components/PaletteTools.svelte'
