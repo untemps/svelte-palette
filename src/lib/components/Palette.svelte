@@ -816,7 +816,13 @@
 		box-sizing: border-box;
 	}
 
-	.palette {
+	/*
+	 * Token defaults are declared at zero specificity via :where() so any ordinary
+	 * consumer rule — an inline style, or a class on the root — overrides them
+	 * without !important and without coupling to internal BEM class names. The
+	 * visual properties below stay on `.palette` and read the tokens through var().
+	 */
+	:where(.palette) {
 		--palette-surface: #fafafa;
 		--palette-text: black;
 		--palette-border: #e5e5e5;
@@ -836,7 +842,9 @@
 		--palette-focus-ring: #1a1a1a;
 		--palette-tooltip-surface: black;
 		--palette-tooltip-text: #fff;
+	}
 
+	.palette {
 		width: 100%;
 		color: var(--palette-text, black);
 		display: flex;
@@ -846,16 +854,17 @@
 	}
 
 	/*
-	 * Dark theme token remap. Applied automatically when the OS prefers a dark
-	 * scheme (unless the host opts out with data-palette-theme="light"), and
-	 * unconditionally when the host forces it with data-palette-theme="dark".
-	 * The two blocks are intentionally identical and must stay in sync — plain
-	 * CSS cannot share a declaration list between a media-conditional and an
-	 * unconditional selector. The focus ring flips to a light value so it keeps
-	 * its WCAG-compliant contrast against the dark surface.
+	 * Dark theme token remap, also at zero specificity (:where) so consumer token
+	 * overrides win in dark mode too. Applied automatically when the OS prefers a
+	 * dark scheme (unless the host opts out with data-palette-theme="light"), and
+	 * unconditionally when the host forces it with data-palette-theme="dark". The
+	 * two blocks are intentionally identical and must stay in sync — plain CSS
+	 * cannot share a declaration list between a media-conditional and an
+	 * unconditional selector. The focus ring flips to a light value so it keeps its
+	 * WCAG-compliant contrast against the dark surface.
 	 */
 	@media (prefers-color-scheme: dark) {
-		.palette:not([data-palette-theme='light']) {
+		:where(.palette:not([data-palette-theme='light'])) {
 			--palette-surface: #1e1e1e;
 			--palette-text: #ededed;
 			--palette-border: #3a3a3a;
@@ -875,7 +884,7 @@
 		}
 	}
 
-	.palette[data-palette-theme='dark'] {
+	:where(.palette[data-palette-theme='dark']) {
 		--palette-surface: #1e1e1e;
 		--palette-text: #ededed;
 		--palette-border: #3a3a3a;

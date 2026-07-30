@@ -510,7 +510,7 @@ If you replace a region with your own snippet (`loader`, `error`, `input`, `tool
 
 ### Theming with CSS Custom Properties
 
-The palette is themed through a set of `--palette-*` custom properties declared on its root element. Because custom properties inherit through the subtree and pierce Svelte's style scoping, you override them with an ordinary inline `style` — or any CSS rule that targets the root — with no `:global()`, no `!important`, and no dependency on internal class names.
+The palette is themed through a set of `--palette-*` custom properties declared on its root element. The defaults are declared at **zero specificity** (via `:where()`), so any ordinary rule that targets the root overrides them — an inline `style`, or a class — with no `!important` and no dependency on internal BEM class names. The tokens inherit through the subtree, so overriding them on the root re-themes the whole palette.
 
 `<Palette>` forwards `style` and any other extra attributes (`...restProps`) to its root `<div>`, so inline custom properties and `data-*` attributes pass straight through:
 
@@ -537,6 +537,8 @@ Or from a stylesheet, by passing a class and setting the tokens on it:
 	}
 </style>
 ```
+
+> The `:global()` here is only needed to pierce Svelte's style scoping so the selector can reach the palette's root from your component — not to win on precedence. A plain class selector already outranks the zero-specificity token defaults.
 
 #### Tokens
 
