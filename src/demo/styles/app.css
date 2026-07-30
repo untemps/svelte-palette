@@ -309,13 +309,13 @@
 /*
  * The library floors slot-grid tracks at 2rem (minmax(2rem, 1fr)), which
  * overflows a narrow card once a palette has more than ~6 columns (e.g. the
- * Layout card at high maxColumns, or the transparent slot's 7-slot row). Lower
- * the floor to the slot size so dense grids shrink to fit instead of spilling
- * out; wider palettes still fill via 1fr, and the compact grid keeps its own
- * rule. Specificity (5) beats the library's own selector.
+ * Layout card at high maxColumns, or the transparent slot's 7-slot row). Drop
+ * the floor to 0 so dense grids always shrink to fit the card, however narrow
+ * the viewport gets on mobile; wider palettes still fill via 1fr, and the
+ * compact grid keeps its own rule. Specificity (5) beats the library's selector.
  */
 .palette-frame .palette__content:not(.palette__content--compact) > .palette__cells > .palette__listbox {
-	grid-template-columns: repeat(var(--num-columns), minmax(1rem, 1fr));
+	grid-template-columns: repeat(var(--num-columns), minmax(0, 1fr));
 }
 
 /* ------------------------------------------------------------------ *
@@ -467,6 +467,15 @@ select.field {
 .btn--ghost {
 	background: transparent;
 	border-color: var(--border);
+}
+.btn--outline {
+	background: transparent;
+	border-color: var(--accent);
+	color: var(--accent);
+}
+.btn--outline:hover {
+	background: var(--accent-tint);
+	border-color: var(--accent);
 }
 .btn--sm {
 	min-height: 32px;

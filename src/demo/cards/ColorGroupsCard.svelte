@@ -67,8 +67,9 @@
 		padding: 0;
 		list-style: none;
 		display: grid;
-		/* Honour the palette's numColumns (published on .palette__content) */
-		grid-template-columns: repeat(var(--num-columns, 6), minmax(1.5rem, 1fr));
+		/* Honour the palette's numColumns (published on .palette__content); a 0
+		   floor keeps the row inside the card at any mobile width. */
+		grid-template-columns: repeat(var(--num-columns, 6), minmax(0, 1fr));
 		gap: 0.4rem;
 		align-items: center;
 		justify-items: center;

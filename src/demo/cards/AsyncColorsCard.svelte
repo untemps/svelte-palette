@@ -52,7 +52,7 @@
 	docHref="https://github.com/untemps/svelte-palette#promise"
 >
 	<div class="btn-row">
-		<button type="button" class="btn btn--sm btn--primary" onclick={loadSucceeding}>Fetch (succeeds)</button>
+		<button type="button" class="btn btn--sm btn--outline" onclick={loadSucceeding}>Fetch (succeeds)</button>
 		<button type="button" class="btn btn--sm" onclick={loadFailing}>Fetch (fails)</button>
 	</div>
 
