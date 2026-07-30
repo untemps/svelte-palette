@@ -468,15 +468,6 @@ select.field {
 	background: transparent;
 	border-color: var(--border);
 }
-.btn--outline {
-	background: transparent;
-	border-color: var(--accent);
-	color: var(--accent);
-}
-.btn--outline:hover {
-	background: var(--accent-tint);
-	border-color: var(--accent);
-}
 .btn--sm {
 	min-height: 32px;
 	padding: 5px 12px;
