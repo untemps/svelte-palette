@@ -597,6 +597,22 @@ Your own token overrides win over the built-in themes, so you can fine-tune eith
 <Palette {colors} data-palette-theme="dark" style="--palette-surface: #101418;" />
 ```
 
+### Box Sizing
+
+The palette applies a `box-sizing: border-box` reset **scoped to itself and its descendants** (`.palette, .palette *`) — it no longer resets the whole host document. This keeps the library from silently altering your app's box model, but it has two consequences:
+
+- **Migrating from a previous version:** earlier releases reset every element on the page (`* { box-sizing: border-box }`). If your app was relying on that inherited reset, add your own once at the app level:
+
+    ```css
+    *,
+    *::before,
+    *::after {
+    	box-sizing: border-box;
+    }
+    ```
+
+- **Using the exported sub-components standalone:** a sub-component (e.g. `PaletteSlot`, `PaletteIconButton`, `PaletteInput`) mounted _outside_ a `Palette` root does not inherit the reset, so under the host's default `content-box` its border adds to its fixed size (a slot renders `1rem + 2px` rather than `1rem`). Wrap it in an element with `box-sizing: border-box` if you need pixel-exact sizing.
+
 ### Root Tag Class
 
 > The [token API](#theming-with-css-custom-properties) above is the recommended way to restyle the palette. Reach for the `:global()` overrides below only for things the tokens do not expose (layout, geometry, a specific element). They couple you to internal BEM class names, which are not a stable contract.
