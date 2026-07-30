@@ -601,7 +601,7 @@ select.field {
 	min-width: 74px;
 }
 .log:empty::after {
-	content: 'No events yet — interact with the palette above.';
+	content: 'No events yet — pick, add or delete a color.';
 	color: var(--text-faint);
 }
 

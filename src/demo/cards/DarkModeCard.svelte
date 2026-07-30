@@ -39,6 +39,8 @@
 	</div>
 
 	<p class="hint">
-		This palette is set to <code>{mode}</code>, independent of the showcase theme — <code>auto</code> tracks your OS preference.
+		Set to <code>{mode}</code> — <code>auto</code> tracks the OS through <code>prefers-color-scheme</code>, while
+		<code>light</code>
+		and <code>dark</code> pin the scheme.
 	</p>
 </Card>

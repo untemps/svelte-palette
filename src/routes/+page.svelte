@@ -24,11 +24,11 @@
 		</span>
 		<h1>The color palette component for <span class="accent">Svelte</span>.</h1>
 		<p>
-			Editable slots, color groups, async sources, custom snippets, CSS-token theming and built-in dark mode —
-			every capability below is a live, interactive {'<Palette>'} you can poke at.
+			Editable slots, color groups, async sources, custom snippets, CSS-token theming and built-in dark mode — an
+			accessible, listbox-based color picker for Svelte 5.
 		</p>
 		<div class="intro__meta">
-			<span>Toggle the theme in the header; every palette follows.</span>
+			<span>Click a slot to pick a color, add your own from the input, and remove them inline.</span>
 			<a href="https://github.com/untemps/svelte-palette#readme" target="_blank" rel="noopener noreferrer">
 				Read the docs →
 			</a>
@@ -37,7 +37,7 @@
 
 	<h2 class="section-title">Explore the capabilities</h2>
 	<p class="section-lead">
-		Fifteen focused cards, one capability each — each backed by a live palette and its snippet.
+		One capability at a time — editable lists, color groups, async sources, localized labels and full token theming.
 	</p>
 
 	<div class="grid">
