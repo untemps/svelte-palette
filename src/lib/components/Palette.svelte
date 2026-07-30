@@ -811,7 +811,8 @@
 </template>
 
 <style>
-	:global(*) {
+	.palette,
+	:global(.palette *) {
 		box-sizing: border-box;
 	}
 
