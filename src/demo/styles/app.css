@@ -306,6 +306,18 @@
 	margin-inline: auto;
 }
 
+/*
+ * The library floors slot-grid tracks at 2rem (minmax(2rem, 1fr)), which
+ * overflows a narrow card once a palette has more than ~6 columns (e.g. the
+ * Layout card at high maxColumns, or the transparent slot's 7-slot row). Lower
+ * the floor to the slot size so dense grids shrink to fit instead of spilling
+ * out; wider palettes still fill via 1fr, and the compact grid keeps its own
+ * rule. Specificity (5) beats the library's own selector.
+ */
+.palette-frame .palette__content:not(.palette__content--compact) > .palette__cells > .palette__listbox {
+	grid-template-columns: repeat(var(--num-columns), minmax(1rem, 1fr));
+}
+
 /* ------------------------------------------------------------------ *
  * Controls
  * ------------------------------------------------------------------ */
