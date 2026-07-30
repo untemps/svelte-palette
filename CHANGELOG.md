@@ -1,3 +1,15 @@
+# [6.0.0-beta.17](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.16...v6.0.0-beta.17) (2026-07-30)
+
+
+### Features
+
+* CSS custom property theming and dark mode ([#254](https://github.com/untemps/svelte-palette/issues/254)) ([2dab13e](https://github.com/untemps/svelte-palette/commit/2dab13e24e4a9e35b153900a5c99611f2a3321b0))
+
+
+### BREAKING CHANGES
+
+* Palette no longer sets box-sizing: border-box on the whole host document. Apps that were silently inheriting that reset from this library will revert to content-box on their own elements, which can shift layout. Add your own reset if you relied on it: *, *::before, *::after { box-sizing: border-box; }
+
 # [6.0.0-beta.16](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.15...v6.0.0-beta.16) (2026-07-29)
 
 
