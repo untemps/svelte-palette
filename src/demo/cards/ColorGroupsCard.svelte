@@ -6,7 +6,7 @@
 	import { getPaletteTheme } from '../lib/theme.svelte'
 
 	const DESCRIPTION =
-		'Pass an array of <code>{ name, colors }</code> groups and the palette renders each named collection as its own labelled strip.'
+		'Pass an array of <code>{ name, colors }</code> groups and the palette renders each named collection as its own labelled strip. Add <code>presentational</code> to drop the listbox roles, tab stop and arrow-key navigation — a purely decorative palette — and replace each slot with the <code>slot</code> snippet to render your own mark.'
 
 	const CODE = `const colors = [
 	{ name: 'Warm', colors: ['#865C54', '#A65846', '#AD8C72'] },

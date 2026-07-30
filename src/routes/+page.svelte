@@ -5,7 +5,6 @@
 	import CompactModeCard from '../demo/cards/CompactModeCard.svelte'
 	import ColorGroupsCard from '../demo/cards/ColorGroupsCard.svelte'
 	import AsyncColorsCard from '../demo/cards/AsyncColorsCard.svelte'
-	import PresentationalSlotCard from '../demo/cards/PresentationalSlotCard.svelte'
 	import CustomSnippetsCard from '../demo/cards/CustomSnippetsCard.svelte'
 	import TransparentSlotCard from '../demo/cards/TransparentSlotCard.svelte'
 	import DeletionModesCard from '../demo/cards/DeletionModesCard.svelte'
@@ -47,7 +46,6 @@
 		<CompactModeCard />
 		<ColorGroupsCard />
 		<AsyncColorsCard />
-		<PresentationalSlotCard />
 		<CustomSnippetsCard />
 		<TransparentSlotCard />
 		<DeletionModesCard />
