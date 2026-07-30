@@ -651,6 +651,8 @@ To do so, set a **global** class name to the `tooltipClassName` prop.
 
 > As the tooltip is interactive, make sure you define a sufficient hover area that allow to access the content of the tooltip before the leave event is triggered.
 
+> The tooltip is rendered inline within the palette (not portalled to `<body>`), so an ancestor with `overflow: hidden` — for example a wrapper used to clip rounded corners — will clip the tooltip too. Round the palette element itself instead of clipping an outer wrapper, or avoid `overflow: hidden` on ancestors of the palette.
+
 If you ignore that prop, the tooltip keeps the default class names from [@untemps/svelte-use-tooltip](https://github.com/untemps/svelte-use-tooltip): `__tooltip __tooltip-top`.
 
 > Please note that `tooltipClassName` **replaces** the default class names rather than adding to them.
