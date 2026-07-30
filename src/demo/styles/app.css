@@ -403,6 +403,10 @@ select.field {
 	border-radius: var(--radius-pill);
 	background: var(--surface-raised);
 }
+/* Center the control (and hug its options) within a card column */
+.seg--center {
+	align-self: center;
+}
 .seg__btn {
 	padding: 6px 14px;
 	border: none;

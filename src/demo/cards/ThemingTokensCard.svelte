@@ -62,7 +62,7 @@
 	code={CODE}
 	docHref="https://github.com/untemps/svelte-palette#theming-with-css-custom-properties"
 >
-	<div class="seg" role="group" aria-label="Token preset">
+	<div class="seg seg--center" role="group" aria-label="Token preset">
 		{#each PRESETS as preset, index (preset.name)}
 			<button type="button" class="seg__btn" aria-pressed={selected === index} onclick={() => (selected = index)}>
 				{preset.name}

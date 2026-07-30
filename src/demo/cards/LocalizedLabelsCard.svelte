@@ -47,7 +47,7 @@
 	code={CODE}
 	docHref="https://github.com/untemps/svelte-palette#internationalization"
 >
-	<div class="seg" role="group" aria-label="Locale">
+	<div class="seg seg--center" role="group" aria-label="Locale">
 		{#each Object.entries(LOCALES) as [key, { name }] (key)}
 			<button
 				type="button"

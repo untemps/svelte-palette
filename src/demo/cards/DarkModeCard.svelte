@@ -24,7 +24,7 @@
 	code={CODE}
 	docHref="https://github.com/untemps/svelte-palette#dark-mode"
 >
-	<div class="seg" role="group" aria-label="Palette theme">
+	<div class="seg seg--center" role="group" aria-label="Palette theme">
 		{#each MODES as option (option)}
 			<button type="button" class="seg__btn" aria-pressed={mode === option} onclick={() => (mode = option)}>
 				{option}
