@@ -11,16 +11,12 @@
 		/>
 		<title>svelte-palette · capability showcase</title>
 		<script>
-			// Paint the saved theme before hydration to avoid a flash of the wrong scheme.
-			// With no saved choice the attribute stays unset and prefers-color-scheme wins.
 			try {
 				const saved = localStorage.getItem('svelte-palette-demo-theme')
 				if (saved === 'light' || saved === 'dark') {
 					document.documentElement.dataset.theme = saved
 				}
-			} catch (error) {
-				/* localStorage unavailable */
-			}
+			} catch (error) {}
 		</script>
 		%sveltekit.head%
 	</head>

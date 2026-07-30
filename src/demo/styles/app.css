@@ -1,13 +1,9 @@
-/* ------------------------------------------------------------------ *
- * Page shell
- * ------------------------------------------------------------------ */
 .page {
 	display: flex;
 	flex-direction: column;
 	min-height: 100svh;
 }
 
-/* Keyboard bypass past the sticky header — hidden until focused */
 .skip-link {
 	position: fixed;
 	top: var(--space-2);
@@ -33,9 +29,6 @@
 	padding-inline: clamp(var(--space-4), 3vw, var(--space-6));
 }
 
-/* ------------------------------------------------------------------ *
- * Header
- * ------------------------------------------------------------------ */
 .header {
 	position: sticky;
 	top: 0;
@@ -155,9 +148,6 @@
 	height: 20px;
 }
 
-/* ------------------------------------------------------------------ *
- * Hero / intro
- * ------------------------------------------------------------------ */
 .intro {
 	padding-top: clamp(var(--space-6), 6vw, var(--space-8));
 	padding-bottom: var(--space-5);
@@ -212,9 +202,6 @@
 	max-width: 64ch;
 }
 
-/* ------------------------------------------------------------------ *
- * Card grid
- * ------------------------------------------------------------------ */
 .grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
@@ -278,7 +265,6 @@
 	flex: 1 1 auto;
 }
 
-/* Stage: the neutral surface a live <Palette> (or a readout) sits on */
 .card__stage {
 	display: flex;
 	flex-direction: column;
@@ -295,28 +281,17 @@
 	align-items: center;
 	text-align: center;
 }
-/* Constrain a palette so it never stretches edge-to-edge on wide cards */
+
 .palette-frame {
 	width: 100%;
 	max-width: 24rem;
 	margin-inline: auto;
 }
 
-/*
- * The library floors slot-grid tracks at 2rem (minmax(2rem, 1fr)), which
- * overflows a narrow card once a palette has more than ~6 columns (e.g. the
- * Layout card at high maxColumns, or the transparent slot's 7-slot row). Drop
- * the floor to 0 so dense grids always shrink to fit the card, however narrow
- * the viewport gets on mobile; wider palettes still fill via 1fr, and the
- * compact grid keeps its own rule. Specificity (5) beats the library's selector.
- */
 .palette-frame .palette__content:not(.palette__content--compact) > .palette__cells > .palette__listbox {
 	grid-template-columns: repeat(var(--num-columns), minmax(0, 1fr));
 }
 
-/* ------------------------------------------------------------------ *
- * Controls
- * ------------------------------------------------------------------ */
 .control {
 	display: flex;
 	flex-direction: column;
@@ -390,7 +365,6 @@ select.field {
 	font-weight: 550;
 }
 
-/* Segmented radio-style control (theme mode, locale, deletion mode…) */
 .seg {
 	display: inline-flex;
 	padding: 3px;
@@ -399,7 +373,7 @@ select.field {
 	border-radius: var(--radius-pill);
 	background: var(--surface-raised);
 }
-/* Center the control (and hug its options) within a card column */
+
 .seg--center {
 	align-self: center;
 }
@@ -478,9 +452,6 @@ select.field {
 	gap: var(--space-2);
 }
 
-/* ------------------------------------------------------------------ *
- * Readouts, pills, chips
- * ------------------------------------------------------------------ */
 .pill {
 	display: inline-flex;
 	align-items: center;
@@ -556,7 +527,6 @@ select.field {
 	color: inherit;
 }
 
-/* A single readout line: label chip + value */
 .readout {
 	display: flex;
 	align-items: center;
@@ -588,7 +558,6 @@ select.field {
 	vertical-align: -0.2em;
 }
 
-/* Event feed */
 .log {
 	margin: 0;
 	max-height: 168px;
@@ -617,9 +586,6 @@ select.field {
 	color: var(--text-faint);
 }
 
-/* ------------------------------------------------------------------ *
- * Collapsible code block
- * ------------------------------------------------------------------ */
 .code {
 	border: 1px solid var(--border);
 	border-radius: var(--radius-md);
@@ -672,9 +638,6 @@ select.field {
 	right: var(--space-2);
 }
 
-/* ------------------------------------------------------------------ *
- * Footer & misc
- * ------------------------------------------------------------------ */
 .footer {
 	margin-top: auto;
 	border-top: 1px solid var(--border);

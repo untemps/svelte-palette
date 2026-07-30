@@ -12,9 +12,7 @@
 	bind:colors
 	bind:selectedColor
 	deletionMode="tooltip"
-/>
-<!-- listbox / option roles, roving tabindex,
-     arrow-key navigation & a visible focus ring -->`
+/>`
 
 	let colors = $state<ColorsProp | null>(['#2b2d42', '#8d99ae', '#edf2f4', '#ef233c', '#d90429', '#fca311'])
 	let selectedColor = $state<ColorValue | null>('#ef233c')

@@ -7,8 +7,7 @@
 	const DESCRIPTION =
 		'Built-in dark mode is opt-out via <code>data-palette-theme</code>: <code>auto</code> follows the OS through <code>prefers-color-scheme</code>, while <code>light</code> and <code>dark</code> force a scheme regardless.'
 
-	const CODE = `<Palette data-palette-theme="auto" />
-<!-- "auto" (default) · "light" · "dark" -->`
+	const CODE = `<Palette data-palette-theme="auto" />`
 
 	const MODES = ['auto', 'light', 'dark'] as const
 	type Mode = (typeof MODES)[number]

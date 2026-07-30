@@ -1,8 +1,3 @@
-/*
- * Per-instance clipboard helper. Returns a reactive `copied` flag that flips to
- * true for a short window after a successful copy, so a button can show a
- * transient "Copied" affordance without each caller wiring its own timer.
- */
 export const createClipboard = (resetMs = 1600) => {
 	let copied = $state(false)
 	let timer: ReturnType<typeof setTimeout> | undefined

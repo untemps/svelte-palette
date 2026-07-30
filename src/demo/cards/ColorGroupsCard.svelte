@@ -46,17 +46,12 @@
 </Card>
 
 <style>
-	/*
-	 * The library lays out only the ungrouped listbox; grouped mode leaves each
-	 * group's cells to the consumer. Render each group as a full-width colour
-	 * strip captioned by its name, in the spirit of the presentational demo.
-	 */
 	.groups-frame :global(.palette__groups) {
 		gap: 1rem;
 	}
 	.groups-frame :global(.palette__groups__group) {
 		display: flex;
-		flex-direction: column-reverse; /* strip on top, name beneath */
+		flex-direction: column-reverse;
 		gap: 0.5rem;
 	}
 	.groups-frame :global(.palette__groups__group__name) {
@@ -72,7 +67,6 @@
 		border-radius: 0.5rem;
 		overflow: hidden;
 	}
-	/* Equal-width blocks so groups of any size fill the whole strip */
 	.groups-frame :global(.palette__cells__cell) {
 		flex: 1 1 0;
 		min-width: 0;

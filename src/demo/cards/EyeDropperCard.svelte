@@ -15,7 +15,6 @@
 	let colors = $state<ColorsProp | null>(['#ef476f', '#ffd166', '#06d6a0', '#118ab2', '#073b4c'])
 	let lastError = $state<string | null>(null)
 
-	// Resolve support after hydration so SSR and the first client render agree.
 	let supported = $state(false)
 	onMount(() => {
 		supported = 'EyeDropper' in window
