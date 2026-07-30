@@ -156,19 +156,19 @@
 	}
 
 	.palette_input__input {
-		font-family: Helvetica, sans-serif;
+		font-family: var(--palette-font-family, Helvetica, sans-serif);
 		font-size: 0.8rem;
 		width: 71%;
 		height: 2rem;
 		margin: 0;
 		padding: 0.4rem;
 		outline: none;
-		color: rgba(0, 0, 0, 0.6);
-		background: rgba(255, 255, 255, 1);
+		color: var(--palette-input-text, rgba(0, 0, 0, 0.6));
+		background: var(--palette-input-surface, rgba(255, 255, 255, 1));
 		border-width: 1px;
-		border-color: #e5e5e5;
+		border-color: var(--palette-border, #e5e5e5);
 		border-style: solid;
-		border-radius: 0.3rem;
+		border-radius: var(--palette-radius, 0.3rem);
 		border-right-width: 0;
 		border-top-right-radius: 0;
 		border-bottom-right-radius: 0;
@@ -179,7 +179,7 @@
 	}
 
 	.palette_input__input:focus-visible {
-		outline: 2px solid #1a1a1a;
+		outline: 2px solid var(--palette-focus-ring, #1a1a1a);
 		outline-offset: 2px;
 		/* Lift above the adjoining submit button (which is position: relative) so the
 		   ring shows on all four sides instead of being covered at the shared edge. */
@@ -206,7 +206,7 @@
 
 	.palette__divider {
 		border: none;
-		background-color: #e9e9e9;
+		background-color: var(--palette-divider, #e9e9e9);
 		width: 100%;
 		height: 1px;
 		margin: 0;

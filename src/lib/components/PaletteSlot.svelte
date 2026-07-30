@@ -56,11 +56,11 @@
 
 <style>
 	button {
-		width: 1rem;
-		height: 1rem;
+		width: var(--palette-slot-size, 1rem);
+		height: var(--palette-slot-size, 1rem);
 		margin: 1px 0 0 0;
 		padding: 0;
-		border: 1px solid rgba(0, 0, 0, 0.2);
+		border: 1px solid var(--palette-slot-border, rgba(0, 0, 0, 0.2));
 		border-radius: 50%;
 		background-color: var(--color);
 	}
@@ -70,7 +70,7 @@
 	}
 
 	button:focus-visible {
-		outline: 2px solid #1a1a1a;
+		outline: 2px solid var(--palette-focus-ring, #1a1a1a);
 		outline-offset: 2px;
 	}
 
@@ -81,11 +81,11 @@
 	}
 
 	button.selected {
-		/* Selection ring drawn as a box-shadow; the #fafafa layer keeps a 2px gap
-		   between the swatch and the grey ring. */
+		/* Selection ring drawn as a box-shadow; the surface layer keeps a 2px gap
+		   between the slot and the grey ring. */
 		box-shadow:
-			0 0 0 2px #fafafa,
-			0 0 0 4px #9e9e9e;
+			0 0 0 2px var(--palette-surface, #fafafa),
+			0 0 0 4px var(--palette-slot-ring, #9e9e9e);
 	}
 
 	button.clickable {
@@ -93,7 +93,12 @@
 	}
 
 	button.empty {
-		border: #aaa solid 1px;
-		background: linear-gradient(to top left, #00000000 calc(50% - 1px), #aaa 50% 50%, #00000000 calc(50% + 1px));
+		border: var(--palette-slot-empty, #aaa) solid 1px;
+		background: linear-gradient(
+			to top left,
+			#00000000 calc(50% - 1px),
+			var(--palette-slot-empty, #aaa) 50% 50%,
+			#00000000 calc(50% + 1px)
+		);
 	}
 </style>

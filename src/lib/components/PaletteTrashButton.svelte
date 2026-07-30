@@ -59,7 +59,7 @@
 	}
 
 	.trash_button__button--active {
-		background-color: #e5e5e5;
+		background-color: var(--palette-border, #e5e5e5);
 		outline: none;
 	}
 

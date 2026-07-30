@@ -62,11 +62,11 @@
 		height: 2rem;
 		margin: 0;
 		padding: 0;
-		background-color: #fafafa;
+		background-color: var(--palette-surface, #fafafa);
 		border-width: 1px;
-		border-color: #e5e5e5;
+		border-color: var(--palette-border, #e5e5e5);
 		border-style: solid;
-		border-radius: 0.3rem;
+		border-radius: var(--palette-radius, 0.3rem);
 		cursor: pointer;
 	}
 
@@ -75,12 +75,12 @@
 	}
 
 	.icon_button__button:focus-visible {
-		outline: 2px solid #1a1a1a;
+		outline: 2px solid var(--palette-focus-ring, #1a1a1a);
 		outline-offset: 2px;
 	}
 
 	.icon_button__button--active {
-		background-color: #e5e5e5;
+		background-color: var(--palette-border, #e5e5e5);
 	}
 
 	@media (forced-colors: active) {
@@ -103,7 +103,7 @@
 		.icon_button__button > svg line,
 		.icon_button__button > svg polyline
 	) {
-		stroke: #646464;
+		stroke: var(--palette-icon, #646464);
 	}
 
 	:global(
@@ -112,6 +112,6 @@
 		.icon_button__button:disabled > svg line,
 		.icon_button__button:disabled > svg polyline
 	) {
-		stroke: #bdbdbd;
+		stroke: var(--palette-icon-disabled, #bdbdbd);
 	}
 </style>

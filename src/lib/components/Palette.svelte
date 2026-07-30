@@ -28,6 +28,8 @@
 
 	import type { Snippet } from 'svelte'
 
+	import type { HTMLAttributes } from 'svelte/elements'
+
 	import type { NormalizedColor, NormalizedColorGroup } from '../utils/utils.js'
 
 	import type {
@@ -124,7 +126,8 @@
 		input = undefined,
 		tools = undefined,
 		settings = undefined,
-	}: Props = $props()
+		...restProps
+	}: Props & Omit<HTMLAttributes<HTMLDivElement>, keyof Props> = $props()
 
 	const _paletteId = $props.id()
 
@@ -590,7 +593,7 @@
 	}
 </script>
 
-<div data-palette-id={_paletteId} class="palette {className}" data-testid="__palette__" data-palette>
+<div {...restProps} data-palette-id={_paletteId} class="palette {className}" data-testid="__palette__" data-palette>
 	<section class="palette__content" class:palette__content--compact={_isCompact} style="--num-columns: {_numColumns}">
 		{#if !_isCompact}
 			{@render header?.({ selectedColor })}
@@ -813,12 +816,30 @@
 	}
 
 	.palette {
+		--palette-surface: #fafafa;
+		--palette-text: black;
+		--palette-border: #e5e5e5;
+		--palette-divider: #e9e9e9;
+		--palette-icon: #646464;
+		--palette-icon-disabled: #bdbdbd;
+		--palette-radius: 0.3rem;
+		--palette-font-family: Helvetica, sans-serif;
+		--palette-slot-size: 1rem;
+		--palette-slot-border: rgba(0, 0, 0, 0.2);
+		--palette-slot-empty: #aaa;
+		--palette-slot-ring: #9e9e9e;
+		--palette-input-surface: rgba(255, 255, 255, 1);
+		--palette-input-text: rgba(0, 0, 0, 0.6);
+		--palette-error: #c0392b;
+		--palette-error-message: #595959;
+		--palette-focus-ring: #1a1a1a;
+
 		width: 100%;
-		color: black;
+		color: var(--palette-text, black);
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		background-color: #fafafa;
+		background-color: var(--palette-surface, #fafafa);
 	}
 
 	.palette__content {
