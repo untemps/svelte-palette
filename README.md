@@ -566,10 +566,10 @@ To do so, set a **global** class name to the `tooltipClassName` prop.
 
 > As the tooltip is interactive, make sure you define a sufficient hover area that allow to access the content of the tooltip before the leave event is triggered.
 
-If you ignore that prop, a default class is used.
+If you ignore that prop, the tooltip keeps the default class names from [@untemps/svelte-use-tooltip](https://github.com/untemps/svelte-use-tooltip): `__tooltip __tooltip-top`.
 
-> Please note that the default class name is `__tooltip__default`.
-> Provide a different class name otherwise the default class would have the precedence over the custom one.
+> Please note that `tooltipClassName` **replaces** the default class names rather than adding to them.
+> The default tooltip styles (background, padding, border radius and the arrow drawn by `.__tooltip::after`) are therefore dropped when you pass a custom class, so your class must provide its own styling.
 
 #### Example
 
