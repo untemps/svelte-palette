@@ -572,7 +572,7 @@ Every value falls back to its default, so a palette with no tokens set renders e
 
 ### Dark Mode
 
-The palette ships an automatic dark theme. When the host OS prefers a dark color scheme (`prefers-color-scheme: dark`), the `--palette-*` tokens remap to a dark set. Hosts stay in control through the `data-palette-theme` attribute (also forwarded to the root):
+The palette ships an automatic dark theme, built on the CSS [`light-dark()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/light-dark) function and `color-scheme`. When the host OS prefers a dark color scheme (`prefers-color-scheme: dark`), the themeable `--palette-*` tokens resolve to a dark set. Hosts stay in control through the `data-palette-theme` attribute (also forwarded to the root):
 
 | `data-palette-theme` | Result                             |
 | -------------------- | ---------------------------------- |
@@ -596,6 +596,8 @@ Your own token overrides win over the built-in themes, so you can fine-tune eith
 ```svelte
 <Palette {colors} data-palette-theme="dark" style="--palette-surface: #101418;" />
 ```
+
+> Dark mode relies on `light-dark()` ([Baseline 2024](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/light-dark#browser_compatibility)). On older browsers that lack it, the palette gracefully stays light regardless of the OS or `data-palette-theme` — every other feature is unaffected. Your own token overrides still apply, so you can theme those browsers explicitly.
 
 ### Box Sizing
 

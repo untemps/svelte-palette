@@ -817,10 +817,12 @@
 	}
 
 	/*
-	 * Token defaults are declared at zero specificity via :where() so any ordinary
+	 * Token defaults, declared at zero specificity via :where() so any ordinary
 	 * consumer rule — an inline style, or a class on the root — overrides them
 	 * without !important and without coupling to internal BEM class names. The
 	 * visual properties below stay on `.palette` and read the tokens through var().
+	 * These are also the universal fallback: a browser without light-dark() support
+	 * keeps them (light only) instead of breaking.
 	 */
 	:where(.palette) {
 		--palette-surface: #fafafa;
@@ -854,53 +856,46 @@
 	}
 
 	/*
-	 * Dark theme token remap, also at zero specificity (:where) so consumer token
-	 * overrides win in dark mode too. Applied automatically when the OS prefers a
-	 * dark scheme (unless the host opts out with data-palette-theme="light"), and
-	 * unconditionally when the host forces it with data-palette-theme="dark". The
-	 * two blocks are intentionally identical and must stay in sync — plain CSS
-	 * cannot share a declaration list between a media-conditional and an
-	 * unconditional selector. The focus ring flips to a light value so it keeps its
-	 * WCAG-compliant contrast against the dark surface.
+	 * Dark theme. Where light-dark() is supported, every theme-varying token is
+	 * declared once as light-dark(<light>, <dark>) and resolved from the
+	 * `color-scheme` on the root: `light dark` follows the OS, and data-palette-theme
+	 * forces one scheme. This replaces the previous pair of identical dark
+	 * declaration lists (a @media block and a forced-attribute block) with a single
+	 * source of truth. Browsers without light-dark() keep the light defaults above
+	 * (no dark mode) rather than breaking. The focus-ring dark value stays
+	 * WCAG-contrasting against the dark surface.
 	 */
-	@media (prefers-color-scheme: dark) {
-		:where(.palette:not([data-palette-theme='light'])) {
-			--palette-surface: #1e1e1e;
-			--palette-text: #ededed;
-			--palette-border: #3a3a3a;
-			--palette-divider: #3a3a3a;
-			--palette-icon: #d0d0d0;
-			--palette-icon-disabled: #6a6a6a;
-			--palette-slot-border: rgba(255, 255, 255, 0.2);
-			--palette-slot-empty: #777777;
-			--palette-slot-ring: #6a6a6a;
-			--palette-input-surface: #2a2a2a;
-			--palette-input-text: rgba(255, 255, 255, 0.75);
-			--palette-error: #ff6b5e;
-			--palette-error-message: #b0b0b0;
-			--palette-focus-ring: #f0f0f0;
-			--palette-tooltip-surface: #f0f0f0;
-			--palette-tooltip-text: #1a1a1a;
+	@supports (color: light-dark(#000, #fff)) {
+		:where(.palette) {
+			--palette-surface: light-dark(#fafafa, #1e1e1e);
+			--palette-text: light-dark(black, #ededed);
+			--palette-border: light-dark(#e5e5e5, #3a3a3a);
+			--palette-divider: light-dark(#e9e9e9, #3a3a3a);
+			--palette-icon: light-dark(#646464, #d0d0d0);
+			--palette-icon-disabled: light-dark(#bdbdbd, #6a6a6a);
+			--palette-slot-border: light-dark(rgba(0, 0, 0, 0.2), rgba(255, 255, 255, 0.2));
+			--palette-slot-empty: light-dark(#aaa, #777777);
+			--palette-slot-ring: light-dark(#9e9e9e, #6a6a6a);
+			--palette-input-surface: light-dark(rgba(255, 255, 255, 1), #2a2a2a);
+			--palette-input-text: light-dark(rgba(0, 0, 0, 0.6), rgba(255, 255, 255, 0.75));
+			--palette-error: light-dark(#c0392b, #ff6b5e);
+			--palette-error-message: light-dark(#595959, #b0b0b0);
+			--palette-focus-ring: light-dark(#1a1a1a, #f0f0f0);
+			--palette-tooltip-surface: light-dark(black, #f0f0f0);
+			--palette-tooltip-text: light-dark(#fff, #1a1a1a);
 		}
-	}
 
-	:where(.palette[data-palette-theme='dark']) {
-		--palette-surface: #1e1e1e;
-		--palette-text: #ededed;
-		--palette-border: #3a3a3a;
-		--palette-divider: #3a3a3a;
-		--palette-icon: #d0d0d0;
-		--palette-icon-disabled: #6a6a6a;
-		--palette-slot-border: rgba(255, 255, 255, 0.2);
-		--palette-slot-empty: #777777;
-		--palette-slot-ring: #6a6a6a;
-		--palette-input-surface: #2a2a2a;
-		--palette-input-text: rgba(255, 255, 255, 0.75);
-		--palette-error: #ff6b5e;
-		--palette-error-message: #b0b0b0;
-		--palette-focus-ring: #f0f0f0;
-		--palette-tooltip-surface: #f0f0f0;
-		--palette-tooltip-text: #1a1a1a;
+		.palette {
+			color-scheme: light dark;
+		}
+
+		.palette[data-palette-theme='light'] {
+			color-scheme: light;
+		}
+
+		.palette[data-palette-theme='dark'] {
+			color-scheme: dark;
+		}
 	}
 
 	/*
