@@ -598,6 +598,8 @@ Your own token overrides win over the built-in themes, so you can fine-tune eith
 <Palette {colors} data-palette-theme="dark" style="--palette-surface: #101418;" />
 ```
 
+> If you override the tokens to a **light** appearance but leave `data-palette-theme` on `auto`, the palette still adopts the OS `color-scheme` — so under a dark OS the browser-rendered internals of the hex input (caret, text selection, autofill) resolve dark against your light surface. Pair a light token override with `data-palette-theme="light"` (and a dark one with `data-palette-theme="dark"`) to keep the `color-scheme` in step with your colors.
+
 > Dark mode relies on `light-dark()` ([Baseline 2024](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/light-dark#browser_compatibility)). On older browsers that lack it, the palette gracefully stays light regardless of the OS or `data-palette-theme` — every other feature is unaffected. Your own token overrides still apply, so you can theme those browsers explicitly.
 
 ### Box Sizing
