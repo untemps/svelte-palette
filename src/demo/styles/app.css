@@ -87,10 +87,6 @@
 .brand__name {
 	font-weight: 650;
 }
-.brand__scope {
-	color: var(--text-faint);
-	font-weight: 500;
-}
 
 .header__spacer {
 	flex: 1 1 auto;

@@ -16,7 +16,7 @@
 				<span class="brand__dot" style="background:#3a86ff"></span>
 				<span class="brand__dot" style="background:#2ec4b6"></span>
 			</span>
-			<span><span class="brand__scope">@untemps/</span><span class="brand__name">svelte-palette</span></span>
+			<span class="brand__name">svelte-palette</span>
 		</span>
 
 		<span class="header__spacer"></span>
