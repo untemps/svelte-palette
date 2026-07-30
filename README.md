@@ -552,6 +552,7 @@ Every value falls back to its default, so a palette with no tokens set renders e
 | `--palette-divider`         | `#e9e9e9`                | `#3a3a3a`                  | Divider lines above the input and tools                      |
 | `--palette-icon`            | `#646464`                | `#d0d0d0`                  | Toolbar icon stroke                                          |
 | `--palette-icon-disabled`   | `#bdbdbd`                | `#6a6a6a`                  | Disabled toolbar icon stroke                                 |
+| `--palette-loader`          | `#ccc`                   | `#555555`                  | Loading spinner arc                                          |
 | `--palette-radius`          | `0.3rem`                 | —                          | Corner radius of buttons and the input                       |
 | `--palette-font-family`     | `Helvetica, sans-serif`  | —                          | Hex input font family                                        |
 | `--palette-slot-size`       | `1rem`                   | —                          | Diameter of a color slot                                     |

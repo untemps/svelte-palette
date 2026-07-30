@@ -831,6 +831,7 @@
 		--palette-divider: #e9e9e9;
 		--palette-icon: #646464;
 		--palette-icon-disabled: #bdbdbd;
+		--palette-loader: #ccc;
 		--palette-radius: 0.3rem;
 		--palette-font-family: Helvetica, sans-serif;
 		--palette-slot-size: 1rem;
@@ -873,6 +874,7 @@
 			--palette-divider: light-dark(#e9e9e9, #3a3a3a);
 			--palette-icon: light-dark(#646464, #d0d0d0);
 			--palette-icon-disabled: light-dark(#bdbdbd, #6a6a6a);
+			--palette-loader: light-dark(#ccc, #555555);
 			--palette-slot-border: light-dark(rgba(0, 0, 0, 0.2), rgba(255, 255, 255, 0.2));
 			--palette-slot-empty: light-dark(#aaa, #777777);
 			--palette-slot-ring: light-dark(#9e9e9e, #6a6a6a);
