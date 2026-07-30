@@ -28,6 +28,7 @@
 	<div class="content">
 		<Palette
 			class="palette__custom"
+			data-palette-theme="light"
 			{colors}
 			bind:selectedColor
 			numColumns={6}

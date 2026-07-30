@@ -168,7 +168,12 @@
 		width: 100%;
 		max-width: 22rem;
 		border-radius: 0.75rem;
-		overflow: hidden;
 		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+	}
+
+	/* Round the palette itself instead of clipping the stage: an overflow:hidden
+	   ancestor would hide the inline (portal:false) deletion tooltip. */
+	.stage :global(.palette[data-palette]) {
+		border-radius: inherit;
 	}
 </style>

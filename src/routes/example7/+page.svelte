@@ -56,6 +56,7 @@
 	<div class="content">
 		<Palette
 			class="palette__custom"
+			data-palette-theme="light"
 			bind:colors
 			bind:selectedColor
 			numColumns={4}
@@ -155,7 +156,6 @@
 
 	.example7 :global(.palette[data-palette].palette__custom) {
 		border-radius: 0.5rem;
-		overflow: hidden;
 	}
 
 	.settings {

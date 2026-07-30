@@ -30,7 +30,15 @@
 <main class="example4" style="--bgColor:#000">
 	<div class="content">
 		<div>
-			<Palette {colors} {selectedColor} numColumns={5} {showInput} allowDuplicates onselect={_onSelect}>
+			<Palette
+				{colors}
+				{selectedColor}
+				numColumns={5}
+				{showInput}
+				allowDuplicates
+				data-palette-theme="light"
+				onselect={_onSelect}
+			>
 				{#snippet header({ selectedColor })}
 					<div class="header" style="--color:{selectedColor}; --textColor: {textColor}">
 						{selectedColor ?? ''}

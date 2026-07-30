@@ -49,6 +49,7 @@
 	<div class="content">
 		<Palette
 			class="palette__custom"
+			data-palette-theme="light"
 			{colors}
 			bind:selectedColor
 			numColumns={4}
@@ -78,7 +79,12 @@
 		Omitting the <code>error</code> snippet renders the bundled <code>PaletteError</code> component instead:
 	</p>
 	<div class="content">
-		<Palette class="palette__custom palette__custom--default" colors={_failingSource} numColumns={4} />
+		<Palette
+			class="palette__custom palette__custom--default"
+			colors={_failingSource}
+			numColumns={4}
+			data-palette-theme="light"
+		/>
 	</div>
 </main>
 
