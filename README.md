@@ -238,9 +238,9 @@ The color input used to add a new color to the palette. Implements the default [
 
 Button that opens the browser [EyeDropper API](#eyedropper-api-support) to pick a color from the screen. It always renders when mounted directly — the default input is what hides it when the API is unavailable — so guard on EyeDropper support yourself when using it standalone.
 
-| Prop              | Type   | Default                        | Description                                 |
-| ----------------- | ------ | ------------------------------ | ------------------------------------------- |
-| `eyeDropperLabel` | string | "Pick a color from the screen" | Accessible name of the eye-dropper button.  |
+| Prop              | Type   | Default                        | Description                                |
+| ----------------- | ------ | ------------------------------ | ------------------------------------------ |
+| `eyeDropperLabel` | string | "Pick a color from the screen" | Accessible name of the eye-dropper button. |
 
 | Callback  | Arguments   | Description                                         |
 | --------- | ----------- | --------------------------------------------------- |
@@ -310,9 +310,9 @@ The error state shown when an async `colors` source rejects; it is the default [
 
 Button that opens the settings panel. Renders the settings icon with a `"Go to settings"` accessible name.
 
-| Prop            | Type   | Default          | Description                              |
-| --------------- | ------ | ---------------- | ---------------------------------------- |
-| `settingsLabel` | string | "Go to settings" | Accessible name of the settings button.  |
+| Prop            | Type   | Default          | Description                             |
+| --------------- | ------ | ---------------- | --------------------------------------- |
+| `settingsLabel` | string | "Go to settings" | Accessible name of the settings button. |
 
 | Callback  | Arguments    | Description                        |
 | --------- | ------------ | ---------------------------------- |
@@ -508,12 +508,97 @@ If you replace a region with your own snippet (`loader`, `error`, `input`, `tool
 
 # Styles
 
+### Theming with CSS Custom Properties
+
+The palette is themed through a set of `--palette-*` custom properties declared on its root element. Because custom properties inherit through the subtree and pierce Svelte's style scoping, you override them with an ordinary inline `style` — or any CSS rule that targets the root — with no `:global()`, no `!important`, and no dependency on internal class names.
+
+`<Palette>` forwards `style` and any other extra attributes (`...restProps`) to its root `<div>`, so inline custom properties and `data-*` attributes pass straight through:
+
+```svelte
+<script>
+	import { Palette } from '@untemps/svelte-palette'
+
+	const colors = ['#865C54', '#8F5447', '#A65846', '#A9715E', '#AD8C72']
+</script>
+
+<!-- Inline, per instance -->
+<Palette {colors} style="--palette-surface: #fffaf0; --palette-radius: 0.75rem;" />
+```
+
+Or from a stylesheet, by passing a class and setting the tokens on it:
+
+```svelte
+<Palette {colors} class="brand-palette" />
+
+<style>
+	:global(.brand-palette) {
+		--palette-surface: #fffaf0;
+		--palette-radius: 0.75rem;
+	}
+</style>
+```
+
+#### Tokens
+
+Every value falls back to its default, so a palette with no tokens set renders exactly as before.
+
+| Custom property           | Default (light)          | Dark theme                 | Controls                                                     |
+| ------------------------- | ------------------------ | -------------------------- | ------------------------------------------------------------ |
+| `--palette-surface`       | `#fafafa`                | `#1e1e1e`                  | Palette and toolbar-button background                        |
+| `--palette-text`          | `black`                  | `#ededed`                  | Foreground text                                              |
+| `--palette-border`        | `#e5e5e5`                | `#3a3a3a`                  | Control borders and the active toolbar-button fill           |
+| `--palette-divider`       | `#e9e9e9`                | `#3a3a3a`                  | Divider lines above the input and tools                      |
+| `--palette-icon`          | `#646464`                | `#d0d0d0`                  | Toolbar icon stroke                                          |
+| `--palette-icon-disabled` | `#bdbdbd`                | `#6a6a6a`                  | Disabled toolbar icon stroke                                 |
+| `--palette-radius`        | `0.3rem`                 | —                          | Corner radius of buttons and the input                       |
+| `--palette-font-family`   | `Helvetica, sans-serif`  | —                          | Hex input font family                                        |
+| `--palette-slot-size`     | `1rem`                   | —                          | Diameter of a color slot                                     |
+| `--palette-slot-border`   | `rgba(0, 0, 0, 0.2)`     | `rgba(255, 255, 255, .2)`  | Slot outline                                                 |
+| `--palette-slot-empty`    | `#aaa`                   | `#777`                     | Empty / transparent slot outline and diagonal                |
+| `--palette-slot-ring`     | `#9e9e9e`                | `#6a6a6a`                  | Ring around the selected slot                                |
+| `--palette-input-surface` | `rgba(255, 255, 255, 1)` | `#2a2a2a`                  | Hex input background                                         |
+| `--palette-input-text`    | `rgba(0, 0, 0, 0.6)`     | `rgba(255, 255, 255, .75)` | Hex input text                                               |
+| `--palette-error`         | `#c0392b`                | `#ff6b5e`                  | Error headline and icon                                      |
+| `--palette-error-message` | `#595959`                | `#b0b0b0`                  | Error detail message                                         |
+| `--palette-focus-ring`    | `#1a1a1a`                | `#f0f0f0`                  | Keyboard focus outline (see [Focus Outline](#focus-outline)) |
+
+> `--palette-focus-ring` is themeable so the focus outline can stay visible in dark mode, but its light and dark defaults are chosen for WCAG-compliant contrast against the palette surface. Override it only with a value that preserves sufficient contrast.
+
+### Dark Mode
+
+The palette ships an automatic dark theme. When the host OS prefers a dark color scheme (`prefers-color-scheme: dark`), the `--palette-*` tokens remap to a dark set. Hosts stay in control through the `data-palette-theme` attribute (also forwarded to the root):
+
+| `data-palette-theme` | Result                             |
+| -------------------- | ---------------------------------- |
+| absent / `auto`      | Follows the OS preference          |
+| `light`              | Always light, even under a dark OS |
+| `dark`               | Always dark, even under a light OS |
+
+```svelte
+<!-- Follow the OS (default) -->
+<Palette {colors} />
+
+<!-- Force light regardless of the OS -->
+<Palette {colors} data-palette-theme="light" />
+
+<!-- Force dark regardless of the OS -->
+<Palette {colors} data-palette-theme="dark" />
+```
+
+Your own token overrides win over the built-in themes, so you can fine-tune either one:
+
+```svelte
+<Palette {colors} data-palette-theme="dark" style="--palette-surface: #101418;" />
+```
+
 ### Root Tag Class
+
+> The [token API](#theming-with-css-custom-properties) above is the recommended way to restyle the palette. Reach for the `:global()` overrides below only for things the tokens do not expose (layout, geometry, a specific element). They couple you to internal BEM class names, which are not a stable contract.
 
 You can style the component by passing a class down to the root tag (`div`).
 
 - Flag the class as global to make it available in the Palette component
-- Prefix your class with `.palette[data-palette]` to give precedence over the default one or mark each style with `!important` (not recommanded)
+- Prefix your class with `.palette[data-palette]` to give precedence over the default one or mark each style with `!important` (not recommended)
 
 #### Example
 
@@ -551,10 +636,10 @@ When colors are grouped, each group keeps its own `.palette__cells` grid instead
 
 Every focusable control in the palette shares the same keyboard focus ring: a `2px` solid outline with a `2px` offset, shown only on `:focus-visible` (keyboard interaction, not mouse click). This covers the color slots, the toolbar icon buttons (settings, compact toggle, eye dropper, input submit) and the deletion trash button.
 
-The ring color is fixed for a consistent, WCAG-compliant contrast rather than themeable:
+The ring color comes from the [`--palette-focus-ring`](#tokens) token, whose light and dark defaults are tuned for WCAG-compliant contrast against the palette surface:
 
-- **Dark `#1a1a1a`** on the light `#fafafa` palette and toolbar surfaces. For a slot the ring is drawn in the 2px offset gap over the palette background, so it stays ~17:1 whatever the swatch color.
-- **Light `#fff`** on the dark deletion tooltip that hosts the trash button (~21:1).
+- **Dark `#1a1a1a`** on the light surface, flipping to **light `#f0f0f0`** in the dark theme. For a slot the ring is drawn in the 2px offset gap over the palette surface, so it stays high-contrast whatever the slot color.
+- The deletion trash button keeps a fixed **light `#fff`** ring because its tooltip is dark in every theme.
 
 Under Windows High Contrast (`forced-colors`), the ring switches to the system `Highlight` color.
 
