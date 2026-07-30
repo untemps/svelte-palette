@@ -3,11 +3,28 @@
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
-		<link rel="stylesheet" href="%sveltekit.assets%/app.css" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<meta name="color-scheme" content="light dark" />
+		<meta
+			name="description"
+			content="svelte-palette — a customizable, themeable and accessible color palette component for Svelte 5. Explore every capability as a live, interactive card."
+		/>
+		<title>svelte-palette · capability showcase</title>
+		<script>
+			// Paint the saved theme before hydration to avoid a flash of the wrong scheme.
+			// With no saved choice the attribute stays unset and prefers-color-scheme wins.
+			try {
+				const saved = localStorage.getItem('svelte-palette-demo-theme')
+				if (saved === 'light' || saved === 'dark') {
+					document.documentElement.dataset.theme = saved
+				}
+			} catch (error) {
+				/* localStorage unavailable */
+			}
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
-		<span id="root">%sveltekit.body%</span>
+		<div id="root">%sveltekit.body%</div>
 	</body>
 </html>

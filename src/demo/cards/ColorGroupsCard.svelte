@@ -33,7 +33,7 @@
 	docHref="https://github.com/untemps/svelte-palette#array-of-color-groups"
 >
 	<div class="card__stage">
-		<div class="palette-frame">
+		<div class="palette-frame groups-frame">
 			<Palette {colors} bind:selectedColor numColumns={6} data-palette-theme={getTheme()} />
 		</div>
 	</div>
@@ -48,3 +48,34 @@
 		{/if}
 	</p>
 </Card>
+
+<style>
+	/*
+	 * The library lays out only the ungrouped listbox; grouped mode leaves each
+	 * group's cells to the consumer, so give them a name and a horizontal grid.
+	 */
+	.groups-frame :global(.palette__groups__group__name) {
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		font-size: 0.65rem;
+		font-weight: 700;
+		color: var(--palette-text);
+		opacity: 0.7;
+	}
+	.groups-frame :global(ul.palette__cells) {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		display: grid;
+		grid-template-columns: repeat(6, minmax(1.5rem, 1fr));
+		gap: 0.4rem;
+		align-items: center;
+		justify-items: center;
+	}
+	.groups-frame :global(.palette__cells__cell) {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+</style>

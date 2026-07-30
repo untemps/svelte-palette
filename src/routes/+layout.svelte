@@ -1,47 +1,22 @@
 <script lang="ts">
-	import 'carbon-components-svelte/css/g90.css'
-	import {
-		Header,
-		HeaderNav,
-		HeaderNavItem,
-		HeaderNavMenu,
-		SkipToContent,
-		Content,
-		Grid,
-		Row,
-		Column,
-		SideNav,
-		SideNavItems,
-		SideNavLink,
-	} from 'carbon-components-svelte'
+	import { onMount } from 'svelte'
+	import type { Snippet } from 'svelte'
 
-	let isSideNavOpen = false
+	import '../demo/styles/tokens.css'
+	import '../demo/styles/base.css'
+	import '../demo/styles/app.css'
+
+	import { initTheme } from '../demo/lib/theme.svelte'
+	import Header from '../demo/components/Header.svelte'
+	import Footer from '../demo/components/Footer.svelte'
+
+	let { children }: { children?: Snippet } = $props()
+
+	onMount(() => initTheme())
 </script>
 
-<Header companyName="@untemps" platformName="/svelte-palette" bind:isSideNavOpen persistentHamburgerMenu={true}>
-	<HeaderNav>
-		<HeaderNavItem href="/example1" text="Example 1" />
-		<HeaderNavItem href="/example2" text="Example 2" />
-		<HeaderNavItem href="/example3" text="Example 3" />
-		<HeaderNavItem href="/example4" text="Example 4" />
-		<HeaderNavItem href="/example5" text="Example 5" />
-		<HeaderNavItem href="/example6" text="Example 6" />
-		<HeaderNavItem href="/example7" text="Example 7" />
-		<HeaderNavItem href="/example8" text="Example 8" />
-	</HeaderNav>
-</Header>
-
-<SideNav bind:isOpen={isSideNavOpen}>
-	<SideNavItems>
-		<SideNavLink href="/example1" text="Example 1" />
-		<SideNavLink href="/example2" text="Example 2" />
-		<SideNavLink href="/example3" text="Example 3" />
-		<SideNavLink href="/example4" text="Example 4" />
-		<SideNavLink href="/example5" text="Example 5" />
-		<SideNavLink href="/example6" text="Example 6" />
-		<SideNavLink href="/example7" text="Example 7" />
-		<SideNavLink href="/example8" text="Example 8" />
-	</SideNavItems>
-</SideNav>
-
-<slot />
+<div class="page">
+	<Header />
+	{@render children?.()}
+	<Footer />
+</div>
