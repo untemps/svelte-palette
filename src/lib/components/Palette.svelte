@@ -908,6 +908,13 @@
 	 * replaces the default class, opting out of these rules (the consumer owns it).
 	 */
 	.palette :global(.__tooltip) {
+		/*
+		 * Collapse the inline line box so the trash icon is centered: the button is
+		 * an inline-block on the baseline, and the line-height strut otherwise adds
+		 * the font's descender space below it, leaving more padding under the icon
+		 * than above it.
+		 */
+		line-height: 0;
 		background-color: var(--palette-tooltip-surface, black);
 		color: var(--palette-tooltip-text, #fff);
 	}
