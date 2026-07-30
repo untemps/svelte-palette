@@ -11,10 +11,10 @@
 	<div class="container header__inner">
 		<span class="brand">
 			<span class="brand__dots" aria-hidden="true">
-				<span class="brand__dot" style="background:#f56476"></span>
-				<span class="brand__dot" style="background:#ffb703"></span>
-				<span class="brand__dot" style="background:#3a86ff"></span>
-				<span class="brand__dot" style="background:#2ec4b6"></span>
+				<span class="brand__dot" style="background:#8b7bf5"></span>
+				<span class="brand__dot" style="background:#6b8ef0"></span>
+				<span class="brand__dot" style="background:#4facd6"></span>
+				<span class="brand__dot" style="background:#46c2a8"></span>
 			</span>
 			<span class="brand__name">svelte-palette</span>
 		</span>
