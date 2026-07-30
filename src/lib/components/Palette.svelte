@@ -842,6 +842,51 @@
 		background-color: var(--palette-surface, #fafafa);
 	}
 
+	/*
+	 * Dark theme token remap. Applied automatically when the OS prefers a dark
+	 * scheme (unless the host opts out with data-palette-theme="light"), and
+	 * unconditionally when the host forces it with data-palette-theme="dark".
+	 * The two blocks are intentionally identical and must stay in sync — plain
+	 * CSS cannot share a declaration list between a media-conditional and an
+	 * unconditional selector. The focus ring flips to a light value so it keeps
+	 * its WCAG-compliant contrast against the dark surface.
+	 */
+	@media (prefers-color-scheme: dark) {
+		.palette:not([data-palette-theme='light']) {
+			--palette-surface: #1e1e1e;
+			--palette-text: #ededed;
+			--palette-border: #3a3a3a;
+			--palette-divider: #3a3a3a;
+			--palette-icon: #d0d0d0;
+			--palette-icon-disabled: #6a6a6a;
+			--palette-slot-border: rgba(255, 255, 255, 0.2);
+			--palette-slot-empty: #777777;
+			--palette-slot-ring: #6a6a6a;
+			--palette-input-surface: #2a2a2a;
+			--palette-input-text: rgba(255, 255, 255, 0.75);
+			--palette-error: #ff6b5e;
+			--palette-error-message: #b0b0b0;
+			--palette-focus-ring: #f0f0f0;
+		}
+	}
+
+	.palette[data-palette-theme='dark'] {
+		--palette-surface: #1e1e1e;
+		--palette-text: #ededed;
+		--palette-border: #3a3a3a;
+		--palette-divider: #3a3a3a;
+		--palette-icon: #d0d0d0;
+		--palette-icon-disabled: #6a6a6a;
+		--palette-slot-border: rgba(255, 255, 255, 0.2);
+		--palette-slot-empty: #777777;
+		--palette-slot-ring: #6a6a6a;
+		--palette-input-surface: #2a2a2a;
+		--palette-input-text: rgba(255, 255, 255, 0.75);
+		--palette-error: #ff6b5e;
+		--palette-error-message: #b0b0b0;
+		--palette-focus-ring: #f0f0f0;
+	}
+
 	.palette__content {
 		width: 100%;
 		min-height: 70px;
