@@ -28,6 +28,8 @@
 
 	import type { Snippet } from 'svelte'
 
+	import type { HTMLAttributes } from 'svelte/elements'
+
 	import type { NormalizedColor, NormalizedColorGroup } from '../utils/utils.js'
 
 	import type {
@@ -124,7 +126,8 @@
 		input = undefined,
 		tools = undefined,
 		settings = undefined,
-	}: Props = $props()
+		...restProps
+	}: Props & Omit<HTMLAttributes<HTMLDivElement>, keyof Props> = $props()
 
 	const _paletteId = $props.id()
 
@@ -590,7 +593,7 @@
 	}
 </script>
 
-<div data-palette-id={_paletteId} class="palette {className}" data-testid="__palette__" data-palette>
+<div {...restProps} data-palette-id={_paletteId} class="palette {className}" data-testid="__palette__" data-palette>
 	<section class="palette__content" class:palette__content--compact={_isCompact} style="--num-columns: {_numColumns}">
 		{#if !_isCompact}
 			{@render header?.({ selectedColor })}
@@ -808,17 +811,121 @@
 </template>
 
 <style>
-	:global(*) {
+	.palette,
+	:global(.palette *) {
 		box-sizing: border-box;
+	}
+
+	/*
+	 * Token defaults, declared at zero specificity via :where() so any ordinary
+	 * consumer rule — an inline style, or a class on the root — overrides them
+	 * without !important and without coupling to internal BEM class names. The
+	 * visual properties below stay on `.palette` and read the tokens through var().
+	 * These are also the universal fallback: a browser without light-dark() support
+	 * keeps them (light only) instead of breaking.
+	 */
+	:where(.palette) {
+		--palette-surface: #fafafa;
+		--palette-text: black;
+		--palette-border: #e5e5e5;
+		--palette-divider: #e9e9e9;
+		--palette-icon: #646464;
+		--palette-icon-disabled: #bdbdbd;
+		--palette-loader: #ccc;
+		--palette-radius: 0.3rem;
+		--palette-font-family: Helvetica, sans-serif;
+		--palette-slot-size: 1rem;
+		--palette-slot-border: rgba(0, 0, 0, 0.2);
+		--palette-slot-empty: #aaa;
+		--palette-slot-ring: #9e9e9e;
+		--palette-input-surface: rgba(255, 255, 255, 1);
+		--palette-input-text: rgba(0, 0, 0, 0.6);
+		--palette-error: #c0392b;
+		--palette-error-message: #595959;
+		--palette-focus-ring: #1a1a1a;
+		--palette-tooltip-surface: black;
+		--palette-tooltip-text: #fff;
 	}
 
 	.palette {
 		width: 100%;
-		color: black;
+		color: var(--palette-text, black);
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		background-color: #fafafa;
+		background-color: var(--palette-surface, #fafafa);
+	}
+
+	/*
+	 * Dark theme. Where light-dark() is supported, every theme-varying token is
+	 * declared once as light-dark(<light>, <dark>) and resolved from the
+	 * `color-scheme` on the root: `light dark` follows the OS, and data-palette-theme
+	 * forces one scheme. This replaces the previous pair of identical dark
+	 * declaration lists (a @media block and a forced-attribute block) with a single
+	 * source of truth. Browsers without light-dark() keep the light defaults above
+	 * (no dark mode) rather than breaking. The focus-ring dark value stays
+	 * WCAG-contrasting against the dark surface.
+	 */
+	@supports (color: light-dark(#000, #fff)) {
+		:where(.palette) {
+			--palette-surface: light-dark(#fafafa, #1e1e1e);
+			--palette-text: light-dark(black, #ededed);
+			--palette-border: light-dark(#e5e5e5, #3a3a3a);
+			--palette-divider: light-dark(#e9e9e9, #3a3a3a);
+			--palette-icon: light-dark(#646464, #d0d0d0);
+			--palette-icon-disabled: light-dark(#bdbdbd, #6a6a6a);
+			--palette-loader: light-dark(#ccc, #555555);
+			--palette-slot-border: light-dark(rgba(0, 0, 0, 0.2), rgba(255, 255, 255, 0.2));
+			--palette-slot-empty: light-dark(#aaa, #777777);
+			--palette-slot-ring: light-dark(#9e9e9e, #6a6a6a);
+			--palette-input-surface: light-dark(rgba(255, 255, 255, 1), #2a2a2a);
+			--palette-input-text: light-dark(rgba(0, 0, 0, 0.6), rgba(255, 255, 255, 0.75));
+			--palette-error: light-dark(#c0392b, #ff6b5e);
+			--palette-error-message: light-dark(#595959, #b0b0b0);
+			--palette-focus-ring: light-dark(#1a1a1a, #f0f0f0);
+			--palette-tooltip-surface: light-dark(black, #f0f0f0);
+			--palette-tooltip-text: light-dark(#fff, #1a1a1a);
+		}
+
+		.palette {
+			color-scheme: light dark;
+		}
+
+		.palette[data-palette-theme='light'] {
+			color-scheme: light;
+		}
+
+		.palette[data-palette-theme='dark'] {
+			color-scheme: dark;
+		}
+	}
+
+	/*
+	 * Theme-aware deletion tooltip. The default svelte-use-tooltip bubble ships a
+	 * fixed black background; because it renders inline inside the palette
+	 * (portal: false), it inherits the palette tokens, so restyle it to track the
+	 * theme instead of staying black on a dark surface. A custom tooltipClassName
+	 * replaces the default class, opting out of these rules (the consumer owns it).
+	 */
+	.palette :global(.__tooltip) {
+		background-color: var(--palette-tooltip-surface, black);
+		color: var(--palette-tooltip-text, #fff);
+	}
+
+	.palette :global(.__tooltip-top::after) {
+		border-top-color: var(--palette-tooltip-surface, black);
+	}
+
+	.palette :global(.__tooltip-bottom::after) {
+		border-bottom-color: var(--palette-tooltip-surface, black);
+	}
+
+	.palette :global(.__tooltip-left::after) {
+		border-left-color: var(--palette-tooltip-surface, black);
+	}
+
+	.palette :global(.__tooltip-right::after) {
+		border-right-color: var(--palette-tooltip-surface, black);
 	}
 
 	.palette__content {

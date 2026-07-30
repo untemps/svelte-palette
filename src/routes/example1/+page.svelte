@@ -108,6 +108,7 @@
 			{#key unique}
 				<Palette
 					class="palette__custom"
+					data-palette-theme="light"
 					labels={{ slots: 'Background color slots' }}
 					bind:colors
 					compactColorIndices={showCompactControl ? compactIndices : null}

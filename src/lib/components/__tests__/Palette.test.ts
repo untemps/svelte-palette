@@ -827,6 +827,21 @@ test('Does not expose a main landmark on the root', async () => {
 	expect(root).toHaveAttribute('data-palette')
 })
 
+test('Forwards style and extra attributes to the root element', async () => {
+	const colors = ['#ff0', '#0ff', '#f0f']
+	setup(Palette, {
+		props: { colors, style: '--palette-surface: #123456;', 'data-palette-theme': 'dark' },
+	})
+
+	await screen.findAllByTestId('__palette-slot__')
+
+	const root = screen.getByTestId('__palette__')
+	expect(root.style.getPropertyValue('--palette-surface')).toBe('#123456')
+	expect(root).toHaveAttribute('data-palette-theme', 'dark')
+	expect(root).toHaveAttribute('data-palette')
+	expect(root).toHaveClass('palette')
+})
+
 test('Exposes the slot grid as a listbox', async () => {
 	const colors = ['#ff0', '#0ff', '#f0f']
 	setup(Palette, { colors })

@@ -60,7 +60,7 @@
 		align-items: center;
 		gap: 0.4rem;
 		text-align: center;
-		color: #c0392b;
+		color: var(--palette-error, #c0392b);
 		font-family: inherit;
 	}
 
@@ -71,7 +71,7 @@
 
 	.palette__error__message {
 		font-size: 0.75rem;
-		color: #595959;
+		color: var(--palette-error-message, #595959);
 		word-break: break-word;
 	}
 </style>

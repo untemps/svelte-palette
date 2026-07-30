@@ -17,7 +17,7 @@
 		aria-hidden="true"
 		xmlns="http://www.w3.org/2000/svg"
 	>
-		<path d="M12,2.5 A9.5,9.5 0 0,1 21.5,12" stroke-width="2" stroke="#ccc" fill="none" />
+		<path d="M12,2.5 A9.5,9.5 0 0,1 21.5,12" stroke-width="2" fill="none" />
 	</svg>
 	<span class="palette__loader__label">{label}</span>
 </div>
@@ -26,6 +26,10 @@
 	.palette__loader__spinner {
 		transform-origin: 50% 50%;
 		animation: palette-spin 1s linear infinite;
+	}
+
+	.palette__loader__spinner path {
+		stroke: var(--palette-loader, #ccc);
 	}
 
 	.palette__loader__label {
