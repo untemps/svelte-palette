@@ -542,27 +542,31 @@ Or from a stylesheet, by passing a class and setting the tokens on it:
 
 Every value falls back to its default, so a palette with no tokens set renders exactly as before.
 
-| Custom property           | Default (light)          | Dark theme                 | Controls                                                     |
-| ------------------------- | ------------------------ | -------------------------- | ------------------------------------------------------------ |
-| `--palette-surface`       | `#fafafa`                | `#1e1e1e`                  | Palette and toolbar-button background                        |
-| `--palette-text`          | `black`                  | `#ededed`                  | Foreground text                                              |
-| `--palette-border`        | `#e5e5e5`                | `#3a3a3a`                  | Control borders and the active toolbar-button fill           |
-| `--palette-divider`       | `#e9e9e9`                | `#3a3a3a`                  | Divider lines above the input and tools                      |
-| `--palette-icon`          | `#646464`                | `#d0d0d0`                  | Toolbar icon stroke                                          |
-| `--palette-icon-disabled` | `#bdbdbd`                | `#6a6a6a`                  | Disabled toolbar icon stroke                                 |
-| `--palette-radius`        | `0.3rem`                 | —                          | Corner radius of buttons and the input                       |
-| `--palette-font-family`   | `Helvetica, sans-serif`  | —                          | Hex input font family                                        |
-| `--palette-slot-size`     | `1rem`                   | —                          | Diameter of a color slot                                     |
-| `--palette-slot-border`   | `rgba(0, 0, 0, 0.2)`     | `rgba(255, 255, 255, .2)`  | Slot outline                                                 |
-| `--palette-slot-empty`    | `#aaa`                   | `#777`                     | Empty / transparent slot outline and diagonal                |
-| `--palette-slot-ring`     | `#9e9e9e`                | `#6a6a6a`                  | Ring around the selected slot                                |
-| `--palette-input-surface` | `rgba(255, 255, 255, 1)` | `#2a2a2a`                  | Hex input background                                         |
-| `--palette-input-text`    | `rgba(0, 0, 0, 0.6)`     | `rgba(255, 255, 255, .75)` | Hex input text                                               |
-| `--palette-error`         | `#c0392b`                | `#ff6b5e`                  | Error headline and icon                                      |
-| `--palette-error-message` | `#595959`                | `#b0b0b0`                  | Error detail message                                         |
-| `--palette-focus-ring`    | `#1a1a1a`                | `#f0f0f0`                  | Keyboard focus outline (see [Focus Outline](#focus-outline)) |
+| Custom property             | Default (light)          | Dark theme                 | Controls                                                     |
+| --------------------------- | ------------------------ | -------------------------- | ------------------------------------------------------------ |
+| `--palette-surface`         | `#fafafa`                | `#1e1e1e`                  | Palette and toolbar-button background                        |
+| `--palette-text`            | `black`                  | `#ededed`                  | Foreground text                                              |
+| `--palette-border`          | `#e5e5e5`                | `#3a3a3a`                  | Control borders and the active toolbar-button fill           |
+| `--palette-divider`         | `#e9e9e9`                | `#3a3a3a`                  | Divider lines above the input and tools                      |
+| `--palette-icon`            | `#646464`                | `#d0d0d0`                  | Toolbar icon stroke                                          |
+| `--palette-icon-disabled`   | `#bdbdbd`                | `#6a6a6a`                  | Disabled toolbar icon stroke                                 |
+| `--palette-radius`          | `0.3rem`                 | —                          | Corner radius of buttons and the input                       |
+| `--palette-font-family`     | `Helvetica, sans-serif`  | —                          | Hex input font family                                        |
+| `--palette-slot-size`       | `1rem`                   | —                          | Diameter of a color slot                                     |
+| `--palette-slot-border`     | `rgba(0, 0, 0, 0.2)`     | `rgba(255, 255, 255, .2)`  | Slot outline                                                 |
+| `--palette-slot-empty`      | `#aaa`                   | `#777`                     | Empty / transparent slot outline and diagonal                |
+| `--palette-slot-ring`       | `#9e9e9e`                | `#6a6a6a`                  | Ring around the selected slot                                |
+| `--palette-input-surface`   | `rgba(255, 255, 255, 1)` | `#2a2a2a`                  | Hex input background                                         |
+| `--palette-input-text`      | `rgba(0, 0, 0, 0.6)`     | `rgba(255, 255, 255, .75)` | Hex input text                                               |
+| `--palette-error`           | `#c0392b`                | `#ff6b5e`                  | Error headline and icon                                      |
+| `--palette-error-message`   | `#595959`                | `#b0b0b0`                  | Error detail message                                         |
+| `--palette-focus-ring`      | `#1a1a1a`                | `#f0f0f0`                  | Keyboard focus outline (see [Focus Outline](#focus-outline)) |
+| `--palette-tooltip-surface` | `black`                  | `#f0f0f0`                  | Default deletion tooltip background and arrow                |
+| `--palette-tooltip-text`    | `#fff`                   | `#1a1a1a`                  | Default deletion tooltip icon, text and focus ring           |
 
 > `--palette-focus-ring` is themeable so the focus outline can stay visible in dark mode, but its light and dark defaults are chosen for WCAG-compliant contrast against the palette surface. Override it only with a value that preserves sufficient contrast.
+
+> The tooltip tokens only style the **default** deletion tooltip. Passing a [`tooltipClassName`](#deletion-tooltip-class) replaces the default class and its styling, so a custom tooltip owns its own colors.
 
 ### Dark Mode
 
@@ -639,7 +643,7 @@ Every focusable control in the palette shares the same keyboard focus ring: a `2
 The ring color comes from the [`--palette-focus-ring`](#tokens) token, whose light and dark defaults are tuned for WCAG-compliant contrast against the palette surface:
 
 - **Dark `#1a1a1a`** on the light surface, flipping to **light `#f0f0f0`** in the dark theme. For a slot the ring is drawn in the 2px offset gap over the palette surface, so it stays high-contrast whatever the slot color.
-- The deletion trash button keeps a fixed **light `#fff`** ring because its tooltip is dark in every theme.
+- The deletion trash button rings in [`--palette-tooltip-text`](#tokens) so it contrasts with the tooltip in both themes (light `#fff` on the default dark tooltip, dark `#1a1a1a` on the light dark-theme tooltip).
 
 Under Windows High Contrast (`forced-colors`), the ring switches to the system `Highlight` color.
 

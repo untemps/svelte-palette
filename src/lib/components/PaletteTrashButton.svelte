@@ -54,7 +54,7 @@
 	}
 
 	.trash_button__button:focus-visible {
-		outline: 2px solid #fff;
+		outline: 2px solid var(--palette-tooltip-text, #fff);
 		outline-offset: 2px;
 	}
 
@@ -83,6 +83,6 @@
 		.trash_button__button > svg line,
 		.trash_button__button > svg polyline
 	) {
-		stroke: #fff;
+		stroke: var(--palette-tooltip-text, #fff);
 	}
 </style>

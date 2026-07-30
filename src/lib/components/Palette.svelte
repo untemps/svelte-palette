@@ -834,6 +834,8 @@
 		--palette-error: #c0392b;
 		--palette-error-message: #595959;
 		--palette-focus-ring: #1a1a1a;
+		--palette-tooltip-surface: black;
+		--palette-tooltip-text: #fff;
 
 		width: 100%;
 		color: var(--palette-text, black);
@@ -868,6 +870,8 @@
 			--palette-error: #ff6b5e;
 			--palette-error-message: #b0b0b0;
 			--palette-focus-ring: #f0f0f0;
+			--palette-tooltip-surface: #f0f0f0;
+			--palette-tooltip-text: #1a1a1a;
 		}
 	}
 
@@ -886,6 +890,36 @@
 		--palette-error: #ff6b5e;
 		--palette-error-message: #b0b0b0;
 		--palette-focus-ring: #f0f0f0;
+		--palette-tooltip-surface: #f0f0f0;
+		--palette-tooltip-text: #1a1a1a;
+	}
+
+	/*
+	 * Theme-aware deletion tooltip. The default svelte-use-tooltip bubble ships a
+	 * fixed black background; because it renders inline inside the palette
+	 * (portal: false), it inherits the palette tokens, so restyle it to track the
+	 * theme instead of staying black on a dark surface. A custom tooltipClassName
+	 * replaces the default class, opting out of these rules (the consumer owns it).
+	 */
+	.palette :global(.__tooltip) {
+		background-color: var(--palette-tooltip-surface, black);
+		color: var(--palette-tooltip-text, #fff);
+	}
+
+	.palette :global(.__tooltip-top::after) {
+		border-top-color: var(--palette-tooltip-surface, black);
+	}
+
+	.palette :global(.__tooltip-bottom::after) {
+		border-bottom-color: var(--palette-tooltip-surface, black);
+	}
+
+	.palette :global(.__tooltip-left::after) {
+		border-left-color: var(--palette-tooltip-surface, black);
+	}
+
+	.palette :global(.__tooltip-right::after) {
+		border-right-color: var(--palette-tooltip-surface, black);
 	}
 
 	.palette__content {
