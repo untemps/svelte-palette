@@ -838,7 +838,6 @@ test('Forwards style and extra attributes to the root element', async () => {
 	const root = screen.getByTestId('__palette__')
 	expect(root.style.getPropertyValue('--palette-surface')).toBe('#123456')
 	expect(root).toHaveAttribute('data-palette-theme', 'dark')
-	// The component's own identity attributes are preserved alongside forwarded ones.
 	expect(root).toHaveAttribute('data-palette')
 	expect(root).toHaveClass('palette')
 })
