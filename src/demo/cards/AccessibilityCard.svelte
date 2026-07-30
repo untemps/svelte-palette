@@ -3,7 +3,7 @@
 	import type { ColorsProp, ColorValue } from '$lib/types'
 
 	import Card from '../components/Card.svelte'
-	import { getTheme } from '../lib/theme.svelte'
+	import { getPaletteTheme } from '../lib/theme.svelte'
 
 	const DESCRIPTION =
 		'The slot grid is a real <code>listbox</code> with <code>option</code> children, a single tab stop and roving <code>tabindex</code>. Arrow keys move focus, Enter/Space select, and Delete/Backspace remove the focused slot when a <code>deletionMode</code> is set.'
@@ -34,7 +34,7 @@
 				bind:selectedColor
 				numColumns={6}
 				deletionMode="tooltip"
-				data-palette-theme={getTheme()}
+				data-palette-theme={getPaletteTheme()}
 			/>
 		</div>
 	</div>

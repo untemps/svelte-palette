@@ -3,7 +3,7 @@
 	import type { ColorsProp } from '$lib/types'
 
 	import Card from '../components/Card.svelte'
-	import { getTheme } from '../lib/theme.svelte'
+	import { getPaletteTheme } from '../lib/theme.svelte'
 
 	const DESCRIPTION =
 		'Provide <code>compactColorIndices</code> to expose a compact toggle in the tools row. Collapsing the palette shows only the picked indices; enlarging restores the full grid.'
@@ -40,7 +40,7 @@
 >
 	<div class="card__stage">
 		<div class="palette-frame">
-			<Palette {colors} {compactColorIndices} data-palette-theme={getTheme()} />
+			<Palette {colors} {compactColorIndices} data-palette-theme={getPaletteTheme()} />
 		</div>
 	</div>
 

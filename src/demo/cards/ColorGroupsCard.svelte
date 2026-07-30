@@ -3,7 +3,7 @@
 	import type { ColorsProp, ColorValue } from '$lib/types'
 
 	import Card from '../components/Card.svelte'
-	import { getTheme } from '../lib/theme.svelte'
+	import { getPaletteTheme } from '../lib/theme.svelte'
 
 	const DESCRIPTION =
 		'Pass an array of <code>{ name, colors }</code> groups and the palette renders each collection under its label. Selection still works across every group.'
@@ -34,14 +34,14 @@
 >
 	<div class="card__stage">
 		<div class="palette-frame groups-frame">
-			<Palette {colors} bind:selectedColor numColumns={6} data-palette-theme={getTheme()} />
+			<Palette {colors} bind:selectedColor numColumns={6} data-palette-theme={getPaletteTheme()} />
 		</div>
 	</div>
 
 	<p class="readout">
 		<span class="readout__label">selectedColor</span>
 		{#if selectedColor}
-			<span class="swatch" style="background:{selectedColor}"></span>
+			<span class="color-chip" style="background:{selectedColor}"></span>
 			<span class="readout__value">{selectedColor}</span>
 		{:else}
 			<span class="readout__value">null</span>
@@ -67,7 +67,8 @@
 		padding: 0;
 		list-style: none;
 		display: grid;
-		grid-template-columns: repeat(6, minmax(1.5rem, 1fr));
+		/* Honour the palette's numColumns (published on .palette__content) */
+		grid-template-columns: repeat(var(--num-columns, 6), minmax(1.5rem, 1fr));
 		gap: 0.4rem;
 		align-items: center;
 		justify-items: center;

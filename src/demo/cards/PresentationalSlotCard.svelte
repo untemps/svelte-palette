@@ -3,7 +3,7 @@
 	import type { ColorsProp } from '$lib/types'
 
 	import Card from '../components/Card.svelte'
-	import { getTheme } from '../lib/theme.svelte'
+	import { getPaletteTheme } from '../lib/theme.svelte'
 
 	const DESCRIPTION =
 		'Add <code>presentational</code> to drop the listbox roles, tab stop and arrow-key navigation — a purely decorative palette. Replace each slot with the <code>slot</code> snippet to render your own mark.'
@@ -28,8 +28,8 @@
 	docHref="https://github.com/untemps/svelte-palette#display-only-palettes"
 >
 	<div class="card__stage">
-		<div class="palette-frame pslot-frame">
-			<Palette {colors} numColumns={5} presentational data-palette-theme={getTheme()}>
+		<div class="palette-frame">
+			<Palette {colors} numColumns={5} presentational data-palette-theme={getPaletteTheme()}>
 				{#snippet slot({ color })}
 					<div class="pslot" style="--c:{color}"></div>
 				{/snippet}

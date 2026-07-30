@@ -3,7 +3,7 @@
 	import type { ColorsProp } from '$lib/types'
 
 	import Card from '../components/Card.svelte'
-	import { getTheme } from '../lib/theme.svelte'
+	import { getPaletteTheme } from '../lib/theme.svelte'
 
 	const DESCRIPTION =
 		'Two-way <code>bind:colors</code> keeps a list in sync as slots are added from the input or removed from the palette. <code>maxColors</code> caps the size and <code>allowDuplicates</code> gates repeats.'
@@ -53,7 +53,7 @@
 				{allowDuplicates}
 				showInput
 				deletionMode="tooltip"
-				data-palette-theme={getTheme()}
+				data-palette-theme={getPaletteTheme()}
 			/>
 		</div>
 	</div>

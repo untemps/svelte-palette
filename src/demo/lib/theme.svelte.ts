@@ -22,19 +22,32 @@ const applyTheme = (theme: Theme): void => {
 }
 
 /*
- * Shared, reactive theme state. Components read it through `getTheme()` so they
- * re-render on toggle, and each <Palette> is passed the value as
- * `data-palette-theme` to keep the library's dark mode in lockstep with the
- * showcase chrome. SSR and the first client render use the `light` default; the
- * inline boot script in app.html paints the correct attribute before hydration,
- * and `initTheme()` reconciles the store on mount without a hydration mismatch.
+ * Shared, reactive theme state. The chrome reads it through `getTheme()` and the
+ * inline boot script in app.html paints the chrome's `data-theme` on <html>
+ * before hydration, so the header never flashes the wrong scheme.
+ *
+ * SSR and the first client render can't know the resolved theme, so both use the
+ * `light` default and `initTheme()` reconciles the store on mount — matching SSR
+ * exactly, with no hydration mismatch.
  */
 let current = $state<Theme>('light')
+let initialized = $state(false)
 
 export const getTheme = (): Theme => current
 
+/*
+ * Theme handed to each <Palette> as `data-palette-theme`. Before the store
+ * initialises (SSR + first hydration render) we return `'auto'` so the library
+ * follows the OS through its own `color-scheme` — this avoids a wrong-scheme
+ * flash for dark-preference visitors while still matching the SSR markup. After
+ * `initTheme()` it returns the explicit choice, so the header toggle drives every
+ * palette in lockstep.
+ */
+export const getPaletteTheme = (): 'auto' | Theme => (initialized ? current : 'auto')
+
 export const initTheme = (): (() => void) => {
 	current = storedTheme() ?? systemTheme()
+	initialized = true
 	applyTheme(current)
 
 	if (!browser) return () => {}

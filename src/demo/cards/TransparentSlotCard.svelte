@@ -3,7 +3,7 @@
 	import type { ColorsProp, ColorValue } from '$lib/types'
 
 	import Card from '../components/Card.svelte'
-	import { getTheme } from '../lib/theme.svelte'
+	import { getPaletteTheme } from '../lib/theme.svelte'
 
 	const DESCRIPTION =
 		'Set <code>showTransparentSlot</code> to prepend a "no color" option. Selecting it clears the pick — <code>selectedColor</code> becomes <code>null</code>.'
@@ -27,14 +27,20 @@
 >
 	<div class="card__stage">
 		<div class="palette-frame">
-			<Palette {colors} bind:selectedColor showTransparentSlot numColumns={7} data-palette-theme={getTheme()} />
+			<Palette
+				{colors}
+				bind:selectedColor
+				showTransparentSlot
+				numColumns={7}
+				data-palette-theme={getPaletteTheme()}
+			/>
 		</div>
 	</div>
 
 	<p class="readout">
 		<span class="readout__label">selectedColor</span>
 		{#if selectedColor}
-			<span class="swatch" style="background:{selectedColor}"></span>
+			<span class="color-chip" style="background:{selectedColor}"></span>
 			<span class="readout__value">{selectedColor}</span>
 		{:else}
 			<span class="readout__value">null (transparent)</span>

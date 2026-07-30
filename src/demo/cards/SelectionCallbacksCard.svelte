@@ -3,7 +3,7 @@
 	import type { ColorsProp, ColorValue } from '$lib/types'
 
 	import Card from '../components/Card.svelte'
-	import { getTheme } from '../lib/theme.svelte'
+	import { getPaletteTheme } from '../lib/theme.svelte'
 
 	const DESCRIPTION =
 		'Bind the current pick with <code>bind:selectedColor</code>, then observe every mutation through the <code>onselect</code>, <code>onadd</code>, <code>ondelete</code> and <code>onerror</code> callbacks.'
@@ -43,7 +43,7 @@
 				bind:selectedColor
 				showInput
 				deletionMode="tooltip"
-				data-palette-theme={getTheme()}
+				data-palette-theme={getPaletteTheme()}
 				onselect={({ color }) => log('select', color ?? 'transparent')}
 				onadd={({ color }) => log('add', color)}
 				ondelete={({ color, index }) => log('delete', `${color} @${index}`)}
@@ -55,7 +55,7 @@
 	<p class="readout">
 		<span class="readout__label">selectedColor</span>
 		{#if selectedColor}
-			<span class="swatch" style="background:{selectedColor}"></span>
+			<span class="color-chip" style="background:{selectedColor}"></span>
 			<span class="readout__value">{selectedColor}</span>
 		{:else}
 			<span class="readout__value">null</span>

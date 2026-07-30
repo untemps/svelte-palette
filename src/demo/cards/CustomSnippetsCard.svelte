@@ -3,7 +3,7 @@
 	import type { ColorsProp, ColorValue } from '$lib/types'
 
 	import Card from '../components/Card.svelte'
-	import { getTheme } from '../lib/theme.svelte'
+	import { getPaletteTheme } from '../lib/theme.svelte'
 
 	const DESCRIPTION =
 		'Every region is a snippet: <code>header</code>, <code>footer</code>, <code>input</code>, <code>tools</code>, <code>settings</code>, plus <code>beforeSlot</code> / <code>afterSlot</code> and <code>transparentSlot</code>. Here a <code>header</code> previews the pick and a <code>footer</code> captions the set.'
@@ -32,7 +32,7 @@
 >
 	<div class="card__stage">
 		<div class="palette-frame">
-			<Palette {colors} bind:selectedColor numColumns={6} data-palette-theme={getTheme()}>
+			<Palette {colors} bind:selectedColor numColumns={6} data-palette-theme={getPaletteTheme()}>
 				{#snippet header({ selectedColor })}
 					<div class="snip-header" style="--c:{selectedColor ?? 'transparent'}">
 						<span>{selectedColor ?? 'none'}</span>

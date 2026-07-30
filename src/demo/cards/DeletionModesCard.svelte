@@ -3,7 +3,7 @@
 	import type { ColorsProp, DeletionMode } from '$lib/types'
 
 	import Card from '../components/Card.svelte'
-	import { getTheme } from '../lib/theme.svelte'
+	import { getPaletteTheme } from '../lib/theme.svelte'
 
 	const DESCRIPTION =
 		'<code>deletionMode</code> controls how slots are removed: <code>none</code> disables it, <code>tooltip</code> asks for confirmation on hover, and <code>drop</code> drags a slot onto a trash target. A <code>tooltipClassName</code> restyles the confirm bubble.'
@@ -49,7 +49,7 @@
 				numColumns={6}
 				deletionMode={mode}
 				tooltipClassName={customTooltip ? 'demo-tooltip' : null}
-				data-palette-theme={getTheme()}
+				data-palette-theme={getPaletteTheme()}
 			/>
 		</div>
 	</div>

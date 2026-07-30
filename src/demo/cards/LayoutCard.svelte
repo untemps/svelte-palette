@@ -3,7 +3,7 @@
 	import type { ColorsProp } from '$lib/types'
 
 	import Card from '../components/Card.svelte'
-	import { getTheme } from '../lib/theme.svelte'
+	import { getPaletteTheme } from '../lib/theme.svelte'
 
 	const DESCRIPTION =
 		'<code>numColumns</code> fixes the grid width. Set it to <code>0</code> to lay slots on a single row and let <code>maxColumns</code> decide when they wrap.'
@@ -47,7 +47,7 @@
 
 	<div class="card__stage">
 		<div class="palette-frame">
-			<Palette {colors} {numColumns} {maxColumns} data-palette-theme={getTheme()} />
+			<Palette {colors} {numColumns} {maxColumns} data-palette-theme={getPaletteTheme()} />
 		</div>
 	</div>
 

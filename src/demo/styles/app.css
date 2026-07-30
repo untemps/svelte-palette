@@ -7,6 +7,25 @@
 	min-height: 100svh;
 }
 
+/* Keyboard bypass past the sticky header — hidden until focused */
+.skip-link {
+	position: fixed;
+	top: var(--space-2);
+	left: var(--space-2);
+	z-index: 60;
+	padding: 8px 14px;
+	border-radius: var(--radius-sm);
+	background: var(--accent);
+	color: var(--accent-contrast);
+	font-weight: 600;
+	text-decoration: none;
+	transform: translateY(-150%);
+	transition: transform 0.15s ease;
+}
+.skip-link:focus-visible {
+	transform: translateY(0);
+}
+
 .container {
 	width: 100%;
 	max-width: var(--page-max);
@@ -548,7 +567,7 @@ select.field {
 	font-family: var(--font-mono);
 	word-break: break-word;
 }
-.swatch {
+.color-chip {
 	display: inline-block;
 	width: 1.1em;
 	height: 1.1em;

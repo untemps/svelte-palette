@@ -3,7 +3,7 @@
 	import type { ColorsProp } from '$lib/types'
 
 	import Card from '../components/Card.svelte'
-	import { getTheme } from '../lib/theme.svelte'
+	import { getPaletteTheme } from '../lib/theme.svelte'
 
 	const DESCRIPTION =
 		'Restyle the palette through its <code>--palette-*</code> custom properties. They are declared at zero specificity, so an inline <code>style</code> or a class overrides any of them without <code>!important</code>.'
@@ -72,7 +72,7 @@
 
 	<div class="card__stage">
 		<div class="palette-frame">
-			<Palette {colors} showInput numColumns={6} style={paletteStyle} data-palette-theme={getTheme()} />
+			<Palette {colors} showInput numColumns={6} style={paletteStyle} data-palette-theme={getPaletteTheme()} />
 		</div>
 	</div>
 

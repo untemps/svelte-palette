@@ -29,6 +29,9 @@
 		>
 			<code>{INSTALL_CMD}</code>
 			<Icon name={clip.copied ? 'check' : 'copy'} size={17} />
+			<span class="visually-hidden" role="status" aria-live="polite"
+				>{clip.copied ? 'Copied to clipboard' : ''}</span
+			>
 		</button>
 
 		<div class="header__actions">

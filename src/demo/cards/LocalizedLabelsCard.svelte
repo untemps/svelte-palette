@@ -3,7 +3,7 @@
 	import type { ColorsProp, ColorValue, PaletteLabels } from '$lib/types'
 
 	import Card from '../components/Card.svelte'
-	import { getTheme } from '../lib/theme.svelte'
+	import { getPaletteTheme } from '../lib/theme.svelte'
 
 	const DESCRIPTION =
 		'Every built-in string — the listbox, input, tools and deletion tooltip — is driven by one <code>labels</code> bag. Override a subset to localize the palette or tweak individual accessible names.'
@@ -45,7 +45,7 @@
 	badge="labels"
 	description={DESCRIPTION}
 	code={CODE}
-	docHref="https://github.com/untemps/svelte-palette#palette-api"
+	docHref="https://github.com/untemps/svelte-palette#internationalization"
 >
 	<div class="seg" role="group" aria-label="Locale">
 		{#each Object.entries(LOCALES) as [key, { name }] (key)}
@@ -70,7 +70,7 @@
 				showTransparentSlot
 				deletionMode="tooltip"
 				labels={LOCALES[locale].labels}
-				data-palette-theme={getTheme()}
+				data-palette-theme={getPaletteTheme()}
 			/>
 		</div>
 	</div>

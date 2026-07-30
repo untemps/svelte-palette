@@ -5,7 +5,7 @@
 	import type { ColorsProp } from '$lib/types'
 
 	import Card from '../components/Card.svelte'
-	import { getTheme } from '../lib/theme.svelte'
+	import { getPaletteTheme } from '../lib/theme.svelte'
 
 	const DESCRIPTION =
 		'The <code>colors</code> prop accepts a <code>Promise</code>. The palette shows the loader while it is pending, and — through the <code>error</code> snippet and <code>onerror</code> — an error state if it rejects, instead of spinning forever.'
@@ -61,7 +61,7 @@
 			<Palette
 				{colors}
 				numColumns={4}
-				data-palette-theme={getTheme()}
+				data-palette-theme={getPaletteTheme()}
 				onerror={({ error }) => (lastError = error instanceof Error ? error.message : String(error))}
 			>
 				{#snippet error({ error })}

@@ -16,6 +16,7 @@
 </script>
 
 <div class="page">
+	<a class="skip-link" href="#main">Skip to content</a>
 	<Header />
 	{@render children?.()}
 	<Footer />

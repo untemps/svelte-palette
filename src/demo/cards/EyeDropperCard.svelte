@@ -1,21 +1,25 @@
 <script lang="ts">
-	import { browser } from '$app/environment'
+	import { onMount } from 'svelte'
 
 	import { Palette } from '$lib'
 	import type { ColorsProp } from '$lib/types'
 
 	import Card from '../components/Card.svelte'
-	import { getTheme } from '../lib/theme.svelte'
+	import { getPaletteTheme } from '../lib/theme.svelte'
 
 	const DESCRIPTION =
 		'With <code>showInput</code>, the input row exposes the native EyeDropper button. Pick any pixel on screen to add its color; a cancelled or unsupported pick surfaces through <code>onerror</code>.'
 
 	const CODE = `<Palette bind:colors showInput onerror={handleEyeDropperError} />`
 
-	const supported = browser && 'EyeDropper' in window
-
 	let colors = $state<ColorsProp | null>(['#ef476f', '#ffd166', '#06d6a0', '#118ab2', '#073b4c'])
 	let lastError = $state<string | null>(null)
+
+	// Resolve support after hydration so SSR and the first client render agree.
+	let supported = $state(false)
+	onMount(() => {
+		supported = 'EyeDropper' in window
+	})
 </script>
 
 <Card
@@ -39,7 +43,7 @@
 				bind:colors
 				showInput
 				numColumns={5}
-				data-palette-theme={getTheme()}
+				data-palette-theme={getPaletteTheme()}
 				onerror={({ error }) => (lastError = error instanceof Error ? error.message : String(error))}
 			/>
 		</div>
