@@ -18,7 +18,7 @@
 		color?: ColorValue | null
 		/** Type of the input. */
 		inputType?: InputType
-		/** Accessible name of the hex color input. */
+		/** Accessible name of the color input. */
 		hexLabel?: string
 		/** Validation hint shown as the input `title`. */
 		hexErrorLabel?: string
