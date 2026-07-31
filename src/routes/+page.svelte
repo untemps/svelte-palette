@@ -1,5 +1,6 @@
 <script lang="ts">
 	import EditablePaletteCard from '../demo/cards/EditablePaletteCard.svelte'
+	import ColorFormatsCard from '../demo/cards/ColorFormatsCard.svelte'
 	import SelectionCallbacksCard from '../demo/cards/SelectionCallbacksCard.svelte'
 	import LayoutCard from '../demo/cards/LayoutCard.svelte'
 	import CompactModeCard from '../demo/cards/CompactModeCard.svelte'
@@ -41,6 +42,7 @@
 
 	<div class="grid">
 		<EditablePaletteCard />
+		<ColorFormatsCard />
 		<SelectionCallbacksCard />
 		<LayoutCard />
 		<CompactModeCard />
