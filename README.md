@@ -226,8 +226,8 @@ The field accepts any [supported color format](#supported-color-formats) — hex
 | ----------------- | ----------------- | --------------------------------- | ---------------------------------------------------------- |
 | `color`           | string \| null    | null                              | The color pre-filled in the input.                         |
 | `inputType`       | "text" \| "color" | "text"                            | Type of the input. Any other value falls back to `"text"`. |
-| `hexLabel`        | string            | "Enter a color value"             | Accessible name of the color input.                        |
-| `hexErrorLabel`   | string            | "The value must be a valid color" | Validation hint shown as the input `title`.                |
+| `colorLabel`      | string            | "Enter a color value"             | Accessible name of the color input.                        |
+| `colorErrorLabel` | string            | "The value must be a valid color" | Validation hint shown as the input `title`.                |
 | `submitLabel`     | string            | "Submit the color value"          | Accessible name of the submit button.                      |
 | `eyeDropperLabel` | string            | "Pick a color from the screen"    | Accessible name of the eye-dropper button.                 |
 | `class`           | string            | ''                                | Class name applied to the root element.                    |
@@ -499,9 +499,9 @@ Every built-in text and accessibility label of `<Palette>` (and the default prim
 | `transparentSlot` | "Transparent slot"                | The leading transparent slot accessible name.              |
 | `compact`         | "Compact the palette"             | The tools compact button.                                  |
 | `enlarge`         | "Enlarge the palette"             | The compact-mode enlarge button.                           |
-| `inputHex`        | "Enter a color value"             | The [`PaletteInput`](#paletteinput) color field.           |
-| `inputHexError`   | "The value must be a valid color" | The color field `title` (validation hint).                 |
-| `submitHex`       | "Submit the color value"          | The input submit button.                                   |
+| `inputColor`      | "Enter a color value"             | The [`PaletteInput`](#paletteinput) color field.           |
+| `inputColorError` | "The value must be a valid color" | The color field `title` (validation hint).                 |
+| `submitColor`     | "Submit the color value"          | The input submit button.                                   |
 | `eyeDropper`      | "Pick a color from the screen"    | The [`PaletteEyeDropperButton`](#paletteeyedropperbutton). |
 | `tools`           | "Palette tools"                   | The [`PaletteTools`](#palettetools) section.               |
 | `settings`        | "Go to settings"                  | The [`PaletteSettingsButton`](#palettesettingsbutton).     |

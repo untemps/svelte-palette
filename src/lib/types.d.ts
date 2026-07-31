@@ -88,12 +88,12 @@ export interface PaletteLabels {
 	compact: string
 	/** Accessible name of the compact-mode enlarge button (restores the full palette). */
 	enlarge: string
-	/** Accessible name of the hex color input. */
-	inputHex: string
-	/** Validation hint shown as the hex input `title`. */
-	inputHexError: string
+	/** Accessible name of the color input. */
+	inputColor: string
+	/** Validation hint shown as the color input `title`. */
+	inputColorError: string
 	/** Accessible name of the input submit button. */
-	submitHex: string
+	submitColor: string
 	/** Accessible name of the eye-dropper button. */
 	eyeDropper: string
 	/** Accessible name of the tools panel section. */

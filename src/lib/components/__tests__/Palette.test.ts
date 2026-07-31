@@ -2205,7 +2205,11 @@ describe('Built-in label overrides', () => {
 			props: {
 				colors,
 				showInput: true,
-				labels: { inputHex: 'Saisir une couleur', inputHexError: 'Couleur invalide', submitHex: 'Ajouter' },
+				labels: {
+					inputColor: 'Saisir une couleur',
+					inputColorError: 'Couleur invalide',
+					submitColor: 'Ajouter',
+				},
 			},
 		})
 		const input = await screen.findByTestId('__palette-input-input__')

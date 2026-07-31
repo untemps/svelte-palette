@@ -781,9 +781,9 @@
 			<PaletteInput
 				color={selectedColor}
 				inputType={_inputType}
-				hexLabel={_labels.inputHex}
-				hexErrorLabel={_labels.inputHexError}
-				submitLabel={_labels.submitHex}
+				colorLabel={_labels.inputColor}
+				colorErrorLabel={_labels.inputColorError}
+				submitLabel={_labels.submitColor}
 				eyeDropperLabel={_labels.eyeDropper}
 				onadd={_onInputAdd}
 			/>
