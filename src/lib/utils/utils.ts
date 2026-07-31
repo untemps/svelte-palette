@@ -176,8 +176,11 @@ const splitColorArgs = ($inner: string): string[] | null => {
 	} else {
 		const [main, alpha, ...rest] = inner.split('/').map(($part) => $part.trim())
 		if (rest.length) return null
-		tokens = main.split(/\s+/).filter(Boolean)
-		if (alpha !== undefined) tokens.push(alpha)
+		const components = main.split(/\s+/).filter(Boolean)
+		// In space-separated syntax alpha is introduced by `/`; a bare fourth value
+		// (e.g. `rgb(255 0 0 0)`) is not valid alpha, so reject any extra component.
+		if (components.length > 3) return null
+		tokens = alpha !== undefined ? [...components, alpha] : components
 	}
 	return tokens.every(($token) => $token.length > 0 && !/\s/.test($token)) ? tokens : null
 }
