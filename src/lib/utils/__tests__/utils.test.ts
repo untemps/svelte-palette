@@ -246,6 +246,11 @@ describe('utils', () => {
 			['rgb(255, 0 0)', null],
 			['rgb(100 %, 0%, 0%)', null],
 			['hsl(0, 100, 50)', null],
+			['constructor', null],
+			['__proto__', null],
+			['toString', null],
+			['hasOwnProperty', null],
+			['valueOf', null],
 			[null, null],
 			[undefined, null],
 			[123, null],
@@ -276,6 +281,8 @@ describe('utils', () => {
 			[' #ff0000 ', '#ff0000'],
 			['rgba(0, 0, 0, 0.999)', '#000000'],
 			['not-a-color', 'not-a-color'],
+			['constructor', 'constructor'],
+			['__proto__', '__proto__'],
 		])('color:%j, expected:%j', (color, expected) => {
 			expect(normalizeColor(color)).toBe(expected)
 		})
@@ -318,6 +325,9 @@ describe('utils', () => {
 			['rgb(255 0 0 /)', false],
 			['rgb(100 %, 0%, 0%)', false],
 			['rgb(255 0 0 / 5 0%)', false],
+			['constructor', false],
+			['__proto__', false],
+			['toString', false],
 			[null, false],
 			[undefined, false],
 			[0, false],

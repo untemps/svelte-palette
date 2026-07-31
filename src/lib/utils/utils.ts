@@ -293,8 +293,10 @@ export const parseColor = ($color: unknown): ParsedColor | null => {
 	if (COLOR_REGEX.test(color)) return parseHex(color)
 	if (/^rgba?\(/i.test(color)) return parseRgb(color)
 	if (/^hsla?\(/i.test(color)) return parseHsl(color)
+	// Guard the lookup against inherited `Object.prototype` keys (`constructor`, `__proto__`, …):
+	// a bare object literal resolves those to functions/objects, which would throw in `parseHex`.
 	const named = CSS_NAMED_COLORS[color.toLowerCase()]
-	return named ? parseHex(named) : null
+	return typeof named === 'string' ? parseHex(named) : null
 }
 
 export const isColorValid = ($color: unknown): boolean => parseColor($color) !== null
