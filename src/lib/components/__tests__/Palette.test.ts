@@ -41,6 +41,17 @@ test('Marks the slot matching selectedColor as selected', async () => {
 	expect(slots[2]).not.toHaveClass('selected')
 })
 
+test('Surfaces a named color on the default slot label and title', async () => {
+	const colors = [{ name: 'Sunbeam', value: '#ff0' }, { value: '#0ff' }]
+	setup(Palette, { props: { colors } })
+
+	const named = await screen.findByLabelText('Sunbeam')
+	expect(named).toHaveAttribute('title', 'Sunbeam')
+
+	const bare = screen.getByLabelText('#0ff')
+	expect(bare).not.toHaveAttribute('title')
+})
+
 test('Displays as many color slots as set in async mode', async () => {
 	let cells = null
 	const colors = Promise.resolve(['#ff0', '#0ff', '#f0f'])
@@ -561,6 +572,14 @@ test('Displays groups with their names and color slots', async () => {
 
 	const cells = await screen.findAllByTestId('__palette-cell__')
 	expect(cells).toHaveLength(5)
+})
+
+test('Surfaces a named color on the default slot inside a group', async () => {
+	const colors = [{ name: 'Warm', colors: [{ name: 'Sunbeam', value: '#ff0' }, '#f80'] }]
+	setup(Palette, { props: { colors } })
+
+	const named = await screen.findByLabelText('Sunbeam')
+	expect(named).toHaveAttribute('title', 'Sunbeam')
 })
 
 test('Does not display group name when group has no name', async () => {

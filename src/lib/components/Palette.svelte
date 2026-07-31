@@ -656,6 +656,7 @@
 									{:else}
 										<PaletteSlot
 											color={color.value}
+											name={color.name}
 											role={_optionRole}
 											selected={optionIndex === _selectedIndex}
 											tabindex={_rovingTabindex(optionIndex)}
@@ -733,6 +734,7 @@
 							{:else}
 								<PaletteSlot
 									color={color.value}
+									name={color.name}
 									role={_optionRole}
 									selected={optionIndex === _selectedIndex}
 									tabindex={_rovingTabindex(optionIndex)}
