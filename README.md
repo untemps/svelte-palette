@@ -363,6 +363,11 @@ colors = [
 ]
 ```
 
+Each object accepts:
+
+- `value` — the color (any CSS color string, typically a hex value)
+- `name` (optional) — a human-readable label. By default it becomes the slot's native tooltip (`title`) and accessible name (`aria-label`), so screen readers announce the name instead of the raw value. Colors passed as bare strings, or objects without a `name`, keep announcing their value. Override it per slot through the [`slot` snippet](#snippets).
+
 ## Array of Color Groups
 
 Colors can be organized into named groups by passing an array of `ColorGroup` objects:
