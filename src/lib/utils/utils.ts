@@ -307,7 +307,9 @@ export const isColorValid = ($color: unknown): boolean => parseColor($color) !==
 export const normalizeColor = ($color: string): string => {
 	if (typeof $color === 'string') {
 		const trimmed = $color.trim()
-		if (COLOR_REGEX.test(trimmed)) return trimmed.replace(COLOR_REGEX, '#$1')
+		// Lower-case so hex passthrough matches the canonical lower-case output of the
+		// parsed formats below (e.g. `rgb()` → `#ff0000`), rather than echoing input case.
+		if (COLOR_REGEX.test(trimmed)) return trimmed.replace(COLOR_REGEX, '#$1').toLowerCase()
 	}
 	const parsed = parseColor($color)
 	if (!parsed) return $color
