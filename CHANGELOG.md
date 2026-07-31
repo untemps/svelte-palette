@@ -1,3 +1,10 @@
+# [6.0.0-beta.18](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.17...v6.0.0-beta.18) (2026-07-31)
+
+
+### Features
+
+* Surface color names on default slots ([#257](https://github.com/untemps/svelte-palette/issues/257)) ([645f2ea](https://github.com/untemps/svelte-palette/commit/645f2ea2ee2c5ab102891d31abdb7f8408ea8bb1))
+
 # [6.0.0-beta.17](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.16...v6.0.0-beta.17) (2026-07-30)
 
 
