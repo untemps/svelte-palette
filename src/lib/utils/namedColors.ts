@@ -1,9 +1,3 @@
-/**
- * The 148 CSS named colors (CSS Color Module Level 4 extended keywords), mapped to their
- * 6-digit hex value. Used by {@link parseColor} to validate and normalize named-color input
- * without a DOM, so the parser stays pure and SSR-safe. Keys are lowercase; look up with
- * `CSS_NAMED_COLORS[value.toLowerCase()]`.
- */
 export const CSS_NAMED_COLORS: Readonly<Record<string, string>> = Object.freeze({
 	aliceblue: '#f0f8ff',
 	antiquewhite: '#faebd7',

@@ -125,16 +125,8 @@ export const calculateColorGroups = (
 		}))
 }
 
-/**
- * Matches a hex color (`#` optional, 3/4/6/8 digits). Still used by `PaletteInput` to auto-prefix
- * bare hex input with `#` (`.replace(COLOR_REGEX, '#$1')`) and by {@link normalizeColor} to pass
- * valid hex through untouched. Color validation itself now goes through {@link parseColor}.
- */
 export const COLOR_REGEX = /^#?(([0-9a-f]{2}){3,4}|([0-9a-f]){3,4})$/i
 
-/**
- * A color decomposed into 8-bit `r`/`g`/`b` channels (0–255) and a normalized `a` alpha (0–1).
- */
 export interface ParsedColor {
 	r: number
 	g: number
@@ -174,9 +166,21 @@ const parseHex = ($hex: string): ParsedColor | null => {
 	return { r, g, b, a }
 }
 
-// rgb()/hsl() arguments may be separated by commas (legacy) or spaces, with the alpha set off by
-// a slash in the modern syntax — split on any mix of those so both forms feed one parser.
-const splitColorArgs = ($inner: string): string[] => $inner.split(/[\s,/]+/).filter(Boolean)
+const splitColorArgs = ($inner: string): string[] | null => {
+	const inner = $inner.trim()
+	if (!inner) return null
+	let tokens: string[]
+	if (inner.includes(',')) {
+		if (inner.includes('/')) return null
+		tokens = inner.split(',').map(($part) => $part.trim())
+	} else {
+		const [main, alpha, ...rest] = inner.split('/').map(($part) => $part.trim())
+		if (rest.length) return null
+		tokens = main.split(/\s+/).filter(Boolean)
+		if (alpha !== undefined) tokens.push(alpha)
+	}
+	return tokens.every(($token) => $token.length > 0 && !/\s/.test($token)) ? tokens : null
+}
 
 const parseChannel = ($token: string): number | null => {
 	if ($token.endsWith('%')) {
@@ -250,7 +254,7 @@ const parseRgb = ($color: string): ParsedColor | null => {
 	const match = $color.match(/^rgba?\(\s*([^)]+?)\s*\)$/i)
 	if (!match) return null
 	const tokens = splitColorArgs(match[1])
-	if (tokens.length < 3 || tokens.length > 4) return null
+	if (!tokens || tokens.length < 3 || tokens.length > 4) return null
 	const r = parseChannel(tokens[0])
 	const g = parseChannel(tokens[1])
 	const b = parseChannel(tokens[2])
@@ -268,7 +272,7 @@ const parseHsl = ($color: string): ParsedColor | null => {
 	const match = $color.match(/^hsla?\(\s*([^)]+?)\s*\)$/i)
 	if (!match) return null
 	const tokens = splitColorArgs(match[1])
-	if (tokens.length < 3 || tokens.length > 4) return null
+	if (!tokens || tokens.length < 3 || tokens.length > 4) return null
 	const h = parseHue(tokens[0])
 	const s = parsePercent(tokens[1])
 	const l = parsePercent(tokens[2])
@@ -282,12 +286,6 @@ const parseHsl = ($color: string): ParsedColor | null => {
 	return { ...hslToRgb(h, s, l), a }
 }
 
-/**
- * Parses any color the components can render into canonical `{ r, g, b, a }` channels, or `null`
- * when the string is not a color. Supports hex (3/4/6/8 digits, `#` optional), `rgb()`/`rgba()` and
- * `hsl()`/`hsla()` in both comma and space (CSS Color 4 `/ alpha`) syntax, and the 148 CSS named
- * colors. This is the single source of truth for {@link isColorValid} and {@link normalizeColor}.
- */
 export const parseColor = ($color: unknown): ParsedColor | null => {
 	if (typeof $color !== 'string') return null
 	const color = $color.trim()
@@ -302,14 +300,16 @@ export const parseColor = ($color: unknown): ParsedColor | null => {
 export const isColorValid = ($color: unknown): boolean => parseColor($color) !== null
 
 export const normalizeColor = ($color: string): string => {
-	// Preserve valid hex byte-for-byte so existing outputs stay untouched.
-	if (typeof $color === 'string' && COLOR_REGEX.test($color.trim())) return $color
+	if (typeof $color === 'string') {
+		const trimmed = $color.trim()
+		if (COLOR_REGEX.test(trimmed)) return trimmed.replace(COLOR_REGEX, '#$1')
+	}
 	const parsed = parseColor($color)
 	if (!parsed) return $color
 	const { r, g, b, a } = parsed
 	const hex = `#${toHex2(r)}${toHex2(g)}${toHex2(b)}`
-	// Emit the 8-digit form only when alpha carries information, keeping opaque colors 6-digit.
-	return a < 1 ? `${hex}${toHex2(a * 255)}` : hex
+	const alpha = Math.round(a * 255)
+	return alpha < 255 ? `${hex}${toHex2(alpha)}` : hex
 }
 
 export const PALETTE_INPUT_TYPES = ['text', 'color'] as const satisfies readonly InputType[]

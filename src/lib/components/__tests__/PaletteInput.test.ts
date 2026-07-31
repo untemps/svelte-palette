@@ -135,8 +135,6 @@ test('Triggers submit with color when pressing Enter on the numeric keypad', asy
 })
 
 test('Normalizes a non-hex CSS color to hex on submit', async () => {
-	// The rendering path already paints any CSS color, but the submit boundary now accepts
-	// rgb()/hsl()/named input too — and canonicalizes it to hex, matching the eyedropper path.
 	const onAdd = vi.fn(() => 0)
 	const { user } = setup(PaletteInput, { props: { onadd: onAdd } })
 	const input = screen.getByTestId('__palette-input-input__')
