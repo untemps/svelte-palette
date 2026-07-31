@@ -220,6 +220,8 @@ A single color slot rendered as a `<button>`, as displayed inside the palette gr
 
 The color input used to add a new color to the palette. Implements the default [`input`](#snippets) snippet, and renders the [`PaletteEyeDropperButton`](#paletteeyedropperbutton) when the EyeDropper API is available and `inputType` is `"text"`.
 
+The field accepts any [supported color format](#supported-color-formats) — hex, `rgb()`/`rgba()`, `hsl()`/`hsla()` (comma or space syntax), or a CSS named color. On submit the value is normalized to hex (8-digit `#RRGGBBAA` when it carries alpha), so the palette stays hex-canonical whatever the user types.
+
 | Prop              | Type              | Default                           | Description                                                |
 | ----------------- | ----------------- | --------------------------------- | ---------------------------------------------------------- |
 | `color`           | string \| null    | null                              | The color pre-filled in the input.                         |
@@ -365,7 +367,7 @@ colors = [
 
 Each object accepts:
 
-- `value` — the color (any CSS color string, typically a hex value)
+- `value` — the color, in any [supported format](#supported-color-formats) (hex, `rgb()`/`rgba()`, `hsl()`/`hsla()`, or a CSS named color); typically a hex value
 - `name` (optional) — a human-readable label. By default it becomes the slot's native tooltip (`title`) and accessible name (`aria-label`), so screen readers announce the name instead of the raw value. Colors passed as bare strings, or objects without a `name`, keep announcing their value. Override it per slot through the [`slot` snippet](#snippets).
 
 ## Array of Color Groups
@@ -394,6 +396,20 @@ A promise to be resolved with an array of color strings, objects, or groups can 
 While the promise is pending, the palette displays the loader and the color-bound footer affordances (the color input and the compact toggle) are not rendered — they appear once the promise has resolved. If the palette already displays a resolved list and `colors` is then replaced by a new pending source, the previous list and its affordances stay displayed and interactive until the new source resolves.
 
 The same loader is shown whenever `colors` is absent or `null` (its default): there is no resolved source yet, so the palette waits. To render an empty palette instead, pass `colors={[]}` explicitly.
+
+## Supported Color Formats
+
+Colors — whether passed through `colors`, typed into the [`PaletteInput`](#paletteinput), or returned by the [EyeDropper](#eyedropper-api-support) — may be expressed in any of these formats:
+
+| Format           | Examples                                                        |
+| ---------------- | --------------------------------------------------------------- |
+| Hex              | `#f00`, `#ff0000`, `#ff0000ff`                                  |
+| Hex with alpha   | `#f008`, `#ff000080`                                            |
+| `rgb()`/`rgba()` | `rgb(255, 0, 0)`, `rgb(255 0 0)`, `rgb(255 0 0 / 50%)`          |
+| `hsl()`/`hsla()` | `hsl(0, 100%, 50%)`, `hsl(0 100% 50%)`, `hsl(0 100% 50% / 0.5)` |
+| CSS named color  | `red`, `rebeccapurple`, `dodgerblue` (the 148 named colors)     |
+
+Both the legacy comma syntax and the modern space-separated [CSS Color 4](https://www.w3.org/TR/css-color-4/) syntax (with the `/ alpha` form) are accepted. Values added through the input or the eyedropper are normalized to hex — 6-digit when opaque, 8-digit `#RRGGBBAA` when they carry alpha, so alpha is never silently dropped.
 
 # Deletion Modes
 
@@ -726,7 +742,7 @@ Once selected, the color is inserted in the input waiting for the user to submit
 
 If the API is not available, nothing will be rendered.
 
-> **Browser compatibility note:** The EyeDropper API specification defines `sRGBHex` as returning a hexadecimal color string (e.g. `#rrggbb`). However, some browsers return an `rgb()` or `rgba()` string instead. The component normalizes the value to hex format automatically.
+> **Browser compatibility note:** The EyeDropper API specification defines `sRGBHex` as returning a hexadecimal color string (e.g. `#rrggbb`). However, some browsers return an `rgb()` or `rgba()` string instead. The component normalizes the value to hex format automatically, preserving alpha as an 8-digit `#RRGGBBAA` value when the picked color is not fully opaque.
 
 > The [`PaletteEyeDropperButton`](#paletteeyedropperbutton) component can be used on its own anywhere within a snippet or in an external component as it is exported from this lib.
 
