@@ -7,6 +7,8 @@
 	interface Props {
 		/** The color value of the slot. */
 		color?: ColorValue | null
+		/** Human-readable name used as the accessible label and native tooltip; falls back to the color value. */
+		name?: string | null
 		/** Whether the slot is selected. */
 		selected?: boolean
 		/** Whether the slot is disabled. */
@@ -21,6 +23,7 @@
 
 	let {
 		color = null,
+		name = null,
 		selected = false,
 		disabled = false,
 		tabindex = 0,
@@ -40,7 +43,8 @@
 
 <button
 	data-testid="__palette-slot__"
-	aria-label={color}
+	aria-label={name ?? color}
+	title={name ?? undefined}
 	{role}
 	aria-selected={role === 'option' ? selected : undefined}
 	{...restProps}
