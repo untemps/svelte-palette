@@ -6,6 +6,7 @@ import {
 	isColorValid,
 	normalizeColor,
 	normalizeInputType,
+	parseColor,
 	transformColors,
 } from '../utils.js'
 
@@ -219,13 +220,55 @@ describe('utils', () => {
 		})
 	})
 
+	describe('parseColor', () => {
+		test.each([
+			['#ff0000', { r: 255, g: 0, b: 0, a: 1 }],
+			['ff0', { r: 255, g: 255, b: 0, a: 1 }],
+			['#f00a', { r: 255, g: 0, b: 0, a: 170 / 255 }],
+			['#ff000080', { r: 255, g: 0, b: 0, a: 128 / 255 }],
+			['rgb(255, 0, 0)', { r: 255, g: 0, b: 0, a: 1 }],
+			['rgb(255 0 0)', { r: 255, g: 0, b: 0, a: 1 }],
+			['rgb(100% 0% 0%)', { r: 255, g: 0, b: 0, a: 1 }],
+			['rgba(0, 128, 0, 0.5)', { r: 0, g: 128, b: 0, a: 0.5 }],
+			['rgb(255 0 0 / 50%)', { r: 255, g: 0, b: 0, a: 0.5 }],
+			['hsl(0 100% 50%)', { r: 255, g: 0, b: 0, a: 1 }],
+			['hsl(120, 100%, 50%)', { r: 0, g: 255, b: 0, a: 1 }],
+			['hsla(240, 100%, 50%, 0.5)', { r: 0, g: 0, b: 255, a: 0.5 }],
+			['hsl(0 0% 50%)', { r: 128, g: 128, b: 128, a: 1 }],
+			['hsl(0rad 100% 50%)', { r: 255, g: 0, b: 0, a: 1 }],
+			['hsl(100grad 100% 50%)', { r: 128, g: 255, b: 0, a: 1 }],
+			['hsl(0.25turn 100% 50%)', { r: 128, g: 255, b: 0, a: 1 }],
+			['red', { r: 255, g: 0, b: 0, a: 1 }],
+			['RebeccaPurple', { r: 102, g: 51, b: 153, a: 1 }],
+			['not-a-color', null],
+			['rgb(0, 0)', null],
+			['hsl(0, 100, 50)', null],
+			[null, null],
+			[undefined, null],
+			[123, null],
+		])('color:%j, expected:%j', (color, expected) => {
+			expect(parseColor(color)).toEqual(expected)
+		})
+	})
+
 	describe('normalizeColor', () => {
 		test.each([
 			['#ff0', '#ff0'],
 			['#ff0000', '#ff0000'],
+			['#f00a', '#f00a'],
+			['#ff000080', '#ff000080'],
 			['rgb(255, 0, 0)', '#ff0000'],
+			['rgb(255 0 0)', '#ff0000'],
+			['rgb(100% 0% 0%)', '#ff0000'],
 			['rgba(255, 0, 0, 1)', '#ff0000'],
 			['rgb(0,128,0)', '#008000'],
+			['rgba(255, 0, 0, 0.5)', '#ff000080'],
+			['rgb(255 0 0 / 50%)', '#ff000080'],
+			['hsl(0 100% 50%)', '#ff0000'],
+			['hsl(120, 100%, 50%)', '#00ff00'],
+			['hsla(240, 100%, 50%, 0.5)', '#0000ff80'],
+			['red', '#ff0000'],
+			['RebeccaPurple', '#663399'],
 			['not-a-color', 'not-a-color'],
 		])('color:%j, expected:%j', (color, expected) => {
 			expect(normalizeColor(color)).toBe(expected)
@@ -250,6 +293,20 @@ describe('utils', () => {
 			['ffg', false],
 			['.ff0', false],
 			['ff0ff000.', false],
+			['red', true],
+			['RED', true],
+			['rebeccapurple', true],
+			['notacolor', false],
+			['rgb(255, 0, 0)', true],
+			['rgb(255 0 0)', true],
+			['rgba(255, 0, 0, 0.5)', true],
+			['rgb(255 0 0 / 50%)', true],
+			['hsl(0 100% 50%)', true],
+			['hsl(0, 100%, 50%)', true],
+			['hsla(0, 100%, 50%, 0.5)', true],
+			['rgb(0, 0)', false],
+			['hsl(0, 100, 50)', false],
+			['rgb(a, b, c)', false],
 			[null, false],
 			[undefined, false],
 			[0, false],
