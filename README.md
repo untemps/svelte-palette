@@ -411,6 +411,8 @@ Colors — whether passed through `colors`, typed into the [`PaletteInput`](#pal
 
 Both the legacy comma syntax and the modern space-separated [CSS Color 4](https://www.w3.org/TR/css-color-4/) syntax (with the `/ alpha` form) are accepted. Values added through the input or the eyedropper are normalized to hex — 6-digit when opaque, 8-digit `#RRGGBBAA` when they carry alpha, so alpha is never silently dropped.
 
+> **Outside this set:** CSS-wide keywords (`transparent`, `currentColor`) and newer color functions (`lab()`, `oklch()`, `color()`, …) are not recognized. Passed directly through `colors` they still render — that prop accepts any CSS color string — but they do not validate in the [`PaletteInput`](#paletteinput) and normalization returns them unchanged. For a translucent entry use `rgb()`/`hsl()` with alpha or 8-digit hex; for a fully transparent leading slot use the `showTransparentSlot` prop.
+
 # Deletion Modes
 
 The `deletionMode` prop allows to define the way users can delete (or not) the color slots:
