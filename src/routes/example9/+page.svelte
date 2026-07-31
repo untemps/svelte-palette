@@ -3,8 +3,6 @@
 
 	import type { ColorsProp, ColorObject } from '$lib/types'
 
-	// One slot per accepted format — the palette renders each straight from CSS, and the `name`
-	// surfaces the format in the slot tooltip.
 	const _initialColors: ColorObject[] = [
 		{ name: 'Named color', value: 'rebeccapurple' },
 		{ name: 'rgb()', value: 'rgb(46, 196, 182)' },
@@ -16,8 +14,6 @@
 	let colors = $state<ColorsProp>(_initialColors)
 	let selectedColor = $state<string | null>(null)
 
-	// After the palette normalizes an added color, the bound list holds it as hex — read it back
-	// to show typed rgb()/hsl()/named input landing canonicalized.
 	const _values = $derived(
 		Array.isArray(colors) ? colors.map((color) => (typeof color === 'string' ? color : color.value)) : []
 	)
@@ -47,7 +43,7 @@
 	<div class="values" data-testid="__example-values__">
 		<span class="values__label">Stored values</span>
 		<ul class="values__list">
-			{#each _values as value (value)}
+			{#each _values as value, i (i)}
 				<li><code>{value}</code></li>
 			{/each}
 		</ul>
