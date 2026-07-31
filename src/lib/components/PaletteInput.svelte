@@ -7,7 +7,7 @@
 	import PaletteSlot from './PaletteSlot.svelte'
 	import PaletteEyeDropperButton from './PaletteEyeDropperButton.svelte'
 
-	import { COLOR_REGEX, isColorValid, normalizeInputType } from '../utils/utils'
+	import { COLOR_REGEX, isColorValid, normalizeColor, normalizeInputType } from '../utils/utils'
 
 	import { DEFAULT_LABELS } from '../labels'
 
@@ -84,7 +84,7 @@
 	}
 
 	const _onSubmit = () => {
-		isValid && onadd?.({ color })
+		isValid && onadd?.({ color: normalizeColor(color) })
 	}
 </script>
 

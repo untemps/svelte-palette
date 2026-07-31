@@ -134,6 +134,30 @@ test('Triggers submit with color when pressing Enter on the numeric keypad', asy
 	expect(onAdd).toHaveBeenCalledWith({ color: '#ff0' })
 })
 
+test('Normalizes a non-hex CSS color to hex on submit', async () => {
+	// The rendering path already paints any CSS color, but the submit boundary now accepts
+	// rgb()/hsl()/named input too — and canonicalizes it to hex, matching the eyedropper path.
+	const onAdd = vi.fn(() => 0)
+	const { user } = setup(PaletteInput, { props: { onadd: onAdd } })
+	const input = screen.getByTestId('__palette-input-input__')
+	const button = screen.getByTestId('__palette-input-submit__')
+	await user.type(input, 'rgb(255 0 0)')
+	await waitFor(() => expect(button).toBeEnabled())
+	await user.click(button)
+	expect(onAdd).toHaveBeenCalledWith({ color: '#ff0000' })
+})
+
+test('Preserves alpha when normalizing on submit', async () => {
+	const onAdd = vi.fn(() => 0)
+	const { user } = setup(PaletteInput, { props: { onadd: onAdd } })
+	const input = screen.getByTestId('__palette-input-input__')
+	const button = screen.getByTestId('__palette-input-submit__')
+	await user.type(input, 'rgba(255, 0, 0, 0.5)')
+	await waitFor(() => expect(button).toBeEnabled())
+	await user.click(button)
+	expect(onAdd).toHaveBeenCalledWith({ color: '#ff000080' })
+})
+
 test('Does not submit when pressing Enter with an invalid color', async () => {
 	const onAdd = vi.fn(() => 0)
 	const { user } = setup(PaletteInput, { props: { onadd: onAdd } })
