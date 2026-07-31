@@ -41,6 +41,29 @@ test('Marks the slot matching selectedColor as selected', async () => {
 	expect(slots[2]).not.toHaveClass('selected')
 })
 
+test('Matches selectedColor against slot values case-insensitively', async () => {
+	const colors = ['#FF0', '#00FFFF', '#F0F']
+	setup(Palette, {
+		props: { colors, selectedColor: '#00ffff' },
+	})
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots[0]).not.toHaveClass('selected')
+	expect(slots[1]).toHaveClass('selected')
+	expect(slots[2]).not.toHaveClass('selected')
+})
+
+test('Surfaces a named color on the default slot label and title', async () => {
+	const colors = [{ name: 'Sunbeam', value: '#ff0' }, { value: '#0ff' }]
+	setup(Palette, { props: { colors } })
+
+	const named = await screen.findByLabelText('Sunbeam')
+	expect(named).toHaveAttribute('title', 'Sunbeam')
+
+	const bare = screen.getByLabelText('#0ff')
+	expect(bare).not.toHaveAttribute('title')
+})
+
 test('Displays as many color slots as set in async mode', async () => {
 	let cells = null
 	const colors = Promise.resolve(['#ff0', '#0ff', '#f0f'])
@@ -561,6 +584,14 @@ test('Displays groups with their names and color slots', async () => {
 
 	const cells = await screen.findAllByTestId('__palette-cell__')
 	expect(cells).toHaveLength(5)
+})
+
+test('Surfaces a named color on the default slot inside a group', async () => {
+	const colors = [{ name: 'Warm', colors: [{ name: 'Sunbeam', value: '#ff0' }, '#f80'] }]
+	setup(Palette, { props: { colors } })
+
+	const named = await screen.findByLabelText('Sunbeam')
+	expect(named).toHaveAttribute('title', 'Sunbeam')
 })
 
 test('Does not display group name when group has no name', async () => {
@@ -2174,7 +2205,11 @@ describe('Built-in label overrides', () => {
 			props: {
 				colors,
 				showInput: true,
-				labels: { inputHex: 'Saisir une couleur', inputHexError: 'Couleur invalide', submitHex: 'Ajouter' },
+				labels: {
+					inputColor: 'Saisir une couleur',
+					inputColorError: 'Couleur invalide',
+					submitColor: 'Ajouter',
+				},
 			},
 		})
 		const input = await screen.findByTestId('__palette-input-input__')

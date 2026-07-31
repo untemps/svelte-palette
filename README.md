@@ -220,15 +220,17 @@ A single color slot rendered as a `<button>`, as displayed inside the palette gr
 
 The color input used to add a new color to the palette. Implements the default [`input`](#snippets) snippet, and renders the [`PaletteEyeDropperButton`](#paletteeyedropperbutton) when the EyeDropper API is available and `inputType` is `"text"`.
 
-| Prop              | Type              | Default                               | Description                                                |
-| ----------------- | ----------------- | ------------------------------------- | ---------------------------------------------------------- |
-| `color`           | string \| null    | null                                  | The color pre-filled in the input.                         |
-| `inputType`       | "text" \| "color" | "text"                                | Type of the input. Any other value falls back to `"text"`. |
-| `hexLabel`        | string            | "Enter a hex color value"             | Accessible name of the hex color input.                    |
-| `hexErrorLabel`   | string            | "The value must be a valid hex color" | Validation hint shown as the input `title`.                |
-| `submitLabel`     | string            | "Submit the hex color value"          | Accessible name of the submit button.                      |
-| `eyeDropperLabel` | string            | "Pick a color from the screen"        | Accessible name of the eye-dropper button.                 |
-| `class`           | string            | ''                                    | Class name applied to the root element.                    |
+The field accepts any [supported color format](#supported-color-formats) — hex, `rgb()`/`rgba()`, `hsl()`/`hsla()` (comma or space syntax), or a CSS named color. On submit the value is normalized to hex (8-digit `#RRGGBBAA` when it carries alpha), so the palette stays hex-canonical whatever the user types.
+
+| Prop              | Type              | Default                           | Description                                                |
+| ----------------- | ----------------- | --------------------------------- | ---------------------------------------------------------- |
+| `color`           | string \| null    | null                              | The color pre-filled in the input.                         |
+| `inputType`       | "text" \| "color" | "text"                            | Type of the input. Any other value falls back to `"text"`. |
+| `colorLabel`      | string            | "Enter a color value"             | Accessible name of the color input.                        |
+| `colorErrorLabel` | string            | "The value must be a valid color" | Validation hint shown as the input `title`.                |
+| `submitLabel`     | string            | "Submit the color value"          | Accessible name of the submit button.                      |
+| `eyeDropperLabel` | string            | "Pick a color from the screen"    | Accessible name of the eye-dropper button.                 |
+| `class`           | string            | ''                                | Class name applied to the root element.                    |
 
 | Callback | Arguments   | Description                       |
 | -------- | ----------- | --------------------------------- |
@@ -363,6 +365,11 @@ colors = [
 ]
 ```
 
+Each object accepts:
+
+- `value` — the color, in any [supported format](#supported-color-formats) (hex, `rgb()`/`rgba()`, `hsl()`/`hsla()`, or a CSS named color); typically a hex value
+- `name` (optional) — a human-readable label. By default it becomes the slot's native tooltip (`title`) and accessible name (`aria-label`), so screen readers announce the name instead of the raw value. Colors passed as bare strings, or objects without a `name`, keep announcing their value. Override it per slot through the [`slot` snippet](#snippets).
+
 ## Array of Color Groups
 
 Colors can be organized into named groups by passing an array of `ColorGroup` objects:
@@ -389,6 +396,22 @@ A promise to be resolved with an array of color strings, objects, or groups can 
 While the promise is pending, the palette displays the loader and the color-bound footer affordances (the color input and the compact toggle) are not rendered — they appear once the promise has resolved. If the palette already displays a resolved list and `colors` is then replaced by a new pending source, the previous list and its affordances stay displayed and interactive until the new source resolves.
 
 The same loader is shown whenever `colors` is absent or `null` (its default): there is no resolved source yet, so the palette waits. To render an empty palette instead, pass `colors={[]}` explicitly.
+
+## Supported Color Formats
+
+Colors — whether passed through `colors`, typed into the [`PaletteInput`](#paletteinput), or returned by the [EyeDropper](#eyedropper-api-support) — may be expressed in any of these formats:
+
+| Format           | Examples                                                        |
+| ---------------- | --------------------------------------------------------------- |
+| Hex              | `#f00`, `#ff0000`, `#ff0000ff`                                  |
+| Hex with alpha   | `#f008`, `#ff000080`                                            |
+| `rgb()`/`rgba()` | `rgb(255, 0, 0)`, `rgb(255 0 0)`, `rgb(255 0 0 / 50%)`          |
+| `hsl()`/`hsla()` | `hsl(0, 100%, 50%)`, `hsl(0 100% 50%)`, `hsl(0 100% 50% / 0.5)` |
+| CSS named color  | `red`, `rebeccapurple`, `dodgerblue` (the 148 named colors)     |
+
+Both the legacy comma syntax and the modern space-separated [CSS Color 4](https://www.w3.org/TR/css-color-4/) syntax (with the `/ alpha` form) are accepted. Values added through the input or the eyedropper are normalized to hex — 6-digit when opaque, 8-digit `#RRGGBBAA` when they carry alpha, so alpha is never silently dropped.
+
+> **Outside this set:** CSS-wide keywords (`transparent`, `currentColor`) and newer color functions (`lab()`, `oklch()`, `color()`, …) are not recognized. Passed directly through `colors` they still render — that prop accepts any CSS color string — but they do not validate in the [`PaletteInput`](#paletteinput) and normalization returns them unchanged. For a translucent entry use `rgb()`/`hsl()` with alpha or 8-digit hex; for a fully transparent leading slot use the `showTransparentSlot` prop.
 
 # Deletion Modes
 
@@ -468,21 +491,21 @@ The root element is a generic container and does not expose a landmark role. Wra
 
 Every built-in text and accessibility label of `<Palette>` (and the default primitives it renders) is overridable through a single optional `labels` prop typed as `Partial<PaletteLabels>`. It is fully additive: every key defaults to the matching string in the exported `DEFAULT_LABELS`, so omitting `labels` — or any individual key — reproduces the current defaults. Swap the whole object per locale, or override a single key for a one-off tweak, without re-implementing any snippet.
 
-| Key               | Default                               | Applies to                                                 |
-| ----------------- | ------------------------------------- | ---------------------------------------------------------- |
-| `slots`           | "Color slots"                         | The slot listbox accessible name.                          |
-| `loader`          | "Loading colors"                      | The default [`PaletteLoader`](#paletteloader) live region. |
-| `error`           | "Colors failed to load"               | The default [`PaletteError`](#paletteerror) headline.      |
-| `transparentSlot` | "Transparent slot"                    | The leading transparent slot accessible name.              |
-| `compact`         | "Compact the palette"                 | The tools compact button.                                  |
-| `enlarge`         | "Enlarge the palette"                 | The compact-mode enlarge button.                           |
-| `inputHex`        | "Enter a hex color value"             | The [`PaletteInput`](#paletteinput) hex field.             |
-| `inputHexError`   | "The value must be a valid hex color" | The hex field `title` (validation hint).                   |
-| `submitHex`       | "Submit the hex color value"          | The input submit button.                                   |
-| `eyeDropper`      | "Pick a color from the screen"        | The [`PaletteEyeDropperButton`](#paletteeyedropperbutton). |
-| `tools`           | "Palette tools"                       | The [`PaletteTools`](#palettetools) section.               |
-| `settings`        | "Go to settings"                      | The [`PaletteSettingsButton`](#palettesettingsbutton).     |
-| `trash`           | "Delete color"                        | The deletion [`PaletteTrashButton`](#palettetrashbutton).  |
+| Key               | Default                           | Applies to                                                 |
+| ----------------- | --------------------------------- | ---------------------------------------------------------- |
+| `slots`           | "Color slots"                     | The slot listbox accessible name.                          |
+| `loader`          | "Loading colors"                  | The default [`PaletteLoader`](#paletteloader) live region. |
+| `error`           | "Colors failed to load"           | The default [`PaletteError`](#paletteerror) headline.      |
+| `transparentSlot` | "Transparent slot"                | The leading transparent slot accessible name.              |
+| `compact`         | "Compact the palette"             | The tools compact button.                                  |
+| `enlarge`         | "Enlarge the palette"             | The compact-mode enlarge button.                           |
+| `inputColor`      | "Enter a color value"             | The [`PaletteInput`](#paletteinput) color field.           |
+| `inputColorError` | "The value must be a valid color" | The color field `title` (validation hint).                 |
+| `submitColor`     | "Submit the color value"          | The input submit button.                                   |
+| `eyeDropper`      | "Pick a color from the screen"    | The [`PaletteEyeDropperButton`](#paletteeyedropperbutton). |
+| `tools`           | "Palette tools"                   | The [`PaletteTools`](#palettetools) section.               |
+| `settings`        | "Go to settings"                  | The [`PaletteSettingsButton`](#palettesettingsbutton).     |
+| `trash`           | "Delete color"                    | The deletion [`PaletteTrashButton`](#palettetrashbutton).  |
 
 If you replace a region with your own snippet (`loader`, `error`, `input`, `tools`, …), that snippet owns its own text and the matching `labels` key no longer applies.
 
@@ -721,7 +744,7 @@ Once selected, the color is inserted in the input waiting for the user to submit
 
 If the API is not available, nothing will be rendered.
 
-> **Browser compatibility note:** The EyeDropper API specification defines `sRGBHex` as returning a hexadecimal color string (e.g. `#rrggbb`). However, some browsers return an `rgb()` or `rgba()` string instead. The component normalizes the value to hex format automatically.
+> **Browser compatibility note:** The EyeDropper API specification defines `sRGBHex` as returning a hexadecimal color string (e.g. `#rrggbb`). However, some browsers return an `rgb()` or `rgba()` string instead. The component normalizes the value to hex format automatically, preserving alpha as an 8-digit `#RRGGBBAA` value when the picked color is not fully opaque.
 
 > The [`PaletteEyeDropperButton`](#paletteeyedropperbutton) component can be used on its own anywhere within a snippet or in an external component as it is exported from this lib.
 

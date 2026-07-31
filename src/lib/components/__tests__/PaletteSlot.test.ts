@@ -23,6 +23,30 @@ test('Sets empty aria-label if color is not set', () => {
 	expect(slot).toBeInTheDocument()
 })
 
+test('Prefers name over color as aria-label when name is set', () => {
+	setup(PaletteSlot, { color: '#ff0', name: 'Sunbeam' })
+	const slot = screen.getByTestId('__palette-slot__')
+	expect(slot).toHaveAttribute('aria-label', 'Sunbeam')
+})
+
+test('Sets name as the title when name is set', () => {
+	setup(PaletteSlot, { color: '#ff0', name: 'Sunbeam' })
+	const slot = screen.getByTitle('Sunbeam')
+	expect(slot).toBeInTheDocument()
+})
+
+test('Does not set a title when name is not set', () => {
+	setup(PaletteSlot, { color: '#ff0' })
+	const slot = screen.getByTestId('__palette-slot__')
+	expect(slot).not.toHaveAttribute('title')
+})
+
+test('Lets an explicit aria-label override the name', () => {
+	setup(PaletteSlot, { color: '#ff0', name: 'Sunbeam', ['aria-label']: 'Override' })
+	const slot = screen.getByLabelText('Override')
+	expect(slot).toBeInTheDocument()
+})
+
 test('Triggers click event', async () => {
 	const color = '#ff0'
 	const onClick = vi.fn(() => 0)

@@ -7,7 +7,7 @@
 	import PaletteSlot from './PaletteSlot.svelte'
 	import PaletteEyeDropperButton from './PaletteEyeDropperButton.svelte'
 
-	import { COLOR_REGEX, isColorValid, normalizeInputType } from '../utils/utils'
+	import { COLOR_REGEX, isColorValid, normalizeColor, normalizeInputType } from '../utils/utils'
 
 	import { DEFAULT_LABELS } from '../labels'
 
@@ -18,10 +18,10 @@
 		color?: ColorValue | null
 		/** Type of the input. */
 		inputType?: InputType
-		/** Accessible name of the hex color input. */
-		hexLabel?: string
+		/** Accessible name of the color input. */
+		colorLabel?: string
 		/** Validation hint shown as the input `title`. */
-		hexErrorLabel?: string
+		colorErrorLabel?: string
 		/** Accessible name of the submit button. */
 		submitLabel?: string
 		/** Accessible name of the eye-dropper button. */
@@ -35,9 +35,9 @@
 	let {
 		color: colorProp = null,
 		inputType = 'text',
-		hexLabel = DEFAULT_LABELS.inputHex,
-		hexErrorLabel = DEFAULT_LABELS.inputHexError,
-		submitLabel = DEFAULT_LABELS.submitHex,
+		colorLabel = DEFAULT_LABELS.inputColor,
+		colorErrorLabel = DEFAULT_LABELS.inputColorError,
+		submitLabel = DEFAULT_LABELS.submitColor,
 		eyeDropperLabel = DEFAULT_LABELS.eyeDropper,
 		onadd = undefined,
 		class: className = '',
@@ -84,7 +84,7 @@
 	}
 
 	const _onSubmit = () => {
-		isValid && onadd?.({ color })
+		isValid && onadd?.({ color: normalizeColor(color) })
 	}
 </script>
 
@@ -107,8 +107,8 @@
 				data-testid="__palette-input-input__"
 				type={_inputType}
 				value={color}
-				aria-label={hexLabel}
-				title={hexErrorLabel}
+				aria-label={colorLabel}
+				title={colorErrorLabel}
 				class="palette_input__input"
 				class:palette_input__input--color={_inputType === 'color'}
 				onfocus={_onInputFocus}

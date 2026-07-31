@@ -1,3 +1,31 @@
+# [6.0.0-beta.19](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.18...v6.0.0-beta.19) (2026-07-31)
+
+
+### Features
+
+* Support rgb/hsl/named colors and alpha ([#258](https://github.com/untemps/svelte-palette/issues/258)) ([57a84fd](https://github.com/untemps/svelte-palette/commit/57a84fd550db348703e25e9e7d2505ecd6000fea))
+
+
+### BREAKING CHANGES
+
+* The hex-prefixed public names are renamed to color-prefixed because the input now accepts any CSS color format, not hex only.
+
+PaletteInput props:
+- hexLabel      -> colorLabel
+- hexErrorLabel -> colorErrorLabel
+
+PaletteLabels keys (passed through the labels prop) and DEFAULT_LABELS:
+- inputHex      -> inputColor
+- inputHexError -> inputColorError
+- submitHex     -> submitColor
+
+# [6.0.0-beta.18](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.17...v6.0.0-beta.18) (2026-07-31)
+
+
+### Features
+
+* Surface color names on default slots ([#257](https://github.com/untemps/svelte-palette/issues/257)) ([645f2ea](https://github.com/untemps/svelte-palette/commit/645f2ea2ee2c5ab102891d31abdb7f8408ea8bb1))
+
 # [6.0.0-beta.17](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.16...v6.0.0-beta.17) (2026-07-30)
 
 

@@ -6,6 +6,7 @@
 		calculateColors,
 		calculateNumColumns,
 		isColorGroups,
+		isSameColor,
 		normalizeInputType,
 		transformColors,
 	} from '../utils/utils.js'
@@ -270,7 +271,7 @@
 		if (_colorGroups) {
 			let base = 0
 			for (const group of _colorGroups) {
-				const index = group.colors.findIndex((color) => color.value === selectedColor)
+				const index = group.colors.findIndex((color) => isSameColor(color.value, selectedColor))
 				if (index >= 0) {
 					return base + index
 				}
@@ -283,7 +284,7 @@
 			if (showTransparentSlot && selectedColor === null) {
 				return 0
 			}
-			const index = _colors.findIndex((color) => color.value === selectedColor)
+			const index = _colors.findIndex((color) => isSameColor(color.value, selectedColor))
 			return index >= 0 ? index + offset : -1
 		}
 		return -1
@@ -656,6 +657,7 @@
 									{:else}
 										<PaletteSlot
 											color={color.value}
+											name={color.name}
 											role={_optionRole}
 											selected={optionIndex === _selectedIndex}
 											tabindex={_rovingTabindex(optionIndex)}
@@ -733,6 +735,7 @@
 							{:else}
 								<PaletteSlot
 									color={color.value}
+									name={color.name}
 									role={_optionRole}
 									selected={optionIndex === _selectedIndex}
 									tabindex={_rovingTabindex(optionIndex)}
@@ -778,9 +781,9 @@
 			<PaletteInput
 				color={selectedColor}
 				inputType={_inputType}
-				hexLabel={_labels.inputHex}
-				hexErrorLabel={_labels.inputHexError}
-				submitLabel={_labels.submitHex}
+				colorLabel={_labels.inputColor}
+				colorErrorLabel={_labels.inputColorError}
+				submitLabel={_labels.submitColor}
 				eyeDropperLabel={_labels.eyeDropper}
 				onadd={_onInputAdd}
 			/>
