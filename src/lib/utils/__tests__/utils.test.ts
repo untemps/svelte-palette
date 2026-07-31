@@ -4,6 +4,7 @@ import {
 	calculateNumColumns,
 	isColorGroups,
 	isColorValid,
+	isSameColor,
 	normalizeColor,
 	normalizeInputType,
 	parseColor,
@@ -111,6 +112,12 @@ describe('utils', () => {
 			[colors, { ...params, isCompact: true, compactColorIndices: null }, []],
 			[colors, { ...params, allowDuplicates: false }, colorsObjects],
 			[[1, 1, 1], { ...params, allowDuplicates: false }, [{ value: 1 }]],
+			[['#FF0000', '#ff0000'], { ...params, allowDuplicates: false }, [{ value: '#FF0000' }]],
+			[
+				['#FF0000', '#ff0000'],
+				{ ...params, allowDuplicates: true },
+				[{ value: '#FF0000' }, { value: '#ff0000' }],
+			],
 			[[1, 1, 1], { ...params, allowDuplicates: true }, [{ value: 1 }, { value: 1 }, { value: 1 }]],
 			[colors, { ...params, maxColors: 8 }, colorsObjects],
 			[colors, { ...params, maxColors: 3 }, colorsObjects.slice(0, 3)],
@@ -341,6 +348,24 @@ describe('utils', () => {
 			[0, false],
 		])('color:%j, expected:%j', (color, expected) => {
 			expect(isColorValid(color)).toBe(expected)
+		})
+	})
+
+	describe('isSameColor', () => {
+		test.each([
+			['#ff0000', '#ff0000', true],
+			['#FF0000', '#ff0000', true],
+			['#ABCDEF', '#abcdef', true],
+			['RED', 'red', true],
+			['#ff0000', '#00ff00', false],
+			['red', '#ff0000', false],
+			[null, null, true],
+			['#ff0000', null, false],
+			[null, '#ff0000', false],
+			[1, 1, true],
+			[1, 2, false],
+		])('a:%j, b:%j, expected:%j', (a, b, expected) => {
+			expect(isSameColor(a, b)).toBe(expected)
 		})
 	})
 

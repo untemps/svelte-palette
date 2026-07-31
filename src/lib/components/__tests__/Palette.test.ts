@@ -41,6 +41,18 @@ test('Marks the slot matching selectedColor as selected', async () => {
 	expect(slots[2]).not.toHaveClass('selected')
 })
 
+test('Matches selectedColor against slot values case-insensitively', async () => {
+	const colors = ['#FF0', '#00FFFF', '#F0F']
+	setup(Palette, {
+		props: { colors, selectedColor: '#00ffff' },
+	})
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots[0]).not.toHaveClass('selected')
+	expect(slots[1]).toHaveClass('selected')
+	expect(slots[2]).not.toHaveClass('selected')
+})
+
 test('Surfaces a named color on the default slot label and title', async () => {
 	const colors = [{ name: 'Sunbeam', value: '#ff0' }, { value: '#0ff' }]
 	setup(Palette, { props: { colors } })

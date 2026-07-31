@@ -51,6 +51,16 @@ export const transformColors = ($colors: ReadonlyArray<ColorInput | NormalizedCo
 	})
 }
 
+/**
+ * Case-insensitive equality for color values. CSS color strings — hex, named and
+ * functional notations — are case-insensitive, so `#FF0000` and `#ff0000` are the
+ * same color. Comparing case-sensitively would treat a consumer-supplied value and
+ * a normalized one (e.g. a color added through the input, which is lower-cased on
+ * submit) as distinct. Non-string values fall back to strict equality.
+ */
+export const isSameColor = ($a: ColorValue | null, $b: ColorValue | null): boolean =>
+	typeof $a === 'string' && typeof $b === 'string' ? $a.toLowerCase() === $b.toLowerCase() : $a === $b
+
 export const calculateColors = (
 	$colors: ReadonlyArray<ColorInput | NormalizedColor> | null | undefined,
 	$params?: CalculateColorsParams
@@ -75,7 +85,9 @@ export const calculateColors = (
 		colors = extractByIndices(colors, params.compactColorIndices ?? [])
 	}
 	if (!params.allowDuplicates) {
-		colors = colors.filter((item, index) => colors.findIndex(({ value }) => value === item.value) === index)
+		colors = colors.filter(
+			(item, index) => colors.findIndex(({ value }) => isSameColor(value, item.value)) === index
+		)
 	}
 	if (params.maxColors !== undefined && colors.length > params.maxColors) {
 		colors = colors.slice(0, params.maxColors)
