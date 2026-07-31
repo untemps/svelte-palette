@@ -220,15 +220,15 @@ A single color slot rendered as a `<button>`, as displayed inside the palette gr
 
 The color input used to add a new color to the palette. Implements the default [`input`](#snippets) snippet, and renders the [`PaletteEyeDropperButton`](#paletteeyedropperbutton) when the EyeDropper API is available and `inputType` is `"text"`.
 
-| Prop              | Type              | Default                               | Description                                                |
-| ----------------- | ----------------- | ------------------------------------- | ---------------------------------------------------------- |
-| `color`           | string \| null    | null                                  | The color pre-filled in the input.                         |
-| `inputType`       | "text" \| "color" | "text"                                | Type of the input. Any other value falls back to `"text"`. |
-| `hexLabel`        | string            | "Enter a hex color value"             | Accessible name of the hex color input.                    |
-| `hexErrorLabel`   | string            | "The value must be a valid hex color" | Validation hint shown as the input `title`.                |
-| `submitLabel`     | string            | "Submit the hex color value"          | Accessible name of the submit button.                      |
-| `eyeDropperLabel` | string            | "Pick a color from the screen"        | Accessible name of the eye-dropper button.                 |
-| `class`           | string            | ''                                    | Class name applied to the root element.                    |
+| Prop              | Type              | Default                           | Description                                                |
+| ----------------- | ----------------- | --------------------------------- | ---------------------------------------------------------- |
+| `color`           | string \| null    | null                              | The color pre-filled in the input.                         |
+| `inputType`       | "text" \| "color" | "text"                            | Type of the input. Any other value falls back to `"text"`. |
+| `hexLabel`        | string            | "Enter a color value"             | Accessible name of the color input.                        |
+| `hexErrorLabel`   | string            | "The value must be a valid color" | Validation hint shown as the input `title`.                |
+| `submitLabel`     | string            | "Submit the color value"          | Accessible name of the submit button.                      |
+| `eyeDropperLabel` | string            | "Pick a color from the screen"    | Accessible name of the eye-dropper button.                 |
+| `class`           | string            | ''                                | Class name applied to the root element.                    |
 
 | Callback | Arguments   | Description                       |
 | -------- | ----------- | --------------------------------- |
@@ -473,21 +473,21 @@ The root element is a generic container and does not expose a landmark role. Wra
 
 Every built-in text and accessibility label of `<Palette>` (and the default primitives it renders) is overridable through a single optional `labels` prop typed as `Partial<PaletteLabels>`. It is fully additive: every key defaults to the matching string in the exported `DEFAULT_LABELS`, so omitting `labels` — or any individual key — reproduces the current defaults. Swap the whole object per locale, or override a single key for a one-off tweak, without re-implementing any snippet.
 
-| Key               | Default                               | Applies to                                                 |
-| ----------------- | ------------------------------------- | ---------------------------------------------------------- |
-| `slots`           | "Color slots"                         | The slot listbox accessible name.                          |
-| `loader`          | "Loading colors"                      | The default [`PaletteLoader`](#paletteloader) live region. |
-| `error`           | "Colors failed to load"               | The default [`PaletteError`](#paletteerror) headline.      |
-| `transparentSlot` | "Transparent slot"                    | The leading transparent slot accessible name.              |
-| `compact`         | "Compact the palette"                 | The tools compact button.                                  |
-| `enlarge`         | "Enlarge the palette"                 | The compact-mode enlarge button.                           |
-| `inputHex`        | "Enter a hex color value"             | The [`PaletteInput`](#paletteinput) hex field.             |
-| `inputHexError`   | "The value must be a valid hex color" | The hex field `title` (validation hint).                   |
-| `submitHex`       | "Submit the hex color value"          | The input submit button.                                   |
-| `eyeDropper`      | "Pick a color from the screen"        | The [`PaletteEyeDropperButton`](#paletteeyedropperbutton). |
-| `tools`           | "Palette tools"                       | The [`PaletteTools`](#palettetools) section.               |
-| `settings`        | "Go to settings"                      | The [`PaletteSettingsButton`](#palettesettingsbutton).     |
-| `trash`           | "Delete color"                        | The deletion [`PaletteTrashButton`](#palettetrashbutton).  |
+| Key               | Default                           | Applies to                                                 |
+| ----------------- | --------------------------------- | ---------------------------------------------------------- |
+| `slots`           | "Color slots"                     | The slot listbox accessible name.                          |
+| `loader`          | "Loading colors"                  | The default [`PaletteLoader`](#paletteloader) live region. |
+| `error`           | "Colors failed to load"           | The default [`PaletteError`](#paletteerror) headline.      |
+| `transparentSlot` | "Transparent slot"                | The leading transparent slot accessible name.              |
+| `compact`         | "Compact the palette"             | The tools compact button.                                  |
+| `enlarge`         | "Enlarge the palette"             | The compact-mode enlarge button.                           |
+| `inputHex`        | "Enter a color value"             | The [`PaletteInput`](#paletteinput) color field.           |
+| `inputHexError`   | "The value must be a valid color" | The color field `title` (validation hint).                 |
+| `submitHex`       | "Submit the color value"          | The input submit button.                                   |
+| `eyeDropper`      | "Pick a color from the screen"    | The [`PaletteEyeDropperButton`](#paletteeyedropperbutton). |
+| `tools`           | "Palette tools"                   | The [`PaletteTools`](#palettetools) section.               |
+| `settings`        | "Go to settings"                  | The [`PaletteSettingsButton`](#palettesettingsbutton).     |
+| `trash`           | "Delete color"                    | The deletion [`PaletteTrashButton`](#palettetrashbutton).  |
 
 If you replace a region with your own snippet (`loader`, `error`, `input`, `tools`, …), that snippet owns its own text and the matching `labels` key no longer applies.
 

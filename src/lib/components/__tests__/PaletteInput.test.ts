@@ -70,12 +70,12 @@ test('Inherits the default eyedropper accessible name', async () => {
 	expect(button).toBeInTheDocument()
 })
 
-test('Names the hex input and submit button with default labels', () => {
+test('Names the color input and submit button with default labels', () => {
 	setup(PaletteInput)
 	const input = screen.getByTestId('__palette-input-input__')
-	expect(input).toHaveAttribute('aria-label', 'Enter a hex color value')
-	expect(input).toHaveAttribute('title', 'The value must be a valid hex color')
-	expect(screen.getByTestId('__palette-input-submit__')).toHaveAttribute('aria-label', 'Submit the hex color value')
+	expect(input).toHaveAttribute('aria-label', 'Enter a color value')
+	expect(input).toHaveAttribute('title', 'The value must be a valid color')
+	expect(screen.getByTestId('__palette-input-submit__')).toHaveAttribute('aria-label', 'Submit the color value')
 })
 
 test('Names the hex input, its title and the submit button with custom labels', () => {
