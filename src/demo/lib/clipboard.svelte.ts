@@ -1,0 +1,22 @@
+export const createClipboard = (resetMs = 1600) => {
+	let copied = $state(false)
+	let timer: ReturnType<typeof setTimeout> | undefined
+
+	const copy = async (value: string): Promise<void> => {
+		try {
+			await navigator.clipboard.writeText(value)
+			copied = true
+			clearTimeout(timer)
+			timer = setTimeout(() => (copied = false), resetMs)
+		} catch {
+			copied = false
+		}
+	}
+
+	return {
+		get copied() {
+			return copied
+		},
+		copy,
+	}
+}

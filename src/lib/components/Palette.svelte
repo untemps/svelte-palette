@@ -915,6 +915,10 @@
 		color: var(--palette-tooltip-text, #fff);
 	}
 
+	.palette :global(.__tooltip:has(.trash_button__button)) {
+		line-height: 0;
+	}
+
 	.palette :global(.__tooltip-top::after) {
 		border-top-color: var(--palette-tooltip-surface, black);
 	}
