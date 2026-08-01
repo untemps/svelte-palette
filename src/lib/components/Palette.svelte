@@ -915,14 +915,6 @@
 		color: var(--palette-tooltip-text, #fff);
 	}
 
-	/*
-	 * Collapse the bubble's line-box strut ONLY when it holds the default trash
-	 * icon. That button is an inline-block sitting on the baseline, so the strut
-	 * adds the font's descender space beneath it, rendering the icon lower than
-	 * it is centred. Gating on the trash button keeps custom
-	 * `tooltipContentSelector` content — which reuses this same default class —
-	 * from having its own line spacing zeroed out.
-	 */
 	.palette :global(.__tooltip:has(.trash_button__button)) {
 		line-height: 0;
 	}
