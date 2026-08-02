@@ -109,6 +109,19 @@ describe('utils', () => {
 				{ ...params, isCompact: true, compactColorIndices: [0, 4] },
 				[{ value: colors[0] }, { value: colors[4] }],
 			],
+			// Unsorted indices still yield source-order output (regression guard for @untemps/utils@4,
+			// whose extractByIndices now follows the indices order).
+			[
+				colors,
+				{ ...params, isCompact: true, compactColorIndices: [4, 0] },
+				[{ value: colors[0] }, { value: colors[4] }],
+			],
+			// Duplicate indices are de-duplicated (v3 semantics preserved under @untemps/utils@4).
+			[
+				colors,
+				{ ...params, isCompact: true, compactColorIndices: [0, 0, 4] },
+				[{ value: colors[0] }, { value: colors[4] }],
+			],
 			[colors, { ...params, isCompact: true, compactColorIndices: null }, []],
 			[colors, { ...params, allowDuplicates: false }, colorsObjects],
 			[[1, 1, 1], { ...params, allowDuplicates: false }, [{ value: 1 }]],
