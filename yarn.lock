@@ -1328,6 +1328,11 @@
   resolved "https://registry.yarnpkg.com/@untemps/utils/-/utils-3.2.1.tgz#4cd521f661f2376d48ad51e6f8b209bfe4c516a7"
   integrity sha512-6+lQBrEEtRd0s/sdz7Q+ooeSDbQ40wCRN/4hxJP978xSZ/m6T3H29QVHyDWIdx7Bbnk9nyrq6KPkAt68gt3wWg==
 
+"@untemps/utils@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@untemps/utils/-/utils-4.0.0.tgz#2bacdfd9e8932840d052b3f9d66ad9990029c21f"
+  integrity sha512-VgPKnC3WyW/8Zbm272EchVscewplIrwWGo6TLYhRA3unaJn2+/3pPF6nZPPnY0lpxVXflQVIaclgSfvh+awNug==
+
 "@vercel/nft@^1.3.2":
   version "1.10.2"
   resolved "https://registry.yarnpkg.com/@vercel/nft/-/nft-1.10.2.tgz#01aefaddc079a19bfe7d499872b2d6dd3cd729e1"

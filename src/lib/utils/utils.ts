@@ -82,7 +82,8 @@ export const calculateColors = (
 	let colors = transformColors(source)
 
 	if (params.isCompact) {
-		colors = extractByIndices(colors, params.compactColorIndices ?? [])
+		const compactIndices = [...new Set(params.compactColorIndices ?? [])].sort((a, b) => a - b)
+		colors = extractByIndices(colors, compactIndices)
 	}
 	if (!params.allowDuplicates) {
 		colors = colors.filter(

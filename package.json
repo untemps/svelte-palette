@@ -40,7 +40,7 @@
 		}
 	},
 	"engines": {
-		"node": ">=22.12.0"
+		"node": ">=22.13.0"
 	},
 	"devDependencies": {
 		"@commitlint/cli": "^21.2.1",
@@ -73,7 +73,7 @@
 	"dependencies": {
 		"@untemps/svelte-use-drop-outside": "^1.7.0",
 		"@untemps/svelte-use-tooltip": "^4.0.0",
-		"@untemps/utils": "^3.0.0"
+		"@untemps/utils": "^4.0.0"
 	},
 	"peerDependencies": {
 		"svelte": "^5.20.0"

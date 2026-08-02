@@ -109,6 +109,16 @@ describe('utils', () => {
 				{ ...params, isCompact: true, compactColorIndices: [0, 4] },
 				[{ value: colors[0] }, { value: colors[4] }],
 			],
+			[
+				colors,
+				{ ...params, isCompact: true, compactColorIndices: [4, 0] },
+				[{ value: colors[0] }, { value: colors[4] }],
+			],
+			[
+				colors,
+				{ ...params, isCompact: true, compactColorIndices: [0, 0, 4] },
+				[{ value: colors[0] }, { value: colors[4] }],
+			],
 			[colors, { ...params, isCompact: true, compactColorIndices: null }, []],
 			[colors, { ...params, allowDuplicates: false }, colorsObjects],
 			[[1, 1, 1], { ...params, allowDuplicates: false }, [{ value: 1 }]],
