@@ -72,7 +72,7 @@ test('Displays as many color slots as set in async mode', async () => {
 	})
 
 	cells = await screen.findAllByTestId('__palette-cell__')
-	waitFor(() => expect(cells).toHaveLength(3))
+	expect(cells).toHaveLength(3)
 })
 
 test('Discards a stale async colors promise that settles after a newer one', async () => {
