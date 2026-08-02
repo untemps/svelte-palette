@@ -82,9 +82,6 @@ export const calculateColors = (
 	let colors = transformColors(source)
 
 	if (params.isCompact) {
-		// @untemps/utils@4 made extractByIndices follow the `indices` order and keep duplicate
-		// indices; v3 returned source-order, de-duplicated output. Sort + unique to preserve that
-		// contract, keeping this mapping aligned with Palette's source-order `_compactPicked`.
 		const compactIndices = [...new Set(params.compactColorIndices ?? [])].sort((a, b) => a - b)
 		colors = extractByIndices(colors, compactIndices)
 	}
