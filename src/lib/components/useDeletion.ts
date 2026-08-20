@@ -59,7 +59,7 @@ const createAction = (
 		case TOOLTIP:
 			return useTooltip(node, buildTooltipOptions(options)) as unknown as DeletionAction
 		case DROP:
-			return useDropOutside(node, buildDropOptions(node, options)) as DeletionAction
+			return useDropOutside(node, buildDropOptions(node, options)) as unknown as DeletionAction
 		default:
 			return null
 	}
