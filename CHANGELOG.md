@@ -1,3 +1,5 @@
+# [6.0.0-beta.20](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.19...v6.0.0-beta.20) (2026-08-21)
+
 # [6.0.0-beta.19](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.18...v6.0.0-beta.19) (2026-07-31)
 
 
