@@ -11,6 +11,7 @@ permissions:
     issues: write
 jobs:
     publish:
+        name: 'Publish'
         runs-on: ubuntu-latest
         env:
             HUSKY: '0'
