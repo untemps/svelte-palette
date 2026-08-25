@@ -22,6 +22,7 @@ jobs:
               with:
                   node-version: '24'
             - run: yarn install --frozen-lockfile
+            - run: yarn lint
             - run: yarn test:ci
             - run: yarn run check
             - run: yarn build
