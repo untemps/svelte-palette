@@ -1,4 +1,4 @@
-name: 'validate'
+name: 'Validate'
 description: 'Install dependencies and run the quality gate: lint, type check, tests and build'
 inputs:
     node-version:
