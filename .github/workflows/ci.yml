@@ -10,15 +10,6 @@ permissions:
 jobs:
     validate:
         runs-on: ubuntu-latest
-        env:
-            HUSKY: '0'
         steps:
             - uses: actions/checkout@v6
-            - uses: actions/setup-node@v6
-              with:
-                  node-version: '24'
-            - run: yarn install --frozen-lockfile
-            - run: yarn lint
-            - run: yarn run check
-            - run: yarn test:ci
-            - run: yarn build
+            - uses: ./.github/actions/validate

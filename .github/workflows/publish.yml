@@ -18,14 +18,7 @@ jobs:
             - uses: actions/checkout@v6
               with:
                   fetch-depth: 0
-            - uses: actions/setup-node@v6
-              with:
-                  node-version: '24'
-            - run: yarn install --frozen-lockfile
-            - run: yarn lint
-            - run: yarn test:ci
-            - run: yarn run check
-            - run: yarn build
+            - uses: ./.github/actions/validate
             - run: npx semantic-release
               env:
                   GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}

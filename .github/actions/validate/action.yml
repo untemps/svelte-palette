@@ -1,0 +1,25 @@
+name: 'validate'
+description: 'Install dependencies and run the quality gate: lint, type check, tests and build'
+inputs:
+    node-version:
+        description: 'Node version used to run the quality gate'
+        required: false
+        default: '24'
+runs:
+    using: 'composite'
+    steps:
+        - uses: actions/setup-node@v6
+          with:
+              node-version: ${{ inputs.node-version }}
+        - run: yarn install --frozen-lockfile
+          shell: bash
+          env:
+              HUSKY: '0'
+        - run: yarn lint
+          shell: bash
+        - run: yarn run check
+          shell: bash
+        - run: yarn test:ci
+          shell: bash
+        - run: yarn build
+          shell: bash
