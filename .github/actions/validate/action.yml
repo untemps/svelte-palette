@@ -11,6 +11,7 @@ runs:
         - uses: actions/setup-node@v6
           with:
               node-version: ${{ inputs.node-version }}
+              cache: 'yarn'
         - run: yarn install --frozen-lockfile
           shell: bash
           env:
