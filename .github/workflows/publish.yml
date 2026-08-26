@@ -4,6 +4,9 @@ on:
         branches:
             - main
             - beta
+concurrency:
+    group: publish-${{ github.ref }}
+    cancel-in-progress: false
 permissions:
     contents: write
     id-token: write
