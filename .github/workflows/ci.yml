@@ -14,3 +14,6 @@ jobs:
         steps:
             - uses: actions/checkout@v6
             - uses: ./.github/actions/validate
+            - uses: codecov/codecov-action@v5
+              with:
+                  files: coverage/lcov.info
