@@ -124,8 +124,8 @@
 		"test": "vitest watch --coverage",
 		"test:ci": "vitest run --coverage",
 		"lint": "prettier --check .",
+		"lint:fix": "prettier --write .",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"prettier": "prettier \"*/**/*.{js,ts,svelte}\" --ignore-path ./.prettierignore --write && git add -u && git status",
 		"prepare": "husky"
 	}
 }
