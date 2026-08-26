@@ -1,0 +1,20 @@
+name: 'CI'
+on:
+    pull_request:
+    workflow_dispatch:
+concurrency:
+    group: ci-${{ github.ref }}
+    cancel-in-progress: true
+permissions:
+    contents: read
+jobs:
+    validate:
+        name: 'Validate'
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v6
+            - uses: ./.github/actions/validate
+            - uses: codecov/codecov-action@v5
+              with:
+                  files: coverage/lcov.info
+                  token: ${{ secrets.CODECOV_TOKEN }}
