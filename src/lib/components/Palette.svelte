@@ -1049,6 +1049,9 @@
 		row-gap: var(--palette-grid-row-gap);
 		align-items: center;
 		justify-items: center;
+	}
+
+	:where(.palette__groups__group) > ul.palette__cells {
 		margin: 0;
 		padding: 0;
 		list-style: none;
