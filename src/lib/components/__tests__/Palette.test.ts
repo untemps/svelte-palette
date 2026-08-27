@@ -1008,6 +1008,37 @@ test('Moves focus by a full row with ArrowDown and ArrowUp', async () => {
 	expect(slots[0]).toHaveFocus()
 })
 
+test('Clamps the column when the last visual row is shorter', async () => {
+	const colors = ['#100', '#200', '#300', '#400', '#500', '#600']
+	const { user } = setup(Palette, { props: { colors, numColumns: 4 } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	slots[2].focus()
+	await user.keyboard('{ArrowDown}')
+	expect(slots[5]).toHaveFocus()
+
+	await user.keyboard('{ArrowUp}')
+	expect(slots[1]).toHaveFocus()
+})
+
+test('Steps by rendered cell when a custom slot drops out of the option list', async () => {
+	const slotSnippet = createRawSnippet((getProps) => ({
+		render: () =>
+			getProps().color === '#300'
+				? `<div data-testid="__inert-slot__"></div>`
+				: `<span data-testid="__nav-slot__" role="option" tabindex="${getProps().tabindex}"></span>`,
+	}))
+	const colors = ['#100', '#200', '#300', '#400', '#500', '#600']
+	const { user } = setup(Palette, { props: { colors, numColumns: 4, slot: slotSnippet } })
+
+	const slots = await screen.findAllByTestId('__nav-slot__')
+	expect(slots).toHaveLength(5)
+
+	slots[0].focus()
+	await user.keyboard('{ArrowDown}')
+	expect(slots[3]).toHaveFocus()
+})
+
 test('Jumps to the first and last slot with Home and End', async () => {
 	const colors = ['#ff0', '#0ff', '#f0f', '#fff']
 	const { user } = setup(Palette, { colors })
@@ -1142,6 +1173,24 @@ test('Keeps ArrowUp and ArrowDown as no-ops on the outer edges of a grouped pale
 	slots[6].focus()
 	await user.keyboard('{ArrowDown}')
 	expect(slots[6]).toHaveFocus()
+})
+
+test('Steps by rendered cell inside a group when a custom slot drops out of the option list', async () => {
+	const slotSnippet = createRawSnippet((getProps) => ({
+		render: () =>
+			getProps().color === '#a11'
+				? `<div data-testid="__inert-slot__"></div>`
+				: `<span data-testid="__nav-slot__" role="option" tabindex="${getProps().tabindex}"></span>`,
+	}))
+	const colors = [{ name: 'A', colors: ['#a00', '#a11', '#a22', '#a33', '#a44', '#a55'] }]
+	const { user } = setup(Palette, { props: { colors, numColumns: 4, slot: slotSnippet } })
+
+	const slots = await screen.findAllByTestId('__nav-slot__')
+	expect(slots).toHaveLength(5)
+
+	slots[0].focus()
+	await user.keyboard('{ArrowDown}')
+	expect(slots[3]).toHaveFocus()
 })
 
 test('Selects the focused slot with Enter and Space', async () => {
