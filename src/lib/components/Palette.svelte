@@ -1018,4 +1018,24 @@
 		font-weight: 600;
 		margin: 0;
 	}
+
+	:where(.palette__groups__group > ul.palette__cells) {
+		display: grid;
+		grid-template-columns: repeat(var(--num-columns), minmax(2rem, 1fr));
+		grid-auto-rows: minmax(2rem, 1fr);
+		column-gap: 0.3rem;
+		row-gap: 0.6rem;
+		align-items: center;
+		justify-items: center;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	:where(.palette__groups__group > ul.palette__cells > .palette__cells__cell) {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
 </style>
