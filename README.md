@@ -686,15 +686,17 @@ The slot grid (columns, gaps) is laid out on the `listbox` element, `.palette__l
 </style>
 ```
 
-When colors are grouped, each group keeps its own `.palette__cells` grid instead — laid out on the same `--num-columns`, so a group holding more colors than the column count wraps onto further rows. That grid is declared inside `:where()`, at zero specificity, so any ordinary rule of yours replaces it without `!important`:
+When colors are grouped, each group keeps its own `.palette__cells` grid instead — laid out on the same `--num-columns`, so a group holding more colors than the column count wraps onto further rows. That grid is declared inside `:where()`, at zero specificity, so any ordinary rule of yours replaces it without `!important` and without borrowing the palette's own class names:
 
 ```svelte
 <style>
-	:global(.palette[data-palette].palette__custom .palette__groups__group > ul.palette__cells) {
+	:global(.palette__groups__group > ul.palette__cells) {
 		display: flex;
 	}
 </style>
 ```
+
+The list reset the grid sits on — `margin`, `padding` and `list-style` — is declared at normal specificity instead, so an ambient `ul { ... }` rule from a CSS reset or a framework cannot re-indent a group. To change those three as well, add a class of your own (e.g. `.palette__custom`) to the selector above.
 
 Overriding the layout does not change the keyboard model: `↑` / `↓` still step by `numColumns`, so keep your own rows that wide if you want vertical navigation to match what you render (see [Accessibility](#accessibility)).
 
