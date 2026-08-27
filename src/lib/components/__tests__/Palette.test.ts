@@ -682,6 +682,19 @@ test('Sets num-columns from the longest group when numColumns is 0 in grouped mo
 	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 7'))
 })
 
+test('Keeps the minimum column count when every group is shorter in grouped mode', async () => {
+	const colors = [
+		{ name: 'A', colors: ['#a00', '#a11'] },
+		{ name: 'B', colors: ['#b00', '#b11', '#b22'] },
+	]
+
+	setup(Palette, { props: { colors, numColumns: 0 } })
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 5'))
+})
+
 test('Caps num-columns with maxColumns in grouped mode', async () => {
 	const colors = [
 		{ name: 'A', colors: ['#a00', '#a11'] },
