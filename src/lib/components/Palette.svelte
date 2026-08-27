@@ -859,6 +859,10 @@
 		--palette-loader: #ccc;
 		--palette-radius: 0.3rem;
 		--palette-font-family: Helvetica, sans-serif;
+		--palette-grid-column-track: minmax(2rem, 1fr);
+		--palette-grid-row-track: minmax(2rem, 1fr);
+		--palette-grid-column-gap: 0.3rem;
+		--palette-grid-row-gap: 0.6rem;
 		--palette-slot-size: 1rem;
 		--palette-slot-border: rgba(0, 0, 0, 0.2);
 		--palette-slot-empty: #aaa;
@@ -988,10 +992,10 @@
 	.palette__content > .palette__cells > .palette__listbox {
 		width: 100%;
 		display: grid;
-		grid-template-columns: repeat(var(--num-columns), minmax(2rem, 1fr));
-		grid-auto-rows: minmax(2rem, 1fr);
-		column-gap: 0.3rem;
-		row-gap: 0.6rem;
+		grid-template-columns: repeat(var(--num-columns), var(--palette-grid-column-track));
+		grid-auto-rows: var(--palette-grid-row-track);
+		column-gap: var(--palette-grid-column-gap);
+		row-gap: var(--palette-grid-row-gap);
 		align-items: center;
 		justify-items: center;
 		margin: 0;
@@ -1039,10 +1043,10 @@
 
 	:where(.palette__groups__group > ul.palette__cells) {
 		display: grid;
-		grid-template-columns: repeat(var(--num-columns), minmax(2rem, 1fr));
-		grid-auto-rows: minmax(2rem, 1fr);
-		column-gap: 0.3rem;
-		row-gap: 0.6rem;
+		grid-template-columns: repeat(var(--num-columns), var(--palette-grid-column-track));
+		grid-auto-rows: var(--palette-grid-row-track);
+		column-gap: var(--palette-grid-column-gap);
+		row-gap: var(--palette-grid-row-gap);
 		align-items: center;
 		justify-items: center;
 		margin: 0;
