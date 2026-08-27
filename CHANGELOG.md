@@ -1,3 +1,34 @@
+# [6.0.0-beta.21](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.20...v6.0.0-beta.21) (2026-08-27)
+
+
+### Features
+
+* Render grouped palettes on multiple rows with row-accurate vertical navigation ([#271](https://github.com/untemps/svelte-palette/issues/271)) ([759137d](https://github.com/untemps/svelte-palette/commit/759137d642b56bbf1e61c90de3903d888e7bc965))
+
+
+### BREAKING CHANGES
+
+* Each group's `ul.palette__cells` now carries a list reset (`margin`, `padding`,
+`list-style`) declared at 0,2,1 specificity, so an ambient `ul { … }` rule from a CSS reset or a
+framework cannot re-indent a group. The library shipped no rule on that element before, so a
+consumer rule below 0,2,1 — a bare `:global(ul.palette__cells)`, or any rule in a global
+stylesheet — silently loses those three properties where it used to win. Raise the selector above
+the library's two classes: `.my-frame :global(ul.palette__cells)` inside a Svelte component
+compiles to 0,3,1 and wins. Layout is not affected — the grid is declared inside `:where()` at
+0,0,0 and stays overridable at any specificity.
+* Each group's `ul.palette__cells` is now laid out as a grid of `numColumns`
+tracks, mirroring the ungrouped listbox. Grouped palettes that shipped no CSS rendered as a bare
+bulleted, indented list and now render as a grid, and a group holding more colors than
+`numColumns` wraps onto further rows instead of running on one line. Consumers already styling
+`ul.palette__cells` keep their own layout.
+* In grouped palettes `↑` / `↓` no longer treat each group as a single logical row.
+They follow the rendered rows instead: a group wider than `numColumns` is walked row by row, and
+the step crosses into the adjacent group only from that group's top or bottom edge. Grouped
+palettes whose groups all fit within `numColumns` are unaffected.
+* In ungrouped palettes a vertical step into a partly filled last row now clamps to
+that row's last slot instead of being refused. With six slots on four columns, `↓` from the third
+slot did nothing and now moves to the sixth. `↑`, and any step into a full row, are unchanged.
+
 # [6.0.0-beta.20](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.19...v6.0.0-beta.20) (2026-08-21)
 
 # [6.0.0-beta.19](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.18...v6.0.0-beta.19) (2026-07-31)
