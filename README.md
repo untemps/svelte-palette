@@ -465,11 +465,11 @@ The slot grid follows the [ARIA listbox pattern](https://www.w3.org/WAI/ARIA/apg
 
 Arrow keys only move focus; the selection (and the `onselect` callback) is triggered on `Enter`, `Space` or a click, so navigating the grid never changes the selected color on its own.
 
-In grouped palettes `↑` / `↓` follow the rendered rows. Each group is laid out on [`numColumns`](#palette-api) columns, so a group holding more colors wraps onto further rows and vertical steps walk those rows before crossing into the adjacent group. Moving between two rows keeps the column position, clamping it to the target row when that row is shorter — the last row of a group, or a whole group narrower than the column count. `←` / `→` remain a flat walk over every slot in order, across group boundaries.
+`↑` / `↓` follow the rendered rows, each [`numColumns`](#palette-api) wide. A vertical step keeps the column position and clamps it to the last slot of the target row when that row is shorter, so a partly filled bottom row stays reachable from every column above it. In grouped palettes each group is laid out on the same column count, so a group holding more colors wraps onto further rows: vertical steps walk a group's own rows first and cross into the adjacent group only from its top or bottom edge, where the same clamp covers a group narrower than the column count. `←` / `→` remain a flat walk over every slot in order, across group boundaries.
 
 When a `deletionMode` (`"tooltip"` or `"drop"`) is set, `Delete` or `Backspace` removes the focused slot and moves focus to the neighbour that takes its place — the keyboard counterpart of the pointer-only tooltip and drop affordances. The leading transparent slot is never removed, and the keys do nothing when `deletionMode` is `"none"`. To surface that affordance to assistive technologies, deletable slots carry `aria-keyshortcuts="Delete Backspace"` while a `deletionMode` is set, so screen readers announce the shortcut on the focused slot.
 
-> **Custom slots** — the roving tab index is managed automatically for the default slots. Only the [`slot`](#snippets) snippet receives the computed `tabindex` argument: forward it onto your own focusable element and the slot joins the arrow-key navigation — no `role="option"` is required for keyboard access. Also add `role="option"` and `aria-selected={selected}` (the snippet receives a computed `selected` flag that is index-accurate, so with `allowDuplicates` only the first matching slot is marked) so screen readers expose the slot as a selectable option. When you set a `deletionMode`, forward the `ariaKeyShortcuts` argument too (`aria-keyshortcuts={ariaKeyShortcuts}`) so the delete shortcut is announced on your custom slot. A `slot` that ignores `tabindex` keeps working but stays a separate tab stop.
+> **Custom slots** — the roving tab index is managed automatically for the default slots. Only the [`slot`](#snippets) snippet receives the computed `tabindex` argument: forward it onto your own focusable element and the slot joins the arrow-key navigation — no `role="option"` is required for keyboard access. Also add `role="option"` and `aria-selected={selected}` (the snippet receives a computed `selected` flag that is index-accurate, so with `allowDuplicates` only the first matching slot is marked) so screen readers expose the slot as a selectable option. When you set a `deletionMode`, forward the `ariaKeyShortcuts` argument too (`aria-keyshortcuts={ariaKeyShortcuts}`) so the delete shortcut is announced on your custom slot. A `slot` that ignores `tabindex` keeps working but stays a separate tab stop; its cell still occupies a grid position, so `↑` / `↓` keep stepping over the rows as rendered rather than closing the gap it leaves.
 >
 > The `beforeSlot` and `afterSlot` snippets render **outside** the `listbox`, stacked before and after the slot grid, so they are not options and are **not** part of the arrow-key navigation. Render them as plain elements (e.g. a `<div>`, **not** an `<li>`), keep any interactive content they hold reachable with `Tab`, and do not give it `role="option"`. The `transparentSlot` snippet, by contrast, replaces the leading option _inside_ the listbox and now receives `tabindex` and `selected`: forward `role="option"`, the `tabindex` argument, and `aria-selected={selected}` onto your element so it stays the single leading tab stop and part of arrow-key navigation.
 
@@ -569,28 +569,32 @@ Or from a stylesheet, by passing a class and setting the tokens on it:
 
 Every value falls back to its default, so a palette with no tokens set renders exactly as before.
 
-| Custom property             | Default (light)          | Dark theme                 | Controls                                                     |
-| --------------------------- | ------------------------ | -------------------------- | ------------------------------------------------------------ |
-| `--palette-surface`         | `#fafafa`                | `#1e1e1e`                  | Palette and toolbar-button background                        |
-| `--palette-text`            | `black`                  | `#ededed`                  | Foreground text                                              |
-| `--palette-border`          | `#e5e5e5`                | `#3a3a3a`                  | Control borders and the active toolbar-button fill           |
-| `--palette-divider`         | `#e9e9e9`                | `#3a3a3a`                  | Divider lines above the input and tools                      |
-| `--palette-icon`            | `#646464`                | `#d0d0d0`                  | Toolbar icon stroke                                          |
-| `--palette-icon-disabled`   | `#bdbdbd`                | `#6a6a6a`                  | Disabled toolbar icon stroke                                 |
-| `--palette-loader`          | `#ccc`                   | `#555555`                  | Loading spinner arc                                          |
-| `--palette-radius`          | `0.3rem`                 | —                          | Corner radius of buttons and the input                       |
-| `--palette-font-family`     | `Helvetica, sans-serif`  | —                          | Hex input font family                                        |
-| `--palette-slot-size`       | `1rem`                   | —                          | Diameter of a color slot                                     |
-| `--palette-slot-border`     | `rgba(0, 0, 0, 0.2)`     | `rgba(255, 255, 255, .2)`  | Slot outline                                                 |
-| `--palette-slot-empty`      | `#aaa`                   | `#777`                     | Empty / transparent slot outline and diagonal                |
-| `--palette-slot-ring`       | `#9e9e9e`                | `#6a6a6a`                  | Ring around the selected slot                                |
-| `--palette-input-surface`   | `rgba(255, 255, 255, 1)` | `#2a2a2a`                  | Hex input background                                         |
-| `--palette-input-text`      | `rgba(0, 0, 0, 0.6)`     | `rgba(255, 255, 255, .75)` | Hex input text                                               |
-| `--palette-error`           | `#c0392b`                | `#ff6b5e`                  | Error headline and icon                                      |
-| `--palette-error-message`   | `#595959`                | `#b0b0b0`                  | Error detail message                                         |
-| `--palette-focus-ring`      | `#1a1a1a`                | `#f0f0f0`                  | Keyboard focus outline (see [Focus Outline](#focus-outline)) |
-| `--palette-tooltip-surface` | `black`                  | `#f0f0f0`                  | Default deletion tooltip background and arrow                |
-| `--palette-tooltip-text`    | `#fff`                   | `#1a1a1a`                  | Default deletion tooltip icon, text and focus ring           |
+| Custom property               | Default (light)          | Dark theme                 | Controls                                                           |
+| ----------------------------- | ------------------------ | -------------------------- | ------------------------------------------------------------------ |
+| `--palette-surface`           | `#fafafa`                | `#1e1e1e`                  | Palette and toolbar-button background                              |
+| `--palette-text`              | `black`                  | `#ededed`                  | Foreground text                                                    |
+| `--palette-border`            | `#e5e5e5`                | `#3a3a3a`                  | Control borders and the active toolbar-button fill                 |
+| `--palette-divider`           | `#e9e9e9`                | `#3a3a3a`                  | Divider lines above the input and tools                            |
+| `--palette-icon`              | `#646464`                | `#d0d0d0`                  | Toolbar icon stroke                                                |
+| `--palette-icon-disabled`     | `#bdbdbd`                | `#6a6a6a`                  | Disabled toolbar icon stroke                                       |
+| `--palette-loader`            | `#ccc`                   | `#555555`                  | Loading spinner arc                                                |
+| `--palette-radius`            | `0.3rem`                 | —                          | Corner radius of buttons and the input                             |
+| `--palette-font-family`       | `Helvetica, sans-serif`  | —                          | Hex input font family                                              |
+| `--palette-grid-column-track` | `minmax(2rem, 1fr)`      | —                          | Width of one slot-grid column (compact mode uses a narrower track) |
+| `--palette-grid-row-track`    | `minmax(2rem, 1fr)`      | —                          | Height of one slot-grid row                                        |
+| `--palette-grid-column-gap`   | `0.3rem`                 | —                          | Horizontal gap between slots (compact mode closes it)              |
+| `--palette-grid-row-gap`      | `0.6rem`                 | —                          | Vertical gap between slot rows                                     |
+| `--palette-slot-size`         | `1rem`                   | —                          | Diameter of a color slot                                           |
+| `--palette-slot-border`       | `rgba(0, 0, 0, 0.2)`     | `rgba(255, 255, 255, .2)`  | Slot outline                                                       |
+| `--palette-slot-empty`        | `#aaa`                   | `#777`                     | Empty / transparent slot outline and diagonal                      |
+| `--palette-slot-ring`         | `#9e9e9e`                | `#6a6a6a`                  | Ring around the selected slot                                      |
+| `--palette-input-surface`     | `rgba(255, 255, 255, 1)` | `#2a2a2a`                  | Hex input background                                               |
+| `--palette-input-text`        | `rgba(0, 0, 0, 0.6)`     | `rgba(255, 255, 255, .75)` | Hex input text                                                     |
+| `--palette-error`             | `#c0392b`                | `#ff6b5e`                  | Error headline and icon                                            |
+| `--palette-error-message`     | `#595959`                | `#b0b0b0`                  | Error detail message                                               |
+| `--palette-focus-ring`        | `#1a1a1a`                | `#f0f0f0`                  | Keyboard focus outline (see [Focus Outline](#focus-outline))       |
+| `--palette-tooltip-surface`   | `black`                  | `#f0f0f0`                  | Default deletion tooltip background and arrow                      |
+| `--palette-tooltip-text`      | `#fff`                   | `#1a1a1a`                  | Default deletion tooltip icon, text and focus ring                 |
 
 > `--palette-focus-ring` is themeable so the focus outline can stay visible in dark mode, but its light and dark defaults are chosen for WCAG-compliant contrast against the palette surface. Override it only with a value that preserves sufficient contrast.
 
@@ -672,7 +676,7 @@ You can style the component by passing a class down to the root tag (`div`).
 
 ### Slot Grid Class
 
-The slot grid (columns, gaps) is laid out on the `listbox` element, `.palette__listbox`, not on its `.palette__cells` wrapper — the wrapper is a flex column that stacks the optional `beforeSlot` / `afterSlot` around the grid. Target `.palette__listbox` (e.g. `.palette__cells > .palette__listbox`) to override the flat-mode grid:
+The slot grid (columns, gaps) is laid out on the `listbox` element, `.palette__listbox`, not on its `.palette__cells` wrapper — the wrapper is a flex column that stacks the optional `beforeSlot` / `afterSlot` around the grid. Its track sizes and gaps come from the [`--palette-grid-*` tokens](#tokens), so retuning those is a one-line override that needs no internal class name and applies to grouped palettes at the same time. Target `.palette__listbox` (e.g. `.palette__cells > .palette__listbox`) when you need to replace the layout itself:
 
 ```svelte
 <style>
@@ -682,7 +686,7 @@ The slot grid (columns, gaps) is laid out on the `listbox` element, `.palette__l
 </style>
 ```
 
-When colors are grouped, each group keeps its own `.palette__cells` grid instead — laid out on the same `--num-columns`, so a group holding more colors than the column count wraps onto further rows. That grid is declared inside `:where()`, at zero specificity, so any ordinary rule of yours replaces it without `!important` and without matching internal class names:
+When colors are grouped, each group keeps its own `.palette__cells` grid instead — laid out on the same `--num-columns`, so a group holding more colors than the column count wraps onto further rows. That grid is declared inside `:where()`, at zero specificity, so any ordinary rule of yours replaces it without `!important`:
 
 ```svelte
 <style>
