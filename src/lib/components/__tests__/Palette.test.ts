@@ -708,6 +708,41 @@ test('Caps num-columns with maxColumns in grouped mode', async () => {
 	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 4'))
 })
 
+test('Recounts num-columns after a slot deletion when numColumns is 0', async () => {
+	const colors = ['#100', '#200', '#300', '#400', '#500', '#600', '#700']
+
+	const { user } = setup(Palette, { props: { colors, numColumns: 0, deletionMode: TOOLTIP } })
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 7'))
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 6'))
+})
+
+test('Recounts num-columns after a slot deletion when numColumns is 0 in grouped mode', async () => {
+	const colors = [
+		{ name: 'A', colors: ['#a00', '#a11'] },
+		{ name: 'B', colors: ['#b00', '#b11', '#b22', '#b33', '#b44', '#b55', '#b66'] },
+	]
+
+	const { user } = setup(Palette, { props: { colors, numColumns: 0, deletionMode: TOOLTIP } })
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 7'))
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[2])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 6'))
+})
+
 test('Removes duplicates when updating allowDuplicates value', async () => {
 	const colors = ['#ff0', '#0ff', '#f0f', '#f0f', '#f0f']
 

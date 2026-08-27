@@ -357,6 +357,7 @@
 		const removed = (_colors ?? [])[index]
 		const nextColors = (_colors ?? []).filter((c, i) => i !== index)
 		_colors = nextColors
+		_numColumns = calculateNumColumns(nextColors.length, _viewParams())
 		if (removed) {
 			_syncColors(nextColors)
 			ondelete?.({ color: removed.value, index, colors: nextColors })
@@ -413,6 +414,12 @@
 			gi === groupIndex ? { ...g, colors: g.colors.filter((_, ci) => ci !== colorIndex) } : g
 		)
 		_colorGroups = nextColorGroups
+		const maxGroupLength = nextColorGroups.reduce((max, g) => Math.max(max, g.colors.length), 0)
+		_numColumns = calculateNumColumns(maxGroupLength, {
+			showTransparentSlot: false,
+			numColumns,
+			maxColumns,
+		})
 		if (removed) {
 			_syncColorGroups(nextColorGroups)
 			ondelete?.({
