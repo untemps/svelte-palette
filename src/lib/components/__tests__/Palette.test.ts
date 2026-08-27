@@ -669,6 +669,32 @@ test('Updates num-columns when numColumns changes to 0', async () => {
 	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 25'))
 })
 
+test('Sets num-columns from the longest group when numColumns is 0 in grouped mode', async () => {
+	const colors = [
+		{ name: 'A', colors: ['#a00', '#a11'] },
+		{ name: 'B', colors: ['#b00', '#b11', '#b22', '#b33', '#b44', '#b55', '#b66'] },
+	]
+
+	setup(Palette, { props: { colors, numColumns: 0 } })
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 7'))
+})
+
+test('Caps num-columns with maxColumns in grouped mode', async () => {
+	const colors = [
+		{ name: 'A', colors: ['#a00', '#a11'] },
+		{ name: 'B', colors: ['#b00', '#b11', '#b22', '#b33', '#b44', '#b55', '#b66'] },
+	]
+
+	setup(Palette, { props: { colors, numColumns: 0, maxColumns: 4 } })
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 4'))
+})
+
 test('Removes duplicates when updating allowDuplicates value', async () => {
 	const colors = ['#ff0', '#0ff', '#f0f', '#f0f', '#f0f']
 

@@ -216,7 +216,11 @@
 						_colors = null
 						_fullColors = null
 						const maxGroupLength = newColorGroups.reduce((max, g) => Math.max(max, g.colors.length), 0)
-						_numColumns = calculateNumColumns(maxGroupLength, { numColumns: _params.numColumns })
+						_numColumns = calculateNumColumns(maxGroupLength, {
+							showTransparentSlot: false,
+							numColumns: _params.numColumns,
+							maxColumns: _params.maxColumns,
+						})
 					} else {
 						const newColors = calculateColors(results, _params)
 						_colors = newColors
