@@ -14,7 +14,12 @@
 	deletionMode="tooltip"
 />
 
-<Palette colors={colorGroups} numColumns={4} />`
+<Palette
+	colors={colorGroups}
+	bind:selectedColor={groupedColor}
+	numColumns={4}
+	labels={{ slots: 'Grouped color slots' }}
+/>`
 
 	let colors = $state<ColorsProp | null>(['#2b2d42', '#8d99ae', '#edf2f4', '#ef233c', '#d90429', '#fca311'])
 	let selectedColor = $state<ColorValue | null>('#ef233c')
@@ -49,6 +54,7 @@
 				colors={colorGroups}
 				bind:selectedColor={groupedColor}
 				numColumns={4}
+				labels={{ slots: 'Grouped color slots' }}
 				data-palette-theme={getPaletteTheme()}
 			/>
 		</div>
