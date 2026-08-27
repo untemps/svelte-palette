@@ -70,8 +70,8 @@ yarn add @untemps/svelte-palette
 | `maxColors`              | number                                                                                                  | 30      | Maximum number of slots to be displayed in the palette. Set this value to `-1` to allow infinite number of slots.                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | `showInput`              | boolean                                                                                                 | false   | Flag to display an input to add colors below the palette. The input is not rendered in compact mode, in grouped mode, or while an async `colors` source is still unresolved.                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | `inputType`              | string                                                                                                  | "text"  | Type of the color input. Only "text" and "color" are allowed. Any other value will be replaced by "text".                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `numColumns`             | number                                                                                                  | 5       | Number of columns of the palette grid. Set this value to `0` to display the slots on a single row (see `maxColumns`). Values lower than `0` are treated the same as `0`.                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| `maxColumns`             | number                                                                                                  | 0       | Maximum number of columns when `numColumns` is set to `0`. Once reached, additional slots wrap to a new row. Set this value to `0` to allow unlimited columns.                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `numColumns`             | number                                                                                                  | 5       | Number of columns of the palette grid. Set this value to `0` to display the slots on a single row (see `maxColumns`). Values lower than `0` are treated the same as `0`. In grouped mode it is the width of every group: a group holding more colors wraps onto further rows. `0` sizes the grid to the longest group, subject to the same five-column minimum as flat mode and to `maxColumns`.                                                                                                                                                                                              |
+| `maxColumns`             | number                                                                                                  | 0       | Maximum number of columns when `numColumns` is set to `0`. Once reached, additional slots wrap to a new row. Set this value to `0` to allow unlimited columns. Caps the auto-sized width in grouped mode too.                                                                                                                                                                                                                                                                                                                                                                                 |
 | `transition`             | object                                                                                                  | null    | Animation when a slot is rendered (see [Transition](#transition)).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | `labels`                 | Partial\<PaletteLabels\>                                                                                | {}      | Overrides for the built-in text and accessibility labels. Every key is optional and defaults to the matching `DEFAULT_LABELS` string, so this is a fully additive way to localize the palette or tweak individual labels without replacing any snippet (see [Internationalization](#internationalization)).                                                                                                                                                                                                                                                                                   |
 | `presentational`         | boolean                                                                                                 | false   | Renders the slot grid as a purely visual display: drops the `listbox`/`option` roles, the single tab stop and the arrow-key navigation. Use it for decorative palettes that are not meant to be picked from (see [Accessibility](#accessibility)).                                                                                                                                                                                                                                                                                                                                            |
@@ -463,11 +463,13 @@ The slot grid follows the [ARIA listbox pattern](https://www.w3.org/WAI/ARIA/apg
 | `Enter` / `Space`      | Select the focused slot                                |
 | `Delete` / `Backspace` | Remove the focused slot (when a `deletionMode` is set) |
 
-Arrow keys only move focus; the selection (and the `onselect` callback) is triggered on `Enter`, `Space` or a click, so navigating the grid never changes the selected color on its own. In grouped palettes each group is a row: `↑` / `↓` move to the slot at the same position in the adjacent group (clamped to that group's length).
+Arrow keys only move focus; the selection (and the `onselect` callback) is triggered on `Enter`, `Space` or a click, so navigating the grid never changes the selected color on its own.
+
+`↑` / `↓` follow the rendered rows, each [`numColumns`](#palette-api) wide. A vertical step keeps the column position and clamps it to the last slot of the target row when that row is shorter, so a partly filled bottom row stays reachable from every column above it. In grouped palettes each group is laid out on the same column count, so a group holding more colors wraps onto further rows: vertical steps walk a group's own rows first and cross into the adjacent group only from its top or bottom edge, where the same clamp covers a group narrower than the column count. `←` / `→` remain a flat walk over every slot in order, across group boundaries.
 
 When a `deletionMode` (`"tooltip"` or `"drop"`) is set, `Delete` or `Backspace` removes the focused slot and moves focus to the neighbour that takes its place — the keyboard counterpart of the pointer-only tooltip and drop affordances. The leading transparent slot is never removed, and the keys do nothing when `deletionMode` is `"none"`. To surface that affordance to assistive technologies, deletable slots carry `aria-keyshortcuts="Delete Backspace"` while a `deletionMode` is set, so screen readers announce the shortcut on the focused slot.
 
-> **Custom slots** — the roving tab index is managed automatically for the default slots. Only the [`slot`](#snippets) snippet receives the computed `tabindex` argument: forward it onto your own focusable element and the slot joins the arrow-key navigation — no `role="option"` is required for keyboard access. Also add `role="option"` and `aria-selected={selected}` (the snippet receives a computed `selected` flag that is index-accurate, so with `allowDuplicates` only the first matching slot is marked) so screen readers expose the slot as a selectable option. When you set a `deletionMode`, forward the `ariaKeyShortcuts` argument too (`aria-keyshortcuts={ariaKeyShortcuts}`) so the delete shortcut is announced on your custom slot. A `slot` that ignores `tabindex` keeps working but stays a separate tab stop.
+> **Custom slots** — the roving tab index is managed automatically for the default slots. Only the [`slot`](#snippets) snippet receives the computed `tabindex` argument: forward it onto your own focusable element and the slot joins the arrow-key navigation — no `role="option"` is required for keyboard access. Also add `role="option"` and `aria-selected={selected}` (the snippet receives a computed `selected` flag that is index-accurate, so with `allowDuplicates` only the first matching slot is marked) so screen readers expose the slot as a selectable option. When you set a `deletionMode`, forward the `ariaKeyShortcuts` argument too (`aria-keyshortcuts={ariaKeyShortcuts}`) so the delete shortcut is announced on your custom slot. A `slot` that ignores `tabindex` keeps working but stays a separate tab stop; its cell still occupies a grid position, so `↑` / `↓` keep stepping over the rows as rendered rather than closing the gap it leaves.
 >
 > The `beforeSlot` and `afterSlot` snippets render **outside** the `listbox`, stacked before and after the slot grid, so they are not options and are **not** part of the arrow-key navigation. Render them as plain elements (e.g. a `<div>`, **not** an `<li>`), keep any interactive content they hold reachable with `Tab`, and do not give it `role="option"`. The `transparentSlot` snippet, by contrast, replaces the leading option _inside_ the listbox and now receives `tabindex` and `selected`: forward `role="option"`, the `tabindex` argument, and `aria-selected={selected}` onto your element so it stays the single leading tab stop and part of arrow-key navigation.
 
@@ -567,28 +569,32 @@ Or from a stylesheet, by passing a class and setting the tokens on it:
 
 Every value falls back to its default, so a palette with no tokens set renders exactly as before.
 
-| Custom property             | Default (light)          | Dark theme                 | Controls                                                     |
-| --------------------------- | ------------------------ | -------------------------- | ------------------------------------------------------------ |
-| `--palette-surface`         | `#fafafa`                | `#1e1e1e`                  | Palette and toolbar-button background                        |
-| `--palette-text`            | `black`                  | `#ededed`                  | Foreground text                                              |
-| `--palette-border`          | `#e5e5e5`                | `#3a3a3a`                  | Control borders and the active toolbar-button fill           |
-| `--palette-divider`         | `#e9e9e9`                | `#3a3a3a`                  | Divider lines above the input and tools                      |
-| `--palette-icon`            | `#646464`                | `#d0d0d0`                  | Toolbar icon stroke                                          |
-| `--palette-icon-disabled`   | `#bdbdbd`                | `#6a6a6a`                  | Disabled toolbar icon stroke                                 |
-| `--palette-loader`          | `#ccc`                   | `#555555`                  | Loading spinner arc                                          |
-| `--palette-radius`          | `0.3rem`                 | —                          | Corner radius of buttons and the input                       |
-| `--palette-font-family`     | `Helvetica, sans-serif`  | —                          | Hex input font family                                        |
-| `--palette-slot-size`       | `1rem`                   | —                          | Diameter of a color slot                                     |
-| `--palette-slot-border`     | `rgba(0, 0, 0, 0.2)`     | `rgba(255, 255, 255, .2)`  | Slot outline                                                 |
-| `--palette-slot-empty`      | `#aaa`                   | `#777`                     | Empty / transparent slot outline and diagonal                |
-| `--palette-slot-ring`       | `#9e9e9e`                | `#6a6a6a`                  | Ring around the selected slot                                |
-| `--palette-input-surface`   | `rgba(255, 255, 255, 1)` | `#2a2a2a`                  | Hex input background                                         |
-| `--palette-input-text`      | `rgba(0, 0, 0, 0.6)`     | `rgba(255, 255, 255, .75)` | Hex input text                                               |
-| `--palette-error`           | `#c0392b`                | `#ff6b5e`                  | Error headline and icon                                      |
-| `--palette-error-message`   | `#595959`                | `#b0b0b0`                  | Error detail message                                         |
-| `--palette-focus-ring`      | `#1a1a1a`                | `#f0f0f0`                  | Keyboard focus outline (see [Focus Outline](#focus-outline)) |
-| `--palette-tooltip-surface` | `black`                  | `#f0f0f0`                  | Default deletion tooltip background and arrow                |
-| `--palette-tooltip-text`    | `#fff`                   | `#1a1a1a`                  | Default deletion tooltip icon, text and focus ring           |
+| Custom property               | Default (light)          | Dark theme                 | Controls                                                           |
+| ----------------------------- | ------------------------ | -------------------------- | ------------------------------------------------------------------ |
+| `--palette-surface`           | `#fafafa`                | `#1e1e1e`                  | Palette and toolbar-button background                              |
+| `--palette-text`              | `black`                  | `#ededed`                  | Foreground text                                                    |
+| `--palette-border`            | `#e5e5e5`                | `#3a3a3a`                  | Control borders and the active toolbar-button fill                 |
+| `--palette-divider`           | `#e9e9e9`                | `#3a3a3a`                  | Divider lines above the input and tools                            |
+| `--palette-icon`              | `#646464`                | `#d0d0d0`                  | Toolbar icon stroke                                                |
+| `--palette-icon-disabled`     | `#bdbdbd`                | `#6a6a6a`                  | Disabled toolbar icon stroke                                       |
+| `--palette-loader`            | `#ccc`                   | `#555555`                  | Loading spinner arc                                                |
+| `--palette-radius`            | `0.3rem`                 | —                          | Corner radius of buttons and the input                             |
+| `--palette-font-family`       | `Helvetica, sans-serif`  | —                          | Hex input font family                                              |
+| `--palette-grid-column-track` | `minmax(2rem, 1fr)`      | —                          | Width of one slot-grid column (compact mode uses a narrower track) |
+| `--palette-grid-row-track`    | `minmax(2rem, 1fr)`      | —                          | Height of one slot-grid row                                        |
+| `--palette-grid-column-gap`   | `0.3rem`                 | —                          | Horizontal gap between slots (compact mode closes it)              |
+| `--palette-grid-row-gap`      | `0.6rem`                 | —                          | Vertical gap between slot rows                                     |
+| `--palette-slot-size`         | `1rem`                   | —                          | Diameter of a color slot                                           |
+| `--palette-slot-border`       | `rgba(0, 0, 0, 0.2)`     | `rgba(255, 255, 255, .2)`  | Slot outline                                                       |
+| `--palette-slot-empty`        | `#aaa`                   | `#777`                     | Empty / transparent slot outline and diagonal                      |
+| `--palette-slot-ring`         | `#9e9e9e`                | `#6a6a6a`                  | Ring around the selected slot                                      |
+| `--palette-input-surface`     | `rgba(255, 255, 255, 1)` | `#2a2a2a`                  | Hex input background                                               |
+| `--palette-input-text`        | `rgba(0, 0, 0, 0.6)`     | `rgba(255, 255, 255, .75)` | Hex input text                                                     |
+| `--palette-error`             | `#c0392b`                | `#ff6b5e`                  | Error headline and icon                                            |
+| `--palette-error-message`     | `#595959`                | `#b0b0b0`                  | Error detail message                                               |
+| `--palette-focus-ring`        | `#1a1a1a`                | `#f0f0f0`                  | Keyboard focus outline (see [Focus Outline](#focus-outline))       |
+| `--palette-tooltip-surface`   | `black`                  | `#f0f0f0`                  | Default deletion tooltip background and arrow                      |
+| `--palette-tooltip-text`      | `#fff`                   | `#1a1a1a`                  | Default deletion tooltip icon, text and focus ring                 |
 
 > `--palette-focus-ring` is themeable so the focus outline can stay visible in dark mode, but its light and dark defaults are chosen for WCAG-compliant contrast against the palette surface. Override it only with a value that preserves sufficient contrast.
 
@@ -670,7 +676,7 @@ You can style the component by passing a class down to the root tag (`div`).
 
 ### Slot Grid Class
 
-The slot grid (columns, gaps) is laid out on the `listbox` element, `.palette__listbox`, not on its `.palette__cells` wrapper — the wrapper is a flex column that stacks the optional `beforeSlot` / `afterSlot` around the grid. Target `.palette__listbox` (e.g. `.palette__cells > .palette__listbox`) to override the flat-mode grid:
+The slot grid (columns, gaps) is laid out on the `listbox` element, `.palette__listbox`, not on its `.palette__cells` wrapper — the wrapper is a flex column that stacks the optional `beforeSlot` / `afterSlot` around the grid. Its track sizes and gaps come from the [`--palette-grid-*` tokens](#tokens), so retuning those is a one-line override that needs no internal class name and applies to grouped palettes at the same time. Target `.palette__listbox` (e.g. `.palette__cells > .palette__listbox`) when you need to replace the layout itself:
 
 ```svelte
 <style>
@@ -680,7 +686,19 @@ The slot grid (columns, gaps) is laid out on the `listbox` element, `.palette__l
 </style>
 ```
 
-When colors are grouped, each group keeps its own `.palette__cells` grid instead.
+When colors are grouped, each group keeps its own `.palette__cells` grid instead — laid out on the same `--num-columns`, so a group holding more colors than the column count wraps onto further rows. That grid is declared inside `:where()`, at zero specificity, so any ordinary rule of yours replaces it without `!important` and without borrowing the palette's own class names:
+
+```svelte
+<style>
+	:global(.palette__groups__group > ul.palette__cells) {
+		display: flex;
+	}
+</style>
+```
+
+The list reset the grid sits on — `margin`, `padding` and `list-style` — is declared at normal specificity instead, so an ambient `ul { ... }` rule from a CSS reset or a framework cannot re-indent a group. To change those three as well, add a class of your own (e.g. `.palette__custom`) to the selector above.
+
+Overriding the layout does not change the keyboard model: `↑` / `↓` still step by `numColumns`, so keep your own rows that wide if you want vertical navigation to match what you render (see [Accessibility](#accessibility)).
 
 ### Focus Outline
 

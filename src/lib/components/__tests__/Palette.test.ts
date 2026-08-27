@@ -669,6 +669,45 @@ test('Updates num-columns when numColumns changes to 0', async () => {
 	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 25'))
 })
 
+test('Sets num-columns from the longest group when numColumns is 0 in grouped mode', async () => {
+	const colors = [
+		{ name: 'A', colors: ['#a00', '#a11'] },
+		{ name: 'B', colors: ['#b00', '#b11', '#b22', '#b33', '#b44', '#b55', '#b66'] },
+	]
+
+	setup(Palette, { props: { colors, numColumns: 0 } })
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 7'))
+})
+
+test('Keeps the minimum column count when every group is shorter in grouped mode', async () => {
+	const colors = [
+		{ name: 'A', colors: ['#a00', '#a11'] },
+		{ name: 'B', colors: ['#b00', '#b11', '#b22'] },
+	]
+
+	setup(Palette, { props: { colors, numColumns: 0 } })
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 5'))
+})
+
+test('Caps num-columns with maxColumns in grouped mode', async () => {
+	const colors = [
+		{ name: 'A', colors: ['#a00', '#a11'] },
+		{ name: 'B', colors: ['#b00', '#b11', '#b22', '#b33', '#b44', '#b55', '#b66'] },
+	]
+
+	setup(Palette, { props: { colors, numColumns: 0, maxColumns: 4 } })
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 4'))
+})
+
 test('Removes duplicates when updating allowDuplicates value', async () => {
 	const colors = ['#ff0', '#0ff', '#f0f', '#f0f', '#f0f']
 
@@ -969,6 +1008,55 @@ test('Moves focus by a full row with ArrowDown and ArrowUp', async () => {
 	expect(slots[0]).toHaveFocus()
 })
 
+test('Clamps the column when the last visual row is shorter', async () => {
+	const colors = ['#100', '#200', '#300', '#400', '#500', '#600']
+	const { user } = setup(Palette, { props: { colors, numColumns: 4 } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	slots[2].focus()
+	await user.keyboard('{ArrowDown}')
+	expect(slots[5]).toHaveFocus()
+
+	await user.keyboard('{ArrowUp}')
+	expect(slots[1]).toHaveFocus()
+})
+
+test('Steps by rendered cell when a custom slot drops out of the option list', async () => {
+	const slotSnippet = createRawSnippet((getProps) => ({
+		render: () =>
+			getProps().color === '#300'
+				? `<div data-testid="__inert-slot__"></div>`
+				: `<span data-testid="__nav-slot__" role="option" tabindex="${getProps().tabindex}"></span>`,
+	}))
+	const colors = ['#100', '#200', '#300', '#400', '#500', '#600']
+	const { user } = setup(Palette, { props: { colors, numColumns: 4, slot: slotSnippet } })
+
+	const slots = await screen.findAllByTestId('__nav-slot__')
+	expect(slots).toHaveLength(5)
+
+	slots[0].focus()
+	await user.keyboard('{ArrowDown}')
+	expect(slots[3]).toHaveFocus()
+})
+
+test('Falls back to the first slot of the target row when no slot reaches the column', async () => {
+	const slotSnippet = createRawSnippet((getProps) => ({
+		render: () =>
+			getProps().color === '#500'
+				? `<div data-testid="__inert-slot__"></div>`
+				: `<span data-testid="__nav-slot__" role="option" tabindex="${getProps().tabindex}"></span>`,
+	}))
+	const colors = ['#100', '#200', '#300', '#400', '#500', '#600', '#700', '#800']
+	const { user } = setup(Palette, { props: { colors, numColumns: 4, slot: slotSnippet } })
+
+	const slots = await screen.findAllByTestId('__nav-slot__')
+	expect(slots).toHaveLength(7)
+
+	slots[0].focus()
+	await user.keyboard('{ArrowDown}')
+	expect(slots[4]).toHaveFocus()
+})
+
 test('Jumps to the first and last slot with Home and End', async () => {
 	const colors = ['#ff0', '#0ff', '#f0f', '#fff']
 	const { user } = setup(Palette, { colors })
@@ -1045,6 +1133,82 @@ test('Moves between groups by row with ArrowDown and ArrowUp, clamping to the gr
 	slots[3].focus()
 	await user.keyboard('{ArrowDown}')
 	expect(slots[5]).toHaveFocus()
+})
+
+test('Moves by visual row inside a group holding more colors than numColumns', async () => {
+	const colors = [
+		{ name: 'A', colors: ['#a00', '#a11', '#a22', '#a33', '#a44', '#a55', '#a66'] },
+		{ name: 'B', colors: ['#b00', '#b11', '#b22'] },
+	]
+	const { user } = setup(Palette, { props: { colors, numColumns: 4 } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+
+	slots[0].focus()
+	await user.keyboard('{ArrowDown}')
+	expect(slots[4]).toHaveFocus()
+
+	await user.keyboard('{ArrowDown}')
+	expect(slots[7]).toHaveFocus()
+
+	await user.keyboard('{ArrowUp}')
+	expect(slots[4]).toHaveFocus()
+
+	await user.keyboard('{ArrowUp}')
+	expect(slots[0]).toHaveFocus()
+})
+
+test('Clamps the column when the next visual row of a group is shorter', async () => {
+	const colors = [
+		{ name: 'A', colors: ['#a00', '#a11', '#a22', '#a33', '#a44', '#a55'] },
+		{ name: 'B', colors: ['#b00', '#b11', '#b22', '#b33'] },
+	]
+	const { user } = setup(Palette, { props: { colors, numColumns: 4 } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+
+	slots[3].focus()
+	await user.keyboard('{ArrowDown}')
+	expect(slots[5]).toHaveFocus()
+
+	await user.keyboard('{ArrowDown}')
+	expect(slots[7]).toHaveFocus()
+})
+
+test('Keeps ArrowUp and ArrowDown as no-ops on the outer edges of a grouped palette', async () => {
+	const colors = [
+		{ name: 'A', colors: ['#a00', '#a11', '#a22', '#a33', '#a44'] },
+		{ name: 'B', colors: ['#b00', '#b11'] },
+	]
+	const { user } = setup(Palette, { props: { colors, numColumns: 4 } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+
+	slots[0].focus()
+	await user.keyboard('{ArrowUp}')
+	expect(slots[0]).toHaveFocus()
+
+	slots[6].focus()
+	await user.keyboard('{ArrowDown}')
+	expect(slots[6]).toHaveFocus()
+})
+
+test('Steps by rendered cell inside a group when a custom slot drops out of the option list', async () => {
+	const slotSnippet = createRawSnippet((getProps) => ({
+		render: () =>
+			getProps().color === '#a11'
+				? `<div data-testid="__inert-slot__"></div>`
+				: `<span data-testid="__nav-slot__" role="option" tabindex="${getProps().tabindex}"></span>`,
+	}))
+	const colors = [{ name: 'A', colors: ['#a00', '#a11', '#a22', '#a33', '#a44', '#a55'] }]
+	const { user } = setup(Palette, { props: { colors, numColumns: 4, slot: slotSnippet } })
+
+	const slots = await screen.findAllByTestId('__nav-slot__')
+	expect(slots).toHaveLength(5)
+
+	slots[0].focus()
+	await user.keyboard('{ArrowDown}')
+	expect(slots[3]).toHaveFocus()
 })
 
 test('Selects the focused slot with Enter and Space', async () => {

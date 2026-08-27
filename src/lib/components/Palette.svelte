@@ -216,7 +216,11 @@
 						_colors = null
 						_fullColors = null
 						const maxGroupLength = newColorGroups.reduce((max, g) => Math.max(max, g.colors.length), 0)
-						_numColumns = calculateNumColumns(maxGroupLength, { numColumns: _params.numColumns })
+						_numColumns = calculateNumColumns(maxGroupLength, {
+							showTransparentSlot: false,
+							numColumns: _params.numColumns,
+							maxColumns: _params.maxColumns,
+						})
 					} else {
 						const newColors = calculateColors(results, _params)
 						_colors = newColors
@@ -452,7 +456,10 @@
 		_isSettingsOn = false
 	}
 
+	type CellPosition = { container: Element | null; position: number }
+
 	let _cachedOptions: HTMLElement[] | null = null
+	let _cachedCells: CellPosition[] = []
 
 	$effect(() => {
 		void _colors
@@ -462,6 +469,7 @@
 		void _isCompact
 		void selectedColor
 		_cachedOptions = null
+		_cachedCells = []
 	})
 
 	const _getOptions = (): HTMLElement[] => {
@@ -471,38 +479,52 @@
 		if (!_listboxEl) {
 			return []
 		}
-		_cachedOptions = [..._listboxEl.querySelectorAll<HTMLElement>('.palette__cells__cell')]
-			.map(
-				(cell) =>
-					cell.querySelector<HTMLElement>('[role="option"]:not([disabled])') ??
-					cell.querySelector<HTMLElement>('[tabindex]:not([disabled])')
-			)
-			.filter((el): el is HTMLElement => el != null)
+		const options: HTMLElement[] = []
+		const cells: CellPosition[] = []
+		let container: Element | null = null
+		let position = 0
+		for (const cell of _listboxEl.querySelectorAll<HTMLElement>('.palette__cells__cell')) {
+			const parent = cell.parentElement
+			position = parent === container ? position + 1 : 0
+			container = parent
+			const option =
+				cell.querySelector<HTMLElement>('[role="option"]:not([disabled])') ??
+				cell.querySelector<HTMLElement>('[tabindex]:not([disabled])')
+			if (option) {
+				options.push(option)
+				cells.push({ container, position })
+			}
+		}
+		_cachedOptions = options
+		_cachedCells = cells
 		return _cachedOptions
 	}
 
 	const _rowStep = (options: HTMLElement[], from: number, dir: number): number => {
-		if (!_colorGroups) {
-			const target = from + dir * _numColumns
-			return target >= 0 && target < options.length ? target : from
-		}
-		const rows: number[][] = []
-		let lastRow: Element | null = null
-		options.forEach((option, index) => {
-			const row = option.closest('.palette__cells')
-			if (row !== lastRow) {
+		const columns = Number.isFinite(_numColumns) ? Math.max(_numColumns, 1) : 1
+		const rows: { index: number; column: number }[][] = []
+		let lastContainer: Element | null = null
+		let lastRow = -1
+		for (let index = 0; index < options.length; index++) {
+			const cell = _cachedCells[index]
+			const container = cell?.container ?? null
+			const position = cell?.position ?? index
+			const row = Math.floor(position / columns)
+			if (container !== lastContainer || row !== lastRow) {
 				rows.push([])
+				lastContainer = container
 				lastRow = row
 			}
-			rows[rows.length - 1].push(index)
-		})
-		const rowIndex = rows.findIndex((row) => row.includes(from))
+			rows[rows.length - 1].push({ index, column: position % columns })
+		}
+		const rowIndex = rows.findIndex((row) => row.some((cell) => cell.index === from))
 		const targetRow = rows[rowIndex + dir]
 		if (rowIndex < 0 || !targetRow) {
 			return from
 		}
-		const column = rows[rowIndex].indexOf(from)
-		return targetRow[Math.min(column, targetRow.length - 1)]
+		const column = rows[rowIndex].find((cell) => cell.index === from)?.column ?? 0
+		const target = targetRow.findLast((cell) => cell.column <= column) ?? targetRow[0]
+		return target.index
 	}
 
 	const _deleteOption = async (from: number) => {
@@ -837,6 +859,10 @@
 		--palette-loader: #ccc;
 		--palette-radius: 0.3rem;
 		--palette-font-family: Helvetica, sans-serif;
+		--palette-grid-column-track: minmax(2rem, 1fr);
+		--palette-grid-row-track: minmax(2rem, 1fr);
+		--palette-grid-column-gap: 0.3rem;
+		--palette-grid-row-gap: 0.6rem;
 		--palette-slot-size: 1rem;
 		--palette-slot-border: rgba(0, 0, 0, 0.2);
 		--palette-slot-empty: #aaa;
@@ -966,10 +992,10 @@
 	.palette__content > .palette__cells > .palette__listbox {
 		width: 100%;
 		display: grid;
-		grid-template-columns: repeat(var(--num-columns), minmax(2rem, 1fr));
-		grid-auto-rows: minmax(2rem, 1fr);
-		column-gap: 0.3rem;
-		row-gap: 0.6rem;
+		grid-template-columns: repeat(var(--num-columns), var(--palette-grid-column-track));
+		grid-auto-rows: var(--palette-grid-row-track);
+		column-gap: var(--palette-grid-column-gap);
+		row-gap: var(--palette-grid-row-gap);
 		align-items: center;
 		justify-items: center;
 		margin: 0;
@@ -1013,5 +1039,28 @@
 		font-size: 0.75rem;
 		font-weight: 600;
 		margin: 0;
+	}
+
+	:where(.palette__groups__group > ul.palette__cells) {
+		display: grid;
+		grid-template-columns: repeat(var(--num-columns), var(--palette-grid-column-track));
+		grid-auto-rows: var(--palette-grid-row-track);
+		column-gap: var(--palette-grid-column-gap);
+		row-gap: var(--palette-grid-row-gap);
+		align-items: center;
+		justify-items: center;
+	}
+
+	:where(.palette__groups__group) > ul.palette__cells {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	:where(.palette__groups__group > ul.palette__cells > .palette__cells__cell) {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 </style>
