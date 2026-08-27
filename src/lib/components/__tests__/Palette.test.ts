@@ -1073,6 +1073,64 @@ test('Moves between groups by row with ArrowDown and ArrowUp, clamping to the gr
 	expect(slots[5]).toHaveFocus()
 })
 
+test('Moves by visual row inside a group holding more colors than numColumns', async () => {
+	const colors = [
+		{ name: 'A', colors: ['#a00', '#a11', '#a22', '#a33', '#a44', '#a55', '#a66'] },
+		{ name: 'B', colors: ['#b00', '#b11', '#b22'] },
+	]
+	const { user } = setup(Palette, { props: { colors, numColumns: 4 } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+
+	slots[0].focus()
+	await user.keyboard('{ArrowDown}')
+	expect(slots[4]).toHaveFocus()
+
+	await user.keyboard('{ArrowDown}')
+	expect(slots[7]).toHaveFocus()
+
+	await user.keyboard('{ArrowUp}')
+	expect(slots[4]).toHaveFocus()
+
+	await user.keyboard('{ArrowUp}')
+	expect(slots[0]).toHaveFocus()
+})
+
+test('Clamps the column when the next visual row of a group is shorter', async () => {
+	const colors = [
+		{ name: 'A', colors: ['#a00', '#a11', '#a22', '#a33', '#a44', '#a55'] },
+		{ name: 'B', colors: ['#b00', '#b11', '#b22', '#b33'] },
+	]
+	const { user } = setup(Palette, { props: { colors, numColumns: 4 } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+
+	slots[3].focus()
+	await user.keyboard('{ArrowDown}')
+	expect(slots[5]).toHaveFocus()
+
+	await user.keyboard('{ArrowDown}')
+	expect(slots[7]).toHaveFocus()
+})
+
+test('Keeps ArrowUp and ArrowDown as no-ops on the outer edges of a grouped palette', async () => {
+	const colors = [
+		{ name: 'A', colors: ['#a00', '#a11', '#a22', '#a33', '#a44'] },
+		{ name: 'B', colors: ['#b00', '#b11'] },
+	]
+	const { user } = setup(Palette, { props: { colors, numColumns: 4 } })
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+
+	slots[0].focus()
+	await user.keyboard('{ArrowUp}')
+	expect(slots[0]).toHaveFocus()
+
+	slots[6].focus()
+	await user.keyboard('{ArrowDown}')
+	expect(slots[6]).toHaveFocus()
+})
+
 test('Selects the focused slot with Enter and Space', async () => {
 	const onSelect = vi.fn()
 	const colors = ['#ff0', '#0ff', '#f0f']

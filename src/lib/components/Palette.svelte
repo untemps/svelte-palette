@@ -490,13 +490,16 @@
 			const target = from + dir * _numColumns
 			return target >= 0 && target < options.length ? target : from
 		}
+		const columns = Math.max(_numColumns, 1)
 		const rows: number[][] = []
-		let lastRow: Element | null = null
+		let lastGroup: Element | null = null
 		options.forEach((option, index) => {
-			const row = option.closest('.palette__cells')
-			if (row !== lastRow) {
+			const group = option.closest('.palette__cells')
+			if (group !== lastGroup) {
 				rows.push([])
-				lastRow = row
+				lastGroup = group
+			} else if (rows[rows.length - 1].length >= columns) {
+				rows.push([])
 			}
 			rows[rows.length - 1].push(index)
 		})
