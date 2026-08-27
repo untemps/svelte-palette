@@ -1039,6 +1039,24 @@ test('Steps by rendered cell when a custom slot drops out of the option list', a
 	expect(slots[3]).toHaveFocus()
 })
 
+test('Falls back to the first slot of the target row when no slot reaches the column', async () => {
+	const slotSnippet = createRawSnippet((getProps) => ({
+		render: () =>
+			getProps().color === '#500'
+				? `<div data-testid="__inert-slot__"></div>`
+				: `<span data-testid="__nav-slot__" role="option" tabindex="${getProps().tabindex}"></span>`,
+	}))
+	const colors = ['#100', '#200', '#300', '#400', '#500', '#600', '#700', '#800']
+	const { user } = setup(Palette, { props: { colors, numColumns: 4, slot: slotSnippet } })
+
+	const slots = await screen.findAllByTestId('__nav-slot__')
+	expect(slots).toHaveLength(7)
+
+	slots[0].focus()
+	await user.keyboard('{ArrowDown}')
+	expect(slots[4]).toHaveFocus()
+})
+
 test('Jumps to the first and last slot with Home and End', async () => {
 	const colors = ['#ff0', '#0ff', '#f0f', '#fff']
 	const { user } = setup(Palette, { colors })
