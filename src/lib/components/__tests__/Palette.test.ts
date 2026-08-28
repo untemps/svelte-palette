@@ -743,6 +743,33 @@ test('Recounts num-columns after a slot deletion when numColumns is 0 in grouped
 	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 6'))
 })
 
+test('Recounts num-columns after a desynced compact slot deletion when numColumns is 0', async () => {
+	const colors = ['#AABBCC', '#112233', '#aabbcc', '#445566', '#778899', '#99aabb', '#bbccdd', '#ccddee']
+
+	const { user } = setup(Palette, {
+		props: {
+			colors,
+			numColumns: 0,
+			isCompact: true,
+			compactColorIndices: [0, 1, 2, 3, 4, 5, 6, 7],
+			deletionMode: TOOLTIP,
+		},
+	})
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 7'))
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(7)
+
+	await user.hover(cells[2])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.queryAllByTestId('__palette-cell__')).toHaveLength(6))
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 6'))
+})
+
 test('Removes duplicates when updating allowDuplicates value', async () => {
 	const colors = ['#ff0', '#0ff', '#f0f', '#f0f', '#f0f']
 

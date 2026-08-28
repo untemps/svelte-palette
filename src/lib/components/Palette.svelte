@@ -379,7 +379,9 @@
 		const target = _compactPicked()[index]
 		const rendered = (_colors ?? [])[index]
 		if (!target || !rendered || target.color.value !== rendered.value) {
-			_colors = (_colors ?? []).filter((c, i) => i !== index)
+			const nextColors = (_colors ?? []).filter((c, i) => i !== index)
+			_colors = nextColors
+			_numColumns = calculateNumColumns(nextColors.length, _viewParams())
 			return
 		}
 		const { color: removed, index: fullIndex } = target
