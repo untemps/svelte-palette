@@ -172,6 +172,15 @@
 		a.compactColorIndices.length === b.compactColorIndices.length &&
 		a.compactColorIndices.every((index, i) => index === b.compactColorIndices[i])
 
+	const _groupNumColumns = (
+		groups: NormalizedColorGroup[],
+		params: ReturnType<typeof _viewParams> = _viewParams()
+	): number =>
+		calculateNumColumns(
+			groups.reduce((max, group) => Math.max(max, group.colors.length), 0),
+			{ showTransparentSlot: false, numColumns: params.numColumns, maxColumns: params.maxColumns }
+		)
+
 	$effect(() => {
 		_isCompact = isCompact
 	})
@@ -215,12 +224,7 @@
 						_colorGroups = newColorGroups
 						_colors = null
 						_fullColors = null
-						const maxGroupLength = newColorGroups.reduce((max, g) => Math.max(max, g.colors.length), 0)
-						_numColumns = calculateNumColumns(maxGroupLength, {
-							showTransparentSlot: false,
-							numColumns: _params.numColumns,
-							maxColumns: _params.maxColumns,
-						})
+						_numColumns = _groupNumColumns(newColorGroups, _params)
 					} else {
 						const newColors = calculateColors(results, _params)
 						_colors = newColors
@@ -336,13 +340,7 @@
 			maxColors,
 		})
 		_colors = nextColors
-		_numColumns = calculateNumColumns(nextColors.length, {
-			isCompact: _isCompact,
-			compactColorIndices,
-			showTransparentSlot,
-			numColumns,
-			maxColumns,
-		})
+		_numColumns = calculateNumColumns(nextColors.length, _viewParams())
 		if (nextColors.length > previousLength) {
 			_syncColors(nextColors)
 			onadd?.({ color, colors: nextColors })
@@ -396,13 +394,7 @@
 			maxColors,
 		})
 		_colors = nextColors
-		_numColumns = calculateNumColumns(nextColors.length, {
-			isCompact: true,
-			compactColorIndices,
-			showTransparentSlot,
-			numColumns,
-			maxColumns,
-		})
+		_numColumns = calculateNumColumns(nextColors.length, _viewParams())
 		_syncColors(nextFullColors)
 		ondelete?.({ color: removed.value, index: fullIndex, colors: nextFullColors })
 	}
@@ -414,12 +406,7 @@
 			gi === groupIndex ? { ...g, colors: g.colors.filter((_, ci) => ci !== colorIndex) } : g
 		)
 		_colorGroups = nextColorGroups
-		const maxGroupLength = nextColorGroups.reduce((max, g) => Math.max(max, g.colors.length), 0)
-		_numColumns = calculateNumColumns(maxGroupLength, {
-			showTransparentSlot: false,
-			numColumns,
-			maxColumns,
-		})
+		_numColumns = _groupNumColumns(nextColorGroups)
 		if (removed) {
 			_syncColorGroups(nextColorGroups)
 			ondelete?.({
