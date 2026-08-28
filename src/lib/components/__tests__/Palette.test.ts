@@ -743,6 +743,26 @@ test('Recounts num-columns after a slot deletion when numColumns is 0 in grouped
 	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 6'))
 })
 
+test('Keeps num-columns at the longest group width when a shorter group shrinks', async () => {
+	const colors = [
+		{ name: 'A', colors: ['#a00', '#a11'] },
+		{ name: 'B', colors: ['#b00', '#b11', '#b22', '#b33', '#b44', '#b55', '#b66'] },
+	]
+
+	const { user } = setup(Palette, { props: { colors, numColumns: 0, deletionMode: TOOLTIP } })
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 7'))
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.queryAllByTestId('__palette-cell__')).toHaveLength(8))
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 7'))
+})
+
 test('Recounts num-columns after a desynced compact slot deletion when numColumns is 0', async () => {
 	const colors = ['#AABBCC', '#112233', '#aabbcc', '#445566', '#778899', '#99aabb', '#bbccdd', '#ccddee']
 
