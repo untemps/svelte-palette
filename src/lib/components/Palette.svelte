@@ -182,8 +182,10 @@
 			{ showTransparentSlot: false, numColumns: params.numColumns, maxColumns: params.maxColumns }
 		)
 
-	const _compactNumColumns = (count: number): number =>
-		Math.max(count + Number(showTransparentSlot), MIN_COMPACT_NUM_COLUMNS)
+	const _compactNumColumns = (
+		count: number,
+		params: Pick<ReturnType<typeof _viewParams>, 'showTransparentSlot'> = _viewParams()
+	): number => Math.max(count + Number(params.showTransparentSlot), MIN_COMPACT_NUM_COLUMNS)
 
 	$effect(() => {
 		_isCompact = isCompact
@@ -234,7 +236,9 @@
 						_colors = newColors
 						_colorGroups = null
 						_fullColors = transformColors(Array.isArray(results) ? results : [])
-						_numColumns = calculateNumColumns(newColors.length, _params)
+						_numColumns = _params.isCompact
+							? _compactNumColumns(newColors.length, _params)
+							: calculateNumColumns(newColors.length, _params)
 					}
 				}
 			},
