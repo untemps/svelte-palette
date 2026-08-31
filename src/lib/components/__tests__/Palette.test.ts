@@ -855,6 +855,26 @@ test('Recounts num-columns from the rendered subset when stale compact indices u
 	expect(onDelete).not.toHaveBeenCalled()
 })
 
+test('Keeps num-columns at one column when a compact deletion empties the rendered subset', async () => {
+	const colors = ['#a00', '#0b0']
+
+	const { user } = setup(Palette, {
+		props: { colors, isCompact: true, compactColorIndices: [0], deletionMode: TOOLTIP },
+	})
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(1)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.queryAllByTestId('__palette-cell__')).toHaveLength(0))
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 1'))
+})
+
 test('Removes duplicates when updating allowDuplicates value', async () => {
 	const colors = ['#ff0', '#0ff', '#f0f', '#f0f', '#f0f']
 

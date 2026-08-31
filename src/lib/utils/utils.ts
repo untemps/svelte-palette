@@ -102,6 +102,7 @@ export const calculateNumColumns = (
 	$options?: CalculateNumColumnsOptions
 ): number => {
 	const MIN_NUM_COLUMNS = 5
+	const MIN_COMPACT_NUM_COLUMNS = 1
 	const colorLength = Math.max($colorLength + Number($params?.showTransparentSlot), 0)
 	const params: CalculateNumColumnsParams = $params ?? {
 		isCompact: false,
@@ -110,7 +111,13 @@ export const calculateNumColumns = (
 		numColumns: 1,
 	}
 	if (params.isCompact) {
-		return Math.min(colorLength, Number(params.compactColorIndices?.length) + Number(params.showTransparentSlot))
+		const compactLength = Math.min(
+			colorLength,
+			Number(params.compactColorIndices?.length) + Number(params.showTransparentSlot)
+		)
+		return Number.isFinite(compactLength)
+			? Math.max(compactLength, MIN_COMPACT_NUM_COLUMNS)
+			: MIN_COMPACT_NUM_COLUMNS
 	}
 	if ((params.numColumns ?? 0) > 0) {
 		return Math.max(params.numColumns ?? 0, 0)
