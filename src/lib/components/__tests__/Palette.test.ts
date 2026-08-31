@@ -763,6 +763,62 @@ test('Keeps num-columns at the longest group width when a shorter group shrinks'
 	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 7'))
 })
 
+test('Leaves num-columns at the configured width after a slot deletion', async () => {
+	const colors = ['#100', '#200', '#300', '#400', '#500', '#600', '#700']
+
+	const { user } = setup(Palette, { props: { colors, numColumns: 4, deletionMode: TOOLTIP } })
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 4'))
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(6))
+	expect(section.getAttribute('style')).toContain('--num-columns: 4')
+})
+
+test('Leaves num-columns at the configured width after a grouped slot deletion', async () => {
+	const colors = [
+		{ name: 'A', colors: ['#a00', '#a11'] },
+		{ name: 'B', colors: ['#b00', '#b11', '#b22'] },
+	]
+
+	const { user } = setup(Palette, { props: { colors, numColumns: 4, deletionMode: TOOLTIP } })
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 4'))
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(4))
+	expect(section.getAttribute('style')).toContain('--num-columns: 4')
+})
+
+test('Recounts num-columns from the rendered subset after a compact deletion despite a configured width', async () => {
+	const colors = ['#a00', '#0b0', '#00c']
+
+	const { user } = setup(Palette, {
+		props: { colors, isCompact: true, compactColorIndices: [0, 1, 2], numColumns: 4, deletionMode: TOOLTIP },
+	})
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 3'))
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 2'))
+})
+
 test('Recounts num-columns after a compact slot deletion when the full list holds case-varying duplicates', async () => {
 	const onDelete = vi.fn()
 	const colors = ['#AABBCC', '#112233', '#aabbcc', '#445566', '#778899', '#99aabb', '#bbccdd', '#ccddee']
@@ -770,7 +826,6 @@ test('Recounts num-columns after a compact slot deletion when the full list hold
 	const { user } = setup(Palette, {
 		props: {
 			colors,
-			numColumns: 0,
 			isCompact: true,
 			compactColorIndices: [0, 1, 2, 3, 4, 5, 6, 7],
 			deletionMode: TOOLTIP,
@@ -802,7 +857,6 @@ test('Removes the occurrence the drifted subset selects rather than the first by
 			initialIsCompact: true,
 			initialCompactColorIndices: [0, 2],
 			initialAllowDuplicates: true,
-			initialNumColumns: 0,
 			deletionMode: TOOLTIP,
 			ondelete: onDelete,
 		},
