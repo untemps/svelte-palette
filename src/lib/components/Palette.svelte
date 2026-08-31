@@ -348,17 +348,13 @@
 			return
 		}
 		const previousLength = (_colors ?? []).length
-		const nextColors = calculateColors([...(_colors ?? []), color], {
-			isCompact: _isCompact,
-			compactColorIndices,
-			allowDuplicates,
-			maxColors,
-		})
+		const nextFullColors = transformColors([...(_fullColors ?? []), color])
+		const nextColors = calculateColors(nextFullColors, _viewParams())
 		_colors = nextColors
 		_numColumns = calculateNumColumns(nextColors.length, _viewParams())
 		if (nextColors.length > previousLength) {
-			_syncColors(nextColors)
-			onadd?.({ color, colors: nextColors })
+			_syncColors(nextFullColors)
+			onadd?.({ color, colors: nextFullColors })
 		}
 	}
 

@@ -2536,6 +2536,29 @@ test('Keeps colors dropped as duplicates in the bound list after a deletion', as
 	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(1))
 })
 
+test('Keeps colors dropped as duplicates in the bound list after an add', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#AABBCC', '#112233', '#aabbcc'] },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	expect(await screen.findAllByTestId('__palette-cell__')).toHaveLength(2)
+
+	const input = await screen.findByTestId('__palette-input-input__')
+	await user.type(input, '0f0')
+	await user.click(await screen.findByTestId('__palette-input-submit__'))
+
+	await waitFor(() =>
+		expect(JSON.parse(bound.textContent ?? '')).toEqual([
+			{ value: '#AABBCC' },
+			{ value: '#112233' },
+			{ value: '#aabbcc' },
+			{ value: '#0f0' },
+		])
+	)
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(3))
+})
+
 test('Reflects an add and a delete back through bind:colors', async () => {
 	const { user } = setup(PaletteBind, {
 		props: { initialColors: ['#ff0', '#0ff'] },
