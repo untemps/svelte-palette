@@ -793,37 +793,6 @@ test('Recounts num-columns after a compact slot deletion when the full list hold
 	expect(onDelete).toHaveBeenCalledWith(expect.objectContaining({ color: '#445566', index: 3 }))
 })
 
-test('Recounts num-columns from the rendered subset when a compact deletion desyncs', async () => {
-	const onDelete = vi.fn()
-
-	const { component, user } = setup(PaletteReactive, {
-		props: {
-			initialColors: ['#a00', '#0b0', '#00c'],
-			initialIsCompact: true,
-			initialCompactColorIndices: [0, 1],
-			initialNumColumns: 0,
-			deletionMode: TOOLTIP,
-			ondelete: onDelete,
-		},
-	})
-
-	const cells = await screen.findAllByTestId('__palette-cell__')
-	expect(cells).toHaveLength(2)
-
-	const section = document.querySelector('.palette__content')
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 2'))
-
-	component.setColors(new Promise(() => {}))
-	component.setCompactColorIndices([])
-
-	await user.hover(cells[0])
-	await user.click(await screen.findByTestId('__trash-icon__'))
-
-	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(1))
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 1'))
-	expect(onDelete).not.toHaveBeenCalled()
-})
-
 test('Recounts num-columns from the rendered subset when stale compact indices undercount it', async () => {
 	const onDelete = vi.fn()
 
@@ -993,6 +962,9 @@ test('Falls back to a local removal when the rendered subset drifts from the ful
 	const cells = await screen.findAllByTestId('__palette-cell__')
 	expect(cells).toHaveLength(2)
 
+	const section = document.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 2'))
+
 	component.setColors(new Promise(() => {}))
 	component.setCompactColorIndices([2])
 
@@ -1002,6 +974,7 @@ test('Falls back to a local removal when the rendered subset drifts from the ful
 
 	expect(onDelete).not.toHaveBeenCalled()
 	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(1))
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 1'))
 })
 
 test('Applies an isCompact change made inside ondelete alongside the write-back', async () => {
