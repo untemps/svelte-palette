@@ -763,7 +763,8 @@ test('Keeps num-columns at the longest group width when a shorter group shrinks'
 	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 7'))
 })
 
-test('Recounts num-columns after a desynced compact slot deletion when numColumns is 0', async () => {
+test('Recounts num-columns after a compact slot deletion when the full list holds case-varying duplicates', async () => {
+	const onDelete = vi.fn()
 	const colors = ['#AABBCC', '#112233', '#aabbcc', '#445566', '#778899', '#99aabb', '#bbccdd', '#ccddee']
 
 	const { user } = setup(Palette, {
@@ -773,6 +774,7 @@ test('Recounts num-columns after a desynced compact slot deletion when numColumn
 			isCompact: true,
 			compactColorIndices: [0, 1, 2, 3, 4, 5, 6, 7],
 			deletionMode: TOOLTIP,
+			ondelete: onDelete,
 		},
 	})
 
@@ -788,6 +790,7 @@ test('Recounts num-columns after a desynced compact slot deletion when numColumn
 
 	await waitFor(() => expect(screen.queryAllByTestId('__palette-cell__')).toHaveLength(6))
 	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 6'))
+	expect(onDelete).toHaveBeenCalledWith(expect.objectContaining({ color: '#445566', index: 3 }))
 })
 
 test('Removes duplicates when updating allowDuplicates value', async () => {

@@ -367,7 +367,9 @@
 		const indices = compactColorIndices ?? []
 		let picked = full.map((color, index) => ({ color, index })).filter(({ index }) => indices.includes(index))
 		if (!allowDuplicates) {
-			picked = picked.filter((item, i) => picked.findIndex((o) => o.color.value === item.color.value) === i)
+			picked = picked.filter(
+				(item, i) => picked.findIndex((o) => isSameColor(o.color.value, item.color.value)) === i
+			)
 		}
 		if (maxColors >= 0 && picked.length > maxColors) {
 			picked = picked.slice(0, maxColors)
