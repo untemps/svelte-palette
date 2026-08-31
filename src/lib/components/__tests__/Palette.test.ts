@@ -793,6 +793,68 @@ test('Recounts num-columns after a compact slot deletion when the full list hold
 	expect(onDelete).toHaveBeenCalledWith(expect.objectContaining({ color: '#445566', index: 3 }))
 })
 
+test('Recounts num-columns from the rendered subset when a compact deletion desyncs', async () => {
+	const onDelete = vi.fn()
+
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#00c'],
+			initialIsCompact: true,
+			initialCompactColorIndices: [0, 1],
+			initialNumColumns: 0,
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	const section = document.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 2'))
+
+	component.setColors(new Promise(() => {}))
+	component.setCompactColorIndices([])
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(1))
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 1'))
+	expect(onDelete).not.toHaveBeenCalled()
+})
+
+test('Recounts num-columns from the rendered subset when stale compact indices undercount it', async () => {
+	const onDelete = vi.fn()
+
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#00c'],
+			initialIsCompact: true,
+			initialCompactColorIndices: [0, 1, 2],
+			initialNumColumns: 0,
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	const section = document.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 3'))
+
+	component.setColors(new Promise(() => {}))
+	component.setCompactColorIndices([2])
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 2'))
+	expect(onDelete).not.toHaveBeenCalled()
+})
+
 test('Removes duplicates when updating allowDuplicates value', async () => {
 	const colors = ['#ff0', '#0ff', '#f0f', '#f0f', '#f0f']
 

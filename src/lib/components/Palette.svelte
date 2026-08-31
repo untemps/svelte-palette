@@ -181,6 +181,13 @@
 			{ showTransparentSlot: false, numColumns: params.numColumns, maxColumns: params.maxColumns }
 		)
 
+	const _compactNumColumns = (colors: NormalizedColor[]): number =>
+		calculateNumColumns(colors.length, {
+			..._viewParams(),
+			isCompact: true,
+			compactColorIndices: colors.map((_, index) => index),
+		})
+
 	$effect(() => {
 		_isCompact = isCompact
 	})
@@ -383,7 +390,7 @@
 		if (!target || !rendered || target.color.value !== rendered.value) {
 			const nextColors = (_colors ?? []).filter((c, i) => i !== index)
 			_colors = nextColors
-			_numColumns = calculateNumColumns(nextColors.length, _viewParams())
+			_numColumns = _compactNumColumns(nextColors)
 			return
 		}
 		const { color: removed, index: fullIndex } = target
@@ -398,7 +405,7 @@
 			maxColors,
 		})
 		_colors = nextColors
-		_numColumns = calculateNumColumns(nextColors.length, _viewParams())
+		_numColumns = _compactNumColumns(nextColors)
 		_syncColors(nextFullColors)
 		ondelete?.({ color: removed.value, index: fullIndex, colors: nextFullColors })
 	}
