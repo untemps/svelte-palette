@@ -360,20 +360,34 @@
 			_removeCompactColor(index)
 			return
 		}
-		const removed = (_colors ?? [])[index]
-		const nextColors = (_colors ?? []).filter((c, i) => i !== index)
+		const rendered = (_colors ?? [])[index]
+		if (!rendered) {
+			return
+		}
+		const target = _picked()[index]
+		const fullIndex =
+			target && isSameColor(target.color.value, rendered.value)
+				? target.index
+				: (_fullColors ?? []).findIndex((color) => isSameColor(color.value, rendered.value))
+		if (fullIndex < 0) {
+			return
+		}
+		const removed = (_fullColors ?? [])[fullIndex]
+		const nextFullColors = (_fullColors ?? []).filter((c, i) => i !== fullIndex)
+		const nextColors = calculateColors(nextFullColors, _viewParams())
 		_colors = nextColors
 		_numColumns = calculateNumColumns(nextColors.length, _viewParams())
-		if (removed) {
-			_syncColors(nextColors)
-			ondelete?.({ color: removed.value, index, colors: nextColors })
-		}
+		_syncColors(nextFullColors)
+		ondelete?.({ color: removed.value, index: fullIndex, colors: nextFullColors })
 	}
 
-	const _compactPicked = (): { color: NormalizedColor; index: number }[] => {
+	const _picked = (): { color: NormalizedColor; index: number }[] => {
 		const full = _fullColors ?? []
 		const indices = compactColorIndices ?? []
-		let picked = full.map((color, index) => ({ color, index })).filter(({ index }) => indices.includes(index))
+		let picked = full.map((color, index) => ({ color, index }))
+		if (_isCompact) {
+			picked = picked.filter(({ index }) => indices.includes(index))
+		}
 		if (!allowDuplicates) {
 			picked = picked.filter(
 				(item, i) => picked.findIndex((o) => isSameColor(o.color.value, item.color.value)) === i
@@ -390,7 +404,7 @@
 		if (!rendered) {
 			return
 		}
-		const picked = _compactPicked()
+		const picked = _picked()
 		const target = picked[index]
 		const match =
 			target && isSameColor(target.color.value, rendered.value)

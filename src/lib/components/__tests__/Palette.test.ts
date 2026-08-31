@@ -2348,6 +2348,47 @@ test('Propagates a compact deletion to the full list when compact is toggled at 
 	expect(cells).toHaveLength(1)
 })
 
+test('Keeps colors withheld by maxColors in the bound list after a deletion', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#a00', '#0b0', '#00c', '#dd0'], maxColors: 2 },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() =>
+		expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#0b0' }, { value: '#00c' }, { value: '#dd0' }])
+	)
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#0b0',
+			'#00c',
+		])
+	)
+})
+
+test('Keeps colors dropped as duplicates in the bound list after a deletion', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#AABBCC', '#112233', '#aabbcc'] },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	await user.hover(cells[1])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() =>
+		expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#AABBCC' }, { value: '#aabbcc' }])
+	)
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(1))
+})
+
 test('Reflects an add and a delete back through bind:colors', async () => {
 	const { user } = setup(PaletteBind, {
 		props: { initialColors: ['#ff0', '#0ff'] },
