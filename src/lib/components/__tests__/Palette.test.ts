@@ -2480,6 +2480,28 @@ test('Re-indexes the compact indices across every occurrence a deduplicated slot
 	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(1))
 })
 
+test('Re-indexes the compact indices past several occurrences a deduplicated slot removes', async () => {
+	const { user } = setup(PaletteBind, {
+		props: {
+			initialColors: ['#f00', '#0b0', '#f00', '#00c', '#f00'],
+			isCompact: true,
+			initialCompactColorIndices: [0, 1, 2, 3, 4],
+		},
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	const boundIndices = await screen.findByTestId('__bound-indices__')
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#0b0' }, { value: '#00c' }]))
+	await waitFor(() => expect(JSON.parse(boundIndices.textContent ?? '')).toEqual([0, 1]))
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
+})
+
 test('Keeps an occurrence the compact subset excluded when a deduplicated slot is removed', async () => {
 	const { user } = setup(PaletteBind, {
 		props: { initialColors: ['#f00', '#0b0', '#f00'], isCompact: true, initialCompactColorIndices: [0, 1] },

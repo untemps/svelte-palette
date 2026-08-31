@@ -395,20 +395,32 @@
 		if (allowDuplicates || !removed) {
 			return new Set([fullIndex])
 		}
-		return new Set([
-			...full.reduce<number[]>(
-				(dropped, color, index) =>
-					(!indices || indices.includes(index)) && isSameColor(color.value, removed.value)
-						? [...dropped, index]
-						: dropped,
-				[]
-			),
-			fullIndex,
-		])
+		const scope = indices ? new Set(indices) : null
+		const dropped = new Set<number>()
+		full.forEach((color, index) => {
+			if ((!scope || scope.has(index)) && isSameColor(color.value, removed.value)) {
+				dropped.add(index)
+			}
+		})
+		dropped.add(fullIndex)
+		return dropped
 	}
 
 	const _dropIndices = (full: NormalizedColor[], dropped: Set<number>): NormalizedColor[] =>
 		full.filter((_, index) => !dropped.has(index))
+
+	const _shiftIndices = (indices: number[], dropped: Set<number>): number[] => {
+		const sorted = [...dropped].sort((a, b) => a - b)
+		return indices
+			.filter((index) => !dropped.has(index))
+			.map((index) => {
+				let offset = 0
+				while (offset < sorted.length && sorted[offset] < index) {
+					offset++
+				}
+				return index - offset
+			})
+	}
 
 	const _removeCompactColor = (index: number) => {
 		const rendered = (_colors ?? [])[index]
@@ -430,9 +442,7 @@
 		const removed = (_fullColors ?? [])[fullIndex]
 		const dropped = _droppedIndices(_fullColors ?? [], fullIndex, compactColorIndices ?? [])
 		const nextFullColors = _dropIndices(_fullColors ?? [], dropped)
-		compactColorIndices = (compactColorIndices ?? [])
-			.filter((n) => !dropped.has(n))
-			.map((n) => n - [...dropped].filter((index) => index < n).length)
+		compactColorIndices = _shiftIndices(compactColorIndices ?? [], dropped)
 		const nextColors = calculateColors(nextFullColors, {
 			isCompact: true,
 			compactColorIndices,
