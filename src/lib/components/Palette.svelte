@@ -7,7 +7,6 @@
 		calculateNumColumns,
 		isColorGroups,
 		isSameColor,
-		MIN_COMPACT_NUM_COLUMNS,
 		normalizeInputType,
 		transformColors,
 	} from '../utils/utils.js'
@@ -187,8 +186,13 @@
 
 	const _compactNumColumns = (
 		count: number,
-		params: Pick<ReturnType<typeof _viewParams>, 'showTransparentSlot'> = _viewParams()
-	): number => Math.max(count + Number(params.showTransparentSlot), MIN_COMPACT_NUM_COLUMNS)
+		params: Pick<ReturnType<typeof _viewParams>, 'compactColorIndices' | 'showTransparentSlot'> = _viewParams()
+	): number =>
+		calculateNumColumns(count, {
+			isCompact: true,
+			compactColorIndices: params.compactColorIndices,
+			showTransparentSlot: params.showTransparentSlot,
+		})
 
 	$effect(() => {
 		_isCompact = isCompact
