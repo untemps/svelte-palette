@@ -380,7 +380,8 @@
 			return
 		}
 		const removed = (_fullColors ?? [])[fullIndex]
-		const nextFullColors = (_fullColors ?? []).filter((c, i) => i !== fullIndex)
+		const dropped = _droppedIndices(_fullColors ?? [], fullIndex)
+		const nextFullColors = _dropIndices(_fullColors ?? [], dropped)
 		const nextColors = calculateColors(nextFullColors, _viewParams())
 		_colors = nextColors
 		_numColumns = calculateNumColumns(nextColors.length, _viewParams())
@@ -407,6 +408,22 @@
 	const _picked = (): PickedColor[] =>
 		_pickColors(_fullColors ?? [], _isCompact ? (compactColorIndices ?? []) : undefined)
 
+	const _droppedIndices = (full: NormalizedColor[], fullIndex: number): Set<number> => {
+		const removed = full[fullIndex]
+		if (allowDuplicates || !removed) {
+			return new Set([fullIndex])
+		}
+		return new Set(
+			full.reduce<number[]>(
+				(indices, color, index) => (isSameColor(color.value, removed.value) ? [...indices, index] : indices),
+				[]
+			)
+		)
+	}
+
+	const _dropIndices = (full: NormalizedColor[], dropped: Set<number>): NormalizedColor[] =>
+		full.filter((_, index) => !dropped.has(index))
+
 	const _removeCompactColor = (index: number) => {
 		const rendered = (_colors ?? [])[index]
 		if (!rendered) {
@@ -425,10 +442,11 @@
 			return
 		}
 		const removed = (_fullColors ?? [])[fullIndex]
-		const nextFullColors = (_fullColors ?? []).filter((c, i) => i !== fullIndex)
+		const dropped = _droppedIndices(_fullColors ?? [], fullIndex)
+		const nextFullColors = _dropIndices(_fullColors ?? [], dropped)
 		compactColorIndices = (compactColorIndices ?? [])
-			.filter((n) => n !== fullIndex)
-			.map((n) => (n > fullIndex ? n - 1 : n))
+			.filter((n) => !dropped.has(n))
+			.map((n) => n - [...dropped].filter((index) => index < n).length)
 		const nextColors = calculateColors(nextFullColors, {
 			isCompact: true,
 			compactColorIndices,
@@ -457,8 +475,9 @@
 			return
 		}
 		const removed = (fullGroup?.colors ?? [])[fullIndex]
+		const dropped = _droppedIndices(fullGroup?.colors ?? [], fullIndex)
 		const nextFullColorGroups = (_fullColorGroups ?? []).map((g, gi) =>
-			gi === groupIndex ? { ...g, colors: g.colors.filter((_, ci) => ci !== fullIndex) } : g
+			gi === groupIndex ? { ...g, colors: _dropIndices(g.colors, dropped) } : g
 		)
 		const nextColorGroups = calculateColorGroups(nextFullColorGroups, { allowDuplicates, maxColors })
 		_colorGroups = nextColorGroups
