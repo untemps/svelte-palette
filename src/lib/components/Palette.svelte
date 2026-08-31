@@ -7,6 +7,7 @@
 		calculateNumColumns,
 		isColorGroups,
 		isSameColor,
+		MIN_COMPACT_NUM_COLUMNS,
 		normalizeInputType,
 		transformColors,
 	} from '../utils/utils.js'
@@ -181,12 +182,8 @@
 			{ showTransparentSlot: false, numColumns: params.numColumns, maxColumns: params.maxColumns }
 		)
 
-	const _compactNumColumns = (rendered: NormalizedColor[]): number =>
-		calculateNumColumns(rendered.length, {
-			..._viewParams(),
-			isCompact: true,
-			compactColorIndices: rendered.map((_, index) => index),
-		})
+	const _compactNumColumns = (count: number): number =>
+		Math.max(count + Number(showTransparentSlot), MIN_COMPACT_NUM_COLUMNS)
 
 	$effect(() => {
 		_isCompact = isCompact
@@ -390,7 +387,7 @@
 		if (!target || !rendered || target.color.value !== rendered.value) {
 			const nextColors = (_colors ?? []).filter((c, i) => i !== index)
 			_colors = nextColors
-			_numColumns = _compactNumColumns(nextColors)
+			_numColumns = _compactNumColumns(nextColors.length)
 			return
 		}
 		const { color: removed, index: fullIndex } = target
@@ -405,7 +402,7 @@
 			maxColors,
 		})
 		_colors = nextColors
-		_numColumns = _compactNumColumns(nextColors)
+		_numColumns = _compactNumColumns(nextColors.length)
 		_syncColors(nextFullColors)
 		ondelete?.({ color: removed.value, index: fullIndex, colors: nextFullColors })
 	}
