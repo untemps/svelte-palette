@@ -181,11 +181,11 @@
 			{ showTransparentSlot: false, numColumns: params.numColumns, maxColumns: params.maxColumns }
 		)
 
-	const _compactNumColumns = (colors: NormalizedColor[]): number =>
-		calculateNumColumns(colors.length, {
+	const _compactNumColumns = (rendered: NormalizedColor[]): number =>
+		calculateNumColumns(rendered.length, {
 			..._viewParams(),
 			isCompact: true,
-			compactColorIndices: colors.map((_, index) => index),
+			compactColorIndices: rendered.map((_, index) => index),
 		})
 
 	$effect(() => {
