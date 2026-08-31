@@ -793,14 +793,15 @@ test('Recounts num-columns after a compact slot deletion when the full list hold
 	expect(onDelete).toHaveBeenCalledWith(expect.objectContaining({ color: '#445566', index: 3 }))
 })
 
-test('Recounts num-columns from the rendered subset when stale compact indices undercount it', async () => {
+test('Removes the occurrence the drifted subset selects rather than the first by value', async () => {
 	const onDelete = vi.fn()
 
 	const { component, user } = setup(PaletteReactive, {
 		props: {
-			initialColors: ['#a00', '#0b0', '#00c'],
+			initialColors: ['#a00', '#0b0', '#a00'],
 			initialIsCompact: true,
-			initialCompactColorIndices: [0, 1, 2],
+			initialCompactColorIndices: [0, 2],
+			initialAllowDuplicates: true,
 			initialNumColumns: 0,
 			deletionMode: TOOLTIP,
 			ondelete: onDelete,
@@ -808,20 +809,24 @@ test('Recounts num-columns from the rendered subset when stale compact indices u
 	})
 
 	const cells = await screen.findAllByTestId('__palette-cell__')
-	expect(cells).toHaveLength(3)
+	expect(cells).toHaveLength(2)
 
 	const section = document.querySelector('.palette__content')
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 3'))
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 2'))
 
 	component.setColors(new Promise(() => {}))
-	component.setCompactColorIndices([2])
+	component.setCompactColorIndices([1, 2])
 
 	await user.hover(cells[0])
 	await user.click(await screen.findByTestId('__trash-icon__'))
 
-	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 2'))
-	expect(onDelete).not.toHaveBeenCalled()
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#a00',
+		index: 2,
+		colors: [{ value: '#a00' }, { value: '#0b0' }],
+	})
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(1))
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 1'))
 })
 
 test('Keeps num-columns at one column when a compact deletion empties the rendered subset', async () => {
@@ -946,7 +951,7 @@ test('Recomputes the compact column count when showTransparentSlot changes', asy
 	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 3'))
 })
 
-test('Falls back to a local removal when the rendered subset drifts from the full list', async () => {
+test('Removes the color by value when the rendered subset drifts from the full list', async () => {
 	const onDelete = vi.fn()
 
 	const { component, user } = setup(PaletteReactive, {
@@ -972,9 +977,18 @@ test('Falls back to a local removal when the rendered subset drifts from the ful
 	const trash = await screen.findByTestId('__trash-icon__')
 	await user.click(trash)
 
-	expect(onDelete).not.toHaveBeenCalled()
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#a00',
+		index: 0,
+		colors: [{ value: '#0b0' }, { value: '#00c' }],
+	})
 	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(1))
 	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 1'))
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#00c',
+		])
+	)
 })
 
 test('Applies an isCompact change made inside ondelete alongside the write-back', async () => {

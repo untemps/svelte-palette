@@ -386,15 +386,23 @@
 	}
 
 	const _removeCompactColor = (index: number) => {
-		const target = _compactPicked()[index]
 		const rendered = (_colors ?? [])[index]
-		if (!target || !rendered || !isSameColor(target.color.value, rendered.value)) {
-			const nextColors = (_colors ?? []).filter((c, i) => i !== index)
-			_colors = nextColors
-			_numColumns = _compactNumColumns(nextColors.length)
+		if (!rendered) {
 			return
 		}
-		const { color: removed, index: fullIndex } = target
+		const picked = _compactPicked()
+		const target = picked[index]
+		const match =
+			target && isSameColor(target.color.value, rendered.value)
+				? target
+				: picked.find((item) => isSameColor(item.color.value, rendered.value))
+		const fullIndex = match
+			? match.index
+			: (_fullColors ?? []).findIndex((color) => isSameColor(color.value, rendered.value))
+		if (fullIndex < 0) {
+			return
+		}
+		const removed = (_fullColors ?? [])[fullIndex]
 		const nextFullColors = (_fullColors ?? []).filter((c, i) => i !== fullIndex)
 		compactColorIndices = (compactColorIndices ?? [])
 			.filter((n) => n !== fullIndex)
