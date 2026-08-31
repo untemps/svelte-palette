@@ -229,12 +229,13 @@
 					_error = null
 					_focusedIndex = null
 					if (isColorGroups(results)) {
-						const newColorGroups = calculateColorGroups(results, {
+						const newFullColorGroups = calculateColorGroups(results, { allowDuplicates: true })
+						const newColorGroups = calculateColorGroups(newFullColorGroups, {
 							allowDuplicates: _params.allowDuplicates,
 							maxColors: _params.maxColors,
 						})
 						_colorGroups = newColorGroups
-						_fullColorGroups = calculateColorGroups(results, { allowDuplicates: true })
+						_fullColorGroups = newFullColorGroups
 						_colors = null
 						_fullColors = null
 						_numColumns = _groupNumColumns(newColorGroups, _params)
