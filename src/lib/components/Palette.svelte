@@ -131,11 +131,14 @@
 		...restProps
 	}: Props & Omit<HTMLAttributes<HTMLDivElement>, keyof Props> = $props()
 
+	type PickedColor = { color: NormalizedColor; index: number }
+
 	const _paletteId = $props.id()
 
 	let _colors = $state<NormalizedColor[] | null>(null)
 	let _fullColors = $state<NormalizedColor[] | null>(null)
 	let _colorGroups = $state<NormalizedColorGroup[] | null>(null)
+	let _fullColorGroups = $state<NormalizedColorGroup[] | null>(null)
 	let _error = $state<unknown>(null)
 	let _hasError = $state(false)
 	let _numColumns = $state(untrack(() => numColumns))
@@ -228,6 +231,7 @@
 							maxColors: _params.maxColors,
 						})
 						_colorGroups = newColorGroups
+						_fullColorGroups = calculateColorGroups(results, { allowDuplicates: true })
 						_colors = null
 						_fullColors = null
 						_numColumns = _groupNumColumns(newColorGroups, _params)
@@ -235,6 +239,7 @@
 						const newColors = calculateColors(results, _params)
 						_colors = newColors
 						_colorGroups = null
+						_fullColorGroups = null
 						_fullColors = transformColors(Array.isArray(results) ? results : [])
 						_numColumns = _params.isCompact
 							? _compactNumColumns(newColors.length, _params)
@@ -251,6 +256,7 @@
 				_error = reason
 				_colors = null
 				_colorGroups = null
+				_fullColorGroups = null
 				_fullColors = null
 				_focusedIndex = null
 				if (!_wasError) {
@@ -330,10 +336,11 @@
 		colors = nextColors
 	}
 
-	const _syncColorGroups = (nextColorGroups: NormalizedColorGroup[]) => {
+	const _syncColorGroups = (nextFullColorGroups: NormalizedColorGroup[]) => {
+		_fullColorGroups = nextFullColorGroups
 		_skipColorsSync = true
 		_syncedViewParams = _viewParams()
-		colors = nextColorGroups
+		colors = nextFullColorGroups
 	}
 
 	const _addColor = (color: ColorValue) => {
@@ -381,11 +388,9 @@
 		ondelete?.({ color: removed.value, index: fullIndex, colors: nextFullColors })
 	}
 
-	const _picked = (): { color: NormalizedColor; index: number }[] => {
-		const full = _fullColors ?? []
-		const indices = compactColorIndices ?? []
+	const _pickColors = (full: NormalizedColor[], indices?: number[]): PickedColor[] => {
 		let picked = full.map((color, index) => ({ color, index }))
-		if (_isCompact) {
+		if (indices) {
 			picked = picked.filter(({ index }) => indices.includes(index))
 		}
 		if (!allowDuplicates) {
@@ -398,6 +403,9 @@
 		}
 		return picked
 	}
+
+	const _picked = (): PickedColor[] =>
+		_pickColors(_fullColors ?? [], _isCompact ? (compactColorIndices ?? []) : undefined)
 
 	const _removeCompactColor = (index: number) => {
 		const rendered = (_colors ?? [])[index]
@@ -435,22 +443,34 @@
 
 	const _removeGroupColor = (groupIndex: number, colorIndex: number) => {
 		const group = (_colorGroups ?? [])[groupIndex]
-		const removed = group?.colors[colorIndex]
-		const nextColorGroups = (_colorGroups ?? []).map((g, gi) =>
-			gi === groupIndex ? { ...g, colors: g.colors.filter((_, ci) => ci !== colorIndex) } : g
+		const rendered = group?.colors[colorIndex]
+		if (!rendered) {
+			return
+		}
+		const fullGroup = (_fullColorGroups ?? [])[groupIndex]
+		const target = _pickColors(fullGroup?.colors ?? [])[colorIndex]
+		const fullIndex =
+			target && isSameColor(target.color.value, rendered.value)
+				? target.index
+				: (fullGroup?.colors ?? []).findIndex((color) => isSameColor(color.value, rendered.value))
+		if (fullIndex < 0) {
+			return
+		}
+		const removed = (fullGroup?.colors ?? [])[fullIndex]
+		const nextFullColorGroups = (_fullColorGroups ?? []).map((g, gi) =>
+			gi === groupIndex ? { ...g, colors: g.colors.filter((_, ci) => ci !== fullIndex) } : g
 		)
+		const nextColorGroups = calculateColorGroups(nextFullColorGroups, { allowDuplicates, maxColors })
 		_colorGroups = nextColorGroups
 		_numColumns = _groupNumColumns(nextColorGroups)
-		if (removed) {
-			_syncColorGroups(nextColorGroups)
-			ondelete?.({
-				color: removed.value,
-				index: colorIndex,
-				colors: nextColorGroups,
-				groupIndex,
-				...(group?.name != null && { groupName: group.name }),
-			})
-		}
+		_syncColorGroups(nextFullColorGroups)
+		ondelete?.({
+			color: removed.value,
+			index: fullIndex,
+			colors: nextFullColorGroups,
+			groupIndex,
+			...(group?.name != null && { groupName: group.name }),
+		})
 	}
 
 	const _onSlotSelect = ({ color }: SelectEventArgs) => _selectColor(color)

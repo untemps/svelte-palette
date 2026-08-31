@@ -2348,6 +2348,39 @@ test('Propagates a compact deletion to the full list when compact is toggled at 
 	expect(cells).toHaveLength(1)
 })
 
+test('Keeps grouped colors withheld by maxColors in the bound list after a deletion', async () => {
+	const { user } = setup(PaletteBind, {
+		props: {
+			initialColors: [
+				{ name: 'A', colors: ['#a00', '#a11', '#a22', '#a33'] },
+				{ name: 'B', colors: ['#b00'] },
+			],
+			maxColors: 2,
+		},
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() =>
+		expect(JSON.parse(bound.textContent ?? '')).toEqual([
+			{ name: 'A', colors: [{ value: '#a11' }, { value: '#a22' }, { value: '#a33' }] },
+			{ name: 'B', colors: [{ value: '#b00' }] },
+		])
+	)
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#a11',
+			'#a22',
+			'#b00',
+		])
+	)
+})
+
 test('Keeps colors withheld by maxColors in the bound list after a deletion', async () => {
 	const { user } = setup(PaletteBind, {
 		props: { initialColors: ['#a00', '#0b0', '#00c', '#dd0'], maxColors: 2 },
