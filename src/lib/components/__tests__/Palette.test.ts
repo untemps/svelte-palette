@@ -2052,6 +2052,24 @@ test('Triggers onadd with the added color and the resulting list', async () => {
 	})
 })
 
+test('Triggers onadd with the colors withheld from the rendered slots kept in the list', async () => {
+	const onAdd = vi.fn()
+	const colors = ['#ff0', '#ff0', '#0ff']
+
+	const { user } = setup(Palette, {
+		props: { colors, showInput: true, onadd: onAdd },
+	})
+
+	const input = await screen.findByTestId('__palette-input-input__')
+	await user.type(input, '0f0')
+	await user.click(await screen.findByTestId('__palette-input-submit__'))
+
+	expect(onAdd).toHaveBeenCalledWith({
+		color: '#0f0',
+		colors: [{ value: '#ff0' }, { value: '#ff0' }, { value: '#0ff' }, { value: '#0f0' }],
+	})
+})
+
 test('Triggers ondelete with the removed color and the resulting list in flat mode', async () => {
 	const onDelete = vi.fn()
 	const colors = ['#ff0', '#0ff', '#f0f']

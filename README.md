@@ -78,21 +78,21 @@ yarn add @untemps/svelte-palette
 
 ## Callbacks
 
-| Prop       | Arguments    | Type                     | Description                                                                          |
-| ---------- | ------------ | ------------------------ | ------------------------------------------------------------------------------------ |
-| `onselect` |              |                          | **Called whenever a color is clicked.**                                              |
-|            | `color`      | string                   | Selected color string.                                                               |
-| `onadd`    |              |                          | **Called once a color has been added to the list through the input.**                |
-|            | `color`      | string                   | The color value that was added.                                                      |
-|            | `colors`     | object[] or ColorGroup[] | The resulting color list, in its resolved and normalized form.                       |
-| `ondelete` |              |                          | **Called once a color has been removed from the list through the deletion gesture.** |
-|            | `color`      | string                   | The color value that was removed.                                                    |
-|            | `index`      | number                   | Index of the removed color within its list (or group in grouped mode).               |
-|            | `colors`     | object[] or ColorGroup[] | The resulting color list, in its resolved and normalized form.                       |
-|            | `groupIndex` | number                   | Index of the group the color was removed from (grouped mode only).                   |
-|            | `groupName`  | string                   | Name of the group the color was removed from (grouped mode only, when named).        |
-| `onerror`  |              |                          | **Called when an async `colors` source rejects.**                                    |
-|            | `error`      | unknown                  | The rejection reason of the `colors` promise.                                        |
+| Prop       | Arguments    | Type                     | Description                                                                                                                                                                                                    |
+| ---------- | ------------ | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `onselect` |              |                          | **Called whenever a color is clicked.**                                                                                                                                                                        |
+|            | `color`      | string                   | Selected color string.                                                                                                                                                                                         |
+| `onadd`    |              |                          | **Called once a color has been added to the list through the input.**                                                                                                                                          |
+|            | `color`      | string                   | The color value that was added.                                                                                                                                                                                |
+|            | `colors`     | object[] or ColorGroup[] | The resulting color list, in its resolved and normalized form, holding every color the palette carries, including the ones the rendered slots withhold through `maxColors`, `allowDuplicates` or compact mode. |
+| `ondelete` |              |                          | **Called once a color has been removed from the list through the deletion gesture.**                                                                                                                           |
+|            | `color`      | string                   | The color value that was removed.                                                                                                                                                                              |
+|            | `index`      | number                   | Index of the removed color within its list (or group in grouped mode).                                                                                                                                         |
+|            | `colors`     | object[] or ColorGroup[] | The resulting color list, in its resolved and normalized form, holding every color the palette carries, including the ones the rendered slots withhold through `maxColors`, `allowDuplicates` or compact mode. |
+|            | `groupIndex` | number                   | Index of the group the color was removed from (grouped mode only).                                                                                                                                             |
+|            | `groupName`  | string                   | Name of the group the color was removed from (grouped mode only, when named).                                                                                                                                  |
+| `onerror`  |              |                          | **Called when an async `colors` source rejects.**                                                                                                                                                              |
+|            | `error`      | unknown                  | The rejection reason of the `colors` promise.                                                                                                                                                                  |
 
 ## Snippets
 

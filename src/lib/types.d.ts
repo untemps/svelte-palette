@@ -126,7 +126,10 @@ export interface InputAddEventArgs {
 export interface AddEventArgs {
 	/** The color value that was added. */
 	color: ColorValue
-	/** The resulting color list, resolved to its normalized form. */
+	/**
+	 * The resulting color list, resolved to its normalized form, holding every color the palette carries,
+	 * including the ones the rendered slots withhold through `maxColors`, `allowDuplicates` or compact mode.
+	 */
 	colors: Colors
 }
 
@@ -138,7 +141,10 @@ export interface DeleteEventArgs {
 	color: ColorValue
 	/** The index of the removed color within its list (or group in grouped mode). */
 	index: number
-	/** The resulting color list, resolved to its normalized form. */
+	/**
+	 * The resulting color list, resolved to its normalized form, holding every color the palette carries,
+	 * including the ones the rendered slots withhold through `maxColors`, `allowDuplicates` or compact mode.
+	 */
 	colors: Colors
 	/** The index of the group the color was removed from, only provided in grouped mode. */
 	groupIndex?: number
