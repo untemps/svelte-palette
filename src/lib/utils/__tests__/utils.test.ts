@@ -8,6 +8,7 @@ import {
 	normalizeColor,
 	normalizeInputType,
 	parseColor,
+	pickColors,
 	transformColors,
 } from '../utils.js'
 
@@ -141,6 +142,53 @@ describe('utils', () => {
 			[1, params, []],
 		])('colors:%j, params:%j, expected: %j', (colors, params, expected) => {
 			expect(calculateColors(colors, params)).toEqual(expected)
+		})
+	})
+
+	describe('pickColors', () => {
+		const colors = ['#123456', '#345612', '#456123', '#345612', '#425136']
+
+		test('Pairs every kept color with its index in the transformed source', () => {
+			expect(pickColors(colors)).toEqual([
+				{ color: { value: '#123456' }, index: 0 },
+				{ color: { value: '#345612' }, index: 1 },
+				{ color: { value: '#456123' }, index: 2 },
+				{ color: { value: '#345612' }, index: 3 },
+				{ color: { value: '#425136' }, index: 4 },
+			])
+		})
+
+		test('Keeps the index of the first occurrence a deduplicated color stands for', () => {
+			expect(pickColors(['#123456', '#ABCDEF', '#abcdef'], { allowDuplicates: false })).toEqual([
+				{ color: { value: '#123456' }, index: 0 },
+				{ color: { value: '#ABCDEF' }, index: 1 },
+			])
+		})
+
+		test('Normalizes the compact indices to sorted unique in-range positions', () => {
+			expect(
+				pickColors(colors, {
+					isCompact: true,
+					compactColorIndices: [4, 0, 4, -1, 9, 1.5],
+					allowDuplicates: true,
+				})
+			).toEqual([
+				{ color: { value: '#123456' }, index: 0 },
+				{ color: { value: '#425136' }, index: 4 },
+			])
+		})
+
+		test.each([
+			[{ isCompact: false, compactColorIndices: [], allowDuplicates: true, maxColors: 5 }],
+			[{ isCompact: false, compactColorIndices: [], allowDuplicates: false, maxColors: 5 }],
+			[{ isCompact: false, compactColorIndices: [], allowDuplicates: true, maxColors: 2 }],
+			[{ isCompact: false, compactColorIndices: [], allowDuplicates: false, maxColors: 1 }],
+			[{ isCompact: true, compactColorIndices: [0, 2, 4], allowDuplicates: true, maxColors: 5 }],
+			[{ isCompact: true, compactColorIndices: [4, 1, 1], allowDuplicates: false, maxColors: 5 }],
+			[{ isCompact: true, compactColorIndices: [], allowDuplicates: true, maxColors: 5 }],
+			[{ isCompact: false, compactColorIndices: null, allowDuplicates: false, maxColors: -1 }],
+		])('Stays in lockstep with calculateColors for params:%j', (params) => {
+			expect(pickColors(colors, params).map(({ color }) => color)).toEqual(calculateColors(colors, params))
 		})
 	})
 

@@ -20,6 +20,14 @@ export interface NormalizedColorGroup {
 	colors: NormalizedColor[]
 }
 
+/**
+ * A normalized color paired with its position in the transformed source list.
+ */
+export interface PickedColor {
+	color: NormalizedColor
+	index: number
+}
+
 export interface CalculateColorsParams {
 	isCompact?: boolean
 	compactColorIndices?: number[] | null
@@ -61,10 +69,10 @@ export const transformColors = ($colors: ReadonlyArray<ColorInput | NormalizedCo
 export const isSameColor = ($a: ColorValue | null, $b: ColorValue | null): boolean =>
 	typeof $a === 'string' && typeof $b === 'string' ? $a.toLowerCase() === $b.toLowerCase() : $a === $b
 
-export const calculateColors = (
+export const pickColors = (
 	$colors: ReadonlyArray<ColorInput | NormalizedColor> | null | undefined,
 	$params?: CalculateColorsParams
-): NormalizedColor[] => {
+): PickedColor[] => {
 	const source = !$colors || !Array.isArray($colors) ? [] : $colors
 	let params: CalculateColorsParams = $params ?? {
 		isCompact: false,
@@ -79,22 +87,27 @@ export const calculateColors = (
 		params = { ...params, maxColors: source.length }
 	}
 
-	let colors = transformColors(source)
+	let picked: PickedColor[] = transformColors(source).map((color, index) => ({ color, index }))
 
 	if (params.isCompact) {
 		const compactIndices = [...new Set(params.compactColorIndices ?? [])].sort((a, b) => a - b)
-		colors = extractByIndices(colors, compactIndices)
+		picked = extractByIndices(picked, compactIndices)
 	}
 	if (!params.allowDuplicates) {
-		colors = colors.filter(
-			(item, index) => colors.findIndex(({ value }) => isSameColor(value, item.value)) === index
+		picked = picked.filter(
+			(item, index) => picked.findIndex(({ color }) => isSameColor(color.value, item.color.value)) === index
 		)
 	}
-	if (params.maxColors !== undefined && colors.length > params.maxColors) {
-		colors = colors.slice(0, params.maxColors)
+	if (params.maxColors !== undefined && picked.length > params.maxColors) {
+		picked = picked.slice(0, params.maxColors)
 	}
-	return colors
+	return picked
 }
+
+export const calculateColors = (
+	$colors: ReadonlyArray<ColorInput | NormalizedColor> | null | undefined,
+	$params?: CalculateColorsParams
+): NormalizedColor[] => pickColors($colors, $params).map(({ color }) => color)
 
 export const MIN_COMPACT_NUM_COLUMNS = 1
 

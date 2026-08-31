@@ -8,6 +8,7 @@
 		isColorGroups,
 		isSameColor,
 		normalizeInputType,
+		pickColors,
 		transformColors,
 	} from '../utils/utils.js'
 
@@ -31,7 +32,7 @@
 
 	import type { HTMLAttributes } from 'svelte/elements'
 
-	import type { NormalizedColor, NormalizedColorGroup } from '../utils/utils.js'
+	import type { NormalizedColor, NormalizedColorGroup, PickedColor } from '../utils/utils.js'
 
 	import type {
 		AddEventArgs,
@@ -129,8 +130,6 @@
 		settings = undefined,
 		...restProps
 	}: Props & Omit<HTMLAttributes<HTMLDivElement>, keyof Props> = $props()
-
-	type PickedColor = { color: NormalizedColor; index: number }
 
 	const _paletteId = $props.id()
 
@@ -389,24 +388,7 @@
 		ondelete?.({ color: removed.value, index: fullIndex, colors: nextFullColors })
 	}
 
-	const _pickColors = (full: NormalizedColor[], indices?: number[]): PickedColor[] => {
-		let picked = full.map((color, index) => ({ color, index }))
-		if (indices) {
-			picked = picked.filter(({ index }) => indices.includes(index))
-		}
-		if (!allowDuplicates) {
-			picked = picked.filter(
-				(item, i) => picked.findIndex((o) => isSameColor(o.color.value, item.color.value)) === i
-			)
-		}
-		if (maxColors >= 0 && picked.length > maxColors) {
-			picked = picked.slice(0, maxColors)
-		}
-		return picked
-	}
-
-	const _picked = (): PickedColor[] =>
-		_pickColors(_fullColors ?? [], _isCompact ? (compactColorIndices ?? []) : undefined)
+	const _picked = (): PickedColor[] => pickColors(_fullColors ?? [], _viewParams())
 
 	const _droppedIndices = (full: NormalizedColor[], fullIndex: number, indices?: number[]): Set<number> => {
 		const removed = full[fullIndex]
@@ -473,7 +455,7 @@
 			return
 		}
 		const fullGroup = (_fullColorGroups ?? [])[groupIndex]
-		const target = _pickColors(fullGroup?.colors ?? [])[colorIndex]
+		const target = pickColors(fullGroup?.colors ?? [], { allowDuplicates, maxColors })[colorIndex]
 		const fullIndex =
 			target && isSameColor(target.color.value, rendered.value)
 				? target.index
