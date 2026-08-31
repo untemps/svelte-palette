@@ -404,17 +404,21 @@
 	const _picked = (): PickedColor[] =>
 		_pickColors(_fullColors ?? [], _isCompact ? (compactColorIndices ?? []) : undefined)
 
-	const _droppedIndices = (full: NormalizedColor[], fullIndex: number): Set<number> => {
+	const _droppedIndices = (full: NormalizedColor[], fullIndex: number, indices?: number[]): Set<number> => {
 		const removed = full[fullIndex]
 		if (allowDuplicates || !removed) {
 			return new Set([fullIndex])
 		}
-		return new Set(
-			full.reduce<number[]>(
-				(indices, color, index) => (isSameColor(color.value, removed.value) ? [...indices, index] : indices),
+		return new Set([
+			...full.reduce<number[]>(
+				(dropped, color, index) =>
+					(!indices || indices.includes(index)) && isSameColor(color.value, removed.value)
+						? [...dropped, index]
+						: dropped,
 				[]
-			)
-		)
+			),
+			fullIndex,
+		])
 	}
 
 	const _dropIndices = (full: NormalizedColor[], dropped: Set<number>): NormalizedColor[] =>
@@ -438,7 +442,7 @@
 			return
 		}
 		const removed = (_fullColors ?? [])[fullIndex]
-		const dropped = _droppedIndices(_fullColors ?? [], fullIndex)
+		const dropped = _droppedIndices(_fullColors ?? [], fullIndex, compactColorIndices ?? [])
 		const nextFullColors = _dropIndices(_fullColors ?? [], dropped)
 		compactColorIndices = (compactColorIndices ?? [])
 			.filter((n) => !dropped.has(n))

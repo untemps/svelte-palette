@@ -2454,6 +2454,52 @@ test('Re-indexes the compact indices across every occurrence a deduplicated slot
 	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(1))
 })
 
+test('Keeps an occurrence the compact subset excluded when a deduplicated slot is removed', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#f00', '#0b0', '#f00'], isCompact: true, initialCompactColorIndices: [0, 1] },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	const boundIndices = await screen.findByTestId('__bound-indices__')
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#0b0' }, { value: '#f00' }]))
+	await waitFor(() => expect(JSON.parse(boundIndices.textContent ?? '')).toEqual([0]))
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(1))
+})
+
+test('Removes the drifted occurrence even when the compact subset no longer holds it', async () => {
+	const onDelete = vi.fn()
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#00c'],
+			initialIsCompact: true,
+			initialCompactColorIndices: [0, 1],
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	component.setColors(new Promise(() => {}))
+	component.setCompactColorIndices([2])
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#a00',
+		index: 0,
+		colors: [{ value: '#0b0' }, { value: '#00c' }],
+	})
+})
+
 test('Removes every occurrence a deduplicated slot stood for within its own group', async () => {
 	const { user } = setup(PaletteBind, {
 		props: {
