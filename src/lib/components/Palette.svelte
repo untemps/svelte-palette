@@ -388,7 +388,7 @@
 	const _removeCompactColor = (index: number) => {
 		const target = _compactPicked()[index]
 		const rendered = (_colors ?? [])[index]
-		if (!target || !rendered || target.color.value !== rendered.value) {
+		if (!target || !rendered || !isSameColor(target.color.value, rendered.value)) {
 			const nextColors = (_colors ?? []).filter((c, i) => i !== index)
 			_colors = nextColors
 			_numColumns = _compactNumColumns(nextColors.length)
