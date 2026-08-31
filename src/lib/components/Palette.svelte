@@ -175,7 +175,7 @@
 
 	const _groupNumColumns = (
 		groups: NormalizedColorGroup[],
-		params: ReturnType<typeof _viewParams> = _viewParams()
+		params: Pick<ReturnType<typeof _viewParams>, 'numColumns' | 'maxColumns'> = _viewParams()
 	): number =>
 		calculateNumColumns(
 			groups.reduce((max, group) => Math.max(max, group.colors.length), 0),
