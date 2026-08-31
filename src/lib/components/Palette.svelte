@@ -177,7 +177,7 @@
 
 	const _groupNumColumns = (
 		groups: NormalizedColorGroup[],
-		params: Pick<ReturnType<typeof _viewParams>, 'numColumns' | 'maxColumns'> = _viewParams()
+		params: Pick<ReturnType<typeof _viewParams>, 'numColumns' | 'maxColumns'>
 	): number =>
 		calculateNumColumns(
 			groups.reduce((max, group) => Math.max(max, group.colors.length), 0),
@@ -186,7 +186,7 @@
 
 	const _compactNumColumns = (
 		count: number,
-		params: Pick<ReturnType<typeof _viewParams>, 'compactColorIndices' | 'showTransparentSlot'> = _viewParams()
+		params: Pick<ReturnType<typeof _viewParams>, 'compactColorIndices' | 'showTransparentSlot'>
 	): number =>
 		calculateNumColumns(count, {
 			isCompact: true,
@@ -458,7 +458,10 @@
 			maxColors,
 		})
 		_colors = nextColors
-		_numColumns = _compactNumColumns(nextColors.length)
+		_numColumns = _compactNumColumns(nextColors.length, {
+			compactColorIndices: compactColorIndices ?? [],
+			showTransparentSlot,
+		})
 		_syncColors(nextFullColors)
 		ondelete?.({ color: removed.value, index: fullIndex, colors: nextFullColors })
 	}
@@ -485,7 +488,7 @@
 		)
 		const nextColorGroups = calculateColorGroups(nextFullColorGroups, { allowDuplicates, maxColors })
 		_colorGroups = nextColorGroups
-		_numColumns = _groupNumColumns(nextColorGroups)
+		_numColumns = _groupNumColumns(nextColorGroups, { numColumns, maxColumns })
 		_syncColorGroups(nextFullColorGroups)
 		ondelete?.({
 			color: removed.value,

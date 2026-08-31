@@ -819,6 +819,32 @@ test('Recounts num-columns from the rendered subset after a compact deletion des
 	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 2'))
 })
 
+test('Counts the transparent slot in num-columns after a compact slot deletion', async () => {
+	const colors = ['#a00', '#0b0', '#00c']
+
+	const { user } = setup(Palette, {
+		props: {
+			colors,
+			isCompact: true,
+			compactColorIndices: [0, 1, 2],
+			showTransparentSlot: true,
+			numColumns: 4,
+			deletionMode: TOOLTIP,
+		},
+	})
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 4'))
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[1])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(3))
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 3'))
+})
+
 test('Recounts num-columns after a compact slot deletion when the full list holds case-varying duplicates', async () => {
 	const onDelete = vi.fn()
 	const colors = ['#AABBCC', '#112233', '#aabbcc', '#445566', '#778899', '#99aabb', '#bbccdd', '#ccddee']
