@@ -212,7 +212,6 @@ describe('utils', () => {
 			[colorLength, { ...params, isCompact: true }, , 1],
 			[colorLength, { ...params, isCompact: true, compactColorIndices: [0, 1] }, , 2],
 			[colorLength, { ...params, isCompact: true, compactColorIndices: [0, 1], showTransparentSlot: true }, , 3],
-			// repeat() rejects a non-positive track count, so the compact width never drops below one column
 			[0, { ...params, isCompact: true, compactColorIndices: [0, 1] }, , 1],
 			[-1, { ...params, isCompact: true, compactColorIndices: [0, 1] }, , 1],
 			[colorLength, { ...params, isCompact: true, compactColorIndices: null }, , 1],
