@@ -2830,7 +2830,7 @@ test('Keeps colors dropped as duplicates in the bound list after an add', async 
 	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(3))
 })
 
-test('Keeps every rendered slot present in the bound list across an add and a deletion', async () => {
+test('Drops both occurrences of a deduplicated slot deleted after an add', async () => {
 	const { user } = setup(PaletteBind, {
 		props: { initialColors: ['#f00', '#f00', '#0f0', '#00f'] },
 	})
@@ -2849,10 +2849,12 @@ test('Keeps every rendered slot present in the bound list across an add and a de
 
 	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(3))
 
-	const boundValues = JSON.parse(bound.textContent ?? '').map(({ value }: { value: string }) => value)
-	const renderedValues = screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))
-
-	renderedValues.forEach((value) => expect(boundValues).toContain(value))
+	expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#0f0' }, { value: '#00f' }, { value: '#0ff' }])
+	expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+		'#0f0',
+		'#00f',
+		'#0ff',
+	])
 })
 
 test('Reflects an add and a delete back through bind:colors', async () => {

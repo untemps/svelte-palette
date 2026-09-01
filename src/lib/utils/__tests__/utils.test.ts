@@ -179,16 +179,34 @@ describe('utils', () => {
 		})
 
 		test.each([
-			[{ isCompact: false, compactColorIndices: [], allowDuplicates: true, maxColors: 5 }],
-			[{ isCompact: false, compactColorIndices: [], allowDuplicates: false, maxColors: 5 }],
-			[{ isCompact: false, compactColorIndices: [], allowDuplicates: true, maxColors: 2 }],
-			[{ isCompact: false, compactColorIndices: [], allowDuplicates: false, maxColors: 1 }],
-			[{ isCompact: true, compactColorIndices: [0, 2, 4], allowDuplicates: true, maxColors: 5 }],
-			[{ isCompact: true, compactColorIndices: [4, 1, 1], allowDuplicates: false, maxColors: 5 }],
-			[{ isCompact: true, compactColorIndices: [], allowDuplicates: true, maxColors: 5 }],
-			[{ isCompact: false, compactColorIndices: null, allowDuplicates: false, maxColors: -1 }],
-		])('Stays in lockstep with calculateColors for params:%j', (params) => {
-			expect(pickColors(colors, params).map(({ color }) => color)).toEqual(calculateColors(colors, params))
+			[
+				{ isCompact: false, compactColorIndices: [], allowDuplicates: true, maxColors: 5 },
+				['#123456', '#345612', '#456123', '#345612', '#425136'],
+			],
+			[
+				{ isCompact: false, compactColorIndices: [], allowDuplicates: false, maxColors: 5 },
+				['#123456', '#345612', '#456123', '#425136'],
+			],
+			[
+				{ isCompact: false, compactColorIndices: [], allowDuplicates: true, maxColors: 2 },
+				['#123456', '#345612'],
+			],
+			[{ isCompact: false, compactColorIndices: [], allowDuplicates: false, maxColors: 1 }, ['#123456']],
+			[
+				{ isCompact: true, compactColorIndices: [0, 2, 4], allowDuplicates: true, maxColors: 5 },
+				['#123456', '#456123', '#425136'],
+			],
+			[
+				{ isCompact: true, compactColorIndices: [4, 1, 1], allowDuplicates: false, maxColors: 5 },
+				['#345612', '#425136'],
+			],
+			[{ isCompact: true, compactColorIndices: [], allowDuplicates: true, maxColors: 5 }, []],
+			[
+				{ isCompact: false, compactColorIndices: null, allowDuplicates: false, maxColors: -1 },
+				['#123456', '#345612', '#456123', '#425136'],
+			],
+		])('Picks the colors params:%j select', (params, expected) => {
+			expect(pickColors(colors, params).map(({ color }) => color.value)).toEqual(expected)
 		})
 	})
 
