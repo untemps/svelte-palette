@@ -139,7 +139,11 @@ export interface AddEventArgs {
 export interface DeleteEventArgs {
 	/** The color value that was removed. */
 	color: ColorValue
-	/** The index of the removed color within its list (or group in grouped mode). */
+	/**
+	 * The index of the removed color in the resolved full list, or in its full group in grouped mode — never
+	 * the index of the rendered slot. With `allowDuplicates` off, one deletion drops every occurrence of that
+	 * color and this reports the first.
+	 */
 	index: number
 	/**
 	 * The resulting color list, resolved to its normalized form, holding every color the palette carries,
