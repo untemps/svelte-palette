@@ -371,11 +371,7 @@
 		if (!rendered) {
 			return
 		}
-		const target = _picked()[index]
-		const fullIndex =
-			target && isSameColor(target.color.value, rendered.value)
-				? target.index
-				: (_fullColors ?? []).findIndex((color) => isSameColor(color.value, rendered.value))
+		const fullIndex = _resolveFullIndex(_fullColors ?? [], _picked(), rendered, index)
 		if (fullIndex < 0) {
 			return
 		}
@@ -391,6 +387,20 @@
 	}
 
 	const _picked = (): PickedColor[] => pickColors(_fullColors ?? [], _viewParams())
+
+	const _resolveFullIndex = (
+		full: NormalizedColor[],
+		picked: PickedColor[],
+		rendered: NormalizedColor,
+		index: number
+	): number => {
+		const target = picked[index]
+		if (target && isSameColor(target.color.value, rendered.value)) {
+			return target.index
+		}
+		const match = picked.find((item) => isSameColor(item.color.value, rendered.value))
+		return match ? match.index : full.findIndex((color) => isSameColor(color.value, rendered.value))
+	}
 
 	const _droppedIndices = (full: NormalizedColor[], fullIndex: number, indices?: number[]): Set<number> => {
 		const removed = full[fullIndex]
@@ -429,15 +439,7 @@
 		if (!rendered) {
 			return
 		}
-		const picked = _picked()
-		const target = picked[index]
-		const match =
-			target && isSameColor(target.color.value, rendered.value)
-				? target
-				: picked.find((item) => isSameColor(item.color.value, rendered.value))
-		const fullIndex = match
-			? match.index
-			: (_fullColors ?? []).findIndex((color) => isSameColor(color.value, rendered.value))
+		const fullIndex = _resolveFullIndex(_fullColors ?? [], _picked(), rendered, index)
 		if (fullIndex < 0) {
 			return
 		}
@@ -466,17 +468,18 @@
 		if (!rendered) {
 			return
 		}
-		const fullGroup = (_fullColorGroups ?? [])[groupIndex]
-		const target = pickColors(fullGroup?.colors ?? [], { allowDuplicates, maxColors })[colorIndex]
-		const fullIndex =
-			target && isSameColor(target.color.value, rendered.value)
-				? target.index
-				: (fullGroup?.colors ?? []).findIndex((color) => isSameColor(color.value, rendered.value))
+		const fullGroupColors = (_fullColorGroups ?? [])[groupIndex]?.colors ?? []
+		const fullIndex = _resolveFullIndex(
+			fullGroupColors,
+			pickColors(fullGroupColors, { allowDuplicates, maxColors }),
+			rendered,
+			colorIndex
+		)
 		if (fullIndex < 0) {
 			return
 		}
-		const removed = (fullGroup?.colors ?? [])[fullIndex]
-		const dropped = _droppedIndices(fullGroup?.colors ?? [], fullIndex)
+		const removed = fullGroupColors[fullIndex]
+		const dropped = _droppedIndices(fullGroupColors, fullIndex)
 		const nextFullColorGroups = (_fullColorGroups ?? []).map((g, gi) =>
 			gi === groupIndex ? { ...g, colors: _dropIndices(g.colors, dropped) } : g
 		)

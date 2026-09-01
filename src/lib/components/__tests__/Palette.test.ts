@@ -2117,6 +2117,29 @@ test('Triggers ondelete with the removed color and the resulting list in flat mo
 	})
 })
 
+test('Removes the clicked duplicate rather than the first occurrence when duplicates are allowed', async () => {
+	const onDelete = vi.fn()
+	const colors = [{ name: 'Red A', value: '#f00' }, { value: '#0b0' }, { name: 'Red B', value: '#f00' }]
+
+	const { user } = setup(Palette, {
+		props: { colors, allowDuplicates: true, deletionMode: TOOLTIP, ondelete: onDelete },
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[2])
+
+	const trash = await screen.findByTestId('__trash-icon__')
+	await user.click(trash)
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#f00',
+		index: 2,
+		colors: [{ name: 'Red A', value: '#f00' }, { value: '#0b0' }],
+	})
+})
+
 test('Triggers ondelete with the group identity in group mode', async () => {
 	const onDelete = vi.fn()
 	const colors = [
