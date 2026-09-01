@@ -382,6 +382,7 @@
 		const removed = (_fullColors ?? [])[fullIndex]
 		const dropped = _droppedIndices(_fullColors ?? [], fullIndex)
 		const nextFullColors = _dropIndices(_fullColors ?? [], dropped)
+		compactColorIndices = _shiftIndices(compactColorIndices ?? [], dropped)
 		const nextColors = calculateColors(nextFullColors, _viewParams())
 		_colors = nextColors
 		_numColumns = calculateNumColumns(nextColors.length, _viewParams())

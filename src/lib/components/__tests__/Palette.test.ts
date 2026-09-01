@@ -2746,6 +2746,49 @@ test('Reflects a compact-mode deletion back through bind:colors and re-indexes c
 	expect(cells).toHaveLength(1)
 })
 
+test('Re-indexes the compact indices when a flat slot before them is deleted', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#a00', '#0b0', '#00c'], initialCompactColorIndices: [2] },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	const boundIndices = await screen.findByTestId('__bound-indices__')
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#0b0' }, { value: '#00c' }]))
+	await waitFor(() => expect(JSON.parse(boundIndices.textContent ?? '')).toEqual([1]))
+
+	await user.click(await screen.findByTestId('__palette-compact-toggle-button__'))
+
+	await waitFor(() => {
+		const slots = screen.getAllByTestId('__palette-slot__')
+		expect(slots).toHaveLength(1)
+		expect(slots[0]).toHaveAttribute('aria-label', '#00c')
+	})
+})
+
+test('Drops a compact index whose color a flat deduplicated deletion removes', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#f00', '#0b0', '#f00'], initialCompactColorIndices: [2] },
+	})
+
+	const boundIndices = await screen.findByTestId('__bound-indices__')
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(JSON.parse(boundIndices.textContent ?? '')).toEqual([]))
+	await waitFor(() => expect(screen.queryByTestId('__palette-compact-toggle-button__')).not.toBeInTheDocument())
+})
+
 test('Does not resurrect a flat-deleted color through a compact deletion after a runtime toggle', async () => {
 	const { user } = setup(PaletteBind, {
 		props: { initialColors: ['#a00', '#0b0'], initialCompactColorIndices: [0] },
