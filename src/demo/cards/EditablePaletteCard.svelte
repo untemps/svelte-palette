@@ -61,7 +61,7 @@
 	<p class="readout">
 		<span class="readout__label">bind:colors</span>
 		<span class="readout__value"
-			>{count} colors bound, {maxColors} slots shown — add with the input, delete on hover</span
+			>{count} colors bound, at most {maxColors} shown — add with the input, delete on hover</span
 		>
 	</p>
 </Card>

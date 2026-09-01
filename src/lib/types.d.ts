@@ -142,7 +142,7 @@ export interface DeleteEventArgs {
 	/**
 	 * The index of the removed color in the resolved full list, or in its full group in grouped mode — never
 	 * the index of the rendered slot. With `allowDuplicates` off, one deletion drops every occurrence of that
-	 * color and this reports the first.
+	 * color and this reports the first — in compact mode, the first of the occurrences the selection holds.
 	 */
 	index: number
 	/**
