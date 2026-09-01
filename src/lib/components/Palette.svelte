@@ -453,17 +453,9 @@
 		const dropped = _droppedIndices(_fullColors ?? [], fullIndex, { allowDuplicates }, compactColorIndices ?? [])
 		const nextFullColors = _dropIndices(_fullColors ?? [], dropped)
 		compactColorIndices = _shiftIndices(compactColorIndices ?? [], dropped)
-		const nextColors = calculateColors(nextFullColors, {
-			isCompact: true,
-			compactColorIndices,
-			allowDuplicates,
-			maxColors,
-		})
+		const nextColors = calculateColors(nextFullColors, _viewParams())
 		_colors = nextColors
-		_numColumns = _compactNumColumns(nextColors.length, {
-			compactColorIndices: compactColorIndices ?? [],
-			showTransparentSlot,
-		})
+		_numColumns = _compactNumColumns(nextColors.length, _viewParams())
 		_syncColors(nextFullColors)
 		ondelete?.({ color: removed.value, index: fullIndex, colors: nextFullColors })
 	}
