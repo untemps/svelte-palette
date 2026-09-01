@@ -352,15 +352,15 @@
 		if (_colors == null || _isCompact) {
 			return
 		}
-		const previousLength = (_colors ?? []).length
+		if (!allowDuplicates && (_fullColors ?? []).some((existing) => isSameColor(existing.value, color))) {
+			return
+		}
 		const nextFullColors = transformColors([...(_fullColors ?? []), color])
 		const nextColors = calculateColors(nextFullColors, _viewParams())
 		_colors = nextColors
 		_numColumns = calculateNumColumns(nextColors.length, _viewParams())
-		if (nextColors.length > previousLength) {
-			_syncColors(nextFullColors)
-			onadd?.({ color, colors: nextFullColors })
-		}
+		_syncColors(nextFullColors)
+		onadd?.({ color, colors: nextFullColors })
 	}
 
 	const _removeColor = (index: number) => {

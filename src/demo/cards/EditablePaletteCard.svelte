@@ -6,7 +6,7 @@
 	import { getPaletteTheme } from '../lib/theme.svelte'
 
 	const DESCRIPTION =
-		'Two-way <code>bind:colors</code> keeps a list in sync as slots are added from the input or removed from the palette. <code>maxColors</code> caps the size and <code>allowDuplicates</code> gates repeats.'
+		'Two-way <code>bind:colors</code> keeps a list in sync as slots are added from the input or removed from the palette. <code>maxColors</code> caps how many slots are rendered while the bound list keeps the rest, and <code>allowDuplicates</code> gates repeats.'
 
 	const CODE = `<script>
 	let colors = $state(['#f94144', '#f3722c', '#f8961e'])
@@ -60,6 +60,8 @@
 
 	<p class="readout">
 		<span class="readout__label">bind:colors</span>
-		<span class="readout__value">{count} / {maxColors} slots — add with the input, delete on hover</span>
+		<span class="readout__value"
+			>{count} colors bound, {maxColors} slots shown — add with the input, delete on hover</span
+		>
 	</p>
 </Card>

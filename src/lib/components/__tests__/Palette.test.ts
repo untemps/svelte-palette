@@ -417,30 +417,33 @@ test.each([
 	[['#ff0', '#0ff', '#f0f'], -1, 4, '#0f0'],
 	[['#ff0', '#0ff', '#f0f'], 3, 3, '#f0f'],
 	[['#ff0', '#0ff', '#f0f'], 1, 1, '#ff0'],
-])('Adds or replaces color regarding maxColors value', async (colors, maxColors, expected, expectedColor) => {
-	let input,
-		submit,
-		slots = null
-	const newColor = '0f0'
-	const onSelect = vi.fn(() => 0)
+])(
+	'Adds color and caps the rendered slots regarding maxColors value',
+	async (colors, maxColors, expected, expectedColor) => {
+		let input,
+			submit,
+			slots = null
+		const newColor = '0f0'
+		const onSelect = vi.fn(() => 0)
 
-	const { user } = setup(Palette, {
-		props: { colors, maxColors, showInput: true, onselect: onSelect },
-	})
+		const { user } = setup(Palette, {
+			props: { colors, maxColors, showInput: true, onselect: onSelect },
+		})
 
-	input = await screen.findByTestId('__palette-input-input__')
-	await user.type(input, newColor)
+		input = await screen.findByTestId('__palette-input-input__')
+		await user.type(input, newColor)
 
-	submit = await screen.findByTestId('__palette-input-submit__')
-	await user.click(submit)
+		submit = await screen.findByTestId('__palette-input-submit__')
+		await user.click(submit)
 
-	slots = await screen.findAllByTestId('__palette-slot__')
-	expect(slots).toHaveLength(expected)
+		slots = await screen.findAllByTestId('__palette-slot__')
+		expect(slots).toHaveLength(expected)
 
-	await user.click(slots[slots.length - 1])
+		await user.click(slots[slots.length - 1])
 
-	expect(onSelect).toHaveBeenCalledWith({ color: expectedColor })
-})
+		expect(onSelect).toHaveBeenCalledWith({ color: expectedColor })
+	}
+)
 
 test.each([
 	[['#ff0', '#0ff', '#f0f'], false, 3],
@@ -2200,6 +2203,25 @@ test('Omits groupName in ondelete when the group has no name', async () => {
 	expect(onDelete).toHaveBeenCalledWith(expect.not.objectContaining({ groupName: expect.anything() }))
 })
 
+test('Triggers onadd for a color the rendered slots withhold through maxColors', async () => {
+	const onAdd = vi.fn()
+	const colors = ['#ff0', '#0ff']
+
+	const { user } = setup(Palette, {
+		props: { colors, maxColors: 2, showInput: true, onadd: onAdd },
+	})
+
+	const input = await screen.findByTestId('__palette-input-input__')
+	await user.type(input, '0f0')
+	await user.click(await screen.findByTestId('__palette-input-submit__'))
+
+	expect(onAdd).toHaveBeenCalledWith({
+		color: '#0f0',
+		colors: [{ value: '#ff0' }, { value: '#0ff' }, { value: '#0f0' }],
+	})
+	expect(await screen.findAllByTestId('__palette-slot__')).toHaveLength(2)
+})
+
 test('Does not fire onadd when the color is a rejected duplicate', async () => {
 	const onAdd = vi.fn()
 	const colors = ['#ff0', '#0ff', '#f0f']
@@ -2662,6 +2684,29 @@ test('Keeps colors withheld by maxColors in the bound list after a deletion', as
 		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
 			'#0b0',
 			'#00c',
+		])
+	)
+})
+
+test('Keeps a color added past maxColors in the bound list', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#a00', '#0b0'], maxColors: 2 },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	expect(await screen.findAllByTestId('__palette-cell__')).toHaveLength(2)
+
+	const input = await screen.findByTestId('__palette-input-input__')
+	await user.type(input, '0f0')
+	await user.click(await screen.findByTestId('__palette-input-submit__'))
+
+	await waitFor(() =>
+		expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#a00' }, { value: '#0b0' }, { value: '#0f0' }])
+	)
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#a00',
+			'#0b0',
 		])
 	)
 })
