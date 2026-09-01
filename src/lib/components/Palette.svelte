@@ -427,17 +427,23 @@
 	const _dropIndices = (full: NormalizedColor[], dropped: Set<number>): NormalizedColor[] =>
 		full.filter((_, index) => !dropped.has(index))
 
+	const _countBelow = (sorted: number[], index: number): number => {
+		let low = 0
+		let high = sorted.length
+		while (low < high) {
+			const mid = Math.floor((low + high) / 2)
+			if (sorted[mid] < index) {
+				low = mid + 1
+			} else {
+				high = mid
+			}
+		}
+		return low
+	}
+
 	const _shiftIndices = (indices: number[], dropped: Set<number>): number[] => {
 		const sorted = [...dropped].sort((a, b) => a - b)
-		return indices
-			.filter((index) => !dropped.has(index))
-			.map((index) => {
-				let offset = 0
-				while (offset < sorted.length && sorted[offset] < index) {
-					offset++
-				}
-				return index - offset
-			})
+		return indices.filter((index) => !dropped.has(index)).map((index) => index - _countBelow(sorted, index))
 	}
 
 	const _removeCompactColor = (index: number) => {
