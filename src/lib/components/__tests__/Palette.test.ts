@@ -2194,6 +2194,29 @@ test('Triggers ondelete with the group identity in group mode', async () => {
 	})
 })
 
+test('Triggers ondelete with the index in the full group when a duplicate is hidden', async () => {
+	const onDelete = vi.fn()
+	const colors = [{ name: 'A', colors: ['#f00', '#f00', '#00f'] }]
+
+	const { user } = setup(Palette, {
+		props: { colors, deletionMode: TOOLTIP, ondelete: onDelete },
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	await user.hover(cells[1])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#00f',
+		index: 2,
+		colors: [{ name: 'A', colors: [{ value: '#f00' }, { value: '#f00' }] }],
+		groupIndex: 0,
+		groupName: 'A',
+	})
+})
+
 test('Omits groupName in ondelete when the group has no name', async () => {
 	const onDelete = vi.fn()
 	const colors = [{ colors: ['#f00', '#0f0'] }]
@@ -2228,6 +2251,22 @@ test('Triggers onadd for a color the rendered slots withhold through maxColors',
 		color: '#0f0',
 		colors: [{ value: '#ff0' }, { value: '#0ff' }, { value: '#0f0' }],
 	})
+	expect(await screen.findAllByTestId('__palette-slot__')).toHaveLength(2)
+})
+
+test('Rejects an added color the rendered slots withhold through maxColors', async () => {
+	const onAdd = vi.fn()
+	const colors = ['#a00', '#0b0', '#00c']
+
+	const { user } = setup(Palette, {
+		props: { colors, maxColors: 2, showInput: true, onadd: onAdd },
+	})
+
+	const input = await screen.findByTestId('__palette-input-input__')
+	await user.type(input, '00c')
+	await user.click(await screen.findByTestId('__palette-input-submit__'))
+
+	expect(onAdd).not.toHaveBeenCalled()
 	expect(await screen.findAllByTestId('__palette-slot__')).toHaveLength(2)
 })
 
