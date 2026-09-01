@@ -116,18 +116,16 @@ export const calculateNumColumns = (
 ): number => {
 	const MIN_NUM_COLUMNS = 5
 	const MIN_COMPACT_NUM_COLUMNS = 1
-	const colorLength = Math.max($colorLength + Number($params?.showTransparentSlot), 0)
 	const params: CalculateNumColumnsParams = $params ?? {
 		isCompact: false,
 		compactColorIndices: [],
 		showTransparentSlot: false,
 		numColumns: 1,
 	}
+	const transparentSlot = params.showTransparentSlot ? 1 : 0
+	const colorLength = Math.max($colorLength + transparentSlot, 0)
 	if (params.isCompact) {
-		const compactLength = Math.min(
-			colorLength,
-			Number(params.compactColorIndices?.length) + Number(params.showTransparentSlot)
-		)
+		const compactLength = Math.min(colorLength, Number(params.compactColorIndices?.length) + transparentSlot)
 		return Number.isFinite(compactLength)
 			? Math.max(compactLength, MIN_COMPACT_NUM_COLUMNS)
 			: MIN_COMPACT_NUM_COLUMNS
