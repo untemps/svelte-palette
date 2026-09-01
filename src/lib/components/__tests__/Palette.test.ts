@@ -665,8 +665,17 @@ test('Rounds a fractional numColumns down to a whole column count', async () => 
 
 	const content = await screen.findByTestId('__palette__')
 	const section = content.querySelector('.palette__content')
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 2'))
-	expect(section.getAttribute('style')).not.toContain('--num-columns: 2.5')
+	await waitFor(() => expect(section.getAttribute('style')).toBe('--num-columns: 2;'))
+})
+
+test('Clamps the configured column count before the colors resolve', async () => {
+	setup(Palette, {
+		props: { numColumns: 2.5 },
+	})
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+	expect(section?.getAttribute('style')).toBe('--num-columns: 2;')
 })
 
 test('Updates num-columns when numColumns changes to 0', async () => {
