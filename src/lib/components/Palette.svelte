@@ -489,7 +489,7 @@
 		)
 		const nextColorGroups = calculateColorGroups(nextFullColorGroups, { allowDuplicates, maxColors })
 		_colorGroups = nextColorGroups
-		_numColumns = _groupNumColumns(nextColorGroups, { numColumns, maxColumns })
+		_numColumns = _groupNumColumns(nextColorGroups, _viewParams())
 		_syncColorGroups(nextFullColorGroups)
 		ondelete?.({
 			color: removed.value,
