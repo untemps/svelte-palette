@@ -377,7 +377,7 @@
 			return
 		}
 		const removed = (_fullColors ?? [])[fullIndex]
-		const dropped = _droppedIndices(_fullColors ?? [], fullIndex)
+		const dropped = _droppedIndices(_fullColors ?? [], fullIndex, { allowDuplicates })
 		const nextFullColors = _dropIndices(_fullColors ?? [], dropped)
 		compactColorIndices = _shiftIndices(compactColorIndices ?? [], dropped)
 		const nextColors = calculateColors(nextFullColors, _viewParams())
@@ -403,9 +403,14 @@
 		return match ? match.index : full.findIndex((color) => isSameColor(color.value, rendered.value))
 	}
 
-	const _droppedIndices = (full: NormalizedColor[], fullIndex: number, indices?: number[]): Set<number> => {
+	const _droppedIndices = (
+		full: NormalizedColor[],
+		fullIndex: number,
+		params: Pick<ReturnType<typeof _viewParams>, 'allowDuplicates'>,
+		indices?: number[]
+	): Set<number> => {
 		const removed = full[fullIndex]
-		if (allowDuplicates || !removed) {
+		if (params.allowDuplicates || !removed) {
 			return new Set([fullIndex])
 		}
 		const scope = indices ? new Set(indices) : null
@@ -445,7 +450,7 @@
 			return
 		}
 		const removed = (_fullColors ?? [])[fullIndex]
-		const dropped = _droppedIndices(_fullColors ?? [], fullIndex, compactColorIndices ?? [])
+		const dropped = _droppedIndices(_fullColors ?? [], fullIndex, { allowDuplicates }, compactColorIndices ?? [])
 		const nextFullColors = _dropIndices(_fullColors ?? [], dropped)
 		compactColorIndices = _shiftIndices(compactColorIndices ?? [], dropped)
 		const nextColors = calculateColors(nextFullColors, {
@@ -480,7 +485,7 @@
 			return
 		}
 		const removed = fullGroupColors[fullIndex]
-		const dropped = _droppedIndices(fullGroupColors, fullIndex)
+		const dropped = _droppedIndices(fullGroupColors, fullIndex, { allowDuplicates })
 		const nextFullColorGroups = (_fullColorGroups ?? []).map((g, gi) =>
 			gi === groupIndex ? { ...g, colors: _dropIndices(g.colors, dropped) } : g
 		)
