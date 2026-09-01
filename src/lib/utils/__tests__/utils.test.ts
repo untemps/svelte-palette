@@ -232,6 +232,9 @@ describe('utils', () => {
 			[colorLength, { ...params, numColumns: 30, maxColors: 4 }, , 30],
 			[colorLength, { ...params, numColumns: 0, maxColors: 4 }, , colorLength],
 			[colorLength, { numColumns: 0 }, , colorLength],
+			[colorLength, { ...params, numColumns: 2.5 }, , 2],
+			[colorLength, { ...params, numColumns: 0, maxColumns: 0.5 }, , 1],
+			[0, { ...params, numColumns: 0 }, { minNumColumns: 0 }, 1],
 		])('colorLength:%j, params:%j, options:%j, expected:%j', (colorLength, params, options, expected) => {
 			expect(calculateNumColumns(colorLength, params, options)).toBe(expected)
 		})

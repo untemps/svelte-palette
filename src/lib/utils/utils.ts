@@ -109,13 +109,17 @@ export const calculateColors = (
 	$params?: CalculateColorsParams
 ): NormalizedColor[] => pickColors($colors, $params).map(({ color }) => color)
 
+export const normalizeNumColumns = ($columns: number): number => {
+	const MIN_NUM_COLUMNS = 1
+	return Number.isFinite($columns) ? Math.max(Math.floor($columns), MIN_NUM_COLUMNS) : MIN_NUM_COLUMNS
+}
+
 export const calculateNumColumns = (
 	$colorLength: number,
 	$params?: CalculateNumColumnsParams,
 	$options?: CalculateNumColumnsOptions
 ): number => {
-	const MIN_NUM_COLUMNS = 5
-	const MIN_COMPACT_NUM_COLUMNS = 1
+	const DEFAULT_MIN_NUM_COLUMNS = 5
 	const params: CalculateNumColumnsParams = $params ?? {
 		isCompact: false,
 		compactColorIndices: [],
@@ -124,17 +128,16 @@ export const calculateNumColumns = (
 	}
 	const transparentSlot = params.showTransparentSlot ? 1 : 0
 	const colorLength = Math.max($colorLength + transparentSlot, 0)
+	let columns: number
 	if (params.isCompact) {
-		const compactLength = Math.min(colorLength, Number(params.compactColorIndices?.length) + transparentSlot)
-		return Number.isFinite(compactLength)
-			? Math.max(compactLength, MIN_COMPACT_NUM_COLUMNS)
-			: MIN_COMPACT_NUM_COLUMNS
+		columns = Math.min(colorLength, (params.compactColorIndices?.length ?? 0) + transparentSlot)
+	} else if ((params.numColumns ?? 0) > 0) {
+		columns = params.numColumns ?? 0
+	} else {
+		const autoColumns = Math.max(colorLength, $options?.minNumColumns ?? DEFAULT_MIN_NUM_COLUMNS)
+		columns = (params.maxColumns ?? 0) > 0 ? Math.min(autoColumns, params.maxColumns ?? 0) : autoColumns
 	}
-	if ((params.numColumns ?? 0) > 0) {
-		return Math.max(params.numColumns ?? 0, 0)
-	}
-	const cols = Math.max(colorLength, $options?.minNumColumns ?? MIN_NUM_COLUMNS)
-	return (params.maxColumns ?? 0) > 0 ? Math.min(cols, params.maxColumns ?? 0) : cols
+	return normalizeNumColumns(columns)
 }
 
 export const isColorGroups = ($colors: unknown): $colors is ColorGroup[] => {

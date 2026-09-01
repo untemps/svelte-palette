@@ -653,6 +653,19 @@ test.each([
 	await waitFor(() => expect(section.getAttribute('style')).toContain(`--num-columns: ${expected}`))
 })
 
+test('Rounds a fractional numColumns down to a whole column count', async () => {
+	const colors = Array.from({ length: 25 }, (_, i) => `#${String(i).padStart(6, '0')}`)
+
+	setup(Palette, {
+		props: { colors, numColumns: 2.5 },
+	})
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 2'))
+	expect(section.getAttribute('style')).not.toContain('--num-columns: 2.5')
+})
+
 test('Updates num-columns when numColumns changes to 0', async () => {
 	const colors = Array.from({ length: 25 }, (_, i) => `#${String(i).padStart(6, '0')}`)
 

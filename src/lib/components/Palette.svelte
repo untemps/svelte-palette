@@ -8,6 +8,7 @@
 		isColorGroups,
 		isSameColor,
 		normalizeInputType,
+		normalizeNumColumns,
 		pickColors,
 		transformColors,
 	} from '../utils/utils.js'
@@ -139,7 +140,7 @@
 	let _fullColorGroups = $state<NormalizedColorGroup[] | null>(null)
 	let _error = $state<unknown>(null)
 	let _hasError = $state(false)
-	let _numColumns = $state(untrack(() => numColumns))
+	let _numColumns = $state(untrack(() => normalizeNumColumns(numColumns)))
 	let _isSettingsOn = $state(false)
 	let _isCompact = $state(untrack(() => isCompact))
 	let _listboxEl = $state<HTMLElement | null>(null)
@@ -199,7 +200,7 @@
 
 	$effect(() => {
 		if (numColumns > 0) {
-			_numColumns = numColumns
+			_numColumns = normalizeNumColumns(numColumns)
 		}
 	})
 
@@ -572,7 +573,7 @@
 	}
 
 	const _rowStep = (options: HTMLElement[], from: number, dir: number): number => {
-		const columns = Number.isFinite(_numColumns) ? Math.max(_numColumns, 1) : 1
+		const columns = normalizeNumColumns(_numColumns)
 		const rows: { index: number; column: number }[][] = []
 		let lastContainer: Element | null = null
 		let lastRow = -1
