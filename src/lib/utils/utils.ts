@@ -94,9 +94,15 @@ export const pickColors = (
 		picked = extractByIndices(picked, compactIndices)
 	}
 	if (!params.allowDuplicates) {
-		picked = picked.filter(
-			(item, index) => picked.findIndex(({ color }) => isSameColor(color.value, item.color.value)) === index
-		)
+		const seen = new Set<ColorValue>()
+		picked = picked.filter(({ color }) => {
+			const key = typeof color.value === 'string' ? (color.value.toLowerCase() as ColorValue) : color.value
+			if (seen.has(key)) {
+				return false
+			}
+			seen.add(key)
+			return true
+		})
 	}
 	if (params.maxColors !== undefined && picked.length > params.maxColors) {
 		picked = picked.slice(0, params.maxColors)
