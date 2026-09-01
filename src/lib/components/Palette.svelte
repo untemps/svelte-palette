@@ -334,11 +334,11 @@
 		onselect?.({ color })
 	}
 
-	const _syncColors = (nextColors: NormalizedColor[]) => {
-		_fullColors = nextColors
+	const _syncColors = (nextFullColors: NormalizedColor[]) => {
+		_fullColors = nextFullColors
 		_skipColorsSync = true
 		_syncedViewParams = _viewParams()
-		colors = nextColors
+		colors = nextFullColors
 	}
 
 	const _syncColorGroups = (nextFullColorGroups: NormalizedColorGroup[]) => {
