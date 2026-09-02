@@ -3112,6 +3112,36 @@ test('Drops a compact index whose color a flat deduplicated deletion removes', a
 	await waitFor(() => expect(screen.queryByTestId('__palette-compact-toggle-button__')).not.toBeInTheDocument())
 })
 
+test('Drops a compact index the shortened list no longer reaches on a flat deletion', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#a00', '#0b0', '#00c'], initialCompactColorIndices: [1, 9] },
+	})
+
+	const boundIndices = await screen.findByTestId('__bound-indices__')
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(JSON.parse(boundIndices.textContent ?? '')).toEqual([0]))
+})
+
+test('Drops a compact index the shortened list no longer reaches on a compact deletion', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#a00', '#0b0', '#00c'], isCompact: true, initialCompactColorIndices: [0, 9] },
+	})
+
+	const boundIndices = await screen.findByTestId('__bound-indices__')
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(1)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(JSON.parse(boundIndices.textContent ?? '')).toEqual([]))
+})
+
 test('Does not resurrect a flat-deleted color through a compact deletion after a runtime toggle', async () => {
 	const { user } = setup(PaletteBind, {
 		props: { initialColors: ['#a00', '#0b0'], initialCompactColorIndices: [0] },

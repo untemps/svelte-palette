@@ -429,14 +429,15 @@
 		if (!rendered) {
 			return
 		}
-		const fullIndex = _resolveFullIndex(_fullColors ?? [], _picked(), rendered, index)
+		const full = _fullColors ?? []
+		const fullIndex = _resolveFullIndex(full, _picked(), rendered, index)
 		if (fullIndex < 0) {
 			return
 		}
-		const removed = (_fullColors ?? [])[fullIndex]
-		const dropped = _droppedIndices(_fullColors ?? [], fullIndex, { allowDuplicates })
-		const nextFullColors = _dropIndices(_fullColors ?? [], dropped)
-		compactColorIndices = _shiftIndices(compactColorIndices ?? [], dropped)
+		const removed = full[fullIndex]
+		const dropped = _droppedIndices(full, fullIndex, { allowDuplicates })
+		const nextFullColors = _dropIndices(full, dropped)
+		compactColorIndices = _shiftIndices(compactColorIndices ?? [], dropped, full)
 		const nextColors = calculateColors(nextFullColors, _viewParams())
 		_colors = nextColors
 		_numColumns = calculateNumColumns(nextColors.length, _viewParams())
@@ -498,9 +499,11 @@
 		return low
 	}
 
-	const _shiftIndices = (indices: number[], dropped: Set<number>): number[] => {
+	const _shiftIndices = (indices: number[], dropped: Set<number>, full: NormalizedColor[]): number[] => {
 		const sorted = [...dropped].sort((a, b) => a - b)
-		return indices.filter((index) => !dropped.has(index)).map((index) => index - _countBelow(sorted, index))
+		return indices
+			.filter((index) => index < full.length && !dropped.has(index))
+			.map((index) => index - _countBelow(sorted, index))
 	}
 
 	const _removeCompactColor = (index: number) => {
@@ -508,14 +511,15 @@
 		if (!rendered) {
 			return
 		}
-		const fullIndex = _resolveFullIndex(_fullColors ?? [], _picked(), rendered, index)
+		const full = _fullColors ?? []
+		const fullIndex = _resolveFullIndex(full, _picked(), rendered, index)
 		if (fullIndex < 0) {
 			return
 		}
-		const removed = (_fullColors ?? [])[fullIndex]
-		const dropped = _droppedIndices(_fullColors ?? [], fullIndex, { allowDuplicates }, compactColorIndices ?? [])
-		const nextFullColors = _dropIndices(_fullColors ?? [], dropped)
-		compactColorIndices = _shiftIndices(compactColorIndices ?? [], dropped)
+		const removed = full[fullIndex]
+		const dropped = _droppedIndices(full, fullIndex, { allowDuplicates }, compactColorIndices ?? [])
+		const nextFullColors = _dropIndices(full, dropped)
+		compactColorIndices = _shiftIndices(compactColorIndices ?? [], dropped, full)
 		const nextColors = calculateColors(nextFullColors, _viewParams())
 		_colors = nextColors
 		_numColumns = _compactNumColumns(nextColors.length, _viewParams())
