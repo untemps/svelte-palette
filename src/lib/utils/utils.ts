@@ -150,6 +150,8 @@ export const isColorGroups = ($colors: unknown): $colors is ColorGroup[] => {
 	return Array.isArray($colors) && $colors.length > 0 && Array.isArray(($colors[0] as ColorGroup | undefined)?.colors)
 }
 
+export const hasColorList = ($group: ColorGroup | null | undefined): boolean => Array.isArray($group?.colors)
+
 export const calculateColorGroups = (
 	$groups: ColorGroup[] | null | undefined,
 	$params?: CalculateColorsParams
@@ -157,12 +159,10 @@ export const calculateColorGroups = (
 	if (!$groups || !Array.isArray($groups)) {
 		return []
 	}
-	return $groups
-		.filter((group) => Array.isArray(group?.colors))
-		.map((group) => ({
-			...(group.name != null && { name: group.name }),
-			colors: calculateColors(group.colors, $params),
-		}))
+	return $groups.filter(hasColorList).map((group) => ({
+		...(group.name != null && { name: group.name }),
+		colors: calculateColors(group.colors, $params),
+	}))
 }
 
 export const COLOR_REGEX = /^#?(([0-9a-f]{2}){3,4}|([0-9a-f]){3,4})$/i

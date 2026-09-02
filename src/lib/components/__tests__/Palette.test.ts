@@ -8,6 +8,8 @@ import PaletteReactive from './PaletteReactive.test.svelte'
 
 import { TOOLTIP, DROP } from '../../enums/PaletteDeletionMode'
 
+import type { ColorGroup } from '../../types'
+
 const setup = (component: Parameters<typeof render>[0], options?: Parameters<typeof render>[1]) => {
 	return {
 		user: userEvent.setup(),
@@ -2286,6 +2288,29 @@ test('Omits groupName in ondelete when the group has no name', async () => {
 	expect(onDelete).toHaveBeenCalledWith(expect.not.objectContaining({ groupName: expect.anything() }))
 })
 
+test('Reports the group index in the supplied list when the renderer skips a group', async () => {
+	const onDelete = vi.fn()
+	const colors = [
+		{ name: 'A', colors: ['#f00'] },
+		{ name: 'B' },
+		{ name: 'C', colors: ['#00f', '#11f'] },
+	] as unknown as ColorGroup[]
+
+	const { user } = setup(Palette, {
+		props: { colors, deletionMode: TOOLTIP, ondelete: onDelete },
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[2])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith(
+		expect.objectContaining({ color: '#11f', index: 1, groupIndex: 2, groupName: 'C' })
+	)
+})
+
 test('Refuses an added color once the rendered slots reach maxColors', async () => {
 	const onAdd = vi.fn()
 	const colors = ['#ff0', '#0ff']
@@ -2710,6 +2735,45 @@ test('Removes every occurrence a deduplicated slot stood for within its own grou
 		])
 	)
 	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
+})
+
+test('Keeps the groups and the group keys the renderer skips in the bound list', async () => {
+	const initialColors = [
+		{ name: 'A', colors: ['#f00', '#0f0'] },
+		{ name: 'B' },
+		{ id: 'c', name: 'C', colors: ['#00f'] },
+	] as unknown as ColorGroup[]
+
+	const { user } = setup(PaletteBind, { props: { initialColors } })
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	let cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() =>
+		expect(JSON.parse(bound.textContent ?? '')).toEqual([
+			{ name: 'A', colors: [{ value: '#0f0' }] },
+			{ name: 'B' },
+			{ id: 'c', name: 'C', colors: [{ value: '#00f' }] },
+		])
+	)
+
+	cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() =>
+		expect(JSON.parse(bound.textContent ?? '')).toEqual([
+			{ name: 'A', colors: [] },
+			{ name: 'B' },
+			{ id: 'c', name: 'C', colors: [{ value: '#00f' }] },
+		])
+	)
 })
 
 test('Keeps grouped colors withheld by maxColors in the bound list after a deletion', async () => {

@@ -150,9 +150,14 @@ export interface DeleteEventArgs {
 	/**
 	 * The resulting color list, resolved to its normalized form, holding every color the palette carries,
 	 * including the ones the rendered slots withhold through `maxColors`, `allowDuplicates` or compact mode.
+	 * In grouped mode it is the supplied group list with only its colors normalized, so the groups the grid
+	 * skips and the keys they carry are handed back untouched.
 	 */
 	colors: Colors
-	/** The index of the group the color was removed from, only provided in grouped mode. */
+	/**
+	 * The index of the group the color was removed from, in the supplied list rather than in the rendered
+	 * one, only provided in grouped mode.
+	 */
 	groupIndex?: number
 	/** The name of the group the color was removed from, only provided in grouped mode when the group is named. */
 	groupName?: string
