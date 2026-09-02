@@ -147,6 +147,8 @@
 	let _focusedIndex = $state<number | null>(null)
 	let _skipColorsSync = $state(false)
 	let _syncedViewParams: ReturnType<typeof _viewParams> | null = null
+	let _syncedColors: NormalizedColor[] | null = null
+	let _syncedColorGroups: NormalizedColorGroup[] | null = null
 	let _colorsGeneration = 0
 	let _colorsSource: ColorsProp | null = null
 
@@ -174,6 +176,29 @@
 		a.maxColumns === b.maxColumns &&
 		a.compactColorIndices.length === b.compactColorIndices.length &&
 		a.compactColorIndices.every((index, i) => index === b.compactColorIndices[i])
+
+	const _sameNormalizedColors = (a: NormalizedColor[], b: NormalizedColor[]): boolean =>
+		a.length === b.length &&
+		a.every((color, index) => color.value === b[index].value && color.name === b[index].name)
+
+	const _sameNormalizedColorGroups = (a: NormalizedColorGroup[], b: NormalizedColorGroup[]): boolean =>
+		a.length === b.length &&
+		a.every((group, index) => group.name === b[index].name && _sameNormalizedColors(group.colors, b[index].colors))
+
+	const _isSyncedSource = (source: ColorsProp | null): boolean => {
+		if (!Array.isArray(source)) {
+			return false
+		}
+		if (_syncedColorGroups) {
+			return (
+				isColorGroups(source) &&
+				_sameNormalizedColorGroups(calculateColorGroups(source, { allowDuplicates: true }), _syncedColorGroups)
+			)
+		}
+		return (
+			!!_syncedColors && !isColorGroups(source) && _sameNormalizedColors(transformColors(source), _syncedColors)
+		)
+	}
 
 	const _groupNumColumns = (
 		groups: NormalizedColorGroup[],
@@ -212,7 +237,7 @@
 		_colorsSource = _source
 		if (untrack(() => _skipColorsSync)) {
 			_skipColorsSync = false
-			if (_sameViewParams(_syncedViewParams, _params)) {
+			if (_sameViewParams(_syncedViewParams, _params) && untrack(() => _isSyncedSource(_source))) {
 				return
 			}
 		}
@@ -337,6 +362,8 @@
 	const _syncColors = (nextFullColors: NormalizedColor[]) => {
 		_fullColors = nextFullColors
 		_skipColorsSync = true
+		_syncedColors = nextFullColors
+		_syncedColorGroups = null
 		_syncedViewParams = _viewParams()
 		colors = nextFullColors
 	}
@@ -344,6 +371,8 @@
 	const _syncColorGroups = (nextFullColorGroups: NormalizedColorGroup[]) => {
 		_fullColorGroups = nextFullColorGroups
 		_skipColorsSync = true
+		_syncedColors = null
+		_syncedColorGroups = nextFullColorGroups
 		_syncedViewParams = _viewParams()
 		colors = nextFullColorGroups
 	}

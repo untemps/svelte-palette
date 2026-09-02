@@ -1123,6 +1123,57 @@ test('Applies an isCompact change made inside ondelete alongside the write-back'
 	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 2'))
 })
 
+test('Resolves the list a delete handler assigns instead of the write-back', async () => {
+	let palette: { setColors: (value: string[]) => void } | undefined
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#00c'],
+			deletionMode: TOOLTIP,
+			ondelete: () => palette?.setColors(['#111', '#222', '#333', '#444']),
+		},
+	})
+	palette = component
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#111',
+			'#222',
+			'#333',
+			'#444',
+		])
+	)
+})
+
+test('Resolves the list an add handler assigns instead of the write-back', async () => {
+	let palette: { setColors: (value: string[]) => void } | undefined
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0'],
+			initialShowInput: true,
+			onadd: () => palette?.setColors(['#111', '#222', '#333']),
+		},
+	})
+	palette = component
+
+	const input = await screen.findByTestId('__palette-input-input__')
+	await user.type(input, '0f0')
+	await user.click(await screen.findByTestId('__palette-input-submit__'))
+
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#111',
+			'#222',
+			'#333',
+		])
+	)
+})
+
 test('Toggles the input when colors switch between grouped and flat', async () => {
 	const groups = [
 		{ name: 'Reds', colors: ['#f00'] },
