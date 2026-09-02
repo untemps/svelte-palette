@@ -2235,7 +2235,7 @@ test('Omits groupName in ondelete when the group has no name', async () => {
 	expect(onDelete).toHaveBeenCalledWith(expect.not.objectContaining({ groupName: expect.anything() }))
 })
 
-test('Triggers onadd for a color the rendered slots withhold through maxColors', async () => {
+test('Refuses an added color once the rendered slots reach maxColors', async () => {
 	const onAdd = vi.fn()
 	const colors = ['#ff0', '#0ff']
 
@@ -2247,10 +2247,7 @@ test('Triggers onadd for a color the rendered slots withhold through maxColors',
 	await user.type(input, '0f0')
 	await user.click(await screen.findByTestId('__palette-input-submit__'))
 
-	expect(onAdd).toHaveBeenCalledWith({
-		color: '#0f0',
-		colors: [{ value: '#ff0' }, { value: '#0ff' }, { value: '#0f0' }],
-	})
+	expect(onAdd).not.toHaveBeenCalled()
 	expect(await screen.findAllByTestId('__palette-slot__')).toHaveLength(2)
 })
 
@@ -2720,9 +2717,54 @@ test('Keeps colors withheld by maxColors in the bound list after a deletion', as
 	)
 })
 
-test('Keeps a color added past maxColors in the bound list', async () => {
+test('Keeps the bound list at maxColors when the add gesture is repeated', async () => {
 	const { user } = setup(PaletteBind, {
 		props: { initialColors: ['#a00', '#0b0'], maxColors: 2 },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	expect(await screen.findAllByTestId('__palette-cell__')).toHaveLength(2)
+
+	const input = await screen.findByTestId('__palette-input-input__')
+	const submit = await screen.findByTestId('__palette-input-submit__')
+	for (const color of ['0f0', '0ff', 'f0f']) {
+		await user.clear(input)
+		await user.type(input, color)
+		await user.click(submit)
+	}
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual(['#a00', '#0b0']))
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#a00',
+			'#0b0',
+		])
+	)
+})
+
+test('Refuses a repeated color once the rendered slots reach maxColors when duplicates are allowed', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#a00', '#0b0'], maxColors: 2, allowDuplicates: true },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	expect(await screen.findAllByTestId('__palette-cell__')).toHaveLength(2)
+
+	const input = await screen.findByTestId('__palette-input-input__')
+	const submit = await screen.findByTestId('__palette-input-submit__')
+	for (let i = 0; i < 3; i++) {
+		await user.clear(input)
+		await user.type(input, 'a00')
+		await user.click(submit)
+	}
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual(['#a00', '#0b0']))
+	await waitFor(() => expect(screen.getAllByTestId('__palette-slot__')).toHaveLength(2))
+})
+
+test('Keeps the colors supplied past maxColors when an add is refused', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#a00', '#0b0', '#00c'], maxColors: 2 },
 	})
 
 	const bound = await screen.findByTestId('__bound-colors__')
@@ -2732,15 +2774,66 @@ test('Keeps a color added past maxColors in the bound list', async () => {
 	await user.type(input, '0f0')
 	await user.click(await screen.findByTestId('__palette-input-submit__'))
 
-	await waitFor(() =>
-		expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#a00' }, { value: '#0b0' }, { value: '#0f0' }])
-	)
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual(['#a00', '#0b0', '#00c']))
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#0b0' }, { value: '#00c' }]))
 	await waitFor(() =>
 		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
-			'#a00',
 			'#0b0',
+			'#00c',
 		])
 	)
+})
+
+test('Accepts an added color after a deletion frees a slot', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#a00', '#0b0'], maxColors: 2 },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	const input = await screen.findByTestId('__palette-input-input__')
+	await user.type(input, '0f0')
+	await user.click(await screen.findByTestId('__palette-input-submit__'))
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual(['#a00', '#0b0']))
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-slot__')).toHaveLength(1))
+
+	await user.clear(input)
+	await user.type(input, '0f0')
+	await user.click(await screen.findByTestId('__palette-input-submit__'))
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#0b0' }, { value: '#0f0' }]))
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#0b0',
+			'#0f0',
+		])
+	)
+})
+
+test('Refuses every added color when maxColors is zero', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#a00', '#0b0'], maxColors: 0 },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	const input = await screen.findByTestId('__palette-input-input__')
+	expect(screen.queryAllByTestId('__palette-slot__')).toHaveLength(0)
+
+	await user.type(input, '0f0')
+	await user.click(await screen.findByTestId('__palette-input-submit__'))
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual(['#a00', '#0b0']))
+	expect(screen.queryAllByTestId('__palette-slot__')).toHaveLength(0)
 })
 
 test('Keeps colors dropped as duplicates in the bound list after a deletion', async () => {

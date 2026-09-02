@@ -121,14 +121,16 @@ export interface InputAddEventArgs {
 }
 
 /**
- * Argument passed to the palette-level `onadd` callback once a color has been added to the list.
+ * Argument passed to the palette-level `onadd` callback once a color has been added to the list. A submission
+ * the palette refuses — a repeat of a color already in the list with `allowDuplicates` off, or any color once
+ * the rendered slots are full — adds nothing, writes nothing back and fires no callback.
  */
 export interface AddEventArgs {
 	/** The color value that was added. */
 	color: ColorValue
 	/**
 	 * The resulting color list, resolved to its normalized form, holding every color the palette carries,
-	 * including the ones the rendered slots withhold through `maxColors`, `allowDuplicates` or compact mode.
+	 * including the ones the rendered slots withhold through `allowDuplicates` or compact mode.
 	 */
 	colors: Colors
 }

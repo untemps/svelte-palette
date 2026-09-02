@@ -355,10 +355,14 @@
 		if (!allowDuplicates && (_fullColors ?? []).some((existing) => isSameColor(existing.value, color))) {
 			return
 		}
+		const _params = _viewParams()
 		const nextFullColors = transformColors([...(_fullColors ?? []), color])
-		const nextColors = calculateColors(nextFullColors, _viewParams())
+		const nextColors = calculateColors(nextFullColors, _params)
+		if (nextColors.length <= calculateColors(_fullColors ?? [], _params).length) {
+			return
+		}
 		_colors = nextColors
-		_numColumns = calculateNumColumns(nextColors.length, _viewParams())
+		_numColumns = calculateNumColumns(nextColors.length, _params)
 		_syncColors(nextFullColors)
 		onadd?.({ color, colors: nextFullColors })
 	}
