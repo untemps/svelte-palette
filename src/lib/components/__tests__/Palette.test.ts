@@ -8,7 +8,7 @@ import PaletteReactive from './PaletteReactive.test.svelte'
 
 import { TOOLTIP, DROP } from '../../enums/PaletteDeletionMode'
 
-import type { ColorGroup } from '../../types'
+import type { ColorGroup, DeleteEventArgs } from '../../types'
 
 const setup = (component: Parameters<typeof render>[0], options?: Parameters<typeof render>[1]) => {
 	return {
@@ -2774,6 +2774,131 @@ test('Keeps the groups and the group keys the renderer skips in the bound list',
 			{ id: 'c', name: 'C', colors: [{ value: '#00f' }] },
 		])
 	)
+})
+
+test('Writes a grouped deletion into the group list a delete handler assigned', async () => {
+	const initialColors = [
+		{ id: 'a', name: 'A', colors: ['#a00', '#a11'] },
+		{ name: 'X' },
+		{ id: 'b', name: 'B', colors: ['#b00'] },
+	] as unknown as ColorGroup[]
+
+	const onDelete = vi.fn()
+	let palette: { setColors: (value: ColorGroup[]) => void } | undefined
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors,
+			deletionMode: TOOLTIP,
+			ondelete: (args: DeleteEventArgs) => {
+				onDelete(args)
+				if (onDelete.mock.calls.length === 1) {
+					palette?.setColors(
+						(args.colors as ColorGroup[])
+							.filter((group) => Array.isArray(group.colors))
+							.map((group) => ({ ...group, updatedAt: 1 })) as unknown as ColorGroup[]
+					)
+				}
+			},
+		},
+	})
+	palette = component
+
+	let cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
+
+	cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[1])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(2))
+	expect(onDelete).toHaveBeenNthCalledWith(2, {
+		color: '#b00',
+		index: 0,
+		groupIndex: 1,
+		groupName: 'B',
+		colors: [
+			{ id: 'a', name: 'A', colors: [{ value: '#a11' }], updatedAt: 1 },
+			{ id: 'b', name: 'B', colors: [], updatedAt: 1 },
+		],
+	})
+})
+
+test('Reports the group index in the list a delete handler assigned', async () => {
+	const onDelete = vi.fn()
+	let palette: { setColors: (value: ColorGroup[]) => void } | undefined
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: [
+				{ name: 'A', colors: ['#a00', '#a11'] },
+				{ name: 'C', colors: ['#c00'] },
+			],
+			deletionMode: TOOLTIP,
+			ondelete: (args: DeleteEventArgs) => {
+				onDelete(args)
+				if (onDelete.mock.calls.length === 1) {
+					const groups = args.colors as ColorGroup[]
+					palette?.setColors([groups[0], { name: 'X' }, { name: 'Y' }, groups[1]] as unknown as ColorGroup[])
+				}
+			},
+		},
+	})
+	palette = component
+
+	let cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
+
+	cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[1])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(2))
+	expect(onDelete).toHaveBeenNthCalledWith(2, {
+		color: '#c00',
+		index: 0,
+		groupIndex: 3,
+		groupName: 'C',
+		colors: [{ name: 'A', colors: [{ value: '#a11' }] }, { name: 'X' }, { name: 'Y' }, { name: 'C', colors: [] }],
+	})
+})
+
+test('Falls back to the resolved groups when the supplied group list drifts out of step', async () => {
+	const onDelete = vi.fn()
+	const colors = [
+		{ name: 'A', colors: ['#a00', '#a11'] },
+		{ name: 'B', colors: ['#b00'] },
+	]
+
+	const { user } = setup(Palette, { props: { colors, deletionMode: TOOLTIP, ondelete: onDelete } })
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	colors.splice(1, 0, { name: 'M', colors: ['#0f0'] })
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(1))
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#a00',
+		index: 0,
+		groupIndex: 0,
+		groupName: 'A',
+		colors: [
+			{ name: 'A', colors: [{ value: '#a11' }] },
+			{ name: 'B', colors: [{ value: '#b00' }] },
+		],
+	})
 })
 
 test('Keeps grouped colors withheld by maxColors in the bound list after a deletion', async () => {

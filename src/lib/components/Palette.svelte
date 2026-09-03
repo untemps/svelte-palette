@@ -154,7 +154,6 @@
 	let _colorsGeneration = 0
 	let _colorsSource: ColorsProp | null = null
 	let _sourceColorGroups: ColorGroup[] = []
-	let _groupSourceIndices: number[] = []
 
 	let _inputType = $derived(normalizeInputType(inputType))
 
@@ -242,6 +241,9 @@
 		if (untrack(() => _skipColorsSync)) {
 			_skipColorsSync = false
 			if (_sameViewParams(_syncedViewParams, _params) && untrack(() => _isSyncedSource(_source))) {
+				if (isColorGroups(_source)) {
+					_sourceColorGroups = _source
+				}
 				return
 			}
 		}
@@ -267,7 +269,6 @@
 						_colorGroups = newColorGroups
 						_fullColorGroups = newFullColorGroups
 						_sourceColorGroups = results
-						_groupSourceIndices = results.flatMap((group, index) => (hasColorList(group) ? [index] : []))
 						_colors = null
 						_fullColors = null
 						_numColumns = _groupNumColumns(newColorGroups, _params)
@@ -277,7 +278,6 @@
 						_colorGroups = null
 						_fullColorGroups = null
 						_sourceColorGroups = []
-						_groupSourceIndices = []
 						_fullColors = transformColors(Array.isArray(results) ? results : [])
 						_numColumns = _params.isCompact
 							? _compactNumColumns(newColors.length, _params)
@@ -296,7 +296,6 @@
 				_colorGroups = null
 				_fullColorGroups = null
 				_sourceColorGroups = []
-				_groupSourceIndices = []
 				_fullColors = null
 				_focusedIndex = null
 				if (!_wasError) {
@@ -378,9 +377,15 @@
 		colors = nextFullColors
 	}
 
-	const _toSourceColorGroups = (fullColorGroups: NormalizedColorGroup[]): ColorGroup[] => {
+	const _sourceGroupIndices = (sourceColorGroups: ColorGroup[]): number[] =>
+		sourceColorGroups.flatMap((group, index) => (hasColorList(group) ? [index] : []))
+
+	const _toSourceColorGroups = (fullColorGroups: NormalizedColorGroup[], sourceIndices: number[]): ColorGroup[] => {
+		if (sourceIndices.length !== fullColorGroups.length) {
+			return [...fullColorGroups]
+		}
 		const sourceColorGroups = [..._sourceColorGroups]
-		_groupSourceIndices.forEach((sourceIndex, index) => {
+		sourceIndices.forEach((sourceIndex, index) => {
 			sourceColorGroups[sourceIndex] = {
 				...sourceColorGroups[sourceIndex],
 				colors: fullColorGroups[index].colors,
@@ -389,8 +394,8 @@
 		return sourceColorGroups
 	}
 
-	const _syncColorGroups = (nextFullColorGroups: NormalizedColorGroup[]): ColorGroup[] => {
-		const nextSourceColorGroups = _toSourceColorGroups(nextFullColorGroups)
+	const _syncColorGroups = (nextFullColorGroups: NormalizedColorGroup[], sourceIndices: number[]): ColorGroup[] => {
+		const nextSourceColorGroups = _toSourceColorGroups(nextFullColorGroups, sourceIndices)
 		_fullColorGroups = nextFullColorGroups
 		_sourceColorGroups = nextSourceColorGroups
 		_skipColorsSync = true
@@ -549,14 +554,15 @@
 			gi === groupIndex ? { ...g, colors: _dropIndices(g.colors, dropped) } : g
 		)
 		const nextColorGroups = calculateColorGroups(nextFullColorGroups, { allowDuplicates, maxColors })
+		const sourceIndices = _sourceGroupIndices(_sourceColorGroups)
 		_colorGroups = nextColorGroups
 		_numColumns = _groupNumColumns(nextColorGroups, _viewParams())
-		const nextSourceColorGroups = _syncColorGroups(nextFullColorGroups)
+		const nextSourceColorGroups = _syncColorGroups(nextFullColorGroups, sourceIndices)
 		ondelete?.({
 			color: removed.value,
 			index: fullIndex,
 			colors: nextSourceColorGroups,
-			groupIndex: _groupSourceIndices[groupIndex],
+			groupIndex: sourceIndices[groupIndex] ?? groupIndex,
 			...(group?.name != null && { groupName: group.name }),
 		})
 	}
