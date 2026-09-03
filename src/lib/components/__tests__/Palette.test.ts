@@ -3220,6 +3220,36 @@ test('Re-indexes the compact indices when a flat slot before them is deleted', a
 	})
 })
 
+test('Leaves the compact indices alone when a deletion does not move them', async () => {
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#00c', '#dd0'],
+			initialCompactColorIndices: [0, 1],
+			deletionMode: TOOLTIP,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(4)
+
+	await user.hover(cells[3])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(3))
+
+	component.appendCompactColorIndex(2)
+
+	await user.click(await screen.findByTestId('__palette-compact-toggle-button__'))
+
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#a00',
+			'#0b0',
+			'#00c',
+		])
+	)
+})
+
 test('Drops a compact index whose color a flat deduplicated deletion removes', async () => {
 	const { user } = setup(PaletteBind, {
 		props: { initialColors: ['#f00', '#0b0', '#f00'], initialCompactColorIndices: [2] },

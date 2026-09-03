@@ -169,6 +169,9 @@
 		maxColumns,
 	})
 
+	const _sameIndices = (a: number[], b: number[]): boolean =>
+		a.length === b.length && a.every((index, i) => index === b[i])
+
 	const _sameViewParams = (a: ReturnType<typeof _viewParams> | null, b: ReturnType<typeof _viewParams>): boolean =>
 		a != null &&
 		a.isCompact === b.isCompact &&
@@ -177,8 +180,7 @@
 		a.showTransparentSlot === b.showTransparentSlot &&
 		a.numColumns === b.numColumns &&
 		a.maxColumns === b.maxColumns &&
-		a.compactColorIndices.length === b.compactColorIndices.length &&
-		a.compactColorIndices.every((index, i) => index === b.compactColorIndices[i])
+		_sameIndices(a.compactColorIndices, b.compactColorIndices)
 
 	const _sameNormalizedColors = (a: NormalizedColor[], b: NormalizedColor[]): boolean =>
 		a.length === b.length &&
@@ -442,7 +444,7 @@
 		const removed = full[fullIndex]
 		const dropped = _droppedIndices(full, fullIndex, { allowDuplicates })
 		const nextFullColors = _dropIndices(full, dropped)
-		compactColorIndices = _shiftIndices(compactColorIndices ?? [], dropped, full)
+		_syncCompactColorIndices(dropped, full)
 		const nextColors = calculateColors(nextFullColors, _viewParams())
 		_colors = nextColors
 		_numColumns = calculateNumColumns(nextColors.length, _viewParams())
@@ -511,6 +513,14 @@
 			.map((index) => index - _countBelow(sorted, index))
 	}
 
+	const _syncCompactColorIndices = (dropped: Set<number>, full: NormalizedColor[]) => {
+		const currentCompactColorIndices = compactColorIndices ?? []
+		const nextCompactColorIndices = _shiftIndices(currentCompactColorIndices, dropped, full)
+		if (!_sameIndices(currentCompactColorIndices, nextCompactColorIndices)) {
+			compactColorIndices = nextCompactColorIndices
+		}
+	}
+
 	const _removeCompactColor = (index: number) => {
 		const rendered = (_colors ?? [])[index]
 		if (!rendered) {
@@ -524,7 +534,7 @@
 		const removed = full[fullIndex]
 		const dropped = _droppedIndices(full, fullIndex, { allowDuplicates }, compactColorIndices ?? [])
 		const nextFullColors = _dropIndices(full, dropped)
-		compactColorIndices = _shiftIndices(compactColorIndices ?? [], dropped, full)
+		_syncCompactColorIndices(dropped, full)
 		const nextColors = calculateColors(nextFullColors, _viewParams())
 		_colors = nextColors
 		_numColumns = _compactNumColumns(nextColors.length, _viewParams())
