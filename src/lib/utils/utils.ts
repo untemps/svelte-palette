@@ -20,6 +20,14 @@ export interface NormalizedColorGroup {
 	colors: NormalizedColor[]
 }
 
+/**
+ * A normalized color paired with its position in the transformed source list.
+ */
+export interface PickedColor {
+	color: NormalizedColor
+	index: number
+}
+
 export interface CalculateColorsParams {
 	isCompact?: boolean
 	compactColorIndices?: number[] | null
@@ -61,10 +69,10 @@ export const transformColors = ($colors: ReadonlyArray<ColorInput | NormalizedCo
 export const isSameColor = ($a: ColorValue | null, $b: ColorValue | null): boolean =>
 	typeof $a === 'string' && typeof $b === 'string' ? $a.toLowerCase() === $b.toLowerCase() : $a === $b
 
-export const calculateColors = (
+export const pickColors = (
 	$colors: ReadonlyArray<ColorInput | NormalizedColor> | null | undefined,
 	$params?: CalculateColorsParams
-): NormalizedColor[] => {
+): PickedColor[] => {
 	const source = !$colors || !Array.isArray($colors) ? [] : $colors
 	let params: CalculateColorsParams = $params ?? {
 		isCompact: false,
@@ -79,21 +87,37 @@ export const calculateColors = (
 		params = { ...params, maxColors: source.length }
 	}
 
-	let colors = transformColors(source)
+	let picked: PickedColor[] = transformColors(source).map((color, index) => ({ color, index }))
 
 	if (params.isCompact) {
 		const compactIndices = [...new Set(params.compactColorIndices ?? [])].sort((a, b) => a - b)
-		colors = extractByIndices(colors, compactIndices)
+		picked = extractByIndices(picked, compactIndices)
 	}
 	if (!params.allowDuplicates) {
-		colors = colors.filter(
-			(item, index) => colors.findIndex(({ value }) => isSameColor(value, item.value)) === index
-		)
+		const seen = new Set<ColorValue>()
+		picked = picked.filter(({ color }) => {
+			const key = typeof color.value === 'string' ? (color.value.toLowerCase() as ColorValue) : color.value
+			if (seen.has(key)) {
+				return false
+			}
+			seen.add(key)
+			return true
+		})
 	}
-	if (params.maxColors !== undefined && colors.length > params.maxColors) {
-		colors = colors.slice(0, params.maxColors)
+	if (params.maxColors !== undefined && picked.length > params.maxColors) {
+		picked = picked.slice(0, params.maxColors)
 	}
-	return colors
+	return picked
+}
+
+export const calculateColors = (
+	$colors: ReadonlyArray<ColorInput | NormalizedColor> | null | undefined,
+	$params?: CalculateColorsParams
+): NormalizedColor[] => pickColors($colors, $params).map(({ color }) => color)
+
+export const normalizeNumColumns = ($columns: number): number => {
+	const MIN_NUM_COLUMNS = 1
+	return Number.isFinite($columns) ? Math.max(Math.floor($columns), MIN_NUM_COLUMNS) : MIN_NUM_COLUMNS
 }
 
 export const calculateNumColumns = (
@@ -101,27 +125,32 @@ export const calculateNumColumns = (
 	$params?: CalculateNumColumnsParams,
 	$options?: CalculateNumColumnsOptions
 ): number => {
-	const MIN_NUM_COLUMNS = 5
-	const colorLength = Math.max($colorLength + Number($params?.showTransparentSlot), 0)
+	const DEFAULT_MIN_NUM_COLUMNS = 5
 	const params: CalculateNumColumnsParams = $params ?? {
 		isCompact: false,
 		compactColorIndices: [],
 		showTransparentSlot: false,
 		numColumns: 1,
 	}
+	const transparentSlot = params.showTransparentSlot ? 1 : 0
+	const colorLength = Math.max($colorLength + transparentSlot, 0)
+	let columns: number
 	if (params.isCompact) {
-		return Math.min(colorLength, Number(params.compactColorIndices?.length) + Number(params.showTransparentSlot))
+		columns = Math.min(colorLength, (params.compactColorIndices?.length ?? 0) + transparentSlot)
+	} else if ((params.numColumns ?? 0) > 0) {
+		columns = params.numColumns ?? 0
+	} else {
+		const autoColumns = Math.max(colorLength, $options?.minNumColumns ?? DEFAULT_MIN_NUM_COLUMNS)
+		columns = (params.maxColumns ?? 0) > 0 ? Math.min(autoColumns, params.maxColumns ?? 0) : autoColumns
 	}
-	if ((params.numColumns ?? 0) > 0) {
-		return Math.max(params.numColumns ?? 0, 0)
-	}
-	const cols = Math.max(colorLength, $options?.minNumColumns ?? MIN_NUM_COLUMNS)
-	return (params.maxColumns ?? 0) > 0 ? Math.min(cols, params.maxColumns ?? 0) : cols
+	return normalizeNumColumns(columns)
 }
 
 export const isColorGroups = ($colors: unknown): $colors is ColorGroup[] => {
 	return Array.isArray($colors) && $colors.length > 0 && Array.isArray(($colors[0] as ColorGroup | undefined)?.colors)
 }
+
+export const hasColorList = ($group: ColorGroup | null | undefined): boolean => Array.isArray($group?.colors)
 
 export const calculateColorGroups = (
 	$groups: ColorGroup[] | null | undefined,
@@ -130,12 +159,10 @@ export const calculateColorGroups = (
 	if (!$groups || !Array.isArray($groups)) {
 		return []
 	}
-	return $groups
-		.filter((group) => Array.isArray(group?.colors))
-		.map((group) => ({
-			...(group.name != null && { name: group.name }),
-			colors: calculateColors(group.colors, $params),
-		}))
+	return $groups.filter(hasColorList).map((group) => ({
+		...(group.name != null && { name: group.name }),
+		colors: calculateColors(group.colors, $params),
+	}))
 }
 
 export const COLOR_REGEX = /^#?(([0-9a-f]{2}){3,4}|([0-9a-f]){3,4})$/i

@@ -8,6 +8,7 @@ import {
 	normalizeColor,
 	normalizeInputType,
 	parseColor,
+	pickColors,
 	transformColors,
 } from '../utils.js'
 
@@ -144,6 +145,71 @@ describe('utils', () => {
 		})
 	})
 
+	describe('pickColors', () => {
+		const colors = ['#123456', '#345612', '#456123', '#345612', '#425136']
+
+		test('Pairs every kept color with its index in the transformed source', () => {
+			expect(pickColors(colors)).toEqual([
+				{ color: { value: '#123456' }, index: 0 },
+				{ color: { value: '#345612' }, index: 1 },
+				{ color: { value: '#456123' }, index: 2 },
+				{ color: { value: '#345612' }, index: 3 },
+				{ color: { value: '#425136' }, index: 4 },
+			])
+		})
+
+		test('Keeps the index of the first occurrence a deduplicated color stands for', () => {
+			expect(pickColors(['#123456', '#ABCDEF', '#abcdef'], { allowDuplicates: false })).toEqual([
+				{ color: { value: '#123456' }, index: 0 },
+				{ color: { value: '#ABCDEF' }, index: 1 },
+			])
+		})
+
+		test('Normalizes the compact indices to sorted unique in-range positions', () => {
+			expect(
+				pickColors(colors, {
+					isCompact: true,
+					compactColorIndices: [4, 0, 4, -1, 9, 1.5],
+					allowDuplicates: true,
+				})
+			).toEqual([
+				{ color: { value: '#123456' }, index: 0 },
+				{ color: { value: '#425136' }, index: 4 },
+			])
+		})
+
+		test.each([
+			[
+				{ isCompact: false, compactColorIndices: [], allowDuplicates: true, maxColors: 5 },
+				['#123456', '#345612', '#456123', '#345612', '#425136'],
+			],
+			[
+				{ isCompact: false, compactColorIndices: [], allowDuplicates: false, maxColors: 5 },
+				['#123456', '#345612', '#456123', '#425136'],
+			],
+			[
+				{ isCompact: false, compactColorIndices: [], allowDuplicates: true, maxColors: 2 },
+				['#123456', '#345612'],
+			],
+			[{ isCompact: false, compactColorIndices: [], allowDuplicates: false, maxColors: 1 }, ['#123456']],
+			[
+				{ isCompact: true, compactColorIndices: [0, 2, 4], allowDuplicates: true, maxColors: 5 },
+				['#123456', '#456123', '#425136'],
+			],
+			[
+				{ isCompact: true, compactColorIndices: [4, 1, 1], allowDuplicates: false, maxColors: 5 },
+				['#345612', '#425136'],
+			],
+			[{ isCompact: true, compactColorIndices: [], allowDuplicates: true, maxColors: 5 }, []],
+			[
+				{ isCompact: false, compactColorIndices: null, allowDuplicates: false, maxColors: -1 },
+				['#123456', '#345612', '#456123', '#425136'],
+			],
+		])('Picks the colors params:%j select', (params, expected) => {
+			expect(pickColors(colors, params).map(({ color }) => color.value)).toEqual(expected)
+		})
+	})
+
 	describe('calculateNumColumns', () => {
 		const colorLength = 25
 		const params = {
@@ -161,9 +227,14 @@ describe('utils', () => {
 			[colorLength, { ...params, numColumns: 30, showTransparentSlot: true }, , 30],
 			[colorLength, { ...params, numColumns: 0, showTransparentSlot: true }, , colorLength + 1],
 			[colorLength, { ...params, numColumns: colorLength, showTransparentSlot: true }, , colorLength],
-			[colorLength, { ...params, isCompact: true }, , 0],
+			[colorLength, { ...params, isCompact: true }, , 1],
 			[colorLength, { ...params, isCompact: true, compactColorIndices: [0, 1] }, , 2],
 			[colorLength, { ...params, isCompact: true, compactColorIndices: [0, 1], showTransparentSlot: true }, , 3],
+			[0, { ...params, isCompact: true, compactColorIndices: [0, 1] }, , 1],
+			[-1, { ...params, isCompact: true, compactColorIndices: [0, 1] }, , 1],
+			[colorLength, { ...params, isCompact: true, compactColorIndices: null }, , 1],
+			[colorLength, { ...params, isCompact: true, compactColorIndices: undefined }, , 1],
+			[colorLength, { ...params, isCompact: true, showTransparentSlot: undefined }, , 1],
 			[0, params, , params.numColumns],
 			[0, params, { minNumColumns: 10 }, params.numColumns],
 			[0, { ...params, showTransparentSlot: true }, , params.numColumns],
@@ -178,6 +249,10 @@ describe('utils', () => {
 			// numColumns is returned verbatim and is never clamped to maxColors (README contract, #197)
 			[colorLength, { ...params, numColumns: 30, maxColors: 4 }, , 30],
 			[colorLength, { ...params, numColumns: 0, maxColors: 4 }, , colorLength],
+			[colorLength, { numColumns: 0 }, , colorLength],
+			[colorLength, { ...params, numColumns: 2.5 }, , 2],
+			[colorLength, { ...params, numColumns: 0, maxColumns: 0.5 }, , 1],
+			[0, { ...params, numColumns: 0 }, { minNumColumns: 0 }, 1],
 		])('colorLength:%j, params:%j, options:%j, expected:%j', (colorLength, params, options, expected) => {
 			expect(calculateNumColumns(colorLength, params, options)).toBe(expected)
 		})

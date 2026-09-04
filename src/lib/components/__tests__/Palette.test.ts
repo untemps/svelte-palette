@@ -8,6 +8,8 @@ import PaletteReactive from './PaletteReactive.test.svelte'
 
 import { TOOLTIP, DROP } from '../../enums/PaletteDeletionMode'
 
+import type { ColorGroup, DeleteEventArgs } from '../../types'
+
 const setup = (component: Parameters<typeof render>[0], options?: Parameters<typeof render>[1]) => {
 	return {
 		user: userEvent.setup(),
@@ -417,30 +419,33 @@ test.each([
 	[['#ff0', '#0ff', '#f0f'], -1, 4, '#0f0'],
 	[['#ff0', '#0ff', '#f0f'], 3, 3, '#f0f'],
 	[['#ff0', '#0ff', '#f0f'], 1, 1, '#ff0'],
-])('Adds or replaces color regarding maxColors value', async (colors, maxColors, expected, expectedColor) => {
-	let input,
-		submit,
-		slots = null
-	const newColor = '0f0'
-	const onSelect = vi.fn(() => 0)
+])(
+	'Adds color and caps the rendered slots regarding maxColors value',
+	async (colors, maxColors, expected, expectedColor) => {
+		let input,
+			submit,
+			slots = null
+		const newColor = '0f0'
+		const onSelect = vi.fn(() => 0)
 
-	const { user } = setup(Palette, {
-		props: { colors, maxColors, showInput: true, onselect: onSelect },
-	})
+		const { user } = setup(Palette, {
+			props: { colors, maxColors, showInput: true, onselect: onSelect },
+		})
 
-	input = await screen.findByTestId('__palette-input-input__')
-	await user.type(input, newColor)
+		input = await screen.findByTestId('__palette-input-input__')
+		await user.type(input, newColor)
 
-	submit = await screen.findByTestId('__palette-input-submit__')
-	await user.click(submit)
+		submit = await screen.findByTestId('__palette-input-submit__')
+		await user.click(submit)
 
-	slots = await screen.findAllByTestId('__palette-slot__')
-	expect(slots).toHaveLength(expected)
+		slots = await screen.findAllByTestId('__palette-slot__')
+		expect(slots).toHaveLength(expected)
 
-	await user.click(slots[slots.length - 1])
+		await user.click(slots[slots.length - 1])
 
-	expect(onSelect).toHaveBeenCalledWith({ color: expectedColor })
-})
+		expect(onSelect).toHaveBeenCalledWith({ color: expectedColor })
+	}
+)
 
 test.each([
 	[['#ff0', '#0ff', '#f0f'], false, 3],
@@ -653,6 +658,28 @@ test.each([
 	await waitFor(() => expect(section.getAttribute('style')).toContain(`--num-columns: ${expected}`))
 })
 
+test('Rounds a fractional numColumns down to a whole column count', async () => {
+	const colors = Array.from({ length: 25 }, (_, i) => `#${String(i).padStart(6, '0')}`)
+
+	setup(Palette, {
+		props: { colors, numColumns: 2.5 },
+	})
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toBe('--num-columns: 2;'))
+})
+
+test('Clamps the configured column count before the colors resolve', async () => {
+	setup(Palette, {
+		props: { numColumns: 2.5 },
+	})
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+	expect(section?.getAttribute('style')).toBe('--num-columns: 2;')
+})
+
 test('Updates num-columns when numColumns changes to 0', async () => {
 	const colors = Array.from({ length: 25 }, (_, i) => `#${String(i).padStart(6, '0')}`)
 
@@ -706,6 +733,227 @@ test('Caps num-columns with maxColumns in grouped mode', async () => {
 	const content = await screen.findByTestId('__palette__')
 	const section = content.querySelector('.palette__content')
 	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 4'))
+})
+
+test('Recounts num-columns after a slot deletion when numColumns is 0', async () => {
+	const colors = ['#100', '#200', '#300', '#400', '#500', '#600', '#700']
+
+	const { user } = setup(Palette, { props: { colors, numColumns: 0, deletionMode: TOOLTIP } })
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 7'))
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 6'))
+})
+
+test('Recounts num-columns after a slot deletion when numColumns is 0 in grouped mode', async () => {
+	const colors = [
+		{ name: 'A', colors: ['#a00', '#a11'] },
+		{ name: 'B', colors: ['#b00', '#b11', '#b22', '#b33', '#b44', '#b55', '#b66'] },
+	]
+
+	const { user } = setup(Palette, { props: { colors, numColumns: 0, deletionMode: TOOLTIP } })
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 7'))
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[2])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 6'))
+})
+
+test('Keeps num-columns at the longest group width when a shorter group shrinks', async () => {
+	const colors = [
+		{ name: 'A', colors: ['#a00', '#a11'] },
+		{ name: 'B', colors: ['#b00', '#b11', '#b22', '#b33', '#b44', '#b55', '#b66'] },
+	]
+
+	const { user } = setup(Palette, { props: { colors, numColumns: 0, deletionMode: TOOLTIP } })
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 7'))
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.queryAllByTestId('__palette-cell__')).toHaveLength(8))
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 7'))
+})
+
+test('Leaves num-columns at the configured width after a slot deletion', async () => {
+	const colors = ['#100', '#200', '#300', '#400', '#500', '#600', '#700']
+
+	const { user } = setup(Palette, { props: { colors, numColumns: 4, deletionMode: TOOLTIP } })
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 4'))
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(6))
+	expect(section.getAttribute('style')).toContain('--num-columns: 4')
+})
+
+test('Leaves num-columns at the configured width after a grouped slot deletion', async () => {
+	const colors = [
+		{ name: 'A', colors: ['#a00', '#a11'] },
+		{ name: 'B', colors: ['#b00', '#b11', '#b22'] },
+	]
+
+	const { user } = setup(Palette, { props: { colors, numColumns: 4, deletionMode: TOOLTIP } })
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 4'))
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(4))
+	expect(section.getAttribute('style')).toContain('--num-columns: 4')
+})
+
+test('Recounts num-columns from the rendered subset after a compact deletion despite a configured width', async () => {
+	const colors = ['#a00', '#0b0', '#00c']
+
+	const { user } = setup(Palette, {
+		props: { colors, isCompact: true, compactColorIndices: [0, 1, 2], numColumns: 4, deletionMode: TOOLTIP },
+	})
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 3'))
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 2'))
+})
+
+test('Counts the transparent slot in num-columns after a compact slot deletion', async () => {
+	const colors = ['#a00', '#0b0', '#00c']
+
+	const { user } = setup(Palette, {
+		props: {
+			colors,
+			isCompact: true,
+			compactColorIndices: [0, 1, 2],
+			showTransparentSlot: true,
+			numColumns: 4,
+			deletionMode: TOOLTIP,
+		},
+	})
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 4'))
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[1])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(3))
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 3'))
+})
+
+test('Recounts num-columns after a compact slot deletion when the full list holds case-varying duplicates', async () => {
+	const onDelete = vi.fn()
+	const colors = ['#AABBCC', '#112233', '#aabbcc', '#445566', '#778899', '#99aabb', '#bbccdd', '#ccddee']
+
+	const { user } = setup(Palette, {
+		props: {
+			colors,
+			isCompact: true,
+			compactColorIndices: [0, 1, 2, 3, 4, 5, 6, 7],
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 7'))
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(7)
+
+	await user.hover(cells[2])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.queryAllByTestId('__palette-cell__')).toHaveLength(6))
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 6'))
+	expect(onDelete).toHaveBeenCalledWith(expect.objectContaining({ color: '#445566', index: 3 }))
+})
+
+test('Removes the occurrence the drifted subset selects rather than the first by value', async () => {
+	const onDelete = vi.fn()
+
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#a00'],
+			initialIsCompact: true,
+			initialCompactColorIndices: [0, 2],
+			initialAllowDuplicates: true,
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	const section = document.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 2'))
+
+	component.setColors(new Promise(() => {}))
+	component.setCompactColorIndices([1, 2])
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#a00',
+		index: 2,
+		colors: [{ value: '#a00' }, { value: '#0b0' }],
+	})
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(1))
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 1'))
+})
+
+test('Keeps num-columns at one column when a compact deletion empties the rendered subset', async () => {
+	const colors = ['#a00', '#0b0']
+
+	const { user } = setup(Palette, {
+		props: { colors, isCompact: true, compactColorIndices: [0], deletionMode: TOOLTIP },
+	})
+
+	const content = await screen.findByTestId('__palette__')
+	const section = content.querySelector('.palette__content')
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(1)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.queryAllByTestId('__palette-cell__')).toHaveLength(0))
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 1'))
 })
 
 test('Removes duplicates when updating allowDuplicates value', async () => {
@@ -810,7 +1058,7 @@ test('Recomputes the compact column count when showTransparentSlot changes', asy
 	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 3'))
 })
 
-test('Falls back to a local removal when the rendered subset drifts from the full list', async () => {
+test('Removes the color by value when the rendered subset drifts from the full list', async () => {
 	const onDelete = vi.fn()
 
 	const { component, user } = setup(PaletteReactive, {
@@ -826,6 +1074,9 @@ test('Falls back to a local removal when the rendered subset drifts from the ful
 	const cells = await screen.findAllByTestId('__palette-cell__')
 	expect(cells).toHaveLength(2)
 
+	const section = document.querySelector('.palette__content')
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 2'))
+
 	component.setColors(new Promise(() => {}))
 	component.setCompactColorIndices([2])
 
@@ -833,8 +1084,18 @@ test('Falls back to a local removal when the rendered subset drifts from the ful
 	const trash = await screen.findByTestId('__trash-icon__')
 	await user.click(trash)
 
-	expect(onDelete).not.toHaveBeenCalled()
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#a00',
+		index: 0,
+		colors: [{ value: '#0b0' }, { value: '#00c' }],
+	})
 	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(1))
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 1'))
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#00c',
+		])
+	)
 })
 
 test('Applies an isCompact change made inside ondelete alongside the write-back', async () => {
@@ -862,6 +1123,57 @@ test('Applies an isCompact change made inside ondelete alongside the write-back'
 	await waitFor(() => expect(content).toHaveClass('palette__content--compact'))
 	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
 	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 2'))
+})
+
+test('Resolves the list a delete handler assigns instead of the write-back', async () => {
+	let palette: { setColors: (value: string[]) => void } | undefined
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#00c'],
+			deletionMode: TOOLTIP,
+			ondelete: () => palette?.setColors(['#111', '#222', '#333', '#444']),
+		},
+	})
+	palette = component
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#111',
+			'#222',
+			'#333',
+			'#444',
+		])
+	)
+})
+
+test('Resolves the list an add handler assigns instead of the write-back', async () => {
+	let palette: { setColors: (value: string[]) => void } | undefined
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0'],
+			initialShowInput: true,
+			onadd: () => palette?.setColors(['#111', '#222', '#333']),
+		},
+	})
+	palette = component
+
+	const input = await screen.findByTestId('__palette-input-input__')
+	await user.type(input, '0f0')
+	await user.click(await screen.findByTestId('__palette-input-submit__'))
+
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#111',
+			'#222',
+			'#333',
+		])
+	)
 })
 
 test('Toggles the input when colors switch between grouped and flat', async () => {
@@ -1844,6 +2156,24 @@ test('Triggers onadd with the added color and the resulting list', async () => {
 	})
 })
 
+test('Triggers onadd with the colors withheld from the rendered slots kept in the list', async () => {
+	const onAdd = vi.fn()
+	const colors = ['#ff0', '#ff0', '#0ff']
+
+	const { user } = setup(Palette, {
+		props: { colors, showInput: true, onadd: onAdd },
+	})
+
+	const input = await screen.findByTestId('__palette-input-input__')
+	await user.type(input, '0f0')
+	await user.click(await screen.findByTestId('__palette-input-submit__'))
+
+	expect(onAdd).toHaveBeenCalledWith({
+		color: '#0f0',
+		colors: [{ value: '#ff0' }, { value: '#ff0' }, { value: '#0ff' }, { value: '#0f0' }],
+	})
+})
+
 test('Triggers ondelete with the removed color and the resulting list in flat mode', async () => {
 	const onDelete = vi.fn()
 	const colors = ['#ff0', '#0ff', '#f0f']
@@ -1862,6 +2192,29 @@ test('Triggers ondelete with the removed color and the resulting list in flat mo
 		color: '#ff0',
 		index: 0,
 		colors: [{ value: '#0ff' }, { value: '#f0f' }],
+	})
+})
+
+test('Removes the clicked duplicate rather than the first occurrence when duplicates are allowed', async () => {
+	const onDelete = vi.fn()
+	const colors = [{ name: 'Red A', value: '#f00' }, { value: '#0b0' }, { name: 'Red B', value: '#f00' }]
+
+	const { user } = setup(Palette, {
+		props: { colors, allowDuplicates: true, deletionMode: TOOLTIP, ondelete: onDelete },
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[2])
+
+	const trash = await screen.findByTestId('__trash-icon__')
+	await user.click(trash)
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#f00',
+		index: 2,
+		colors: [{ name: 'Red A', value: '#f00' }, { value: '#0b0' }],
 	})
 })
 
@@ -1894,6 +2247,29 @@ test('Triggers ondelete with the group identity in group mode', async () => {
 	})
 })
 
+test('Triggers ondelete with the index in the full group when a duplicate is hidden', async () => {
+	const onDelete = vi.fn()
+	const colors = [{ name: 'A', colors: ['#f00', '#f00', '#00f'] }]
+
+	const { user } = setup(Palette, {
+		props: { colors, deletionMode: TOOLTIP, ondelete: onDelete },
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	await user.hover(cells[1])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#00f',
+		index: 2,
+		colors: [{ name: 'A', colors: [{ value: '#f00' }, { value: '#f00' }] }],
+		groupIndex: 0,
+		groupName: 'A',
+	})
+})
+
 test('Omits groupName in ondelete when the group has no name', async () => {
 	const onDelete = vi.fn()
 	const colors = [{ colors: ['#f00', '#0f0'] }]
@@ -1910,6 +2286,61 @@ test('Omits groupName in ondelete when the group has no name', async () => {
 
 	expect(onDelete).toHaveBeenCalledWith(expect.objectContaining({ color: '#f00', index: 0, groupIndex: 0 }))
 	expect(onDelete).toHaveBeenCalledWith(expect.not.objectContaining({ groupName: expect.anything() }))
+})
+
+test('Reports the group index in the supplied list when the renderer skips a group', async () => {
+	const onDelete = vi.fn()
+	const colors = [
+		{ name: 'A', colors: ['#f00'] },
+		{ name: 'B' },
+		{ name: 'C', colors: ['#00f', '#11f'] },
+	] as unknown as ColorGroup[]
+
+	const { user } = setup(Palette, {
+		props: { colors, deletionMode: TOOLTIP, ondelete: onDelete },
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[2])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith(
+		expect.objectContaining({ color: '#11f', index: 1, groupIndex: 2, groupName: 'C' })
+	)
+})
+
+test('Refuses an added color once the rendered slots reach maxColors', async () => {
+	const onAdd = vi.fn()
+	const colors = ['#ff0', '#0ff']
+
+	const { user } = setup(Palette, {
+		props: { colors, maxColors: 2, showInput: true, onadd: onAdd },
+	})
+
+	const input = await screen.findByTestId('__palette-input-input__')
+	await user.type(input, '0f0')
+	await user.click(await screen.findByTestId('__palette-input-submit__'))
+
+	expect(onAdd).not.toHaveBeenCalled()
+	expect(await screen.findAllByTestId('__palette-slot__')).toHaveLength(2)
+})
+
+test('Rejects an added color the rendered slots withhold through maxColors', async () => {
+	const onAdd = vi.fn()
+	const colors = ['#a00', '#0b0', '#00c']
+
+	const { user } = setup(Palette, {
+		props: { colors, maxColors: 2, showInput: true, onadd: onAdd },
+	})
+
+	const input = await screen.findByTestId('__palette-input-input__')
+	await user.type(input, '00c')
+	await user.click(await screen.findByTestId('__palette-input-submit__'))
+
+	expect(onAdd).not.toHaveBeenCalled()
+	expect(await screen.findAllByTestId('__palette-slot__')).toHaveLength(2)
 })
 
 test('Does not fire onadd when the color is a rejected duplicate', async () => {
@@ -2194,6 +2625,556 @@ test('Propagates a compact deletion to the full list when compact is toggled at 
 	expect(cells).toHaveLength(1)
 })
 
+test('Removes every occurrence a deduplicated slot stood for, whatever their case', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#AABBCC', '#112233', '#aabbcc'] },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#112233' }]))
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(1))
+})
+
+test('Re-indexes the compact indices past several occurrences a deduplicated slot removes', async () => {
+	const { user } = setup(PaletteBind, {
+		props: {
+			initialColors: ['#f00', '#0b0', '#f00', '#00c', '#f00'],
+			isCompact: true,
+			initialCompactColorIndices: [0, 1, 2, 3, 4],
+		},
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	const boundIndices = await screen.findByTestId('__bound-indices__')
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#0b0' }, { value: '#00c' }]))
+	await waitFor(() => expect(JSON.parse(boundIndices.textContent ?? '')).toEqual([0, 1]))
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
+})
+
+test('Keeps an occurrence the compact subset excluded when a deduplicated slot is removed', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#f00', '#0b0', '#f00'], isCompact: true, initialCompactColorIndices: [0, 1] },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	const boundIndices = await screen.findByTestId('__bound-indices__')
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#0b0' }, { value: '#f00' }]))
+	await waitFor(() => expect(JSON.parse(boundIndices.textContent ?? '')).toEqual([0]))
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(1))
+})
+
+test('Preserves the order and the duplicates of the compact indices a deduplicated deletion re-indexes', async () => {
+	const { user } = setup(PaletteBind, {
+		props: {
+			initialColors: ['#f00', '#0b0', '#f00', '#00c', '#f00', '#dd0', '#0ee'],
+			isCompact: true,
+			initialCompactColorIndices: [6, 1, 0, 2, 4, 6],
+		},
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	const boundIndices = await screen.findByTestId('__bound-indices__')
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() =>
+		expect(JSON.parse(bound.textContent ?? '')).toEqual([
+			{ value: '#0b0' },
+			{ value: '#00c' },
+			{ value: '#dd0' },
+			{ value: '#0ee' },
+		])
+	)
+	await waitFor(() => expect(JSON.parse(boundIndices.textContent ?? '')).toEqual([3, 0, 3]))
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
+})
+
+test('Removes every occurrence a deduplicated slot stood for within its own group', async () => {
+	const { user } = setup(PaletteBind, {
+		props: {
+			initialColors: [
+				{ name: 'A', colors: ['#f00', '#f00', '#00f'] },
+				{ name: 'B', colors: ['#f00'] },
+			],
+		},
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() =>
+		expect(JSON.parse(bound.textContent ?? '')).toEqual([
+			{ name: 'A', colors: [{ value: '#00f' }] },
+			{ name: 'B', colors: [{ value: '#f00' }] },
+		])
+	)
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
+})
+
+test('Keeps the groups and the group keys the renderer skips in the bound list', async () => {
+	const initialColors = [
+		{ name: 'A', colors: ['#f00', '#0f0'] },
+		{ name: 'B' },
+		{ id: 'c', name: 'C', colors: ['#00f'] },
+	] as unknown as ColorGroup[]
+
+	const { user } = setup(PaletteBind, { props: { initialColors } })
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	let cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() =>
+		expect(JSON.parse(bound.textContent ?? '')).toEqual([
+			{ name: 'A', colors: [{ value: '#0f0' }] },
+			{ name: 'B' },
+			{ id: 'c', name: 'C', colors: [{ value: '#00f' }] },
+		])
+	)
+
+	cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() =>
+		expect(JSON.parse(bound.textContent ?? '')).toEqual([
+			{ name: 'A', colors: [] },
+			{ name: 'B' },
+			{ id: 'c', name: 'C', colors: [{ value: '#00f' }] },
+		])
+	)
+})
+
+test('Writes a grouped deletion into the group list a delete handler assigned', async () => {
+	const initialColors = [
+		{ id: 'a', name: 'A', colors: ['#a00', '#a11'] },
+		{ name: 'X' },
+		{ id: 'b', name: 'B', colors: ['#b00'] },
+	] as unknown as ColorGroup[]
+
+	const onDelete = vi.fn()
+	let palette: { setColors: (value: ColorGroup[]) => void } | undefined
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors,
+			deletionMode: TOOLTIP,
+			ondelete: (args: DeleteEventArgs) => {
+				onDelete(args)
+				if (onDelete.mock.calls.length === 1) {
+					palette?.setColors(
+						(args.colors as ColorGroup[])
+							.filter((group) => Array.isArray(group.colors))
+							.map((group) => ({ ...group, updatedAt: 1 })) as unknown as ColorGroup[]
+					)
+				}
+			},
+		},
+	})
+	palette = component
+
+	let cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
+
+	cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[1])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(2))
+	expect(onDelete).toHaveBeenNthCalledWith(2, {
+		color: '#b00',
+		index: 0,
+		groupIndex: 1,
+		groupName: 'B',
+		colors: [
+			{ id: 'a', name: 'A', colors: [{ value: '#a11' }], updatedAt: 1 },
+			{ id: 'b', name: 'B', colors: [], updatedAt: 1 },
+		],
+	})
+})
+
+test('Reports the group index in the list a delete handler assigned', async () => {
+	const onDelete = vi.fn()
+	let palette: { setColors: (value: ColorGroup[]) => void } | undefined
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: [
+				{ name: 'A', colors: ['#a00', '#a11'] },
+				{ name: 'C', colors: ['#c00'] },
+			],
+			deletionMode: TOOLTIP,
+			ondelete: (args: DeleteEventArgs) => {
+				onDelete(args)
+				if (onDelete.mock.calls.length === 1) {
+					const groups = args.colors as ColorGroup[]
+					palette?.setColors([groups[0], { name: 'X' }, { name: 'Y' }, groups[1]] as unknown as ColorGroup[])
+				}
+			},
+		},
+	})
+	palette = component
+
+	let cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
+
+	cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[1])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(2))
+	expect(onDelete).toHaveBeenNthCalledWith(2, {
+		color: '#c00',
+		index: 0,
+		groupIndex: 3,
+		groupName: 'C',
+		colors: [{ name: 'A', colors: [{ value: '#a11' }] }, { name: 'X' }, { name: 'Y' }, { name: 'C', colors: [] }],
+	})
+})
+
+test('Falls back to the resolved groups when the supplied group list drifts out of step', async () => {
+	const onDelete = vi.fn()
+	const colors = [
+		{ name: 'A', colors: ['#a00', '#a11'] },
+		{ name: 'B', colors: ['#b00'] },
+	]
+
+	const { user } = setup(Palette, { props: { colors, deletionMode: TOOLTIP, ondelete: onDelete } })
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	colors.splice(1, 0, { name: 'M', colors: ['#0f0'] })
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(1))
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#a00',
+		index: 0,
+		groupIndex: 0,
+		groupName: 'A',
+		colors: [
+			{ name: 'A', colors: [{ value: '#a11' }] },
+			{ name: 'B', colors: [{ value: '#b00' }] },
+		],
+	})
+})
+
+test('Reports the rendered group index when the supplied group list drifts out of step', async () => {
+	const onDelete = vi.fn()
+	const colors: ColorGroup[] = [
+		{ name: 'A', colors: ['#a00', '#a11'] },
+		{ name: 'B', colors: ['#b00', '#b11'] },
+	]
+
+	const { user } = setup(Palette, { props: { colors, deletionMode: TOOLTIP, ondelete: onDelete } })
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(4)
+
+	colors.splice(1, 0, { name: 'M' } as unknown as ColorGroup)
+	colors.push({ name: 'C', colors: ['#c00'] })
+
+	await user.hover(cells[2])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(1))
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#b00',
+		index: 0,
+		groupIndex: 1,
+		groupName: 'B',
+		colors: [
+			{ name: 'A', colors: [{ value: '#a00' }, { value: '#a11' }] },
+			{ name: 'B', colors: [{ value: '#b11' }] },
+		],
+	})
+})
+
+test('Keeps grouped colors withheld by maxColors in the bound list after a deletion', async () => {
+	const { user } = setup(PaletteBind, {
+		props: {
+			initialColors: [
+				{ name: 'A', colors: ['#a00', '#a11', '#a22', '#a33'] },
+				{ name: 'B', colors: ['#b00'] },
+			],
+			maxColors: 2,
+		},
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() =>
+		expect(JSON.parse(bound.textContent ?? '')).toEqual([
+			{ name: 'A', colors: [{ value: '#a11' }, { value: '#a22' }, { value: '#a33' }] },
+			{ name: 'B', colors: [{ value: '#b00' }] },
+		])
+	)
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#a11',
+			'#a22',
+			'#b00',
+		])
+	)
+})
+
+test('Keeps colors withheld by maxColors in the bound list after a deletion', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#a00', '#0b0', '#00c', '#dd0'], maxColors: 2 },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() =>
+		expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#0b0' }, { value: '#00c' }, { value: '#dd0' }])
+	)
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#0b0',
+			'#00c',
+		])
+	)
+})
+
+test('Keeps the bound list at maxColors when the add gesture is repeated', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#a00', '#0b0'], maxColors: 2 },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	expect(await screen.findAllByTestId('__palette-cell__')).toHaveLength(2)
+
+	const input = await screen.findByTestId('__palette-input-input__')
+	const submit = await screen.findByTestId('__palette-input-submit__')
+	for (const color of ['0f0', '0ff', 'f0f']) {
+		await user.clear(input)
+		await user.type(input, color)
+		await user.click(submit)
+	}
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual(['#a00', '#0b0']))
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#a00',
+			'#0b0',
+		])
+	)
+})
+
+test('Refuses a repeated color once the rendered slots reach maxColors when duplicates are allowed', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#a00', '#0b0'], maxColors: 2, allowDuplicates: true },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	expect(await screen.findAllByTestId('__palette-cell__')).toHaveLength(2)
+
+	const input = await screen.findByTestId('__palette-input-input__')
+	const submit = await screen.findByTestId('__palette-input-submit__')
+	for (let i = 0; i < 3; i++) {
+		await user.clear(input)
+		await user.type(input, 'a00')
+		await user.click(submit)
+	}
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual(['#a00', '#0b0']))
+	await waitFor(() => expect(screen.getAllByTestId('__palette-slot__')).toHaveLength(2))
+})
+
+test('Keeps the colors supplied past maxColors when an add is refused', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#a00', '#0b0', '#00c'], maxColors: 2 },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	expect(await screen.findAllByTestId('__palette-cell__')).toHaveLength(2)
+
+	const input = await screen.findByTestId('__palette-input-input__')
+	await user.type(input, '0f0')
+	await user.click(await screen.findByTestId('__palette-input-submit__'))
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual(['#a00', '#0b0', '#00c']))
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#0b0' }, { value: '#00c' }]))
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#0b0',
+			'#00c',
+		])
+	)
+})
+
+test('Accepts an added color after a deletion frees a slot', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#a00', '#0b0'], maxColors: 2 },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	const input = await screen.findByTestId('__palette-input-input__')
+	await user.type(input, '0f0')
+	await user.click(await screen.findByTestId('__palette-input-submit__'))
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual(['#a00', '#0b0']))
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-slot__')).toHaveLength(1))
+
+	await user.clear(input)
+	await user.type(input, '0f0')
+	await user.click(await screen.findByTestId('__palette-input-submit__'))
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#0b0' }, { value: '#0f0' }]))
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#0b0',
+			'#0f0',
+		])
+	)
+})
+
+test('Refuses every added color when maxColors is zero', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#a00', '#0b0'], maxColors: 0 },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	const input = await screen.findByTestId('__palette-input-input__')
+	expect(screen.queryAllByTestId('__palette-slot__')).toHaveLength(0)
+
+	await user.type(input, '0f0')
+	await user.click(await screen.findByTestId('__palette-input-submit__'))
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual(['#a00', '#0b0']))
+	expect(screen.queryAllByTestId('__palette-slot__')).toHaveLength(0)
+})
+
+test('Keeps colors dropped as duplicates in the bound list after a deletion', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#AABBCC', '#112233', '#aabbcc'] },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	await user.hover(cells[1])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() =>
+		expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#AABBCC' }, { value: '#aabbcc' }])
+	)
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(1))
+})
+
+test('Keeps colors dropped as duplicates in the bound list after an add', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#AABBCC', '#112233', '#aabbcc'] },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	expect(await screen.findAllByTestId('__palette-cell__')).toHaveLength(2)
+
+	const input = await screen.findByTestId('__palette-input-input__')
+	await user.type(input, '0f0')
+	await user.click(await screen.findByTestId('__palette-input-submit__'))
+
+	await waitFor(() =>
+		expect(JSON.parse(bound.textContent ?? '')).toEqual([
+			{ value: '#AABBCC' },
+			{ value: '#112233' },
+			{ value: '#aabbcc' },
+			{ value: '#0f0' },
+		])
+	)
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(3))
+})
+
+test('Drops both occurrences of a deduplicated slot deleted after an add', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#f00', '#f00', '#0f0', '#00f'] },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+
+	const input = await screen.findByTestId('__palette-input-input__')
+	await user.type(input, '0ff')
+	await user.click(await screen.findByTestId('__palette-input-submit__'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(4))
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(3))
+
+	expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#0f0' }, { value: '#00f' }, { value: '#0ff' }])
+	expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+		'#0f0',
+		'#00f',
+		'#0ff',
+	])
+})
+
 test('Reflects an add and a delete back through bind:colors', async () => {
 	const { user } = setup(PaletteBind, {
 		props: { initialColors: ['#ff0', '#0ff'] },
@@ -2242,6 +3223,109 @@ test('Reflects a compact-mode deletion back through bind:colors and re-indexes c
 
 	cells = await screen.findAllByTestId('__palette-cell__')
 	expect(cells).toHaveLength(1)
+})
+
+test('Re-indexes the compact indices when a flat slot before them is deleted', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#a00', '#0b0', '#00c'], initialCompactColorIndices: [2] },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	const boundIndices = await screen.findByTestId('__bound-indices__')
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(JSON.parse(bound.textContent ?? '')).toEqual([{ value: '#0b0' }, { value: '#00c' }]))
+	await waitFor(() => expect(JSON.parse(boundIndices.textContent ?? '')).toEqual([1]))
+
+	await user.click(await screen.findByTestId('__palette-compact-toggle-button__'))
+
+	await waitFor(() => {
+		const slots = screen.getAllByTestId('__palette-slot__')
+		expect(slots).toHaveLength(1)
+		expect(slots[0]).toHaveAttribute('aria-label', '#00c')
+	})
+})
+
+test('Leaves the compact indices alone when a deletion does not move them', async () => {
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#00c', '#dd0'],
+			initialCompactColorIndices: [0, 1],
+			deletionMode: TOOLTIP,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(4)
+
+	await user.hover(cells[3])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(3))
+
+	component.appendCompactColorIndex(2)
+
+	await user.click(await screen.findByTestId('__palette-compact-toggle-button__'))
+
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#a00',
+			'#0b0',
+			'#00c',
+		])
+	)
+})
+
+test('Drops a compact index whose color a flat deduplicated deletion removes', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#f00', '#0b0', '#f00'], initialCompactColorIndices: [2] },
+	})
+
+	const boundIndices = await screen.findByTestId('__bound-indices__')
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(JSON.parse(boundIndices.textContent ?? '')).toEqual([]))
+	await waitFor(() => expect(screen.queryByTestId('__palette-compact-toggle-button__')).not.toBeInTheDocument())
+})
+
+test('Drops a compact index the shortened list no longer reaches on a flat deletion', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#a00', '#0b0', '#00c'], initialCompactColorIndices: [1, 9] },
+	})
+
+	const boundIndices = await screen.findByTestId('__bound-indices__')
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(JSON.parse(boundIndices.textContent ?? '')).toEqual([0]))
+})
+
+test('Drops a compact index the shortened list no longer reaches on a compact deletion', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: ['#a00', '#0b0', '#00c'], isCompact: true, initialCompactColorIndices: [0, 9] },
+	})
+
+	const boundIndices = await screen.findByTestId('__bound-indices__')
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(1)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(JSON.parse(boundIndices.textContent ?? '')).toEqual([]))
 })
 
 test('Does not resurrect a flat-deleted color through a compact deletion after a runtime toggle', async () => {

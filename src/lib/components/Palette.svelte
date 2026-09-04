@@ -5,9 +5,12 @@
 		calculateColorGroups,
 		calculateColors,
 		calculateNumColumns,
+		hasColorList,
 		isColorGroups,
 		isSameColor,
 		normalizeInputType,
+		normalizeNumColumns,
+		pickColors,
 		transformColors,
 	} from '../utils/utils.js'
 
@@ -31,10 +34,11 @@
 
 	import type { HTMLAttributes } from 'svelte/elements'
 
-	import type { NormalizedColor, NormalizedColorGroup } from '../utils/utils.js'
+	import type { NormalizedColor, NormalizedColorGroup, PickedColor } from '../utils/utils.js'
 
 	import type {
 		AddEventArgs,
+		ColorGroup,
 		ColorValue,
 		ColorsProp,
 		DeleteEventArgs,
@@ -135,17 +139,21 @@
 	let _colors = $state<NormalizedColor[] | null>(null)
 	let _fullColors = $state<NormalizedColor[] | null>(null)
 	let _colorGroups = $state<NormalizedColorGroup[] | null>(null)
+	let _fullColorGroups = $state<NormalizedColorGroup[] | null>(null)
 	let _error = $state<unknown>(null)
 	let _hasError = $state(false)
-	let _numColumns = $state(untrack(() => numColumns))
+	let _numColumns = $state(untrack(() => normalizeNumColumns(numColumns)))
 	let _isSettingsOn = $state(false)
 	let _isCompact = $state(untrack(() => isCompact))
 	let _listboxEl = $state<HTMLElement | null>(null)
 	let _focusedIndex = $state<number | null>(null)
 	let _skipColorsSync = $state(false)
 	let _syncedViewParams: ReturnType<typeof _viewParams> | null = null
+	let _syncedColors: NormalizedColor[] | null = null
+	let _syncedColorGroups: NormalizedColorGroup[] | null = null
 	let _colorsGeneration = 0
 	let _colorsSource: ColorsProp | null = null
+	let _sourceColorGroups: ColorGroup[] = []
 
 	let _inputType = $derived(normalizeInputType(inputType))
 
@@ -161,6 +169,9 @@
 		maxColumns,
 	})
 
+	const _sameIndices = (a: number[], b: number[]): boolean =>
+		a.length === b.length && a.every((index, i) => index === b[i])
+
 	const _sameViewParams = (a: ReturnType<typeof _viewParams> | null, b: ReturnType<typeof _viewParams>): boolean =>
 		a != null &&
 		a.isCompact === b.isCompact &&
@@ -169,8 +180,49 @@
 		a.showTransparentSlot === b.showTransparentSlot &&
 		a.numColumns === b.numColumns &&
 		a.maxColumns === b.maxColumns &&
-		a.compactColorIndices.length === b.compactColorIndices.length &&
-		a.compactColorIndices.every((index, i) => index === b.compactColorIndices[i])
+		_sameIndices(a.compactColorIndices, b.compactColorIndices)
+
+	const _sameNormalizedColors = (a: NormalizedColor[], b: NormalizedColor[]): boolean =>
+		a.length === b.length &&
+		a.every((color, index) => color.value === b[index].value && color.name === b[index].name)
+
+	const _sameNormalizedColorGroups = (a: NormalizedColorGroup[], b: NormalizedColorGroup[]): boolean =>
+		a.length === b.length &&
+		a.every((group, index) => group.name === b[index].name && _sameNormalizedColors(group.colors, b[index].colors))
+
+	const _isSyncedSource = (source: ColorsProp | null): boolean => {
+		if (!Array.isArray(source)) {
+			return false
+		}
+		if (_syncedColorGroups) {
+			return (
+				isColorGroups(source) &&
+				_sameNormalizedColorGroups(calculateColorGroups(source, { allowDuplicates: true }), _syncedColorGroups)
+			)
+		}
+		return (
+			!!_syncedColors && !isColorGroups(source) && _sameNormalizedColors(transformColors(source), _syncedColors)
+		)
+	}
+
+	const _groupNumColumns = (
+		groups: NormalizedColorGroup[],
+		params: Pick<ReturnType<typeof _viewParams>, 'numColumns' | 'maxColumns'>
+	): number =>
+		calculateNumColumns(
+			groups.reduce((max, group) => Math.max(max, group.colors.length), 0),
+			{ showTransparentSlot: false, numColumns: params.numColumns, maxColumns: params.maxColumns }
+		)
+
+	const _compactNumColumns = (
+		count: number,
+		params: Pick<ReturnType<typeof _viewParams>, 'compactColorIndices' | 'showTransparentSlot'>
+	): number =>
+		calculateNumColumns(count, {
+			isCompact: true,
+			compactColorIndices: params.compactColorIndices,
+			showTransparentSlot: params.showTransparentSlot,
+		})
 
 	$effect(() => {
 		_isCompact = isCompact
@@ -178,7 +230,7 @@
 
 	$effect(() => {
 		if (numColumns > 0) {
-			_numColumns = numColumns
+			_numColumns = normalizeNumColumns(numColumns)
 		}
 	})
 
@@ -190,7 +242,10 @@
 		_colorsSource = _source
 		if (untrack(() => _skipColorsSync)) {
 			_skipColorsSync = false
-			if (_sameViewParams(_syncedViewParams, _params)) {
+			if (_sameViewParams(_syncedViewParams, _params) && untrack(() => _isSyncedSource(_source))) {
+				if (isColorGroups(_source)) {
+					_sourceColorGroups = _source
+				}
 				return
 			}
 		}
@@ -208,25 +263,27 @@
 					_error = null
 					_focusedIndex = null
 					if (isColorGroups(results)) {
-						const newColorGroups = calculateColorGroups(results, {
+						const newFullColorGroups = calculateColorGroups(results, { allowDuplicates: true })
+						const newColorGroups = calculateColorGroups(newFullColorGroups, {
 							allowDuplicates: _params.allowDuplicates,
 							maxColors: _params.maxColors,
 						})
 						_colorGroups = newColorGroups
+						_fullColorGroups = newFullColorGroups
+						_sourceColorGroups = results
 						_colors = null
 						_fullColors = null
-						const maxGroupLength = newColorGroups.reduce((max, g) => Math.max(max, g.colors.length), 0)
-						_numColumns = calculateNumColumns(maxGroupLength, {
-							showTransparentSlot: false,
-							numColumns: _params.numColumns,
-							maxColumns: _params.maxColumns,
-						})
+						_numColumns = _groupNumColumns(newColorGroups, _params)
 					} else {
 						const newColors = calculateColors(results, _params)
 						_colors = newColors
 						_colorGroups = null
+						_fullColorGroups = null
+						_sourceColorGroups = []
 						_fullColors = transformColors(Array.isArray(results) ? results : [])
-						_numColumns = calculateNumColumns(newColors.length, _params)
+						_numColumns = _params.isCompact
+							? _compactNumColumns(newColors.length, _params)
+							: calculateNumColumns(newColors.length, _params)
 					}
 				}
 			},
@@ -239,6 +296,8 @@
 				_error = reason
 				_colors = null
 				_colorGroups = null
+				_fullColorGroups = null
+				_sourceColorGroups = []
 				_fullColors = null
 				_focusedIndex = null
 				if (!_wasError) {
@@ -311,42 +370,72 @@
 		onselect?.({ color })
 	}
 
-	const _syncColors = (nextColors: NormalizedColor[]) => {
-		_fullColors = nextColors
+	const _syncColors = (nextFullColors: NormalizedColor[]) => {
+		_fullColors = nextFullColors
 		_skipColorsSync = true
+		_syncedColors = nextFullColors
+		_syncedColorGroups = null
 		_syncedViewParams = _viewParams()
-		colors = nextColors
+		colors = nextFullColors
 	}
 
-	const _syncColorGroups = (nextColorGroups: NormalizedColorGroup[]) => {
+	const _sourceGroupIndices = (sourceColorGroups: ColorGroup[]): number[] =>
+		sourceColorGroups.flatMap((group, index) => (hasColorList(group) ? [index] : []))
+
+	type SourceColorGroups = { colorGroups: ColorGroup[]; groupIndices: number[] }
+
+	const _toSourceColorGroups = (
+		fullColorGroups: NormalizedColorGroup[],
+		sourceIndices: number[]
+	): SourceColorGroups => {
+		if (sourceIndices.length !== fullColorGroups.length) {
+			return { colorGroups: [...fullColorGroups], groupIndices: fullColorGroups.map((_, index) => index) }
+		}
+		const sourceColorGroups = [..._sourceColorGroups]
+		sourceIndices.forEach((sourceIndex, index) => {
+			sourceColorGroups[sourceIndex] = {
+				...sourceColorGroups[sourceIndex],
+				colors: fullColorGroups[index].colors,
+			}
+		})
+		return { colorGroups: sourceColorGroups, groupIndices: sourceIndices }
+	}
+
+	const _syncColorGroups = (
+		nextFullColorGroups: NormalizedColorGroup[],
+		sourceIndices: number[]
+	): SourceColorGroups => {
+		const { colorGroups: nextSourceColorGroups, groupIndices } = _toSourceColorGroups(
+			nextFullColorGroups,
+			sourceIndices
+		)
+		_fullColorGroups = nextFullColorGroups
+		_sourceColorGroups = nextSourceColorGroups
 		_skipColorsSync = true
+		_syncedColors = null
+		_syncedColorGroups = nextFullColorGroups
 		_syncedViewParams = _viewParams()
-		colors = nextColorGroups
+		colors = nextSourceColorGroups
+		return { colorGroups: nextSourceColorGroups, groupIndices }
 	}
 
 	const _addColor = (color: ColorValue) => {
 		if (_colors == null || _isCompact) {
 			return
 		}
-		const previousLength = (_colors ?? []).length
-		const nextColors = calculateColors([...(_colors ?? []), color], {
-			isCompact: _isCompact,
-			compactColorIndices,
-			allowDuplicates,
-			maxColors,
-		})
-		_colors = nextColors
-		_numColumns = calculateNumColumns(nextColors.length, {
-			isCompact: _isCompact,
-			compactColorIndices,
-			showTransparentSlot,
-			numColumns,
-			maxColumns,
-		})
-		if (nextColors.length > previousLength) {
-			_syncColors(nextColors)
-			onadd?.({ color, colors: nextColors })
+		if (!allowDuplicates && (_fullColors ?? []).some((existing) => isSameColor(existing.value, color))) {
+			return
 		}
+		const _params = _viewParams()
+		const nextFullColors = transformColors([...(_fullColors ?? []), color])
+		const nextColors = calculateColors(nextFullColors, _params)
+		if (nextColors.length <= calculateColors(_fullColors ?? [], _params).length) {
+			return
+		}
+		_colors = nextColors
+		_numColumns = calculateNumColumns(nextColors.length, _params)
+		_syncColors(nextFullColors)
+		onadd?.({ color, colors: nextFullColors })
 	}
 
 	const _removeColor = (index: number) => {
@@ -354,75 +443,152 @@
 			_removeCompactColor(index)
 			return
 		}
-		const removed = (_colors ?? [])[index]
-		const nextColors = (_colors ?? []).filter((c, i) => i !== index)
-		_colors = nextColors
-		if (removed) {
-			_syncColors(nextColors)
-			ondelete?.({ color: removed.value, index, colors: nextColors })
+		const rendered = (_colors ?? [])[index]
+		if (!rendered) {
+			return
 		}
+		const full = _fullColors ?? []
+		const fullIndex = _resolveFullIndex(full, _picked(), rendered, index)
+		if (fullIndex < 0) {
+			return
+		}
+		const removed = full[fullIndex]
+		const dropped = _droppedIndices(full, fullIndex, { allowDuplicates })
+		const nextFullColors = _dropIndices(full, dropped)
+		_syncCompactColorIndices(dropped, full)
+		const nextColors = calculateColors(nextFullColors, _viewParams())
+		_colors = nextColors
+		_numColumns = calculateNumColumns(nextColors.length, _viewParams())
+		_syncColors(nextFullColors)
+		ondelete?.({ color: removed.value, index: fullIndex, colors: nextFullColors })
 	}
 
-	const _compactPicked = (): { color: NormalizedColor; index: number }[] => {
-		const full = _fullColors ?? []
-		const indices = compactColorIndices ?? []
-		let picked = full.map((color, index) => ({ color, index })).filter(({ index }) => indices.includes(index))
-		if (!allowDuplicates) {
-			picked = picked.filter((item, i) => picked.findIndex((o) => o.color.value === item.color.value) === i)
+	const _picked = (): PickedColor[] => pickColors(_fullColors ?? [], _viewParams())
+
+	const _resolveFullIndex = (
+		full: NormalizedColor[],
+		picked: PickedColor[],
+		rendered: NormalizedColor,
+		index: number
+	): number => {
+		const target = picked[index]
+		if (target && isSameColor(target.color.value, rendered.value)) {
+			return target.index
 		}
-		if (maxColors >= 0 && picked.length > maxColors) {
-			picked = picked.slice(0, maxColors)
+		const match = picked.find((item) => isSameColor(item.color.value, rendered.value))
+		return match ? match.index : full.findIndex((color) => isSameColor(color.value, rendered.value))
+	}
+
+	const _droppedIndices = (
+		full: NormalizedColor[],
+		fullIndex: number,
+		params: Pick<ReturnType<typeof _viewParams>, 'allowDuplicates'>,
+		indices?: number[]
+	): Set<number> => {
+		const removed = full[fullIndex]
+		if (params.allowDuplicates || !removed) {
+			return new Set([fullIndex])
 		}
-		return picked
+		const scope = indices ? new Set(indices) : null
+		const dropped = new Set<number>()
+		full.forEach((color, index) => {
+			if ((!scope || scope.has(index)) && isSameColor(color.value, removed.value)) {
+				dropped.add(index)
+			}
+		})
+		dropped.add(fullIndex)
+		return dropped
+	}
+
+	const _dropIndices = (full: NormalizedColor[], dropped: Set<number>): NormalizedColor[] =>
+		full.filter((_, index) => !dropped.has(index))
+
+	const _countBelow = (sorted: number[], index: number): number => {
+		let low = 0
+		let high = sorted.length
+		while (low < high) {
+			const mid = Math.floor((low + high) / 2)
+			if (sorted[mid] < index) {
+				low = mid + 1
+			} else {
+				high = mid
+			}
+		}
+		return low
+	}
+
+	const _shiftIndices = (indices: number[], dropped: Set<number>, full: NormalizedColor[]): number[] => {
+		const sorted = [...dropped].sort((a, b) => a - b)
+		return indices
+			.filter((index) => index < full.length && !dropped.has(index))
+			.map((index) => index - _countBelow(sorted, index))
+	}
+
+	const _syncCompactColorIndices = (dropped: Set<number>, full: NormalizedColor[]) => {
+		const currentCompactColorIndices = compactColorIndices ?? []
+		const nextCompactColorIndices = _shiftIndices(currentCompactColorIndices, dropped, full)
+		if (!_sameIndices(currentCompactColorIndices, nextCompactColorIndices)) {
+			compactColorIndices = nextCompactColorIndices
+		}
 	}
 
 	const _removeCompactColor = (index: number) => {
-		const target = _compactPicked()[index]
 		const rendered = (_colors ?? [])[index]
-		if (!target || !rendered || target.color.value !== rendered.value) {
-			_colors = (_colors ?? []).filter((c, i) => i !== index)
+		if (!rendered) {
 			return
 		}
-		const { color: removed, index: fullIndex } = target
-		const nextFullColors = (_fullColors ?? []).filter((c, i) => i !== fullIndex)
-		compactColorIndices = (compactColorIndices ?? [])
-			.filter((n) => n !== fullIndex)
-			.map((n) => (n > fullIndex ? n - 1 : n))
-		const nextColors = calculateColors(nextFullColors, {
-			isCompact: true,
-			compactColorIndices,
-			allowDuplicates,
-			maxColors,
-		})
+		const full = _fullColors ?? []
+		const fullIndex = _resolveFullIndex(full, _picked(), rendered, index)
+		if (fullIndex < 0) {
+			return
+		}
+		const removed = full[fullIndex]
+		const dropped = _droppedIndices(full, fullIndex, { allowDuplicates }, compactColorIndices ?? [])
+		const nextFullColors = _dropIndices(full, dropped)
+		_syncCompactColorIndices(dropped, full)
+		const nextColors = calculateColors(nextFullColors, _viewParams())
 		_colors = nextColors
-		_numColumns = calculateNumColumns(nextColors.length, {
-			isCompact: true,
-			compactColorIndices,
-			showTransparentSlot,
-			numColumns,
-			maxColumns,
-		})
+		_numColumns = _compactNumColumns(nextColors.length, _viewParams())
 		_syncColors(nextFullColors)
 		ondelete?.({ color: removed.value, index: fullIndex, colors: nextFullColors })
 	}
 
 	const _removeGroupColor = (groupIndex: number, colorIndex: number) => {
 		const group = (_colorGroups ?? [])[groupIndex]
-		const removed = group?.colors[colorIndex]
-		const nextColorGroups = (_colorGroups ?? []).map((g, gi) =>
-			gi === groupIndex ? { ...g, colors: g.colors.filter((_, ci) => ci !== colorIndex) } : g
-		)
-		_colorGroups = nextColorGroups
-		if (removed) {
-			_syncColorGroups(nextColorGroups)
-			ondelete?.({
-				color: removed.value,
-				index: colorIndex,
-				colors: nextColorGroups,
-				groupIndex,
-				...(group?.name != null && { groupName: group.name }),
-			})
+		const rendered = group?.colors[colorIndex]
+		if (!rendered) {
+			return
 		}
+		const fullGroupColors = (_fullColorGroups ?? [])[groupIndex]?.colors ?? []
+		const fullIndex = _resolveFullIndex(
+			fullGroupColors,
+			pickColors(fullGroupColors, { allowDuplicates, maxColors }),
+			rendered,
+			colorIndex
+		)
+		if (fullIndex < 0) {
+			return
+		}
+		const removed = fullGroupColors[fullIndex]
+		const dropped = _droppedIndices(fullGroupColors, fullIndex, { allowDuplicates })
+		const nextFullColorGroups = (_fullColorGroups ?? []).map((g, gi) =>
+			gi === groupIndex ? { ...g, colors: _dropIndices(g.colors, dropped) } : g
+		)
+		const nextColorGroups = calculateColorGroups(nextFullColorGroups, { allowDuplicates, maxColors })
+		const sourceIndices = _sourceGroupIndices(_sourceColorGroups)
+		_colorGroups = nextColorGroups
+		_numColumns = _groupNumColumns(nextColorGroups, _viewParams())
+		const { colorGroups: nextSourceColorGroups, groupIndices } = _syncColorGroups(
+			nextFullColorGroups,
+			sourceIndices
+		)
+		ondelete?.({
+			color: removed.value,
+			index: fullIndex,
+			colors: nextSourceColorGroups,
+			groupIndex: groupIndices[groupIndex] ?? groupIndex,
+			...(group?.name != null && { groupName: group.name }),
+		})
 	}
 
 	const _onSlotSelect = ({ color }: SelectEventArgs) => _selectColor(color)
@@ -501,7 +667,7 @@
 	}
 
 	const _rowStep = (options: HTMLElement[], from: number, dir: number): number => {
-		const columns = Number.isFinite(_numColumns) ? Math.max(_numColumns, 1) : 1
+		const columns = normalizeNumColumns(_numColumns)
 		const rows: { index: number; column: number }[][] = []
 		let lastContainer: Element | null = null
 		let lastRow = -1

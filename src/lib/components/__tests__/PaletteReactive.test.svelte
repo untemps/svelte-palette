@@ -5,7 +5,7 @@
 
 	import { NONE } from '../../enums/PaletteDeletionMode'
 
-	import type { ColorsProp, DeleteEventArgs, DeletionMode, ErrorEventArgs } from '../../types'
+	import type { AddEventArgs, ColorsProp, DeleteEventArgs, DeletionMode, ErrorEventArgs } from '../../types'
 
 	let {
 		initialColors,
@@ -17,6 +17,7 @@
 		initialNumColumns = 5,
 		initialShowInput = false,
 		deletionMode = NONE,
+		onadd = undefined,
 		ondelete = undefined,
 		onerror = undefined,
 	}: {
@@ -29,6 +30,7 @@
 		initialNumColumns?: number
 		initialShowInput?: boolean
 		deletionMode?: DeletionMode
+		onadd?: (args: AddEventArgs) => void
 		ondelete?: (args: DeleteEventArgs) => void
 		onerror?: (args: ErrorEventArgs) => void
 	} = $props()
@@ -63,6 +65,7 @@
 	{numColumns}
 	{showInput}
 	{deletionMode}
+	{onadd}
 	{ondelete}
 	{onerror}
 />

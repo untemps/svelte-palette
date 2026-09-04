@@ -121,12 +121,17 @@ export interface InputAddEventArgs {
 }
 
 /**
- * Argument passed to the palette-level `onadd` callback once a color has been added to the list.
+ * Argument passed to the palette-level `onadd` callback once a color has been added to the list. A submission
+ * the palette refuses — a repeat of a color already in the list with `allowDuplicates` off, or any color once
+ * the rendered slots are full — adds nothing, writes nothing back and fires no callback.
  */
 export interface AddEventArgs {
 	/** The color value that was added. */
 	color: ColorValue
-	/** The resulting color list, resolved to its normalized form. */
+	/**
+	 * The resulting color list, resolved to its normalized form, holding every color the palette carries,
+	 * including the ones the rendered slots withhold through `allowDuplicates` or compact mode.
+	 */
 	colors: Colors
 }
 
@@ -136,11 +141,27 @@ export interface AddEventArgs {
 export interface DeleteEventArgs {
 	/** The color value that was removed. */
 	color: ColorValue
-	/** The index of the removed color within its list (or group in grouped mode). */
+	/**
+	 * The index of the removed color in the resolved full list, or in its full group in grouped mode — never
+	 * the index of the rendered slot. With `allowDuplicates` off, one deletion drops every occurrence of that
+	 * color and this reports the first — in compact mode, the first of the occurrences the selection holds.
+	 */
 	index: number
-	/** The resulting color list, resolved to its normalized form. */
+	/**
+	 * The resulting color list, resolved to its normalized form, holding every color the palette carries,
+	 * including the ones the rendered slots withhold through `maxColors`, `allowDuplicates` or compact mode.
+	 * In grouped mode it is the supplied group list with only its colors normalized, so the groups the grid
+	 * skips and the keys they carry are handed back untouched. A supplied list that has drifted out of step
+	 * with the resolved one — its groups mutated in place rather than reassigned, so the palette never
+	 * resolved the change — is replaced by the resolved groups, in rendered order and without the groups the
+	 * grid skips.
+	 */
 	colors: Colors
-	/** The index of the group the color was removed from, only provided in grouped mode. */
+	/**
+	 * The index of the group the color was removed from, in the supplied list rather than in the rendered
+	 * one, only provided in grouped mode. It always addresses the list `colors` carries, so it reports the
+	 * rendered index whenever that list falls back to the resolved groups.
+	 */
 	groupIndex?: number
 	/** The name of the group the color was removed from, only provided in grouped mode when the group is named. */
 	groupName?: string
