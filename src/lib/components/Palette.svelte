@@ -382,9 +382,14 @@
 	const _sourceGroupIndices = (sourceColorGroups: ColorGroup[]): number[] =>
 		sourceColorGroups.flatMap((group, index) => (hasColorList(group) ? [index] : []))
 
-	const _toSourceColorGroups = (fullColorGroups: NormalizedColorGroup[], sourceIndices: number[]): ColorGroup[] => {
+	type SourceColorGroups = { colorGroups: ColorGroup[]; groupIndices: number[] }
+
+	const _toSourceColorGroups = (
+		fullColorGroups: NormalizedColorGroup[],
+		sourceIndices: number[]
+	): SourceColorGroups => {
 		if (sourceIndices.length !== fullColorGroups.length) {
-			return [...fullColorGroups]
+			return { colorGroups: [...fullColorGroups], groupIndices: fullColorGroups.map((_, index) => index) }
 		}
 		const sourceColorGroups = [..._sourceColorGroups]
 		sourceIndices.forEach((sourceIndex, index) => {
@@ -393,11 +398,17 @@
 				colors: fullColorGroups[index].colors,
 			}
 		})
-		return sourceColorGroups
+		return { colorGroups: sourceColorGroups, groupIndices: sourceIndices }
 	}
 
-	const _syncColorGroups = (nextFullColorGroups: NormalizedColorGroup[], sourceIndices: number[]): ColorGroup[] => {
-		const nextSourceColorGroups = _toSourceColorGroups(nextFullColorGroups, sourceIndices)
+	const _syncColorGroups = (
+		nextFullColorGroups: NormalizedColorGroup[],
+		sourceIndices: number[]
+	): SourceColorGroups => {
+		const { colorGroups: nextSourceColorGroups, groupIndices } = _toSourceColorGroups(
+			nextFullColorGroups,
+			sourceIndices
+		)
 		_fullColorGroups = nextFullColorGroups
 		_sourceColorGroups = nextSourceColorGroups
 		_skipColorsSync = true
@@ -405,7 +416,7 @@
 		_syncedColorGroups = nextFullColorGroups
 		_syncedViewParams = _viewParams()
 		colors = nextSourceColorGroups
-		return nextSourceColorGroups
+		return { colorGroups: nextSourceColorGroups, groupIndices }
 	}
 
 	const _addColor = (color: ColorValue) => {
@@ -567,12 +578,15 @@
 		const sourceIndices = _sourceGroupIndices(_sourceColorGroups)
 		_colorGroups = nextColorGroups
 		_numColumns = _groupNumColumns(nextColorGroups, _viewParams())
-		const nextSourceColorGroups = _syncColorGroups(nextFullColorGroups, sourceIndices)
+		const { colorGroups: nextSourceColorGroups, groupIndices } = _syncColorGroups(
+			nextFullColorGroups,
+			sourceIndices
+		)
 		ondelete?.({
 			color: removed.value,
 			index: fullIndex,
 			colors: nextSourceColorGroups,
-			groupIndex: sourceIndices[groupIndex] ?? groupIndex,
+			groupIndex: groupIndices[groupIndex] ?? groupIndex,
 			...(group?.name != null && { groupName: group.name }),
 		})
 	}

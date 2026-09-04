@@ -2901,6 +2901,37 @@ test('Falls back to the resolved groups when the supplied group list drifts out 
 	})
 })
 
+test('Reports the rendered group index when the supplied group list drifts out of step', async () => {
+	const onDelete = vi.fn()
+	const colors: ColorGroup[] = [
+		{ name: 'A', colors: ['#a00', '#a11'] },
+		{ name: 'B', colors: ['#b00', '#b11'] },
+	]
+
+	const { user } = setup(Palette, { props: { colors, deletionMode: TOOLTIP, ondelete: onDelete } })
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(4)
+
+	colors.splice(1, 0, { name: 'M' } as unknown as ColorGroup)
+	colors.push({ name: 'C', colors: ['#c00'] })
+
+	await user.hover(cells[2])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(1))
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#b00',
+		index: 0,
+		groupIndex: 1,
+		groupName: 'B',
+		colors: [
+			{ name: 'A', colors: [{ value: '#a00' }, { value: '#a11' }] },
+			{ name: 'B', colors: [{ value: '#b11' }] },
+		],
+	})
+})
+
 test('Keeps grouped colors withheld by maxColors in the bound list after a deletion', async () => {
 	const { user } = setup(PaletteBind, {
 		props: {
