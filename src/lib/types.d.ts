@@ -151,12 +151,16 @@ export interface DeleteEventArgs {
 	 * The resulting color list, resolved to its normalized form, holding every color the palette carries,
 	 * including the ones the rendered slots withhold through `maxColors`, `allowDuplicates` or compact mode.
 	 * In grouped mode it is the supplied group list with only its colors normalized, so the groups the grid
-	 * skips and the keys they carry are handed back untouched.
+	 * skips and the keys they carry are handed back untouched. A supplied list that has drifted out of step
+	 * with the resolved one — its groups mutated in place rather than reassigned, so the palette never
+	 * resolved the change — is replaced by the resolved groups, in rendered order and without the groups the
+	 * grid skips.
 	 */
 	colors: Colors
 	/**
 	 * The index of the group the color was removed from, in the supplied list rather than in the rendered
-	 * one, only provided in grouped mode.
+	 * one, only provided in grouped mode. It always addresses the list `colors` carries, so it reports the
+	 * rendered index whenever that list falls back to the resolved groups.
 	 */
 	groupIndex?: number
 	/** The name of the group the color was removed from, only provided in grouped mode when the group is named. */
