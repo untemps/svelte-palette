@@ -5,6 +5,7 @@
 	import LayoutCard from '../demo/cards/LayoutCard.svelte'
 	import CompactModeCard from '../demo/cards/CompactModeCard.svelte'
 	import ColorGroupsCard from '../demo/cards/ColorGroupsCard.svelte'
+	import GroupedWriteBackCard from '../demo/cards/GroupedWriteBackCard.svelte'
 	import AsyncColorsCard from '../demo/cards/AsyncColorsCard.svelte'
 	import CustomSnippetsCard from '../demo/cards/CustomSnippetsCard.svelte'
 	import TransparentSlotCard from '../demo/cards/TransparentSlotCard.svelte'
@@ -47,6 +48,7 @@
 		<LayoutCard />
 		<CompactModeCard />
 		<ColorGroupsCard />
+		<GroupedWriteBackCard />
 		<AsyncColorsCard />
 		<CustomSnippetsCard />
 		<TransparentSlotCard />
