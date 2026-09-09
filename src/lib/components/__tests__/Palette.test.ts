@@ -8,7 +8,7 @@ import PaletteReactive from './PaletteReactive.test.svelte'
 
 import { TOOLTIP, DROP } from '../../enums/PaletteDeletionMode'
 
-import type { ColorGroup, DeleteEventArgs } from '../../types'
+import type { ColorGroup, ColorInput, DeleteEventArgs } from '../../types'
 
 const setup = (component: Parameters<typeof render>[0], options?: Parameters<typeof render>[1]) => {
 	return {
@@ -2888,6 +2888,40 @@ test('Resolves a group list a delete handler mutated in place', async () => {
 		'--color: #fff;',
 		'--color: #b00;',
 	])
+})
+
+test('Treats a reassigned first group like any other group', async () => {
+	const initialColors = [
+		{ name: 'A', colors: ['#a00', '#a11'] },
+		{ name: 'B', colors: ['#b00'] },
+	] as unknown as ColorGroup[]
+
+	const { component, user } = setup(PaletteReactive, {
+		props: { initialColors, deletionMode: TOOLTIP },
+	})
+	const palette: { setGroupColors: (groupIndex: number, value: ColorInput[]) => void } = component
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
+
+	const settle = async () => {
+		await tick()
+		await new Promise((resolve) => setTimeout(resolve, 0))
+		await tick()
+	}
+
+	palette.setGroupColors(1, ['#b00', '#bbb'])
+	await settle()
+	expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2)
+
+	palette.setGroupColors(0, ['#a11', '#aaa'])
+	await settle()
+	expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2)
 })
 
 test('Reports the group index in the list a delete handler assigned', async () => {

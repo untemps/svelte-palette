@@ -243,8 +243,9 @@
 		if (untrack(() => _skipColorsSync)) {
 			_skipColorsSync = false
 			if (_sameViewParams(_syncedViewParams, _params) && untrack(() => _isSyncedSource(_source))) {
-				if (isColorGroups(_source)) {
-					_sourceColorGroups = _source
+				const _sourceGroups = untrack(() => (isColorGroups(_source) ? _source : null))
+				if (_sourceGroups) {
+					_sourceColorGroups = _sourceGroups
 				}
 				return
 			}
