@@ -265,6 +265,8 @@ describe('utils', () => {
 			[[{ value: '#ff0' }], false],
 			[[{ name: 'Yellows', colors: ['#ff0'] }], true],
 			[[{ colors: ['#ff0'] }, { name: 'Blues', colors: ['#00f'] }], true],
+			[[{ name: 'Blues' }, { name: 'Yellows', colors: ['#ff0'] }], true],
+			[[{ name: 'Blues' }], false],
 			[null, false],
 			[undefined, false],
 			[1, false],

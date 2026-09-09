@@ -2311,6 +2311,31 @@ test('Reports the group index in the supplied list when the renderer skips a gro
 	)
 })
 
+test('Renders as groups when the renderer skips the first group', async () => {
+	const onDelete = vi.fn()
+	const colors = [
+		{ name: 'A' },
+		{ name: 'B', colors: ['#f00'] },
+		{ name: 'C', colors: ['#00f', '#11f'] },
+	] as unknown as ColorGroup[]
+
+	const { user } = setup(Palette, {
+		props: { colors, deletionMode: TOOLTIP, ondelete: onDelete },
+	})
+
+	expect(await screen.findAllByTestId('__palette-group__')).toHaveLength(2)
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[2])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith(
+		expect.objectContaining({ color: '#11f', index: 1, groupIndex: 2, groupName: 'C' })
+	)
+})
+
 test('Refuses an added color once the rendered slots reach maxColors', async () => {
 	const onAdd = vi.fn()
 	const colors = ['#ff0', '#0ff']

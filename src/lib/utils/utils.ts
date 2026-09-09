@@ -146,11 +146,10 @@ export const calculateNumColumns = (
 	return normalizeNumColumns(columns)
 }
 
-export const isColorGroups = ($colors: unknown): $colors is ColorGroup[] => {
-	return Array.isArray($colors) && $colors.length > 0 && Array.isArray(($colors[0] as ColorGroup | undefined)?.colors)
-}
-
 export const hasColorList = ($group: ColorGroup | null | undefined): boolean => Array.isArray($group?.colors)
+
+export const isColorGroups = ($colors: unknown): $colors is ColorGroup[] =>
+	Array.isArray($colors) && $colors.some(hasColorList)
 
 export const calculateColorGroups = (
 	$groups: ColorGroup[] | null | undefined,
