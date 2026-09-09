@@ -370,13 +370,15 @@
 		onselect?.({ color })
 	}
 
-	const _syncColors = (nextFullColors: NormalizedColor[]) => {
+	const _syncColors = (nextFullColors: NormalizedColor[]): NormalizedColor[] => {
+		const nextSourceColors = [...nextFullColors]
 		_fullColors = nextFullColors
 		_skipColorsSync = true
 		_syncedColors = nextFullColors
 		_syncedColorGroups = null
 		_syncedViewParams = _viewParams()
-		colors = nextFullColors
+		colors = nextSourceColors
+		return nextSourceColors
 	}
 
 	const _sourceGroupIndices = (sourceColorGroups: ColorGroup[]): number[] =>
@@ -389,13 +391,16 @@
 		sourceIndices: number[]
 	): SourceColorGroups => {
 		if (sourceIndices.length !== fullColorGroups.length) {
-			return { colorGroups: [...fullColorGroups], groupIndices: fullColorGroups.map((_, index) => index) }
+			return {
+				colorGroups: fullColorGroups.map((group) => ({ ...group, colors: [...group.colors] })),
+				groupIndices: fullColorGroups.map((_, index) => index),
+			}
 		}
 		const sourceColorGroups = [..._sourceColorGroups]
 		sourceIndices.forEach((sourceIndex, index) => {
 			sourceColorGroups[sourceIndex] = {
 				...sourceColorGroups[sourceIndex],
-				colors: fullColorGroups[index].colors,
+				colors: [...fullColorGroups[index].colors],
 			}
 		})
 		return { colorGroups: sourceColorGroups, groupIndices: sourceIndices }
@@ -434,8 +439,8 @@
 		}
 		_colors = nextColors
 		_numColumns = calculateNumColumns(nextColors.length, _params)
-		_syncColors(nextFullColors)
-		onadd?.({ color, colors: nextFullColors })
+		const nextSourceColors = _syncColors(nextFullColors)
+		onadd?.({ color, colors: nextSourceColors })
 	}
 
 	const _removeColor = (index: number) => {
@@ -459,8 +464,8 @@
 		const nextColors = calculateColors(nextFullColors, _viewParams())
 		_colors = nextColors
 		_numColumns = calculateNumColumns(nextColors.length, _viewParams())
-		_syncColors(nextFullColors)
-		ondelete?.({ color: removed.value, index: fullIndex, colors: nextFullColors })
+		const nextSourceColors = _syncColors(nextFullColors)
+		ondelete?.({ color: removed.value, index: fullIndex, colors: nextSourceColors })
 	}
 
 	const _picked = (): PickedColor[] => pickColors(_fullColors ?? [], _viewParams())
@@ -549,8 +554,8 @@
 		const nextColors = calculateColors(nextFullColors, _viewParams())
 		_colors = nextColors
 		_numColumns = _compactNumColumns(nextColors.length, _viewParams())
-		_syncColors(nextFullColors)
-		ondelete?.({ color: removed.value, index: fullIndex, colors: nextFullColors })
+		const nextSourceColors = _syncColors(nextFullColors)
+		ondelete?.({ color: removed.value, index: fullIndex, colors: nextSourceColors })
 	}
 
 	const _removeGroupColor = (groupIndex: number, colorIndex: number) => {

@@ -2853,6 +2853,43 @@ test('Writes a grouped deletion into the group list a delete handler assigned', 
 	})
 })
 
+test('Resolves a group list a delete handler mutated in place', async () => {
+	const initialColors = [
+		{ name: 'A', colors: ['#a00', '#a11'] },
+		{ name: 'B', colors: ['#b00'] },
+	] as unknown as ColorGroup[]
+
+	const onDelete = vi.fn()
+	const { user } = setup(PaletteReactive, {
+		props: {
+			initialColors,
+			deletionMode: TOOLTIP,
+			ondelete: (args: DeleteEventArgs) => {
+				onDelete(args)
+				if (onDelete.mock.calls.length === 1) {
+					const groups = args.colors as ColorGroup[]
+					groups[0].colors.push({ value: '#fff' })
+				}
+			},
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-slot__')).toHaveLength(3))
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots.map((slot) => slot.getAttribute('style'))).toEqual([
+		'--color: #a11;',
+		'--color: #fff;',
+		'--color: #b00;',
+	])
+})
+
 test('Reports the group index in the list a delete handler assigned', async () => {
 	const onDelete = vi.fn()
 	let palette: { setColors: (value: ColorGroup[]) => void } | undefined
