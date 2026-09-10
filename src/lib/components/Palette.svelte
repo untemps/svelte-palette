@@ -319,40 +319,52 @@
 		)
 	})
 
-	const _numColumns = $derived.by(() => {
-		const params = _viewParams()
-		if (_colorGroups) {
-			return _groupNumColumns(_colorGroups, params)
-		}
-		if (_colors == null) {
-			return normalizeNumColumns(numColumns)
-		}
-		return _isCompact ? _compactNumColumns(_colors.length, params) : calculateNumColumns(_colors.length, params)
-	})
-
-	let _tools: PaletteToolName[] = $derived([
-		...(_colors != null && compactColorIndices?.length ? [COMPACT] : []),
-		...(settings ? [SETTINGS] : []),
-	] as PaletteToolName[])
-
-	const _optionCount = $derived(
-		_colorGroups
-			? _colorGroups.reduce((sum, group) => sum + group.colors.length, 0)
-			: _colors
-				? _colors.length + (showTransparentSlot ? 1 : 0)
-				: 0
-	)
-
 	const _compactSource = $derived((_fullColorGroups ?? []).flatMap((group) => group.colors))
 
 	const _fullGroupOffsets = $derived(_groupOffsetsOf(_fullColorGroups ?? []))
 
-	const _groupOffsets = $derived(_groupOffsetsOf(_colorGroups ?? []))
+	const _renderedGroups = $derived(_isCompact ? null : _colorGroups)
+
+	const _compactPicked = $derived(
+		_isCompact && _fullColorGroups != null ? pickColors(_compactSource, _viewParams()) : null
+	)
+
+	const _renderedColors = $derived(_compactPicked ? _compactPicked.map(({ color }) => color) : _colors)
+
+	const _isResolved = $derived(_colors != null || _colorGroups != null)
+
+	const _numColumns = $derived.by(() => {
+		const params = _viewParams()
+		if (_renderedGroups) {
+			return _groupNumColumns(_renderedGroups, params)
+		}
+		if (_renderedColors == null) {
+			return normalizeNumColumns(numColumns)
+		}
+		return _isCompact
+			? _compactNumColumns(_renderedColors.length, params)
+			: calculateNumColumns(_renderedColors.length, params)
+	})
+
+	let _tools: PaletteToolName[] = $derived([
+		...(_isResolved && compactColorIndices?.length ? [COMPACT] : []),
+		...(settings ? [SETTINGS] : []),
+	] as PaletteToolName[])
+
+	const _optionCount = $derived(
+		_renderedGroups
+			? _renderedGroups.reduce((sum, group) => sum + group.colors.length, 0)
+			: _renderedColors
+				? _renderedColors.length + (showTransparentSlot ? 1 : 0)
+				: 0
+	)
+
+	const _groupOffsets = $derived(_groupOffsetsOf(_renderedGroups ?? []))
 
 	const _selectedIndex = $derived.by(() => {
-		if (_colorGroups) {
+		if (_renderedGroups) {
 			let base = 0
-			for (const group of _colorGroups) {
+			for (const group of _renderedGroups) {
 				const index = group.colors.findIndex((color) => isSameColor(color.value, selectedColor))
 				if (index >= 0) {
 					return base + index
@@ -361,12 +373,12 @@
 			}
 			return -1
 		}
-		if (_colors) {
+		if (_renderedColors) {
 			const offset = showTransparentSlot ? 1 : 0
 			if (showTransparentSlot && selectedColor === null) {
 				return 0
 			}
-			const index = _colors.findIndex((color) => isSameColor(color.value, selectedColor))
+			const index = _renderedColors.findIndex((color) => isSameColor(color.value, selectedColor))
 			return index >= 0 ? index + offset : -1
 		}
 		return -1
@@ -463,7 +475,11 @@
 
 	const _removeColor = (index: number) => {
 		if (_isCompact) {
-			_removeCompactColor(index)
+			if (_fullColorGroups != null) {
+				_removeCompactGroupColor(index)
+			} else {
+				_removeCompactColor(index)
+			}
 			return
 		}
 		const rendered = (_colors ?? [])[index]
@@ -574,6 +590,46 @@
 		ondelete?.({ color: removed.value, index: fullIndex, colors: nextSourceColors })
 	}
 
+	const _removeCompactGroupColor = (index: number) => {
+		const target = (_compactPicked ?? [])[index]
+		if (!target) {
+			return
+		}
+		const fullIndex = target.index
+		const fullColorGroups = _fullColorGroups ?? []
+		const offsets = _fullGroupOffsets
+		const groupIndex = _groupIndexAt(offsets, fullIndex)
+		if (groupIndex < 0) {
+			return
+		}
+		const group = fullColorGroups[groupIndex]
+		const colorIndex = fullIndex - offsets[groupIndex]
+		const removed = group?.colors[colorIndex]
+		if (!removed) {
+			return
+		}
+		const full = _compactSource
+		const dropped = _droppedIndices(full, fullIndex, { allowDuplicates }, compactColorIndices ?? [])
+		const nextFullColorGroups = fullColorGroups.map((current, position) => ({
+			...current,
+			colors: current.colors.filter((_, ci) => !dropped.has(offsets[position] + ci)),
+		}))
+		const sourceIndices = _sourceGroupIndices(_sourceColorGroups)
+		_syncCompactColorIndices(dropped, full)
+		_colorGroups = calculateColorGroups(nextFullColorGroups, { allowDuplicates, maxColors })
+		const { colorGroups: nextSourceColorGroups, groupIndices } = _syncColorGroups(
+			nextFullColorGroups,
+			sourceIndices
+		)
+		ondelete?.({
+			color: removed.value,
+			index: colorIndex,
+			colors: nextSourceColorGroups,
+			groupIndex: groupIndices[groupIndex] ?? groupIndex,
+			...(group.name != null && { groupName: group.name }),
+		})
+	}
+
 	const _removeGroupColor = (groupIndex: number, colorIndex: number) => {
 		const group = (_colorGroups ?? [])[groupIndex]
 		const rendered = group?.colors[colorIndex]
@@ -623,7 +679,7 @@
 	const _onDelete = (index: number) => _removeColor(index)
 
 	const _toggleCompact = () => {
-		if (_colors == null) {
+		if (!_isResolved) {
 			return
 		}
 		_isCompact = !_isCompact
@@ -653,6 +709,7 @@
 	let _cachedCells: CellPosition[] = []
 
 	$effect(() => {
+		void _renderedColors
 		void _colors
 		void _colorGroups
 		void showTransparentSlot
@@ -722,7 +779,7 @@
 		if (deletionMode === NONE) {
 			return
 		}
-		if (_colorGroups) {
+		if (_renderedGroups) {
 			const groupIndex = _groupIndexAt(_groupOffsets, from)
 			if (groupIndex < 0) {
 				return
@@ -805,7 +862,7 @@
 		{#if !_isCompact}
 			{@render header?.({ selectedColor })}
 		{/if}
-		{#if !!_colorGroups}
+		{#if !!_renderedGroups}
 			<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 			<div
 				bind:this={_listboxEl}
@@ -816,7 +873,7 @@
 				onkeydown={presentational ? undefined : _onListboxKeydown}
 				onfocusin={presentational ? undefined : _onListboxFocusin}
 			>
-				{#each _colorGroups as group, groupIndex}
+				{#each _renderedGroups as group, groupIndex}
 					<div class="palette__groups__group" role="presentation" data-testid="__palette-group__">
 						{#if group.name}
 							<p
@@ -855,7 +912,7 @@
 											selectedColor,
 											selected: optionIndex === _selectedIndex,
 											transition,
-											isCompact: false,
+											isCompact: _isCompact,
 											index: colorIndex,
 											tabindex: _rovingTabindex(optionIndex),
 											ariaKeyShortcuts: _deleteShortcut,
@@ -878,7 +935,7 @@
 					</div>
 				{/each}
 			</div>
-		{:else if !!_colors}
+		{:else if !!_renderedColors}
 			<div class="palette__cells">
 				{#if beforeSlot}
 					{@render beforeSlot({ selectedColor, transition, isCompact: _isCompact })}
@@ -911,7 +968,7 @@
 							{/if}
 						</li>
 					{/if}
-					{#each _colors as color, index (`${color.value}_${index}`)}
+					{#each _renderedColors as color, index (`${color.value}_${index}`)}
 						{@const optionIndex = index + (showTransparentSlot ? 1 : 0)}
 						<li
 							data-testid="__palette-cell__"
@@ -971,7 +1028,7 @@
 		{#if !_isCompact}
 			{@render footer?.({ selectedColor })}
 		{/if}
-		{#if _isCompact && _colors != null}
+		{#if _isCompact && _isResolved}
 			<PaletteCompactToggleButton
 				isCompact={true}
 				compactLabel={_labels.compact}
