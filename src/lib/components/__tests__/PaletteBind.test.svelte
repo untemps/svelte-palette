@@ -11,7 +11,15 @@
 		initialColors,
 		isCompact = false,
 		initialCompactColorIndices = [],
-	}: { initialColors: ColorsProp; isCompact?: boolean; initialCompactColorIndices?: number[] } = $props()
+		maxColors = 30,
+		allowDuplicates = false,
+	}: {
+		initialColors: ColorsProp
+		isCompact?: boolean
+		initialCompactColorIndices?: number[]
+		maxColors?: number
+		allowDuplicates?: boolean
+	} = $props()
 
 	let colors = $state<ColorsProp | null>(untrack(() => initialColors))
 	let compactColorIndices = $state<number[]>(untrack(() => initialCompactColorIndices))
@@ -19,4 +27,12 @@
 
 <div data-testid="__bound-colors__">{JSON.stringify(colors)}</div>
 <div data-testid="__bound-indices__">{JSON.stringify(compactColorIndices)}</div>
-<Palette bind:colors bind:compactColorIndices {isCompact} showInput deletionMode={TOOLTIP} />
+<Palette
+	bind:colors
+	bind:compactColorIndices
+	{isCompact}
+	{maxColors}
+	{allowDuplicates}
+	showInput
+	deletionMode={TOOLTIP}
+/>

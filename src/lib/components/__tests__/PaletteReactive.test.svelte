@@ -5,7 +5,15 @@
 
 	import { NONE } from '../../enums/PaletteDeletionMode'
 
-	import type { ColorsProp, DeleteEventArgs, DeletionMode, ErrorEventArgs } from '../../types'
+	import type {
+		AddEventArgs,
+		ColorGroup,
+		ColorInput,
+		ColorsProp,
+		DeleteEventArgs,
+		DeletionMode,
+		ErrorEventArgs,
+	} from '../../types'
 
 	let {
 		initialColors,
@@ -17,6 +25,7 @@
 		initialNumColumns = 5,
 		initialShowInput = false,
 		deletionMode = NONE,
+		onadd = undefined,
 		ondelete = undefined,
 		onerror = undefined,
 	}: {
@@ -29,6 +38,7 @@
 		initialNumColumns?: number
 		initialShowInput?: boolean
 		deletionMode?: DeletionMode
+		onadd?: (args: AddEventArgs) => void
 		ondelete?: (args: DeleteEventArgs) => void
 		onerror?: (args: ErrorEventArgs) => void
 	} = $props()
@@ -43,6 +53,10 @@
 	let showInput = $state<boolean>(untrack(() => initialShowInput))
 
 	export const setColors = (value: ColorsProp | null) => (colors = value)
+	export const setGroupColors = (groupIndex: number, value: ColorInput[]) => {
+		const groups = colors as ColorGroup[]
+		groups[groupIndex].colors = value
+	}
 	export const setIsCompact = (value: boolean) => (isCompact = value)
 	export const setCompactColorIndices = (value: number[]) => (compactColorIndices = value)
 	export const appendCompactColorIndex = (value: number) => {
@@ -63,6 +77,7 @@
 	{numColumns}
 	{showInput}
 	{deletionMode}
+	{onadd}
 	{ondelete}
 	{onerror}
 />
