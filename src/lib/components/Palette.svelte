@@ -343,7 +343,9 @@
 			return _groupNumColumns(_renderedGroups, params)
 		}
 		if (_renderedColors == null) {
-			return normalizeNumColumns(numColumns)
+			return _isCompact
+				? _compactNumColumns(compactColorIndices?.length ?? 0, params)
+				: calculateNumColumns(0, params)
 		}
 		return _isCompact
 			? _compactNumColumns(_renderedColors.length, params)

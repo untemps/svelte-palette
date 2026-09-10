@@ -4103,6 +4103,14 @@ test('Hides the compact tool when no supplied index resolves to a color', async 
 	expect(screen.queryByLabelText('Compact the palette')).toBeNull()
 })
 
+test('Sizes an unresolved auto-width palette to maxColumns', async () => {
+	setup(Palette, { props: { colors: null, numColumns: 0, maxColumns: 3 } })
+
+	await waitFor(() =>
+		expect(document.querySelector('.palette__content')?.getAttribute('style')).toBe('--num-columns: 3;')
+	)
+})
+
 test('Removes the occurrence a compact slot stands for when duplicates are allowed', async () => {
 	const onDelete = vi.fn()
 	const colors = [
