@@ -323,6 +323,10 @@
 
 	const _fullGroupOffsets = $derived(_groupOffsetsOf(_fullColorGroups ?? []))
 
+	const _isGrouped = $derived(_fullColorGroups != null)
+
+	const _showsTransparentSlot = $derived(showTransparentSlot && !_isGrouped)
+
 	const _renderedGroups = $derived(_isCompact ? null : _colorGroups)
 
 	const _compactPicked = $derived(
@@ -334,7 +338,7 @@
 	const _isResolved = $derived(_colors != null || _colorGroups != null)
 
 	const _numColumns = $derived.by(() => {
-		const params = _viewParams()
+		const params = { ..._viewParams(), showTransparentSlot: _showsTransparentSlot }
 		if (_renderedGroups) {
 			return _groupNumColumns(_renderedGroups, params)
 		}
@@ -355,7 +359,7 @@
 		_renderedGroups
 			? _renderedGroups.reduce((sum, group) => sum + group.colors.length, 0)
 			: _renderedColors
-				? _renderedColors.length + (showTransparentSlot ? 1 : 0)
+				? _renderedColors.length + (_showsTransparentSlot ? 1 : 0)
 				: 0
 	)
 
@@ -374,8 +378,8 @@
 			return -1
 		}
 		if (_renderedColors) {
-			const offset = showTransparentSlot ? 1 : 0
-			if (showTransparentSlot && selectedColor === null) {
+			const offset = _showsTransparentSlot ? 1 : 0
+			if (_showsTransparentSlot && selectedColor === null) {
 				return 0
 			}
 			const index = _renderedColors.findIndex((color) => isSameColor(color.value, selectedColor))
@@ -712,7 +716,7 @@
 		void _renderedColors
 		void _colors
 		void _colorGroups
-		void showTransparentSlot
+		void _showsTransparentSlot
 		void presentational
 		void _isCompact
 		void selectedColor
@@ -786,7 +790,7 @@
 			}
 			_removeGroupColor(groupIndex, from - _groupOffsets[groupIndex])
 		} else {
-			const colorIndex = from - (showTransparentSlot ? 1 : 0)
+			const colorIndex = from - (_showsTransparentSlot ? 1 : 0)
 			if (colorIndex < 0) {
 				return
 			}
@@ -937,7 +941,7 @@
 			</div>
 		{:else if !!_renderedColors}
 			<div class="palette__cells">
-				{#if beforeSlot}
+				{#if beforeSlot && !_isGrouped}
 					{@render beforeSlot({ selectedColor, transition, isCompact: _isCompact })}
 				{/if}
 				<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
@@ -950,7 +954,7 @@
 					onkeydown={presentational ? undefined : _onListboxKeydown}
 					onfocusin={presentational ? undefined : _onListboxFocusin}
 				>
-					{#if showTransparentSlot}
+					{#if _showsTransparentSlot}
 						<li data-testid="__palette-cell__" class="palette__cells__cell" role="presentation">
 							{#if transparentSlot}
 								{@render transparentSlot({
@@ -969,7 +973,7 @@
 						</li>
 					{/if}
 					{#each _renderedColors as color, index (`${color.value}_${index}`)}
-						{@const optionIndex = index + (showTransparentSlot ? 1 : 0)}
+						{@const optionIndex = index + (_showsTransparentSlot ? 1 : 0)}
 						<li
 							data-testid="__palette-cell__"
 							class="palette__cells__cell"
@@ -1010,7 +1014,7 @@
 						</li>
 					{/each}
 				</ul>
-				{#if afterSlot}
+				{#if afterSlot && !_isGrouped}
 					{@render afterSlot({ selectedColor, transition, isCompact: _isCompact })}
 				{/if}
 			</div>

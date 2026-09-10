@@ -4003,29 +4003,46 @@ test('Keeps the input hidden when a grouped palette is enlarged from its compact
 	expect(screen.queryByTestId('__palette-input-input__')).toBeNull()
 })
 
-test('Keeps the transparent slot in a compact grouped strip', async () => {
+test('Keeps the transparent slot out of a compact grouped strip', async () => {
 	setup(Palette, {
 		props: { colors: GROUPED_FIXTURE, isCompact: true, compactColorIndices: [0, 1], showTransparentSlot: true },
 	})
 
 	await screen.findAllByTestId('__palette-cell__')
 
-	expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(3)
-	expect(slotLabels()).toEqual(['Transparent slot', '#a00', '#a11'])
+	expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2)
+	expect(slotLabels()).toEqual(['#a00', '#a11'])
 	await waitFor(() =>
-		expect(document.querySelector('.palette__content')?.getAttribute('style')).toBe('--num-columns: 3;')
+		expect(document.querySelector('.palette__content')?.getAttribute('style')).toBe('--num-columns: 2;')
 	)
 })
 
-test('Renders the edge slots in a compact grouped strip', async () => {
-	const edgeSnippet = (testid: string) =>
-		createRawSnippet<[{ isCompact: boolean }]>((getProps) => ({
-			render: () => `<div data-testid="${testid}"></div>`,
-			setup: (element) => {
-				element.setAttribute('data-compact', String(getProps().isCompact))
-			},
-		}))
+const edgeSnippet = (testid: string) =>
+	createRawSnippet<[{ isCompact: boolean }]>((getProps) => ({
+		render: () => `<div data-testid="${testid}"></div>`,
+		setup: (element) => {
+			element.setAttribute('data-compact', String(getProps().isCompact))
+		},
+	}))
 
+test('Forwards the compact flag to the edge slots of a flat strip', async () => {
+	setup(Palette, {
+		props: {
+			colors: ['#f00', '#0f0', '#00f'],
+			isCompact: true,
+			compactColorIndices: [0, 2],
+			beforeSlot: edgeSnippet('__before-slot__'),
+			afterSlot: edgeSnippet('__after-slot__'),
+		},
+	})
+
+	await screen.findAllByTestId('__palette-cell__')
+
+	expect(screen.getByTestId('__before-slot__')).toHaveAttribute('data-compact', 'true')
+	expect(screen.getByTestId('__after-slot__')).toHaveAttribute('data-compact', 'true')
+})
+
+test('Keeps the edge slots out of a compact grouped strip', async () => {
 	setup(Palette, {
 		props: {
 			colors: GROUPED_FIXTURE,
@@ -4038,8 +4055,22 @@ test('Renders the edge slots in a compact grouped strip', async () => {
 
 	await screen.findAllByTestId('__palette-cell__')
 
-	expect(screen.getByTestId('__before-slot__')).toHaveAttribute('data-compact', 'true')
-	expect(screen.getByTestId('__after-slot__')).toHaveAttribute('data-compact', 'true')
+	expect(screen.queryByTestId('__before-slot__')).toBeNull()
+	expect(screen.queryByTestId('__after-slot__')).toBeNull()
+})
+
+test('Keeps the transparent slot out of a grouped palette on both sides of the compact toggle', async () => {
+	const { user } = setup(Palette, {
+		props: { colors: GROUPED_FIXTURE, compactColorIndices: [0, 3], showTransparentSlot: true },
+	})
+
+	await screen.findAllByTestId('__palette-group__')
+	expect(slotLabels()).toEqual(['#a00', '#a11', '#b00', '#b11', '#b22'])
+
+	await user.click(screen.getByLabelText('Compact the palette'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-slot__')).toHaveLength(2))
+	expect(slotLabels()).toEqual(['#a00', '#b11'])
 })
 
 test('Removes the occurrence a compact slot stands for when duplicates are allowed', async () => {

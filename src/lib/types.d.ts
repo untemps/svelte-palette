@@ -193,14 +193,16 @@ export interface HeaderSnippetProps {
 }
 
 /**
- * Properties passed to the `beforeSlot` and `afterSlot` snippets.
+ * Properties passed to the `beforeSlot` and `afterSlot` snippets. Neither snippet is rendered on a grouped
+ * `colors` list, whether the groups are displayed or the palette is compact, so they are reachable only on a
+ * flat list.
  */
 export interface EdgeSlotSnippetProps {
 	/** The currently selected color, or `null` when none is selected. */
 	selectedColor: ColorValue | null
 	/** The transition applied to the slots, if any. */
 	transition: Transition | null
-	/** Whether the palette is displayed in compact mode. */
+	/** Whether the palette is displayed in compact mode. Only ever `true` on a flat list, since a grouped one renders no edge slot. */
 	isCompact: boolean
 }
 
@@ -239,7 +241,9 @@ export interface SlotSnippetProps {
 }
 
 /**
- * Properties passed to the `transparentSlot` snippet that replaces the default transparent slot.
+ * Properties passed to the `transparentSlot` snippet that replaces the default transparent slot. Like the
+ * slot it replaces, it is never rendered on a grouped `colors` list, whether the groups are displayed or the
+ * palette is compact.
  */
 export interface TransparentSlotSnippetProps {
 	/** Roving tab index to forward so the transparent option keeps the single tab stop (`0` when active, `-1` otherwise). */
