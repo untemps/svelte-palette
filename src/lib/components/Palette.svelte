@@ -142,7 +142,6 @@
 	let _fullColorGroups = $state<NormalizedColorGroup[] | null>(null)
 	let _error = $state<unknown>(null)
 	let _hasError = $state(false)
-	let _numColumns = $state(untrack(() => normalizeNumColumns(numColumns)))
 	let _isSettingsOn = $state(false)
 	let _isCompact = $state(untrack(() => isCompact))
 	let _listboxEl = $state<HTMLElement | null>(null)
@@ -251,12 +250,6 @@
 	})
 
 	$effect(() => {
-		if (numColumns > 0) {
-			_numColumns = normalizeNumColumns(numColumns)
-		}
-	})
-
-	$effect(() => {
 		const _source = colors
 		const _params = _viewParams()
 		const generation = ++_colorsGeneration
@@ -296,7 +289,6 @@
 						_sourceColorGroups = results
 						_colors = null
 						_fullColors = null
-						_numColumns = _groupNumColumns(newColorGroups, _params)
 					} else {
 						const newColors = calculateColors(results, _params)
 						_colors = newColors
@@ -304,9 +296,6 @@
 						_fullColorGroups = null
 						_sourceColorGroups = []
 						_fullColors = transformColors(Array.isArray(results) ? results : [])
-						_numColumns = _params.isCompact
-							? _compactNumColumns(newColors.length, _params)
-							: calculateNumColumns(newColors.length, _params)
 					}
 				}
 			},
@@ -328,6 +317,17 @@
 				}
 			}
 		)
+	})
+
+	const _numColumns = $derived.by(() => {
+		const params = _viewParams()
+		if (_colorGroups) {
+			return _groupNumColumns(_colorGroups, params)
+		}
+		if (_colors == null) {
+			return normalizeNumColumns(numColumns)
+		}
+		return _isCompact ? _compactNumColumns(_colors.length, params) : calculateNumColumns(_colors.length, params)
 	})
 
 	let _tools: PaletteToolName[] = $derived([
@@ -457,7 +457,6 @@
 			return
 		}
 		_colors = nextColors
-		_numColumns = calculateNumColumns(nextColors.length, _params)
 		const nextSourceColors = _syncColors(nextFullColors)
 		onadd?.({ color, colors: nextSourceColors })
 	}
@@ -482,7 +481,6 @@
 		_syncCompactColorIndices(dropped, full)
 		const nextColors = calculateColors(nextFullColors, _viewParams())
 		_colors = nextColors
-		_numColumns = calculateNumColumns(nextColors.length, _viewParams())
 		const nextSourceColors = _syncColors(nextFullColors)
 		ondelete?.({ color: removed.value, index: fullIndex, colors: nextSourceColors })
 	}
@@ -572,7 +570,6 @@
 		_syncCompactColorIndices(dropped, full)
 		const nextColors = calculateColors(nextFullColors, _viewParams())
 		_colors = nextColors
-		_numColumns = _compactNumColumns(nextColors.length, _viewParams())
 		const nextSourceColors = _syncColors(nextFullColors)
 		ondelete?.({ color: removed.value, index: fullIndex, colors: nextSourceColors })
 	}
@@ -601,7 +598,6 @@
 		const nextColorGroups = calculateColorGroups(nextFullColorGroups, { allowDuplicates, maxColors })
 		const sourceIndices = _sourceGroupIndices(_sourceColorGroups)
 		_colorGroups = nextColorGroups
-		_numColumns = _groupNumColumns(nextColorGroups, _viewParams())
 		const { colorGroups: nextSourceColorGroups, groupIndices } = _syncColorGroups(
 			nextFullColorGroups,
 			sourceIndices
