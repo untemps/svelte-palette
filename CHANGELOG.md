@@ -1,3 +1,20 @@
+# [6.0.0-beta.22](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.21...v6.0.0-beta.22) (2026-09-10)
+
+
+### Bug Fixes
+
+* Preserve withheld colors and recount the columns when a slot is deleted ([#275](https://github.com/untemps/svelte-palette/issues/275)) ([79131dc](https://github.com/untemps/svelte-palette/commit/79131dc76cb47add4969fbaeac7dbd95585cc188))
+
+
+### BREAKING CHANGES
+
+* `ondelete` and `onadd` now address the resolved full list on the flat and grouped paths, where they addressed the rendered slots. `index` is the removed color's position in that full list — in its full group in grouped mode — and `colors`, like the `bind:colors` write-back, carries every entry the grid withholds through `maxColors`, `allowDuplicates` or compact mode. The compact path already behaved this way, so the three paths now agree. A handler that mirrored the deletion into its own state by index — `ondelete={({ index }) => mine.splice(index, 1)}` — removes a different entry as soon as any color is withheld, and one that persisted `colors` now stores the whole list rather than the visible slots: with 40 colors and the default `maxColors: 30`, the bound array kept 29 entries after a deletion and now keeps 39. Index into the full list, or match by value.
+* In grouped mode `bind:colors` and the `ondelete` payload now carry the group list as it was supplied, with only its colors normalized, instead of the renderer's projection. Groups the grid skips and any extra keys they carry — an `id`, a slug, a token name — survive the write-back rather than being stripped, and `groupIndex` reports the group's position in that supplied list rather than among the rendered ones. A consumer that relied on the palette to prune colorless groups, or that compensated for the old rendered offset, must stop doing so. A supplied list mutated in place rather than reassigned is the exception: it drifts out of step with the
+palette, and the resolved groups are handed back in rendered order, `groupIndex` following them.
+* Deleting a slot from the expanded palette now re-indexes a bound `compactColorIndices`, which only a compact deletion used to touch, so the compact subset still points at the same colors once the palette is collapsed again. An index whose color the deletion removed is dropped, as is one the shortened list no longer reaches, and when that empties the subset the compact toggle unmounts with it. A consumer treating `compactColorIndices` as its own configuration — recomputed from a preset, persisted to storage — will see it rewritten by a gesture that never touched it before. Pass a stable reference or bind it; the palette writes only when the deletion actually moves an index.
+* A compact deletion whose rendered subset has drifted from the full list now resolves the slot by value, fires `ondelete` and writes back, where it previously dropped the slot from the view and returned — no callback, no write-back, so the next resolution rebuilt the slot and the deletion undid itself. A handler that is not idempotent, appending to an audit log or POSTing a delete, now receives a call it never used to get.
+* `numColumns` is floored to a whole number and held at a minimum of `1`, on every render rather than only after a deletion. `numColumns={2.5}` produced `repeat(2.5, …)`, which the browser discarded whole, falling the grid back to one implicit column; it now renders two. A palette passing a fractional or sub-one column count changes layout.
+
 # [6.0.0-beta.21](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.20...v6.0.0-beta.21) (2026-08-27)
 
 
