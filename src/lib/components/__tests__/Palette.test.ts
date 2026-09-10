@@ -4073,6 +4073,28 @@ test('Keeps the transparent slot out of a grouped palette on both sides of the c
 	expect(slotLabels()).toEqual(['#a00', '#b11'])
 })
 
+test('Enlarges a compact palette whose source has rejected', async () => {
+	let rejectColors!: (reason?: unknown) => void
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#f00', '#0f0', '#00f'],
+			initialIsCompact: true,
+			initialCompactColorIndices: [0, 2],
+		},
+	})
+
+	await screen.findAllByTestId('__palette-slot__')
+
+	component.setColors(new Promise<string[]>((_, reject) => (rejectColors = reject)))
+	rejectColors(new Error('gone'))
+	await screen.findByRole('alert')
+
+	await user.click(screen.getByLabelText('Enlarge the palette'))
+
+	await waitFor(() => expect(screen.queryByLabelText('Enlarge the palette')).toBeNull())
+	expect(screen.getByRole('alert')).toBeInTheDocument()
+})
+
 test('Removes the occurrence a compact slot stands for when duplicates are allowed', async () => {
 	const onDelete = vi.fn()
 	const colors = [

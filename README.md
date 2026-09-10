@@ -841,7 +841,7 @@ The component displays a customizable loader waiting to the promise to be resolv
 
 The default loader (`PaletteLoader`) is an accessible live region: it exposes a `role="status"` so screen readers announce the loading state, and its spinner is driven by a CSS animation that is disabled under `prefers-reduced-motion: reduce`. When you render `PaletteLoader` directly, its announced text comes from a `label` prop (defaults to `Loading colors`). Through `<Palette>`, localize the loading announcement with `labels.loader` (see [Internationalization](#internationalization)) — or replace the loader entirely with your own `loader` snippet.
 
-Network calls fail, so the promise-based pattern should handle rejection too. When the `colors` promise rejects, the palette catches it and renders an error state instead of spinning forever: the bundled [`PaletteError`](#paletteerror) by default, or your own `error` snippet. The rejection reason is also delivered to the `onerror` callback, and supplying a fresh `colors` promise clears the error and returns to the loader.
+Network calls fail, so the promise-based pattern should handle rejection too. When the `colors` promise rejects, the palette catches it and renders an error state instead of spinning forever: the bundled [`PaletteError`](#paletteerror) by default, or your own `error` snippet. The rejection reason is also delivered to the `onerror` callback, and supplying a fresh `colors` promise clears the error and returns to the loader. A palette that was compact when its source rejected keeps its enlarge button, so the error state is never a dead end: the tools row and the header and footer are still suppressed while compact, and expanding is what brings them back.
 
 #### Example
 

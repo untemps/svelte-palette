@@ -683,10 +683,14 @@
 	const _onDelete = (index: number) => _removeColor(index)
 
 	const _toggleCompact = () => {
+		if (_isCompact) {
+			_isCompact = false
+			return
+		}
 		if (!_isResolved) {
 			return
 		}
-		_isCompact = !_isCompact
+		_isCompact = true
 	}
 
 	const _onToolSelect = (args: ToolSelectEventArgs | PaletteToolName) => {
@@ -1032,7 +1036,7 @@
 		{#if !_isCompact}
 			{@render footer?.({ selectedColor })}
 		{/if}
-		{#if _isCompact && _isResolved}
+		{#if _isCompact && (_isResolved || _hasError)}
 			<PaletteCompactToggleButton
 				isCompact={true}
 				compactLabel={_labels.compact}
