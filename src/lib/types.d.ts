@@ -209,7 +209,7 @@ export interface EdgeSlotSnippetProps {
  */
 export interface SlotSnippetProps {
 	/**
-	 * Index of the slot in the rendered list, or in its rendered group in grouped mode — the position among the
+	 * Index of the slot in the rendered list, or in its rendered group while the groups are displayed — the position among the
 	 * slots the grid draws, which `maxColors`, `allowDuplicates` and compact mode all shift. It is not the index
 	 * `DeleteEventArgs` carries: that one addresses the resolved full list.
 	 */
@@ -220,7 +220,7 @@ export interface SlotSnippetProps {
 	color: ColorValue
 	/** The color name, when the color was provided as an object; `undefined` for bare color values. */
 	colorName?: string
-	/** The group name, only provided when the colors are grouped. */
+	/** The group name, only provided while the grouped display is rendered. A compact palette collapses the grouping and passes no group name. */
 	groupName?: string
 	/** The currently selected color, or `null` when none is selected. */
 	selectedColor: ColorValue | null
