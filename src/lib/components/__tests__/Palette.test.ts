@@ -4095,6 +4095,14 @@ test('Enlarges a compact palette whose source has rejected', async () => {
 	expect(screen.getByRole('alert')).toBeInTheDocument()
 })
 
+test('Hides the compact tool when no supplied index resolves to a color', async () => {
+	setup(Palette, { props: { colors: ['#f00', '#0f0'], compactColorIndices: [99] } })
+
+	await screen.findAllByTestId('__palette-cell__')
+
+	expect(screen.queryByLabelText('Compact the palette')).toBeNull()
+})
+
 test('Removes the occurrence a compact slot stands for when duplicates are allowed', async () => {
 	const onDelete = vi.fn()
 	const colors = [

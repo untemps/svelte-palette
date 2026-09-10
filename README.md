@@ -432,7 +432,7 @@ Whichever mode is used, the gesture deletes from the resolved `colors` list rath
 The compact mode is a way to display a minimal version of the palette with a restricted selection of the original colors and downsized spaces.
 
 The `compactColorIndices` prop allows to define the list of the colors to be picked from the `colors` array by their indices.
-If set a control is added to toggle the compact mode.
+If at least one of its entries resolves to a color, a control is added to toggle the compact mode.
 
 You may also specify whether the palette has to use the compact mode by default by setting `isCompact=true`.
 
@@ -925,7 +925,7 @@ The tools panel is a container for two actions:
 - Display the settings panel (`"settings"`)
 - Toggle the compact mode (`"compact"`)
 
-The compact action is offered as soon as a list has resolved — grouped lists included — and `compactColorIndices` is not empty; the settings action only when a `settings` snippet is passed. The panel itself is not rendered while the palette is compact; the built-in enlarge button takes its place.
+The compact action is offered as soon as a list has resolved — grouped lists included — and at least one entry of `compactColorIndices` resolves to a color in it, so a selection that is empty or wholly out of range offers no collapse to an empty strip; the settings action only when a `settings` snippet is passed. The panel itself is not rendered while the palette is compact; the built-in enlarge button takes its place.
 
 For some use cases, you may want to provide your own controls by using the `tools` snippet.
 

@@ -350,8 +350,18 @@
 			: calculateNumColumns(_renderedColors.length, params)
 	})
 
+	const _compactPickCount = $derived.by(() => {
+		if (!compactColorIndices?.length) {
+			return 0
+		}
+		return pickColors(_isGrouped ? _compactSource : (_fullColors ?? []), {
+			..._viewParams(),
+			isCompact: true,
+		}).length
+	})
+
 	let _tools: PaletteToolName[] = $derived([
-		...(_isResolved && compactColorIndices?.length ? [COMPACT] : []),
+		...(_isResolved && _compactPickCount > 0 ? [COMPACT] : []),
 		...(settings ? [SETTINGS] : []),
 	] as PaletteToolName[])
 
