@@ -224,6 +224,28 @@
 			showTransparentSlot: params.showTransparentSlot,
 		})
 
+	const _groupOffsetsOf = (groups: NormalizedColorGroup[]): number[] => {
+		const offsets: number[] = []
+		let base = 0
+		for (const group of groups) {
+			offsets.push(base)
+			base += group.colors.length
+		}
+		return offsets
+	}
+
+	const _groupIndexAt = (offsets: number[], index: number): number => {
+		let groupIndex = -1
+		for (let i = 0; i < offsets.length; i++) {
+			if (index >= offsets[i]) {
+				groupIndex = i
+			} else {
+				break
+			}
+		}
+		return groupIndex
+	}
+
 	$effect(() => {
 		_isCompact = isCompact
 	})
@@ -321,15 +343,11 @@
 				: 0
 	)
 
-	const _groupOffsets = $derived.by(() => {
-		const offsets: number[] = []
-		let base = 0
-		for (const group of _colorGroups ?? []) {
-			offsets.push(base)
-			base += group.colors.length
-		}
-		return offsets
-	})
+	const _compactSource = $derived((_fullColorGroups ?? []).flatMap((group) => group.colors))
+
+	const _fullGroupOffsets = $derived(_groupOffsetsOf(_fullColorGroups ?? []))
+
+	const _groupOffsets = $derived(_groupOffsetsOf(_colorGroups ?? []))
 
 	const _selectedIndex = $derived.by(() => {
 		if (_colorGroups) {
@@ -704,14 +722,7 @@
 			return
 		}
 		if (_colorGroups) {
-			let groupIndex = -1
-			for (let i = 0; i < _groupOffsets.length; i++) {
-				if (from >= _groupOffsets[i]) {
-					groupIndex = i
-				} else {
-					break
-				}
-			}
+			const groupIndex = _groupIndexAt(_groupOffsets, from)
 			if (groupIndex < 0) {
 				return
 			}
