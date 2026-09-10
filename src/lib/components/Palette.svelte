@@ -626,10 +626,11 @@
 		}
 		const full = _compactSource
 		const dropped = _droppedIndices(full, fullIndex, { allowDuplicates }, compactColorIndices ?? [])
-		const nextFullColorGroups = fullColorGroups.map((current, position) => ({
-			...current,
-			colors: current.colors.filter((_, ci) => !dropped.has(offsets[position] + ci)),
-		}))
+		const nextFullColorGroups = fullColorGroups.map((current, position) => {
+			const base = offsets[position]
+			const nextColors = current.colors.filter((_, ci) => !dropped.has(base + ci))
+			return nextColors.length === current.colors.length ? current : { ...current, colors: nextColors }
+		})
 		const sourceIndices = _sourceGroupIndices(_sourceColorGroups)
 		_syncCompactColorIndices(dropped, full)
 		_colorGroups = calculateColorGroups(nextFullColorGroups, { allowDuplicates, maxColors })
@@ -932,7 +933,7 @@
 											selectedColor,
 											selected: optionIndex === _selectedIndex,
 											transition,
-											isCompact: _isCompact,
+											isCompact: false,
 											index: colorIndex,
 											tabindex: _rovingTabindex(optionIndex),
 											ariaKeyShortcuts: _deleteShortcut,
