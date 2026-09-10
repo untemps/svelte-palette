@@ -208,7 +208,11 @@ export interface EdgeSlotSnippetProps {
  * Properties passed to the `slot` snippet that replaces the default color slots.
  */
 export interface SlotSnippetProps {
-	/** Index of the color within its list (or group). */
+	/**
+	 * Index of the slot in the rendered list, or in its rendered group in grouped mode — the position among the
+	 * slots the grid draws, which `maxColors`, `allowDuplicates` and compact mode all shift. It is not the index
+	 * `DeleteEventArgs` carries: that one addresses the resolved full list.
+	 */
 	index: number
 	/** Roving tab index to forward to the custom slot so it joins arrow-key navigation (`0` when active, `-1` otherwise). */
 	tabindex: number
