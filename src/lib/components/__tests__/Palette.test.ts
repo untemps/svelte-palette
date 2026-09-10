@@ -3593,3 +3593,31 @@ describe('Built-in label overrides', () => {
 		expect(trash?.getAttribute('aria-label')).toBe('Supprimer la couleur')
 	})
 })
+
+const GROUPED_FIXTURE: ColorGroup[] = [
+	{ name: 'A', colors: ['#a00', '#a11'] },
+	{ name: 'B', colors: ['#b00', '#b11', '#b22'] },
+]
+
+test('Re-indexes the compact indices when a grouped slot is deleted from the expanded palette', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: GROUPED_FIXTURE, isCompact: false, initialCompactColorIndices: [0, 3] },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	const boundIndices = await screen.findByTestId('__bound-indices__')
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(5)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() =>
+		expect(JSON.parse(bound.textContent ?? '')).toEqual([
+			{ name: 'A', colors: [{ value: '#a11' }] },
+			{ name: 'B', colors: [{ value: '#b00' }, { value: '#b11' }, { value: '#b22' }] },
+		])
+	)
+	await waitFor(() => expect(JSON.parse(boundIndices.textContent ?? '')).toEqual([2]))
+})

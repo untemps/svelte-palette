@@ -597,6 +597,11 @@
 		)
 		const nextColorGroups = calculateColorGroups(nextFullColorGroups, { allowDuplicates, maxColors })
 		const sourceIndices = _sourceGroupIndices(_sourceColorGroups)
+		const groupOffset = _fullGroupOffsets[groupIndex] ?? 0
+		_syncCompactColorIndices(
+			new Set([...dropped].map((droppedIndex) => groupOffset + droppedIndex)),
+			_compactSource
+		)
 		_colorGroups = nextColorGroups
 		const { colorGroups: nextSourceColorGroups, groupIndices } = _syncColorGroups(
 			nextFullColorGroups,
