@@ -64,8 +64,8 @@
 	</div>
 
 	<p class="hint">
-		Use the compact / enlarge button in the tools row to collapse the palette to indices {compactColorIndices.join(
+		Use the compact / enlarge button in the tools row to collapse the flat palette to indices {compactColorIndices.join(
 			', '
-		)}.
+		)} and the grouped one to indices {groupedCompactColorIndices.join(', ')} of its flattened colors.
 	</p>
 </Card>
