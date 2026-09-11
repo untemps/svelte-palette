@@ -142,7 +142,6 @@
 	let _fullColorGroups = $state<NormalizedColorGroup[] | null>(null)
 	let _error = $state<unknown>(null)
 	let _hasError = $state(false)
-	let _numColumns = $state(untrack(() => normalizeNumColumns(numColumns)))
 	let _isSettingsOn = $state(false)
 	let _isCompact = $state(untrack(() => isCompact))
 	let _listboxEl = $state<HTMLElement | null>(null)
@@ -224,14 +223,30 @@
 			showTransparentSlot: params.showTransparentSlot,
 		})
 
-	$effect(() => {
-		_isCompact = isCompact
-	})
+	const _groupOffsetsOf = (groups: NormalizedColorGroup[]): number[] => {
+		const offsets: number[] = []
+		let base = 0
+		for (const group of groups) {
+			offsets.push(base)
+			base += group.colors.length
+		}
+		return offsets
+	}
+
+	const _groupIndexAt = (offsets: number[], index: number): number => {
+		let groupIndex = -1
+		for (let i = 0; i < offsets.length; i++) {
+			if (index >= offsets[i]) {
+				groupIndex = i
+			} else {
+				break
+			}
+		}
+		return groupIndex
+	}
 
 	$effect(() => {
-		if (numColumns > 0) {
-			_numColumns = normalizeNumColumns(numColumns)
-		}
+		_isCompact = isCompact
 	})
 
 	$effect(() => {
@@ -274,7 +289,6 @@
 						_sourceColorGroups = results
 						_colors = null
 						_fullColors = null
-						_numColumns = _groupNumColumns(newColorGroups, _params)
 					} else {
 						const newColors = calculateColors(results, _params)
 						_colors = newColors
@@ -282,9 +296,6 @@
 						_fullColorGroups = null
 						_sourceColorGroups = []
 						_fullColors = transformColors(Array.isArray(results) ? results : [])
-						_numColumns = _params.isCompact
-							? _compactNumColumns(newColors.length, _params)
-							: calculateNumColumns(newColors.length, _params)
 					}
 				}
 			},
@@ -308,33 +319,68 @@
 		)
 	})
 
+	const _compactSource = $derived((_fullColorGroups ?? []).flatMap((group) => group.colors))
+
+	const _fullGroupOffsets = $derived(_groupOffsetsOf(_fullColorGroups ?? []))
+
+	const _isGrouped = $derived(_fullColorGroups != null)
+
+	const _showsTransparentSlot = $derived(showTransparentSlot && !_isGrouped)
+
+	const _renderedGroups = $derived(_isCompact ? null : _colorGroups)
+
+	const _compactPicked = $derived(
+		_isCompact && _fullColorGroups != null ? pickColors(_compactSource, _viewParams()) : null
+	)
+
+	const _renderedColors = $derived(_compactPicked ? _compactPicked.map(({ color }) => color) : _colors)
+
+	const _isResolved = $derived(_colors != null || _colorGroups != null)
+
+	const _numColumns = $derived.by(() => {
+		const params = { ..._viewParams(), showTransparentSlot: _showsTransparentSlot }
+		if (_renderedGroups) {
+			return _groupNumColumns(_renderedGroups, params)
+		}
+		if (_renderedColors == null) {
+			return _isCompact
+				? _compactNumColumns(compactColorIndices?.length ?? 0, params)
+				: calculateNumColumns(0, params)
+		}
+		return _isCompact
+			? _compactNumColumns(_renderedColors.length, params)
+			: calculateNumColumns(_renderedColors.length, params)
+	})
+
+	const _compactPickCount = $derived.by(() => {
+		if (!compactColorIndices?.length) {
+			return 0
+		}
+		return pickColors(_isGrouped ? _compactSource : (_fullColors ?? []), {
+			..._viewParams(),
+			isCompact: true,
+		}).length
+	})
+
 	let _tools: PaletteToolName[] = $derived([
-		...(_colors != null && compactColorIndices?.length ? [COMPACT] : []),
+		...(_isResolved && _compactPickCount > 0 ? [COMPACT] : []),
 		...(settings ? [SETTINGS] : []),
 	] as PaletteToolName[])
 
 	const _optionCount = $derived(
-		_colorGroups
-			? _colorGroups.reduce((sum, group) => sum + group.colors.length, 0)
-			: _colors
-				? _colors.length + (showTransparentSlot ? 1 : 0)
+		_renderedGroups
+			? _renderedGroups.reduce((sum, group) => sum + group.colors.length, 0)
+			: _renderedColors
+				? _renderedColors.length + (_showsTransparentSlot ? 1 : 0)
 				: 0
 	)
 
-	const _groupOffsets = $derived.by(() => {
-		const offsets: number[] = []
-		let base = 0
-		for (const group of _colorGroups ?? []) {
-			offsets.push(base)
-			base += group.colors.length
-		}
-		return offsets
-	})
+	const _groupOffsets = $derived(_groupOffsetsOf(_renderedGroups ?? []))
 
 	const _selectedIndex = $derived.by(() => {
-		if (_colorGroups) {
+		if (_renderedGroups) {
 			let base = 0
-			for (const group of _colorGroups) {
+			for (const group of _renderedGroups) {
 				const index = group.colors.findIndex((color) => isSameColor(color.value, selectedColor))
 				if (index >= 0) {
 					return base + index
@@ -343,12 +389,12 @@
 			}
 			return -1
 		}
-		if (_colors) {
-			const offset = showTransparentSlot ? 1 : 0
-			if (showTransparentSlot && selectedColor === null) {
+		if (_renderedColors) {
+			const offset = _showsTransparentSlot ? 1 : 0
+			if (_showsTransparentSlot && selectedColor === null) {
 				return 0
 			}
-			const index = _colors.findIndex((color) => isSameColor(color.value, selectedColor))
+			const index = _renderedColors.findIndex((color) => isSameColor(color.value, selectedColor))
 			return index >= 0 ? index + offset : -1
 		}
 		return -1
@@ -439,14 +485,17 @@
 			return
 		}
 		_colors = nextColors
-		_numColumns = calculateNumColumns(nextColors.length, _params)
 		const nextSourceColors = _syncColors(nextFullColors)
 		onadd?.({ color, colors: nextSourceColors })
 	}
 
 	const _removeColor = (index: number) => {
 		if (_isCompact) {
-			_removeCompactColor(index)
+			if (_fullColorGroups != null) {
+				_removeCompactGroupColor(index)
+			} else {
+				_removeCompactColor(index)
+			}
 			return
 		}
 		const rendered = (_colors ?? [])[index]
@@ -464,7 +513,6 @@
 		_syncCompactColorIndices(dropped, full)
 		const nextColors = calculateColors(nextFullColors, _viewParams())
 		_colors = nextColors
-		_numColumns = calculateNumColumns(nextColors.length, _viewParams())
 		const nextSourceColors = _syncColors(nextFullColors)
 		ondelete?.({ color: removed.value, index: fullIndex, colors: nextSourceColors })
 	}
@@ -554,9 +602,49 @@
 		_syncCompactColorIndices(dropped, full)
 		const nextColors = calculateColors(nextFullColors, _viewParams())
 		_colors = nextColors
-		_numColumns = _compactNumColumns(nextColors.length, _viewParams())
 		const nextSourceColors = _syncColors(nextFullColors)
 		ondelete?.({ color: removed.value, index: fullIndex, colors: nextSourceColors })
+	}
+
+	const _removeCompactGroupColor = (index: number) => {
+		const target = (_compactPicked ?? [])[index]
+		if (!target) {
+			return
+		}
+		const fullIndex = target.index
+		const fullColorGroups = _fullColorGroups ?? []
+		const offsets = _fullGroupOffsets
+		const groupIndex = _groupIndexAt(offsets, fullIndex)
+		if (groupIndex < 0) {
+			return
+		}
+		const group = fullColorGroups[groupIndex]
+		const colorIndex = fullIndex - offsets[groupIndex]
+		const removed = group?.colors[colorIndex]
+		if (!removed) {
+			return
+		}
+		const full = _compactSource
+		const dropped = _droppedIndices(full, fullIndex, { allowDuplicates }, compactColorIndices ?? [])
+		const nextFullColorGroups = fullColorGroups.map((current, position) => {
+			const base = offsets[position]
+			const nextColors = current.colors.filter((_, ci) => !dropped.has(base + ci))
+			return nextColors.length === current.colors.length ? current : { ...current, colors: nextColors }
+		})
+		const sourceIndices = _sourceGroupIndices(_sourceColorGroups)
+		_syncCompactColorIndices(dropped, full)
+		_colorGroups = calculateColorGroups(nextFullColorGroups, { allowDuplicates, maxColors })
+		const { colorGroups: nextSourceColorGroups, groupIndices } = _syncColorGroups(
+			nextFullColorGroups,
+			sourceIndices
+		)
+		ondelete?.({
+			color: removed.value,
+			index: colorIndex,
+			colors: nextSourceColorGroups,
+			groupIndex: groupIndices[groupIndex] ?? groupIndex,
+			...(group.name != null && { groupName: group.name }),
+		})
 	}
 
 	const _removeGroupColor = (groupIndex: number, colorIndex: number) => {
@@ -582,8 +670,12 @@
 		)
 		const nextColorGroups = calculateColorGroups(nextFullColorGroups, { allowDuplicates, maxColors })
 		const sourceIndices = _sourceGroupIndices(_sourceColorGroups)
+		const groupOffset = _fullGroupOffsets[groupIndex] ?? 0
+		_syncCompactColorIndices(
+			new Set([...dropped].map((droppedIndex) => groupOffset + droppedIndex)),
+			_compactSource
+		)
 		_colorGroups = nextColorGroups
-		_numColumns = _groupNumColumns(nextColorGroups, _viewParams())
 		const { colorGroups: nextSourceColorGroups, groupIndices } = _syncColorGroups(
 			nextFullColorGroups,
 			sourceIndices
@@ -604,10 +696,14 @@
 	const _onDelete = (index: number) => _removeColor(index)
 
 	const _toggleCompact = () => {
-		if (_colors == null) {
+		if (_isCompact) {
+			_isCompact = false
 			return
 		}
-		_isCompact = !_isCompact
+		if (!_isResolved) {
+			return
+		}
+		_isCompact = true
 	}
 
 	const _onToolSelect = (args: ToolSelectEventArgs | PaletteToolName) => {
@@ -634,9 +730,10 @@
 	let _cachedCells: CellPosition[] = []
 
 	$effect(() => {
+		void _renderedColors
 		void _colors
 		void _colorGroups
-		void showTransparentSlot
+		void _showsTransparentSlot
 		void presentational
 		void _isCompact
 		void selectedColor
@@ -703,21 +800,14 @@
 		if (deletionMode === NONE) {
 			return
 		}
-		if (_colorGroups) {
-			let groupIndex = -1
-			for (let i = 0; i < _groupOffsets.length; i++) {
-				if (from >= _groupOffsets[i]) {
-					groupIndex = i
-				} else {
-					break
-				}
-			}
+		if (_renderedGroups) {
+			const groupIndex = _groupIndexAt(_groupOffsets, from)
 			if (groupIndex < 0) {
 				return
 			}
 			_removeGroupColor(groupIndex, from - _groupOffsets[groupIndex])
 		} else {
-			const colorIndex = from - (showTransparentSlot ? 1 : 0)
+			const colorIndex = from - (_showsTransparentSlot ? 1 : 0)
 			if (colorIndex < 0) {
 				return
 			}
@@ -793,7 +883,7 @@
 		{#if !_isCompact}
 			{@render header?.({ selectedColor })}
 		{/if}
-		{#if !!_colorGroups}
+		{#if !!_renderedGroups}
 			<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 			<div
 				bind:this={_listboxEl}
@@ -804,7 +894,7 @@
 				onkeydown={presentational ? undefined : _onListboxKeydown}
 				onfocusin={presentational ? undefined : _onListboxFocusin}
 			>
-				{#each _colorGroups as group, groupIndex}
+				{#each _renderedGroups as group, groupIndex}
 					<div class="palette__groups__group" role="presentation" data-testid="__palette-group__">
 						{#if group.name}
 							<p
@@ -866,9 +956,9 @@
 					</div>
 				{/each}
 			</div>
-		{:else if !!_colors}
+		{:else if !!_renderedColors}
 			<div class="palette__cells">
-				{#if beforeSlot}
+				{#if beforeSlot && !_isGrouped}
 					{@render beforeSlot({ selectedColor, transition, isCompact: _isCompact })}
 				{/if}
 				<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
@@ -881,7 +971,7 @@
 					onkeydown={presentational ? undefined : _onListboxKeydown}
 					onfocusin={presentational ? undefined : _onListboxFocusin}
 				>
-					{#if showTransparentSlot}
+					{#if _showsTransparentSlot}
 						<li data-testid="__palette-cell__" class="palette__cells__cell" role="presentation">
 							{#if transparentSlot}
 								{@render transparentSlot({
@@ -899,8 +989,8 @@
 							{/if}
 						</li>
 					{/if}
-					{#each _colors as color, index (`${color.value}_${index}`)}
-						{@const optionIndex = index + (showTransparentSlot ? 1 : 0)}
+					{#each _renderedColors as color, index (`${color.value}_${index}`)}
+						{@const optionIndex = index + (_showsTransparentSlot ? 1 : 0)}
 						<li
 							data-testid="__palette-cell__"
 							class="palette__cells__cell"
@@ -941,7 +1031,7 @@
 						</li>
 					{/each}
 				</ul>
-				{#if afterSlot}
+				{#if afterSlot && !_isGrouped}
 					{@render afterSlot({ selectedColor, transition, isCompact: _isCompact })}
 				{/if}
 			</div>
@@ -959,7 +1049,7 @@
 		{#if !_isCompact}
 			{@render footer?.({ selectedColor })}
 		{/if}
-		{#if _isCompact && _colors != null}
+		{#if _isCompact && (_isResolved || _hasError)}
 			<PaletteCompactToggleButton
 				isCompact={true}
 				compactLabel={_labels.compact}

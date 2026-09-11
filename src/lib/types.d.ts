@@ -142,9 +142,14 @@ export interface DeleteEventArgs {
 	/** The color value that was removed. */
 	color: ColorValue
 	/**
-	 * The index of the removed color in the resolved full list, or in its full group in grouped mode — never
-	 * the index of the rendered slot. With `allowDuplicates` off, one deletion drops every occurrence of that
-	 * color and this reports the first — in compact mode, the first of the occurrences the selection holds.
+	 * The index of the removed color in the resolved full list, or in its full group on a grouped `colors`
+	 * list — never the index of the rendered slot, and never an index into `compactColorIndices`. With
+	 * `allowDuplicates` off, one deletion drops every occurrence of that color and this reports the first —
+	 * in compact mode, the first of the occurrences the selection holds. A compact strip over grouped colors
+	 * still resolves the deleted slot to its own full group, so this stays group-relative there and
+	 * `groupIndex` names the group it addresses. On a grouped list that is not compact, the occurrences a
+	 * single deletion drops are scoped to that one group; a compact strip flattens the groups first, so there
+	 * it reaches every group the selection holds.
 	 */
 	index: number
 	/**
@@ -159,11 +164,17 @@ export interface DeleteEventArgs {
 	colors: Colors
 	/**
 	 * The index of the group the color was removed from, in the supplied list rather than in the rendered
-	 * one, only provided in grouped mode. It always addresses the list `colors` carries, so it reports the
-	 * rendered index whenever that list falls back to the resolved groups.
+	 * one, only provided on a grouped `colors` list — from a compact strip over grouped colors as well as
+	 * from the grouped display, since the strip collapses the grouping for the rendering only. It always
+	 * addresses the list `colors` carries, so it reports the rendered index whenever that list falls back to
+	 * the resolved groups.
 	 */
 	groupIndex?: number
-	/** The name of the group the color was removed from, only provided in grouped mode when the group is named. */
+	/**
+	 * The name of the group the color was removed from, only provided on a grouped `colors` list when the
+	 * group is named — from a compact strip over grouped colors as well as from the grouped display, unlike
+	 * `SlotSnippetProps.groupName`, which a compact strip leaves undefined.
+	 */
 	groupName?: string
 }
 
@@ -193,14 +204,16 @@ export interface HeaderSnippetProps {
 }
 
 /**
- * Properties passed to the `beforeSlot` and `afterSlot` snippets.
+ * Properties passed to the `beforeSlot` and `afterSlot` snippets. Neither snippet is rendered on a grouped
+ * `colors` list, whether the groups are displayed or the palette is compact, so they are reachable only on a
+ * flat list.
  */
 export interface EdgeSlotSnippetProps {
 	/** The currently selected color, or `null` when none is selected. */
 	selectedColor: ColorValue | null
 	/** The transition applied to the slots, if any. */
 	transition: Transition | null
-	/** Whether the palette is displayed in compact mode. */
+	/** Whether the palette is displayed in compact mode. Only ever `true` on a flat list, since a grouped one renders no edge slot. */
 	isCompact: boolean
 }
 
@@ -209,9 +222,10 @@ export interface EdgeSlotSnippetProps {
  */
 export interface SlotSnippetProps {
 	/**
-	 * Index of the slot in the rendered list, or in its rendered group in grouped mode — the position among the
+	 * Index of the slot in the rendered list, or in its rendered group while the groups are displayed — the position among the
 	 * slots the grid draws, which `maxColors`, `allowDuplicates` and compact mode all shift. It is not the index
-	 * `DeleteEventArgs` carries: that one addresses the resolved full list.
+	 * `DeleteEventArgs` carries: that one addresses the resolved full list, or the removed color's own full
+	 * group on a grouped `colors` list.
 	 */
 	index: number
 	/** Roving tab index to forward to the custom slot so it joins arrow-key navigation (`0` when active, `-1` otherwise). */
@@ -220,7 +234,7 @@ export interface SlotSnippetProps {
 	color: ColorValue
 	/** The color name, when the color was provided as an object; `undefined` for bare color values. */
 	colorName?: string
-	/** The group name, only provided when the colors are grouped. */
+	/** The group name, only provided while the grouped display is rendered. A compact palette collapses the grouping and passes no group name. */
 	groupName?: string
 	/** The currently selected color, or `null` when none is selected. */
 	selectedColor: ColorValue | null
@@ -239,7 +253,9 @@ export interface SlotSnippetProps {
 }
 
 /**
- * Properties passed to the `transparentSlot` snippet that replaces the default transparent slot.
+ * Properties passed to the `transparentSlot` snippet that replaces the default transparent slot. Like the
+ * slot it replaces, it is never rendered on a grouped `colors` list, whether the groups are displayed or the
+ * palette is compact.
  */
 export interface TransparentSlotSnippetProps {
 	/** Roving tab index to forward so the transparent option keeps the single tab stop (`0` when active, `-1` otherwise). */

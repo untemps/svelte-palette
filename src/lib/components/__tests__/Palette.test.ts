@@ -2490,19 +2490,25 @@ test('Renders the expand button only once a pending colors source resolves in co
 	await waitFor(() => expect(screen.getByTestId('__palette-compact-toggle-button__')).toBeInTheDocument())
 })
 
-test('Does not render the expand button in grouped mode when isCompact is set', async () => {
+test('Renders an empty compact strip and the enlarge button for a grouped palette without compact indices', async () => {
 	const colors = [
 		{ name: 'Reds', colors: ['#f00'] },
 		{ name: 'Blues', colors: ['#00f'] },
 	]
 
-	setup(Palette, {
+	const { user } = setup(Palette, {
 		props: { colors, isCompact: true },
 	})
 
-	const groups = await screen.findAllByTestId('__palette-group__')
-	expect(groups).toHaveLength(2)
-	expect(screen.queryByTestId('__palette-compact-toggle-button__')).not.toBeInTheDocument()
+	await screen.findByTestId('__palette__')
+
+	await waitFor(() => expect(screen.getByLabelText('Enlarge the palette')).toBeInTheDocument())
+	expect(screen.queryAllByTestId('__palette-cell__')).toHaveLength(0)
+	expect(screen.queryAllByTestId('__palette-group__')).toHaveLength(0)
+	expect(document.querySelector('.palette__content')?.getAttribute('style')).toBe('--num-columns: 1;')
+
+	await user.click(screen.getByLabelText('Enlarge the palette'))
+	await waitFor(() => expect(screen.getAllByTestId('__palette-group__')).toHaveLength(2))
 })
 
 test('Ignores a compact tool selection from a custom tools snippet while colors are unresolved', async () => {
@@ -3591,5 +3597,553 @@ describe('Built-in label overrides', () => {
 		const template = document.getElementById('tooltip-template') as HTMLTemplateElement
 		const trash = template.content.querySelector('[data-testid="__palette-trash-button__"]')
 		expect(trash?.getAttribute('aria-label')).toBe('Supprimer la couleur')
+	})
+})
+
+const slotLabels = () => screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))
+
+const GROUPED_FIXTURE: ColorGroup[] = [
+	{ name: 'A', colors: ['#a00', '#a11'] },
+	{ name: 'B', colors: ['#b00', '#b11', '#b22'] },
+]
+
+test('Re-indexes the compact indices when a grouped slot is deleted from the expanded palette', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: GROUPED_FIXTURE, isCompact: false, initialCompactColorIndices: [0, 3] },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	const boundIndices = await screen.findByTestId('__bound-indices__')
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(5)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() =>
+		expect(JSON.parse(bound.textContent ?? '')).toEqual([
+			{ name: 'A', colors: [{ value: '#a11' }] },
+			{ name: 'B', colors: [{ value: '#b00' }, { value: '#b11' }, { value: '#b22' }] },
+		])
+	)
+	await waitFor(() => expect(JSON.parse(boundIndices.textContent ?? '')).toEqual([2]))
+})
+
+test('Collapses a grouped palette into a single flat compact strip', async () => {
+	setup(Palette, {
+		props: { colors: GROUPED_FIXTURE, isCompact: true, compactColorIndices: [0, 3] },
+	})
+
+	await screen.findAllByTestId('__palette-cell__')
+
+	expect(slotLabels()).toEqual(['#a00', '#b11'])
+	expect(screen.queryAllByTestId('__palette-group__')).toHaveLength(0)
+	expect(screen.queryAllByTestId('__palette-group-name__')).toHaveLength(0)
+	expect(document.querySelector('ul.palette__listbox')).not.toBeNull()
+	expect(document.querySelector('.palette__content')).toHaveClass('palette__content--compact')
+})
+
+test('Lays a compact grouped palette out on the flat compact grid', async () => {
+	setup(Palette, {
+		props: { colors: GROUPED_FIXTURE, isCompact: true, compactColorIndices: [0, 1] },
+	})
+
+	await screen.findAllByTestId('__palette-cell__')
+
+	const listbox = document.querySelector('.palette__listbox')
+	expect(listbox).not.toBeNull()
+	expect(listbox!.matches('.palette__content.palette__content--compact > .palette__cells > .palette__listbox')).toBe(
+		true
+	)
+})
+
+test('Restores the groups when a compact grouped palette is enlarged', async () => {
+	const { user } = setup(Palette, {
+		props: { colors: GROUPED_FIXTURE, isCompact: true, compactColorIndices: [0, 3] },
+	})
+
+	await screen.findAllByTestId('__palette-cell__')
+	await user.click(screen.getByLabelText('Enlarge the palette'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-group__')).toHaveLength(2))
+	expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(5)
+	expect(document.querySelector('.palette__content')).not.toHaveClass('palette__content--compact')
+})
+
+test('Offers the compact tool on a grouped palette', async () => {
+	const { user } = setup(Palette, {
+		props: { colors: GROUPED_FIXTURE, compactColorIndices: [0, 3] },
+	})
+
+	await screen.findAllByTestId('__palette-cell__')
+
+	expect(screen.getByTestId('__palette-tools__')).toBeInTheDocument()
+	expect(screen.getByLabelText('Compact the palette')).toBeInTheDocument()
+	expect(screen.getAllByTestId('__palette-group__')).toHaveLength(2)
+
+	await user.click(screen.getByLabelText('Compact the palette'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
+	expect(screen.queryAllByTestId('__palette-group__')).toHaveLength(0)
+	expect(document.querySelector('.palette__content')).toHaveClass('palette__content--compact')
+})
+
+test('Sets num-columns from the compact strip on a grouped palette', async () => {
+	const colors = [
+		{ name: 'A', colors: ['#a00', '#a11', '#a22', '#a33', '#a44', '#a55', '#a66'] },
+		{ name: 'B', colors: ['#b00', '#b11'] },
+	]
+
+	setup(Palette, {
+		props: { colors, numColumns: 0, isCompact: true, compactColorIndices: [0, 1, 8] },
+	})
+
+	await screen.findAllByTestId('__palette-cell__')
+
+	await waitFor(() =>
+		expect(document.querySelector('.palette__content')?.getAttribute('style')).toBe('--num-columns: 3;')
+	)
+})
+
+test('Caps the compact strip of a grouped palette with maxColors across the flattened list', async () => {
+	setup(Palette, {
+		props: { colors: GROUPED_FIXTURE, isCompact: true, compactColorIndices: [0, 1, 2, 3], maxColors: 2 },
+	})
+
+	await screen.findAllByTestId('__palette-cell__')
+
+	expect(slotLabels()).toEqual(['#a00', '#a11'])
+})
+
+test('Forwards isCompact and no group name to a custom slot in a compact grouped palette', async () => {
+	const slotSnippet = createRawSnippet<[{ color: string; isCompact: boolean; groupName?: string }]>((getProps) => ({
+		render: () => `<div data-testid="__custom-slot__"></div>`,
+		setup: (element) => {
+			const props = getProps()
+			element.setAttribute('data-compact', String(props.isCompact))
+			element.setAttribute('data-group', props.groupName ?? 'none')
+		},
+	}))
+
+	setup(Palette, {
+		props: {
+			colors: GROUPED_FIXTURE,
+			isCompact: true,
+			compactColorIndices: [0, 3],
+			slot: slotSnippet,
+		},
+	})
+
+	const slots = await screen.findAllByTestId('__custom-slot__')
+	expect(slots).toHaveLength(2)
+	expect(slots.map((slot) => slot.getAttribute('data-compact'))).toEqual(['true', 'true'])
+	expect(slots.map((slot) => slot.getAttribute('data-group'))).toEqual(['none', 'none'])
+})
+
+test('Fires ondelete with the group identity for a compact deletion on a grouped palette', async () => {
+	const onDelete = vi.fn()
+	const { user } = setup(Palette, {
+		props: {
+			colors: GROUPED_FIXTURE,
+			isCompact: true,
+			compactColorIndices: [0, 3],
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	await user.hover(cells[1])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(1))
+	expect(onDelete.mock.calls[0][0]).toEqual({
+		color: '#b11',
+		index: 1,
+		groupIndex: 1,
+		groupName: 'B',
+		colors: [
+			{ name: 'A', colors: [{ value: '#a00' }, { value: '#a11' }] },
+			{ name: 'B', colors: [{ value: '#b00' }, { value: '#b22' }] },
+		],
+	})
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(1))
+	await waitFor(() =>
+		expect(document.querySelector('.palette__content')?.getAttribute('style')).toBe('--num-columns: 1;')
+	)
+})
+
+test('Removes every occurrence a deduplicated compact slot stood for across its groups', async () => {
+	const onDelete = vi.fn()
+	const colors = [
+		{ name: 'A', colors: ['#f00', '#0f0'] },
+		{ name: 'B', colors: ['#f00', '#00f'] },
+	]
+	const { user } = setup(Palette, {
+		props: {
+			colors,
+			isCompact: true,
+			compactColorIndices: [0, 2, 3],
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+	expect(slotLabels()).toEqual(['#f00', '#00f'])
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(1))
+	expect(onDelete.mock.calls[0][0]).toEqual({
+		color: '#f00',
+		index: 0,
+		groupIndex: 0,
+		groupName: 'A',
+		colors: [
+			{ name: 'A', colors: [{ value: '#0f0' }] },
+			{ name: 'B', colors: [{ value: '#00f' }] },
+		],
+	})
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(1))
+})
+
+test('Keeps an occurrence the compact selection excludes on a grouped palette', async () => {
+	const onDelete = vi.fn()
+	const colors = [
+		{ name: 'A', colors: ['#f00', '#0f0'] },
+		{ name: 'B', colors: ['#f00', '#00f'] },
+	]
+	const { user } = setup(Palette, {
+		props: {
+			colors,
+			isCompact: true,
+			compactColorIndices: [0, 3],
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(1))
+	expect(onDelete.mock.calls[0][0].colors).toEqual([
+		{ name: 'A', colors: [{ value: '#0f0' }] },
+		{ name: 'B', colors: [{ value: '#f00' }, { value: '#00f' }] },
+	])
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(1))
+})
+
+test('Removes a compact slot from the group that follows an empty group', async () => {
+	const onDelete = vi.fn()
+	const colors = [
+		{ name: 'A', colors: ['#a00'] },
+		{ name: 'B', colors: [] },
+		{ name: 'C', colors: ['#c00', '#c11'] },
+	]
+	const { user } = setup(Palette, {
+		props: {
+			colors,
+			isCompact: true,
+			compactColorIndices: [1],
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(1)
+	expect(slotLabels()).toEqual(['#c00'])
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(1))
+	expect(onDelete.mock.calls[0][0]).toEqual({
+		color: '#c00',
+		index: 0,
+		groupIndex: 2,
+		groupName: 'C',
+		colors: [
+			{ name: 'A', colors: [{ value: '#a00' }] },
+			{ name: 'B', colors: [] },
+			{ name: 'C', colors: [{ value: '#c11' }] },
+		],
+	})
+})
+
+test('Reports the group index in the supplied list after a compact grouped deletion', async () => {
+	const onDelete = vi.fn()
+	const colors = [
+		{ name: 'Skipped' },
+		{ name: 'A', colors: ['#a00', '#a11'] },
+		{ name: 'B', colors: ['#b00'] },
+	] as ColorGroup[]
+	const { user } = setup(Palette, {
+		props: {
+			colors,
+			isCompact: true,
+			compactColorIndices: [0, 2],
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+	expect(slotLabels()).toEqual(['#a00', '#b00'])
+
+	await user.hover(cells[1])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(1))
+	expect(onDelete.mock.calls[0][0].groupIndex).toBe(2)
+	expect(onDelete.mock.calls[0][0].groupName).toBe('B')
+	expect(onDelete.mock.calls[0][0].colors[0]).toEqual({ name: 'Skipped' })
+})
+
+test('Removes the focused slot with Delete from a compact grouped strip', async () => {
+	const onDelete = vi.fn()
+	const { user } = setup(Palette, {
+		props: {
+			colors: GROUPED_FIXTURE,
+			isCompact: true,
+			compactColorIndices: [0, 3],
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(2)
+
+	await user.tab()
+	await user.keyboard('{Delete}')
+
+	await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(1))
+	expect(onDelete.mock.calls[0][0].groupIndex).toBe(0)
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(1))
+})
+
+test('Navigates the compact strip after a grouped palette collapses', async () => {
+	const { user } = setup(Palette, {
+		props: { colors: GROUPED_FIXTURE, compactColorIndices: [0, 1, 3] },
+	})
+
+	await screen.findAllByTestId('__palette-cell__')
+	await user.click(screen.getByLabelText('Compact the palette'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-slot__')).toHaveLength(3))
+
+	await user.tab()
+	await user.keyboard('{ArrowRight}')
+
+	expect(document.activeElement?.getAttribute('aria-label')).toBe('#a11')
+})
+
+test('Collapses and restores grouped colors when isCompact changes at runtime', async () => {
+	const { component } = setup(PaletteReactive, {
+		props: { initialColors: GROUPED_FIXTURE, initialCompactColorIndices: [0, 3] },
+	})
+
+	await screen.findAllByTestId('__palette-cell__')
+	expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(5)
+	expect(screen.getAllByTestId('__palette-group__')).toHaveLength(2)
+
+	component.setIsCompact(true)
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
+	expect(screen.queryAllByTestId('__palette-group__')).toHaveLength(0)
+
+	component.setIsCompact(false)
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(5))
+	expect(screen.getAllByTestId('__palette-group__')).toHaveLength(2)
+})
+
+test('Writes a compact grouped deletion back as groups and re-indexes the compact indices', async () => {
+	const { user } = setup(PaletteBind, {
+		props: { initialColors: GROUPED_FIXTURE, isCompact: true, initialCompactColorIndices: [0, 3] },
+	})
+
+	const bound = await screen.findByTestId('__bound-colors__')
+	const boundIndices = await screen.findByTestId('__bound-indices__')
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() =>
+		expect(JSON.parse(bound.textContent ?? '')).toEqual([
+			{ name: 'A', colors: [{ value: '#a11' }] },
+			{ name: 'B', colors: [{ value: '#b00' }, { value: '#b11' }, { value: '#b22' }] },
+		])
+	)
+	await waitFor(() => expect(JSON.parse(boundIndices.textContent ?? '')).toEqual([2]))
+})
+
+test('Keeps the input hidden when a grouped palette is enlarged from its compact strip', async () => {
+	const { user } = setup(Palette, {
+		props: { colors: GROUPED_FIXTURE, showInput: true, isCompact: true, compactColorIndices: [0, 3] },
+	})
+
+	await screen.findAllByTestId('__palette-cell__')
+	await user.click(screen.getByLabelText('Enlarge the palette'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-group__')).toHaveLength(2))
+	expect(screen.queryByTestId('__palette-input-input__')).toBeNull()
+})
+
+test('Keeps the transparent slot out of a compact grouped strip', async () => {
+	setup(Palette, {
+		props: { colors: GROUPED_FIXTURE, isCompact: true, compactColorIndices: [0, 1], showTransparentSlot: true },
+	})
+
+	await screen.findAllByTestId('__palette-cell__')
+
+	expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2)
+	expect(slotLabels()).toEqual(['#a00', '#a11'])
+	await waitFor(() =>
+		expect(document.querySelector('.palette__content')?.getAttribute('style')).toBe('--num-columns: 2;')
+	)
+})
+
+const edgeSnippet = (testid: string) =>
+	createRawSnippet<[{ isCompact: boolean }]>((getProps) => ({
+		render: () => `<div data-testid="${testid}"></div>`,
+		setup: (element) => {
+			element.setAttribute('data-compact', String(getProps().isCompact))
+		},
+	}))
+
+test('Forwards the compact flag to the edge slots of a flat strip', async () => {
+	setup(Palette, {
+		props: {
+			colors: ['#f00', '#0f0', '#00f'],
+			isCompact: true,
+			compactColorIndices: [0, 2],
+			beforeSlot: edgeSnippet('__before-slot__'),
+			afterSlot: edgeSnippet('__after-slot__'),
+		},
+	})
+
+	await screen.findAllByTestId('__palette-cell__')
+
+	expect(screen.getByTestId('__before-slot__')).toHaveAttribute('data-compact', 'true')
+	expect(screen.getByTestId('__after-slot__')).toHaveAttribute('data-compact', 'true')
+})
+
+test('Keeps the edge slots out of a compact grouped strip', async () => {
+	setup(Palette, {
+		props: {
+			colors: GROUPED_FIXTURE,
+			isCompact: true,
+			compactColorIndices: [0, 3],
+			beforeSlot: edgeSnippet('__before-slot__'),
+			afterSlot: edgeSnippet('__after-slot__'),
+		},
+	})
+
+	await screen.findAllByTestId('__palette-cell__')
+
+	expect(screen.queryByTestId('__before-slot__')).toBeNull()
+	expect(screen.queryByTestId('__after-slot__')).toBeNull()
+})
+
+test('Keeps the transparent slot out of a grouped palette on both sides of the compact toggle', async () => {
+	const { user } = setup(Palette, {
+		props: { colors: GROUPED_FIXTURE, compactColorIndices: [0, 3], showTransparentSlot: true },
+	})
+
+	await screen.findAllByTestId('__palette-group__')
+	expect(slotLabels()).toEqual(['#a00', '#a11', '#b00', '#b11', '#b22'])
+
+	await user.click(screen.getByLabelText('Compact the palette'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-slot__')).toHaveLength(2))
+	expect(slotLabels()).toEqual(['#a00', '#b11'])
+})
+
+test('Enlarges a compact palette whose source has rejected', async () => {
+	let rejectColors!: (reason?: unknown) => void
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#f00', '#0f0', '#00f'],
+			initialIsCompact: true,
+			initialCompactColorIndices: [0, 2],
+		},
+	})
+
+	await screen.findAllByTestId('__palette-slot__')
+
+	component.setColors(new Promise<string[]>((_, reject) => (rejectColors = reject)))
+	rejectColors(new Error('gone'))
+	await screen.findByRole('alert')
+
+	await user.click(screen.getByLabelText('Enlarge the palette'))
+
+	await waitFor(() => expect(screen.queryByLabelText('Enlarge the palette')).toBeNull())
+	expect(screen.getByRole('alert')).toBeInTheDocument()
+})
+
+test('Hides the compact tool when no supplied index resolves to a color', async () => {
+	setup(Palette, { props: { colors: ['#f00', '#0f0'], compactColorIndices: [99] } })
+
+	await screen.findAllByTestId('__palette-cell__')
+
+	expect(screen.queryByLabelText('Compact the palette')).toBeNull()
+})
+
+test('Sizes an unresolved auto-width palette to maxColumns', async () => {
+	setup(Palette, { props: { colors: null, numColumns: 0, maxColumns: 3 } })
+
+	await waitFor(() =>
+		expect(document.querySelector('.palette__content')?.getAttribute('style')).toBe('--num-columns: 3;')
+	)
+})
+
+test('Removes the occurrence a compact slot stands for when duplicates are allowed', async () => {
+	const onDelete = vi.fn()
+	const colors = [
+		{ name: 'A', colors: ['#f00', '#0f0'] },
+		{ name: 'B', colors: ['#f00', '#00f'] },
+	]
+	const { user } = setup(Palette, {
+		props: {
+			colors,
+			isCompact: true,
+			compactColorIndices: [0, 2, 3],
+			allowDuplicates: true,
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+	expect(slotLabels()).toEqual(['#f00', '#f00', '#00f'])
+
+	await user.hover(cells[1])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(1))
+	expect(onDelete.mock.calls[0][0]).toEqual({
+		color: '#f00',
+		index: 0,
+		groupIndex: 1,
+		groupName: 'B',
+		colors: [
+			{ name: 'A', colors: [{ value: '#f00' }, { value: '#0f0' }] },
+			{ name: 'B', colors: [{ value: '#00f' }] },
+		],
 	})
 })
