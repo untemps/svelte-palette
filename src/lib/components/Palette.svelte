@@ -148,6 +148,7 @@
 	let _focusedIndex = $state<number | null>(null)
 	let _skipColorsSync = $state(false)
 	let _syncedViewParams: ReturnType<typeof _viewParams> | null = null
+	let _resolvedViewParams: ReturnType<typeof _viewParams> | null = null
 	let _syncedColors: NormalizedColor[] | null = null
 	let _syncedColorGroups: NormalizedColorGroup[] | null = null
 	let _colorsGeneration = 0
@@ -289,6 +290,7 @@
 						_sourceColorGroups = results
 						_colors = null
 						_fullColors = null
+						_resolvedViewParams = _params
 					} else {
 						const newColors = calculateColors(results, _params)
 						_colors = newColors
@@ -296,6 +298,7 @@
 						_fullColorGroups = null
 						_sourceColorGroups = []
 						_fullColors = transformColors(Array.isArray(results) ? results : [])
+						_resolvedViewParams = _params
 					}
 				}
 			},
@@ -311,6 +314,7 @@
 				_fullColorGroups = null
 				_sourceColorGroups = []
 				_fullColors = null
+				_resolvedViewParams = null
 				_focusedIndex = null
 				if (!_wasError) {
 					onerror?.({ error: reason })
@@ -485,6 +489,7 @@
 			return
 		}
 		_colors = nextColors
+		_resolvedViewParams = _params
 		const nextSourceColors = _syncColors(nextFullColors)
 		onadd?.({ color, colors: nextSourceColors })
 	}
@@ -502,8 +507,9 @@
 		if (!rendered) {
 			return
 		}
+		const _params = _resolvedViewParams ?? _viewParams()
 		const full = _fullColors ?? []
-		const fullIndex = _resolveFullIndex(full, _picked(), rendered, index)
+		const fullIndex = _resolveFullIndex(full, _picked(_params), rendered, index)
 		if (fullIndex < 0) {
 			return
 		}
@@ -511,13 +517,15 @@
 		const dropped = _droppedIndices(full, fullIndex, { allowDuplicates })
 		const nextFullColors = _dropIndices(full, dropped)
 		_syncCompactColorIndices(dropped, full)
-		const nextColors = calculateColors(nextFullColors, _viewParams())
+		const nextViewParams = _viewParams()
+		const nextColors = calculateColors(nextFullColors, nextViewParams)
 		_colors = nextColors
+		_resolvedViewParams = nextViewParams
 		const nextSourceColors = _syncColors(nextFullColors)
 		ondelete?.({ color: removed.value, index: fullIndex, colors: nextSourceColors })
 	}
 
-	const _picked = (): PickedColor[] => pickColors(_fullColors ?? [], _viewParams())
+	const _picked = (params: ReturnType<typeof _viewParams>): PickedColor[] => pickColors(_fullColors ?? [], params)
 
 	const _resolveFullIndex = (
 		full: NormalizedColor[],
@@ -591,8 +599,9 @@
 		if (!rendered) {
 			return
 		}
+		const _params = _resolvedViewParams ?? _viewParams()
 		const full = _fullColors ?? []
-		const fullIndex = _resolveFullIndex(full, _picked(), rendered, index)
+		const fullIndex = _resolveFullIndex(full, _picked(_params), rendered, index)
 		if (fullIndex < 0) {
 			return
 		}
@@ -600,8 +609,10 @@
 		const dropped = _droppedIndices(full, fullIndex, { allowDuplicates }, compactColorIndices ?? [])
 		const nextFullColors = _dropIndices(full, dropped)
 		_syncCompactColorIndices(dropped, full)
-		const nextColors = calculateColors(nextFullColors, _viewParams())
+		const nextViewParams = _viewParams()
+		const nextColors = calculateColors(nextFullColors, nextViewParams)
 		_colors = nextColors
+		_resolvedViewParams = nextViewParams
 		const nextSourceColors = _syncColors(nextFullColors)
 		ondelete?.({ color: removed.value, index: fullIndex, colors: nextSourceColors })
 	}
@@ -634,6 +645,7 @@
 		const sourceIndices = _sourceGroupIndices(_sourceColorGroups)
 		_syncCompactColorIndices(dropped, full)
 		_colorGroups = calculateColorGroups(nextFullColorGroups, { allowDuplicates, maxColors })
+		_resolvedViewParams = _viewParams()
 		const { colorGroups: nextSourceColorGroups, groupIndices } = _syncColorGroups(
 			nextFullColorGroups,
 			sourceIndices
@@ -653,10 +665,11 @@
 		if (!rendered) {
 			return
 		}
+		const _params = _resolvedViewParams ?? _viewParams()
 		const fullGroupColors = (_fullColorGroups ?? [])[groupIndex]?.colors ?? []
 		const fullIndex = _resolveFullIndex(
 			fullGroupColors,
-			pickColors(fullGroupColors, { allowDuplicates, maxColors }),
+			pickColors(fullGroupColors, { allowDuplicates: _params.allowDuplicates, maxColors: _params.maxColors }),
 			rendered,
 			colorIndex
 		)
@@ -676,6 +689,7 @@
 			_compactSource
 		)
 		_colorGroups = nextColorGroups
+		_resolvedViewParams = _viewParams()
 		const { colorGroups: nextSourceColorGroups, groupIndices } = _syncColorGroups(
 			nextFullColorGroups,
 			sourceIndices

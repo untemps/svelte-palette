@@ -901,7 +901,7 @@ test('Recounts num-columns after a compact slot deletion when the full list hold
 	expect(onDelete).toHaveBeenCalledWith(expect.objectContaining({ color: '#445566', index: 3 }))
 })
 
-test('Removes the occurrence the drifted subset selects rather than the first by value', async () => {
+test('Removes the occurrence the rendered subset selected when the compact indices drift', async () => {
 	const onDelete = vi.fn()
 
 	const { component, user } = setup(PaletteReactive, {
@@ -929,11 +929,11 @@ test('Removes the occurrence the drifted subset selects rather than the first by
 
 	expect(onDelete).toHaveBeenCalledWith({
 		color: '#a00',
-		index: 2,
-		colors: [{ value: '#a00' }, { value: '#0b0' }],
+		index: 0,
+		colors: [{ value: '#0b0' }, { value: '#a00' }],
 	})
-	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(1))
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 1'))
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 2'))
 })
 
 test('Keeps num-columns at one column when a compact deletion empties the rendered subset', async () => {
@@ -2218,6 +2218,66 @@ test('Removes the clicked duplicate rather than the first occurrence when duplic
 	})
 })
 
+test('Deletes the clicked duplicate when the view params drift ahead of the rendered colors', async () => {
+	const onDelete = vi.fn()
+
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#a00'],
+			initialAllowDuplicates: true,
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	component.setColors(new Promise(() => {}))
+	component.setMaxColors(2)
+	await tick()
+
+	expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(3)
+
+	await user.hover(cells[2])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#a00',
+		index: 2,
+		colors: [{ value: '#a00' }, { value: '#0b0' }],
+	})
+})
+
+test('Reports the clicked duplicate when allowDuplicates drifts ahead of the rendered colors', async () => {
+	const onDelete = vi.fn()
+
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#a00'],
+			initialAllowDuplicates: true,
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	component.setColors(new Promise(() => {}))
+	component.setAllowDuplicates(false)
+	await tick()
+
+	await user.hover(cells[2])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#a00',
+		index: 2,
+		colors: [{ value: '#0b0' }],
+	})
+})
+
 test('Triggers ondelete with the group identity in group mode', async () => {
 	const onDelete = vi.fn()
 	const colors = [
@@ -2267,6 +2327,39 @@ test('Triggers ondelete with the index in the full group when a duplicate is hid
 		colors: [{ name: 'A', colors: [{ value: '#f00' }, { value: '#f00' }] }],
 		groupIndex: 0,
 		groupName: 'A',
+	})
+})
+
+test('Deletes the clicked group duplicate when the view params drift ahead of the rendered groups', async () => {
+	const onDelete = vi.fn()
+
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: [{ name: 'A', colors: ['#a00', '#0b0', '#a00'] }],
+			initialAllowDuplicates: true,
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	component.setColors(new Promise(() => {}))
+	component.setMaxColors(2)
+	await tick()
+
+	expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(3)
+
+	await user.hover(cells[2])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#a00',
+		index: 2,
+		groupIndex: 0,
+		groupName: 'A',
+		colors: [{ name: 'A', colors: [{ value: '#a00' }, { value: '#0b0' }] }],
 	})
 })
 
@@ -2587,6 +2680,72 @@ test('Fires ondelete and propagates a compact-mode deletion to the full list', a
 
 	cells = await screen.findAllByTestId('__palette-cell__')
 	expect(cells).toHaveLength(2)
+})
+
+test('Deletes the clicked compact duplicate when the compact indices drift ahead of the rendered colors', async () => {
+	const onDelete = vi.fn()
+
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#a00'],
+			initialAllowDuplicates: true,
+			initialIsCompact: true,
+			initialCompactColorIndices: [1, 2],
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	component.setColors(new Promise(() => {}))
+	component.setCompactColorIndices([0])
+	await tick()
+
+	await user.hover(cells[1])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#a00',
+		index: 2,
+		colors: [{ value: '#a00' }, { value: '#0b0' }],
+	})
+})
+
+test('Drops every occurrence the compact slot stands for when the compact indices drift', async () => {
+	const onDelete = vi.fn()
+
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#a00'],
+			initialIsCompact: true,
+			initialCompactColorIndices: [0, 1],
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	component.setColors(new Promise(() => {}))
+	component.setCompactColorIndices([0, 1, 2])
+	await tick()
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#a00',
+		index: 0,
+		colors: [{ value: '#0b0' }],
+	})
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#0b0',
+		])
+	)
 })
 
 test('Deletes the mapped color when compactColorIndices are unsorted', async () => {
