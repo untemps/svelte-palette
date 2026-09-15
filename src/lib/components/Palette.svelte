@@ -737,7 +737,7 @@
 		_isSettingsOn = false
 	}
 
-	type CellPosition = { container: Element | null; position: number }
+	type CellPosition = { container: Element | null; position: number; optionIndex: number }
 
 	let _cachedOptions: HTMLElement[] | null = null
 	let _cachedCells: CellPosition[] = []
@@ -765,6 +765,7 @@
 		const cells: CellPosition[] = []
 		let container: Element | null = null
 		let position = 0
+		let optionIndex = 0
 		for (const cell of _listboxEl.querySelectorAll<HTMLElement>('.palette__cells__cell')) {
 			const parent = cell.parentElement
 			position = parent === container ? position + 1 : 0
@@ -774,8 +775,9 @@
 				cell.querySelector<HTMLElement>('[tabindex]:not([disabled])')
 			if (option) {
 				options.push(option)
-				cells.push({ container, position })
+				cells.push({ container, position, optionIndex })
 			}
+			optionIndex++
 		}
 		_cachedOptions = options
 		_cachedCells = cells
@@ -813,14 +815,15 @@
 		if (deletionMode === NONE) {
 			return
 		}
+		const optionIndex = _cachedCells[from]?.optionIndex ?? from
 		if (_renderedGroups) {
-			const groupIndex = _groupIndexAt(_groupOffsets, from)
+			const groupIndex = _groupIndexAt(_groupOffsets, optionIndex)
 			if (groupIndex < 0) {
 				return
 			}
-			_removeGroupColor(groupIndex, from - _groupOffsets[groupIndex])
+			_removeGroupColor(groupIndex, optionIndex - _groupOffsets[groupIndex])
 		} else {
-			const colorIndex = from - (_showsTransparentSlot ? 1 : 0)
+			const colorIndex = optionIndex - (_showsTransparentSlot ? 1 : 0)
 			if (colorIndex < 0) {
 				return
 			}

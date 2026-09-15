@@ -1978,6 +1978,50 @@ test('Removes the correct color when a transparent slot precedes the grid', asyn
 	expect(slots[1]).toHaveAttribute('aria-label', '#0ff')
 })
 
+test('Removes the focused color when a custom transparent slot yields no option', async () => {
+	const onDelete = vi.fn()
+	const transparentSlot = createRawSnippet(() => ({
+		render: () => '<span data-testid="__custom-transparent__"></span>',
+	}))
+	const colors = ['#ff0', '#0ff']
+	const { user } = setup(Palette, {
+		props: { colors, showTransparentSlot: true, transparentSlot, deletionMode: TOOLTIP, ondelete: onDelete },
+	})
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(2)
+
+	slots[0].focus()
+	await user.keyboard('{Delete}')
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#ff0',
+		index: 0,
+		colors: [{ value: '#0ff' }],
+	})
+})
+
+test('Removes the trailing color when a custom transparent slot yields no option', async () => {
+	const onDelete = vi.fn()
+	const transparentSlot = createRawSnippet(() => ({
+		render: () => '<span data-testid="__custom-transparent__"></span>',
+	}))
+	const colors = ['#ff0', '#0ff']
+	const { user } = setup(Palette, {
+		props: { colors, showTransparentSlot: true, transparentSlot, deletionMode: TOOLTIP, ondelete: onDelete },
+	})
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	slots[1].focus()
+	await user.keyboard('{Delete}')
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#0ff',
+		index: 1,
+		colors: [{ value: '#ff0' }],
+	})
+})
+
 test('Removes the focused slot with Delete in grouped mode', async () => {
 	const colors = [
 		{ name: 'Reds', colors: ['#f00', '#f11'] },
