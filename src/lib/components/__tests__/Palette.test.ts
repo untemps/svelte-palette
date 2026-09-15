@@ -2218,6 +2218,27 @@ test('Removes the clicked duplicate rather than the first occurrence when duplic
 	})
 })
 
+test('Deletes a slot whose entry does not survive a second normalization', async () => {
+	const onDelete = vi.fn()
+	const colors = ['#a00', null, '#0b0'] as unknown as ColorInput[]
+
+	const { user } = setup(Palette, {
+		props: { colors, allowDuplicates: true, deletionMode: TOOLTIP, ondelete: onDelete },
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[1])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: null,
+		index: 1,
+		colors: [{ value: '#a00' }, { value: '#0b0' }],
+	})
+})
+
 test('Deletes the clicked duplicate when the view params drift ahead of the rendered colors', async () => {
 	const onDelete = vi.fn()
 

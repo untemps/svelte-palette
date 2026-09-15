@@ -537,8 +537,7 @@
 		if (target && isSameColor(target.color.value, rendered.value)) {
 			return target.index
 		}
-		const match = picked.find((item) => isSameColor(item.color.value, rendered.value))
-		return match ? match.index : full.findIndex((color) => isSameColor(color.value, rendered.value))
+		return full.findIndex((color) => isSameColor(color.value, rendered.value))
 	}
 
 	const _droppedIndices = (
