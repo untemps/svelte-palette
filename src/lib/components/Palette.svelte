@@ -409,8 +409,7 @@
 		return Math.min(Math.max(preferred, 0), Math.max(_optionCount - 1, 0))
 	})
 
-	const _rovingTabindex = (optionIndex: number): number =>
-		presentational ? -1 : optionIndex === _activeIndex ? 0 : -1
+	const _rovingTabindex = (cellIndex: number): number => (presentational ? -1 : cellIndex === _activeIndex ? 0 : -1)
 
 	const _optionRole = $derived(presentational ? undefined : 'option')
 
@@ -737,7 +736,7 @@
 		_isSettingsOn = false
 	}
 
-	type CellPosition = { container: Element | null; position: number; optionIndex: number }
+	type CellPosition = { container: Element | null; position: number; cellIndex: number }
 
 	let _cachedOptions: HTMLElement[] | null = null
 	let _cachedCells: CellPosition[] = []
@@ -765,7 +764,7 @@
 		const cells: CellPosition[] = []
 		let container: Element | null = null
 		let position = 0
-		let optionIndex = 0
+		let cellIndex = 0
 		for (const cell of _listboxEl.querySelectorAll<HTMLElement>('.palette__cells__cell')) {
 			const parent = cell.parentElement
 			position = parent === container ? position + 1 : 0
@@ -775,9 +774,9 @@
 				cell.querySelector<HTMLElement>('[tabindex]:not([disabled])')
 			if (option) {
 				options.push(option)
-				cells.push({ container, position, optionIndex })
+				cells.push({ container, position, cellIndex })
 			}
-			optionIndex++
+			cellIndex++
 		}
 		_cachedOptions = options
 		_cachedCells = cells
@@ -815,15 +814,15 @@
 		if (deletionMode === NONE) {
 			return
 		}
-		const optionIndex = _cachedCells[from]?.optionIndex ?? from
+		const cellIndex = _cachedCells[from]?.cellIndex ?? from
 		if (_renderedGroups) {
-			const groupIndex = _groupIndexAt(_groupOffsets, optionIndex)
+			const groupIndex = _groupIndexAt(_groupOffsets, cellIndex)
 			if (groupIndex < 0) {
 				return
 			}
-			_removeGroupColor(groupIndex, optionIndex - _groupOffsets[groupIndex])
+			_removeGroupColor(groupIndex, cellIndex - _groupOffsets[groupIndex])
 		} else {
-			const colorIndex = optionIndex - (_showsTransparentSlot ? 1 : 0)
+			const colorIndex = cellIndex - (_showsTransparentSlot ? 1 : 0)
 			if (colorIndex < 0) {
 				return
 			}
@@ -927,7 +926,7 @@
 							aria-label={presentational ? undefined : group.name || undefined}
 						>
 							{#each group.colors as color, colorIndex (`${color.value}_${colorIndex}`)}
-								{@const optionIndex = (_groupOffsets[groupIndex] ?? 0) + colorIndex}
+								{@const cellIndex = (_groupOffsets[groupIndex] ?? 0) + colorIndex}
 								<li
 									data-testid="__palette-cell__"
 									class="palette__cells__cell"
@@ -947,11 +946,11 @@
 											colorName: color.name,
 											groupName: group.name,
 											selectedColor,
-											selected: optionIndex === _selectedIndex,
+											selected: cellIndex === _selectedIndex,
 											transition,
 											isCompact: false,
 											index: colorIndex,
-											tabindex: _rovingTabindex(optionIndex),
+											tabindex: _rovingTabindex(cellIndex),
 											ariaKeyShortcuts: _deleteShortcut,
 										})}
 									{:else}
@@ -959,8 +958,8 @@
 											color={color.value}
 											name={color.name}
 											role={_optionRole}
-											selected={optionIndex === _selectedIndex}
-											tabindex={_rovingTabindex(optionIndex)}
+											selected={cellIndex === _selectedIndex}
+											tabindex={_rovingTabindex(cellIndex)}
 											aria-keyshortcuts={_deleteShortcut}
 											{transition}
 											onselect={_onSlotSelect}
@@ -1006,7 +1005,7 @@
 						</li>
 					{/if}
 					{#each _renderedColors as color, index (`${color.value}_${index}`)}
-						{@const optionIndex = index + (_showsTransparentSlot ? 1 : 0)}
+						{@const cellIndex = index + (_showsTransparentSlot ? 1 : 0)}
 						<li
 							data-testid="__palette-cell__"
 							class="palette__cells__cell"
@@ -1025,11 +1024,11 @@
 									color: color.value,
 									colorName: color.name,
 									selectedColor,
-									selected: optionIndex === _selectedIndex,
+									selected: cellIndex === _selectedIndex,
 									transition,
 									isCompact: _isCompact,
 									index,
-									tabindex: _rovingTabindex(optionIndex),
+									tabindex: _rovingTabindex(cellIndex),
 									ariaKeyShortcuts: _deleteShortcut,
 								})}
 							{:else}
@@ -1037,8 +1036,8 @@
 									color={color.value}
 									name={color.name}
 									role={_optionRole}
-									selected={optionIndex === _selectedIndex}
-									tabindex={_rovingTabindex(optionIndex)}
+									selected={cellIndex === _selectedIndex}
+									tabindex={_rovingTabindex(cellIndex)}
 									aria-keyshortcuts={_deleteShortcut}
 									{transition}
 									onselect={_onSlotSelect}
