@@ -814,7 +814,11 @@
 		if (deletionMode === NONE) {
 			return
 		}
-		const cellIndex = _cachedCells[from]?.cellIndex ?? from
+		const cell = _cachedCells[from]
+		if (!cell) {
+			return
+		}
+		const cellIndex = cell.cellIndex
 		if (_renderedGroups) {
 			const groupIndex = _groupIndexAt(_groupOffsets, cellIndex)
 			if (groupIndex < 0) {
