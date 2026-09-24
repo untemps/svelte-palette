@@ -2256,6 +2256,32 @@ test('Triggers onadd with the colors withheld from the rendered slots kept in th
 	})
 })
 
+test('Keeps a nullish entry intact in the list an added color is written into', async () => {
+	const onAdd = vi.fn()
+	const colors = ['#a00', null] as unknown as ColorInput[]
+
+	const { user } = setup(Palette, {
+		props: { colors, showInput: true, onadd: onAdd },
+	})
+
+	const input = await screen.findByTestId('__palette-input-input__')
+	await user.type(input, '0b0')
+	await user.click(await screen.findByTestId('__palette-input-submit__'))
+
+	expect(onAdd).toHaveBeenCalledWith({
+		color: '#0b0',
+		colors: [{ value: '#a00' }, { value: null }, { value: '#0b0' }],
+	})
+
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#a00',
+			null,
+			'#0b0',
+		])
+	)
+})
+
 test('Triggers ondelete with the removed color and the resulting list in flat mode', async () => {
 	const onDelete = vi.fn()
 	const colors = ['#ff0', '#0ff', '#f0f']
@@ -2319,6 +2345,33 @@ test('Deletes a slot whose entry does not survive a second normalization', async
 		index: 1,
 		colors: [{ value: '#a00' }, { value: '#0b0' }],
 	})
+})
+
+test('Keeps a nullish entry intact when another slot is deleted', async () => {
+	const onDelete = vi.fn()
+	const colors = ['#a00', null, '#0b0'] as unknown as ColorInput[]
+
+	const { user } = setup(Palette, {
+		props: { colors, allowDuplicates: true, deletionMode: TOOLTIP, ondelete: onDelete },
+	})
+
+	let cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(async () => {
+		cells = await screen.findAllByTestId('__palette-cell__')
+		expect(cells).toHaveLength(2)
+	})
+	expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+		null,
+		'#0b0',
+	])
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenLastCalledWith({ color: null, index: 0, colors: [{ value: '#0b0' }] })
 })
 
 test('Deletes the clicked duplicate when the view params drift ahead of the rendered colors', async () => {
@@ -2464,6 +2517,37 @@ test('Deletes the clicked group duplicate when the view params drift ahead of th
 		groupName: 'A',
 		colors: [{ name: 'A', colors: [{ value: '#a00' }, { value: '#0b0' }] }],
 	})
+})
+
+test('Renders a nullish group entry as an empty slot and deletes it', async () => {
+	const onDelete = vi.fn()
+	const colors = [{ name: 'A', colors: ['#a00', null, '#0b0'] }] as unknown as ColorGroup[]
+
+	const { user } = setup(Palette, {
+		props: { colors, deletionMode: TOOLTIP, ondelete: onDelete },
+	})
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots.map((slot) => slot.getAttribute('aria-label'))).toEqual(['#a00', null, '#0b0'])
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[1])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: null,
+		index: 1,
+		groupIndex: 0,
+		groupName: 'A',
+		colors: [{ name: 'A', colors: [{ value: '#a00' }, { value: '#0b0' }] }],
+	})
+
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#a00',
+			'#0b0',
+		])
+	)
 })
 
 test('Omits groupName in ondelete when the group has no name', async () => {
@@ -2953,6 +3037,36 @@ test('Deletes the mapped color when compactColorIndices are unsorted', async () 
 
 	cells = await screen.findAllByTestId('__palette-cell__')
 	expect(cells).toHaveLength(1)
+})
+
+test('Removes the compact occurrence a nullish slot was painted from', async () => {
+	const onDelete = vi.fn()
+	const colors = [null, '#0b0', null] as unknown as ColorInput[]
+
+	const { user } = setup(Palette, {
+		props: {
+			colors,
+			isCompact: true,
+			compactColorIndices: [2],
+			allowDuplicates: true,
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(1)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: null,
+		index: 2,
+		colors: [{ value: null }, { value: '#0b0' }],
+	})
+
+	await waitFor(() => expect(screen.queryAllByTestId('__palette-slot__')).toHaveLength(0))
 })
 
 test('Propagates a compact deletion to the full list when compact is toggled at runtime', async () => {
