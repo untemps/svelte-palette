@@ -2060,6 +2060,46 @@ test('Steps from the selected slot when the listbox is focused and a cell yields
 	await waitFor(() => expect(slots[1]).toHaveAttribute('tabindex', '0'))
 })
 
+test('Enters the list at the first navigable slot when the active cell yields no option', async () => {
+	const transparentSlot = createRawSnippet(() => ({
+		render: () => '<span data-testid="__custom-transparent__"></span>',
+	}))
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const { user } = setup(Palette, {
+		props: { colors, showTransparentSlot: true, transparentSlot },
+	})
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+
+	screen.getByRole('listbox').focus()
+	await user.keyboard('{ArrowRight}')
+
+	expect(slots[0]).toHaveFocus()
+	await waitFor(() => expect(slots[0]).toHaveAttribute('tabindex', '0'))
+
+	await user.keyboard('{ArrowRight}')
+	expect(slots[1]).toHaveFocus()
+})
+
+test('Steps back into the list when the listbox is focused and the last cell yields no option', async () => {
+	const slotSnippet = createRawSnippet((getProps) => ({
+		render: () =>
+			getProps().color === '#f0f'
+				? `<div data-testid="__inert-slot__"></div>`
+				: `<span data-testid="__nav-slot__" role="option" tabindex="${getProps().tabindex}"></span>`,
+	}))
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const { user } = setup(Palette, { props: { colors, selectedColor: '#f0f', slot: slotSnippet } })
+
+	const slots = await screen.findAllByTestId('__nav-slot__')
+	expect(slots).toHaveLength(2)
+
+	screen.getByRole('listbox').focus()
+	await user.keyboard('{ArrowLeft}')
+
+	expect(slots[1]).toHaveFocus()
+})
+
 test('Removes the focused slot with Delete in grouped mode', async () => {
 	const colors = [
 		{ name: 'Reds', colors: ['#f00', '#f11'] },
