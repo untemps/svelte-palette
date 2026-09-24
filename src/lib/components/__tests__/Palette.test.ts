@@ -2813,6 +2813,79 @@ test('Drops every occurrence the compact slot stands for when the compact indice
 	)
 })
 
+test('Deletes through the full list when the palette collapses ahead of the rendered colors', async () => {
+	const onDelete = vi.fn()
+
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#a00'],
+			initialCompactColorIndices: [0, 1],
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	component.setColors(new Promise(() => {}))
+	component.setIsCompact(true)
+	await tick()
+
+	expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#a00',
+		index: 0,
+		colors: [{ value: '#0b0' }],
+	})
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#0b0',
+		])
+	)
+})
+
+test('Leaves nothing of a deleted color on screen when the palette expands ahead of the rendered colors', async () => {
+	const onDelete = vi.fn()
+
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#a00'],
+			initialIsCompact: true,
+			initialCompactColorIndices: [0, 1],
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	component.setColors(new Promise(() => {}))
+	component.setIsCompact(false)
+	await tick()
+
+	expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#a00',
+		index: 0,
+		colors: [{ value: '#0b0' }],
+	})
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#0b0',
+		])
+	)
+})
+
 test('Deletes the mapped color when compactColorIndices are unsorted', async () => {
 	const onDelete = vi.fn()
 	const colors = ['#a00', '#0b0', '#00c', '#dd0', '#0ee']

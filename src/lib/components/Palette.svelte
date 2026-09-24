@@ -494,19 +494,19 @@
 	}
 
 	const _removeColor = (index: number) => {
-		if (_isCompact) {
-			if (_fullColorGroups != null) {
-				_removeCompactGroupColor(index)
-			} else {
-				_removeCompactColor(index)
-			}
+		if (_compactPicked) {
+			_removeCompactGroupColor(index)
+			return
+		}
+		const _params = _resolvedViewParams ?? _viewParams()
+		if (_isCompact && _params.isCompact) {
+			_removeCompactColor(index)
 			return
 		}
 		const rendered = (_colors ?? [])[index]
 		if (!rendered) {
 			return
 		}
-		const _params = _resolvedViewParams ?? _viewParams()
 		const full = _fullColors ?? []
 		const fullIndex = _resolveFullIndex(full, _picked(_params), rendered, index)
 		if (fullIndex < 0) {
