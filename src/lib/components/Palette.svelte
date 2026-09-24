@@ -469,7 +469,12 @@
 		return Math.min(Math.max(preferred, 0), Math.max(_optionCount - 1, 0))
 	})
 
-	const _rovingTabindex = (cellIndex: number): number => (presentational ? -1 : cellIndex === _activeIndex ? 0 : -1)
+	const _tabbableIndex = $derived.by(() => {
+		const navigable = _navigableNear(_cachedCells, _activeIndex, 1)
+		return navigable >= 0 ? navigable : _activeIndex
+	})
+
+	const _rovingTabindex = (cellIndex: number): number => (presentational ? -1 : cellIndex === _tabbableIndex ? 0 : -1)
 
 	const _optionRole = $derived(presentational ? undefined : 'option')
 

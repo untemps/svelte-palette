@@ -2060,6 +2060,26 @@ test('Steps from the selected slot when the listbox is focused and a cell yields
 	await waitFor(() => expect(slots[1]).toHaveAttribute('tabindex', '0'))
 })
 
+test('Makes the first navigable slot tabbable when a custom transparent slot yields no option', async () => {
+	const transparentSlot = createRawSnippet(() => ({
+		render: () => '<span data-testid="__custom-transparent__"></span>',
+	}))
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const { user } = setup(Palette, {
+		props: { colors, showTransparentSlot: true, transparentSlot },
+	})
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(3)
+
+	await waitFor(() => expect(slots[0]).toHaveAttribute('tabindex', '0'))
+	expect(slots[1]).toHaveAttribute('tabindex', '-1')
+	expect(slots[2]).toHaveAttribute('tabindex', '-1')
+
+	await user.tab()
+	expect(slots[0]).toHaveFocus()
+})
+
 test('Enters the list at the first navigable slot when the active cell yields no option', async () => {
 	const transparentSlot = createRawSnippet(() => ({
 		render: () => '<span data-testid="__custom-transparent__"></span>',
