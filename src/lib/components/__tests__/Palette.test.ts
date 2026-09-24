@@ -2022,6 +2022,44 @@ test('Removes the trailing color when a custom transparent slot yields no option
 	})
 })
 
+test('Rolls the tabindex to the focused slot when a custom transparent slot yields no option', async () => {
+	const transparentSlot = createRawSnippet(() => ({
+		render: () => '<span data-testid="__custom-transparent__"></span>',
+	}))
+	const colors = ['#ff0', '#0ff', '#f0f']
+	setup(Palette, {
+		props: { colors, showTransparentSlot: true, transparentSlot, deletionMode: TOOLTIP },
+	})
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(3)
+
+	slots[1].focus()
+
+	await waitFor(() => expect(slots[1]).toHaveAttribute('tabindex', '0'))
+	expect(slots[0]).toHaveAttribute('tabindex', '-1')
+	expect(slots[2]).toHaveAttribute('tabindex', '-1')
+})
+
+test('Steps from the selected slot when the listbox is focused and a cell yields no option', async () => {
+	const transparentSlot = createRawSnippet(() => ({
+		render: () => '<span data-testid="__custom-transparent__"></span>',
+	}))
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const { user } = setup(Palette, {
+		props: { colors, showTransparentSlot: true, transparentSlot, selectedColor: '#ff0' },
+	})
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots[0]).toHaveAttribute('tabindex', '0')
+
+	screen.getByRole('listbox').focus()
+	await user.keyboard('{ArrowRight}')
+
+	expect(slots[1]).toHaveFocus()
+	await waitFor(() => expect(slots[1]).toHaveAttribute('tabindex', '0'))
+})
+
 test('Removes the focused slot with Delete in grouped mode', async () => {
 	const colors = [
 		{ name: 'Reds', colors: ['#f00', '#f11'] },

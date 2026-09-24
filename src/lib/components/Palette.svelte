@@ -783,6 +783,13 @@
 		return _cachedOptions
 	}
 
+	const _cellIndexOf = (optionIndex: number): number | null => _cachedCells[optionIndex]?.cellIndex ?? null
+
+	const _optionIndexAt = (cellIndex: number): number => {
+		const index = _cachedCells.findIndex((cell) => cell.cellIndex >= cellIndex)
+		return index >= 0 ? index : _cachedCells.length - 1
+	}
+
 	const _rowStep = (options: HTMLElement[], from: number, dir: number): number => {
 		const columns = normalizeNumColumns(_numColumns)
 		const rows: { index: number; column: number }[][] = []
@@ -841,7 +848,7 @@
 			return
 		}
 		const next = Math.min(from, options.length - 1)
-		_focusedIndex = next
+		_focusedIndex = _cellIndexOf(next)
 		options[next]?.focus()
 	}
 
@@ -852,7 +859,6 @@
 			return
 		}
 		const current = options.indexOf(document.activeElement as HTMLElement)
-		const from = current >= 0 ? current : Math.min(_activeIndex, count - 1)
 		if (e.key === 'Delete' || e.key === 'Backspace') {
 			if (deletionMode === NONE || current < 0) {
 				return
@@ -861,6 +867,7 @@
 			_deleteOption(current)
 			return
 		}
+		const from = current >= 0 ? current : _optionIndexAt(_activeIndex)
 		let next: number
 		switch (e.key) {
 			case 'ArrowRight':
@@ -885,14 +892,14 @@
 				return
 		}
 		e.preventDefault()
-		_focusedIndex = next
+		_focusedIndex = _cellIndexOf(next)
 		options[next]?.focus()
 	}
 
 	const _onListboxFocusin = (e: FocusEvent) => {
 		const index = _getOptions().indexOf(e.target as HTMLElement)
 		if (index >= 0) {
-			_focusedIndex = index
+			_focusedIndex = _cellIndexOf(index)
 		}
 	}
 </script>
