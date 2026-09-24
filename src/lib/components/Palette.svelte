@@ -34,7 +34,7 @@
 
 	import type { HTMLAttributes } from 'svelte/elements'
 
-	import type { NormalizedColor, NormalizedColorGroup, PickedColor } from '../utils/utils.js'
+	import type { CalculateColorsParams, NormalizedColor, NormalizedColorGroup } from '../utils/utils.js'
 
 	import type {
 		AddEventArgs,
@@ -508,7 +508,7 @@
 			return
 		}
 		const full = _fullColors ?? []
-		const fullIndex = _resolveFullIndex(full, _picked(_params), rendered, index)
+		const fullIndex = _resolveFullIndex(full, _params, rendered, index)
 		if (fullIndex < 0) {
 			return
 		}
@@ -524,19 +524,18 @@
 		ondelete?.({ color: removed.value, index: fullIndex, colors: nextSourceColors })
 	}
 
-	const _picked = (params: ReturnType<typeof _viewParams>): PickedColor[] => pickColors(_fullColors ?? [], params)
-
 	const _resolveFullIndex = (
 		full: NormalizedColor[],
-		picked: PickedColor[],
+		params: CalculateColorsParams,
 		rendered: NormalizedColor,
 		index: number
 	): number => {
-		const target = picked[index]
+		const target = pickColors(full, params)[index]
 		if (target && isSameColor(target.color.value, rendered.value)) {
 			return target.index
 		}
-		return full.findIndex((color) => isSameColor(color.value, rendered.value))
+		const scope = pickColors(full, { ...params, allowDuplicates: true, maxColors: undefined })
+		return scope.find(({ color }) => isSameColor(color.value, rendered.value))?.index ?? -1
 	}
 
 	const _droppedIndices = (
@@ -599,7 +598,7 @@
 		}
 		const _params = _resolvedViewParams ?? _viewParams()
 		const full = _fullColors ?? []
-		const fullIndex = _resolveFullIndex(full, _picked(_params), rendered, index)
+		const fullIndex = _resolveFullIndex(full, _params, rendered, index)
 		if (fullIndex < 0) {
 			return
 		}
@@ -667,7 +666,7 @@
 		const fullGroupColors = (_fullColorGroups ?? [])[groupIndex]?.colors ?? []
 		const fullIndex = _resolveFullIndex(
 			fullGroupColors,
-			pickColors(fullGroupColors, { allowDuplicates: _params.allowDuplicates, maxColors: _params.maxColors }),
+			{ allowDuplicates: _params.allowDuplicates, maxColors: _params.maxColors },
 			rendered,
 			colorIndex
 		)
