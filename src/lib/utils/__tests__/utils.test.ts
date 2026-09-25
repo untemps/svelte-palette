@@ -12,6 +12,8 @@ import {
 	transformColors,
 } from '../utils.js'
 
+import type { ColorInput } from '../../types'
+
 describe('utils', () => {
 	describe('transformColors', () => {
 		const colorStrings = ['#123456', '#345612', '#456123']
@@ -72,6 +74,14 @@ describe('utils', () => {
 			],
 		])('colors:%j, expected: %j', (colors, expected) => {
 			expect(transformColors(colors)).toEqual(expected)
+		})
+
+		test('Leaves an already normalized nullish color unchanged', () => {
+			const colors = [null, { value: null }, { name: 'Foo', value: null }] as unknown as ColorInput[]
+			const normalized = transformColors(colors)
+
+			expect(normalized).toEqual([{ value: null }, { value: null }, { name: 'Foo', value: null }])
+			expect(transformColors(normalized)).toEqual(normalized)
 		})
 	})
 

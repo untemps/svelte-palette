@@ -51,7 +51,7 @@ export const transformColors = ($colors: ReadonlyArray<ColorInput | NormalizedCo
 	return $colors.map((color) => {
 		const isObject = typeof color === 'object' && color !== null
 		const name = isObject ? (color.name ?? null) : null
-		const value = (isObject ? color.value : undefined) ?? color
+		const value = isObject && 'value' in color ? color.value : color
 		return {
 			...(!!name && { name }),
 			value,

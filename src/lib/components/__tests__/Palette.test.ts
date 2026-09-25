@@ -373,7 +373,7 @@ test('Scopes the drop deletion area to the owning palette when several are mount
 	expect(cellB).toBeInTheDocument()
 })
 
-test('Deletes a swatch dropped outside its own palette even over another palette', async () => {
+test('Deletes a slot dropped outside its own palette even over another palette', async () => {
 	const colorsA = ['#ff0', '#0ff', '#f0f']
 	const colorsB = ['#111', '#222', '#333']
 
@@ -901,7 +901,7 @@ test('Recounts num-columns after a compact slot deletion when the full list hold
 	expect(onDelete).toHaveBeenCalledWith(expect.objectContaining({ color: '#445566', index: 3 }))
 })
 
-test('Removes the occurrence the drifted subset selects rather than the first by value', async () => {
+test('Removes the occurrence the rendered subset selected when the compact indices drift', async () => {
 	const onDelete = vi.fn()
 
 	const { component, user } = setup(PaletteReactive, {
@@ -929,11 +929,11 @@ test('Removes the occurrence the drifted subset selects rather than the first by
 
 	expect(onDelete).toHaveBeenCalledWith({
 		color: '#a00',
-		index: 2,
-		colors: [{ value: '#a00' }, { value: '#0b0' }],
+		index: 0,
+		colors: [{ value: '#0b0' }, { value: '#a00' }],
 	})
-	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(1))
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 1'))
+	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
+	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 2'))
 })
 
 test('Keeps num-columns at one column when a compact deletion empties the rendered subset', async () => {
@@ -1978,6 +1978,148 @@ test('Removes the correct color when a transparent slot precedes the grid', asyn
 	expect(slots[1]).toHaveAttribute('aria-label', '#0ff')
 })
 
+test('Removes the focused color when a custom transparent slot yields no option', async () => {
+	const onDelete = vi.fn()
+	const transparentSlot = createRawSnippet(() => ({
+		render: () => '<span data-testid="__custom-transparent__"></span>',
+	}))
+	const colors = ['#ff0', '#0ff']
+	const { user } = setup(Palette, {
+		props: { colors, showTransparentSlot: true, transparentSlot, deletionMode: TOOLTIP, ondelete: onDelete },
+	})
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(2)
+
+	slots[0].focus()
+	await user.keyboard('{Delete}')
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#ff0',
+		index: 0,
+		colors: [{ value: '#0ff' }],
+	})
+})
+
+test('Removes the trailing color when a custom transparent slot yields no option', async () => {
+	const onDelete = vi.fn()
+	const transparentSlot = createRawSnippet(() => ({
+		render: () => '<span data-testid="__custom-transparent__"></span>',
+	}))
+	const colors = ['#ff0', '#0ff']
+	const { user } = setup(Palette, {
+		props: { colors, showTransparentSlot: true, transparentSlot, deletionMode: TOOLTIP, ondelete: onDelete },
+	})
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	slots[1].focus()
+	await user.keyboard('{Delete}')
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#0ff',
+		index: 1,
+		colors: [{ value: '#ff0' }],
+	})
+})
+
+test('Rolls the tabindex to the focused slot when a custom transparent slot yields no option', async () => {
+	const transparentSlot = createRawSnippet(() => ({
+		render: () => '<span data-testid="__custom-transparent__"></span>',
+	}))
+	const colors = ['#ff0', '#0ff', '#f0f']
+	setup(Palette, {
+		props: { colors, showTransparentSlot: true, transparentSlot, deletionMode: TOOLTIP },
+	})
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(3)
+
+	slots[1].focus()
+
+	await waitFor(() => expect(slots[1]).toHaveAttribute('tabindex', '0'))
+	expect(slots[0]).toHaveAttribute('tabindex', '-1')
+	expect(slots[2]).toHaveAttribute('tabindex', '-1')
+})
+
+test('Steps from the selected slot when the listbox is focused and a cell yields no option', async () => {
+	const transparentSlot = createRawSnippet(() => ({
+		render: () => '<span data-testid="__custom-transparent__"></span>',
+	}))
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const { user } = setup(Palette, {
+		props: { colors, showTransparentSlot: true, transparentSlot, selectedColor: '#ff0' },
+	})
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots[0]).toHaveAttribute('tabindex', '0')
+
+	screen.getByRole('listbox').focus()
+	await user.keyboard('{ArrowRight}')
+
+	expect(slots[1]).toHaveFocus()
+	await waitFor(() => expect(slots[1]).toHaveAttribute('tabindex', '0'))
+})
+
+test('Makes the first navigable slot tabbable when a custom transparent slot yields no option', async () => {
+	const transparentSlot = createRawSnippet(() => ({
+		render: () => '<span data-testid="__custom-transparent__"></span>',
+	}))
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const { user } = setup(Palette, {
+		props: { colors, showTransparentSlot: true, transparentSlot },
+	})
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(3)
+
+	await waitFor(() => expect(slots[0]).toHaveAttribute('tabindex', '0'))
+	expect(slots[1]).toHaveAttribute('tabindex', '-1')
+	expect(slots[2]).toHaveAttribute('tabindex', '-1')
+
+	await user.tab()
+	expect(slots[0]).toHaveFocus()
+})
+
+test('Enters the list at the first navigable slot when the active cell yields no option', async () => {
+	const transparentSlot = createRawSnippet(() => ({
+		render: () => '<span data-testid="__custom-transparent__"></span>',
+	}))
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const { user } = setup(Palette, {
+		props: { colors, showTransparentSlot: true, transparentSlot },
+	})
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+
+	screen.getByRole('listbox').focus()
+	await user.keyboard('{ArrowRight}')
+
+	expect(slots[0]).toHaveFocus()
+	await waitFor(() => expect(slots[0]).toHaveAttribute('tabindex', '0'))
+
+	await user.keyboard('{ArrowRight}')
+	expect(slots[1]).toHaveFocus()
+})
+
+test('Steps back into the list when the listbox is focused and the last cell yields no option', async () => {
+	const slotSnippet = createRawSnippet((getProps) => ({
+		render: () =>
+			getProps().color === '#f0f'
+				? `<div data-testid="__inert-slot__"></div>`
+				: `<span data-testid="__nav-slot__" role="option" tabindex="${getProps().tabindex}"></span>`,
+	}))
+	const colors = ['#ff0', '#0ff', '#f0f']
+	const { user } = setup(Palette, { props: { colors, selectedColor: '#f0f', slot: slotSnippet } })
+
+	const slots = await screen.findAllByTestId('__nav-slot__')
+	expect(slots).toHaveLength(2)
+
+	screen.getByRole('listbox').focus()
+	await user.keyboard('{ArrowLeft}')
+
+	expect(slots[1]).toHaveFocus()
+})
+
 test('Removes the focused slot with Delete in grouped mode', async () => {
 	const colors = [
 		{ name: 'Reds', colors: ['#f00', '#f11'] },
@@ -2174,6 +2316,32 @@ test('Triggers onadd with the colors withheld from the rendered slots kept in th
 	})
 })
 
+test('Keeps a nullish entry intact in the list an added color is written into', async () => {
+	const onAdd = vi.fn()
+	const colors = ['#a00', null] as unknown as ColorInput[]
+
+	const { user } = setup(Palette, {
+		props: { colors, showInput: true, onadd: onAdd },
+	})
+
+	const input = await screen.findByTestId('__palette-input-input__')
+	await user.type(input, '0b0')
+	await user.click(await screen.findByTestId('__palette-input-submit__'))
+
+	expect(onAdd).toHaveBeenCalledWith({
+		color: '#0b0',
+		colors: [{ value: '#a00' }, { value: null }, { value: '#0b0' }],
+	})
+
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#a00',
+			null,
+			'#0b0',
+		])
+	)
+})
+
 test('Triggers ondelete with the removed color and the resulting list in flat mode', async () => {
 	const onDelete = vi.fn()
 	const colors = ['#ff0', '#0ff', '#f0f']
@@ -2216,6 +2384,125 @@ test('Removes the clicked duplicate rather than the first occurrence when duplic
 		index: 2,
 		colors: [{ name: 'Red A', value: '#f00' }, { value: '#0b0' }],
 	})
+})
+
+test('Deletes a slot whose entry does not survive a second normalization', async () => {
+	const onDelete = vi.fn()
+	const colors = ['#a00', null, '#0b0'] as unknown as ColorInput[]
+
+	const { user } = setup(Palette, {
+		props: { colors, allowDuplicates: true, deletionMode: TOOLTIP, ondelete: onDelete },
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	await user.hover(cells[1])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: null,
+		index: 1,
+		colors: [{ value: '#a00' }, { value: '#0b0' }],
+	})
+})
+
+test('Keeps a nullish entry intact when another slot is deleted', async () => {
+	const onDelete = vi.fn()
+	const colors = ['#a00', null, '#0b0'] as unknown as ColorInput[]
+
+	const { user } = setup(Palette, {
+		props: { colors, allowDuplicates: true, deletionMode: TOOLTIP, ondelete: onDelete },
+	})
+
+	let cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	await waitFor(async () => {
+		cells = await screen.findAllByTestId('__palette-cell__')
+		expect(cells).toHaveLength(2)
+	})
+	expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+		null,
+		'#0b0',
+	])
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenLastCalledWith({ color: null, index: 0, colors: [{ value: '#0b0' }] })
+})
+
+test('Deletes the clicked duplicate when the view params drift ahead of the rendered colors', async () => {
+	const onDelete = vi.fn()
+
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#a00'],
+			initialAllowDuplicates: true,
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	component.setColors(new Promise(() => {}))
+	component.setMaxColors(2)
+	await tick()
+
+	expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(3)
+
+	await user.hover(cells[2])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#a00',
+		index: 2,
+		colors: [{ value: '#a00' }, { value: '#0b0' }],
+	})
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#a00',
+			'#0b0',
+		])
+	)
+})
+
+test('Reports the clicked duplicate when allowDuplicates drifts ahead of the rendered colors', async () => {
+	const onDelete = vi.fn()
+
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#a00'],
+			initialAllowDuplicates: true,
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	component.setColors(new Promise(() => {}))
+	component.setAllowDuplicates(false)
+	await tick()
+
+	await user.hover(cells[2])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#a00',
+		index: 2,
+		colors: [{ value: '#0b0' }],
+	})
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#0b0',
+		])
+	)
 })
 
 test('Triggers ondelete with the group identity in group mode', async () => {
@@ -2268,6 +2555,76 @@ test('Triggers ondelete with the index in the full group when a duplicate is hid
 		groupIndex: 0,
 		groupName: 'A',
 	})
+})
+
+test('Deletes the clicked group duplicate when the view params drift ahead of the rendered groups', async () => {
+	const onDelete = vi.fn()
+
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: [{ name: 'A', colors: ['#a00', '#0b0', '#a00'] }],
+			initialAllowDuplicates: true,
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(3)
+
+	component.setColors(new Promise(() => {}))
+	component.setMaxColors(2)
+	await tick()
+
+	expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(3)
+
+	await user.hover(cells[2])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#a00',
+		index: 2,
+		groupIndex: 0,
+		groupName: 'A',
+		colors: [{ name: 'A', colors: [{ value: '#a00' }, { value: '#0b0' }] }],
+	})
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#a00',
+			'#0b0',
+		])
+	)
+})
+
+test('Renders a nullish group entry as an empty slot and deletes it', async () => {
+	const onDelete = vi.fn()
+	const colors = [{ name: 'A', colors: ['#a00', null, '#0b0'] }] as unknown as ColorGroup[]
+
+	const { user } = setup(Palette, {
+		props: { colors, deletionMode: TOOLTIP, ondelete: onDelete },
+	})
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots.map((slot) => slot.getAttribute('aria-label'))).toEqual(['#a00', null, '#0b0'])
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	await user.hover(cells[1])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: null,
+		index: 1,
+		groupIndex: 0,
+		groupName: 'A',
+		colors: [{ name: 'A', colors: [{ value: '#a00' }, { value: '#0b0' }] }],
+	})
+
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#a00',
+			'#0b0',
+		])
+	)
 })
 
 test('Omits groupName in ondelete when the group has no name', async () => {
@@ -2589,6 +2946,150 @@ test('Fires ondelete and propagates a compact-mode deletion to the full list', a
 	expect(cells).toHaveLength(2)
 })
 
+test('Deletes the clicked compact duplicate when the compact indices drift ahead of the rendered colors', async () => {
+	const onDelete = vi.fn()
+
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#a00'],
+			initialAllowDuplicates: true,
+			initialIsCompact: true,
+			initialCompactColorIndices: [1, 2],
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	component.setColors(new Promise(() => {}))
+	component.setCompactColorIndices([0])
+	await tick()
+
+	await user.hover(cells[1])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#a00',
+		index: 2,
+		colors: [{ value: '#a00' }, { value: '#0b0' }],
+	})
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#a00',
+		])
+	)
+})
+
+test('Drops every occurrence the compact slot stands for when the compact indices drift', async () => {
+	const onDelete = vi.fn()
+
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#a00'],
+			initialIsCompact: true,
+			initialCompactColorIndices: [0, 1],
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	component.setColors(new Promise(() => {}))
+	component.setCompactColorIndices([0, 1, 2])
+	await tick()
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#a00',
+		index: 0,
+		colors: [{ value: '#0b0' }],
+	})
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#0b0',
+		])
+	)
+})
+
+test('Deletes through the full list when the palette collapses ahead of the rendered colors', async () => {
+	const onDelete = vi.fn()
+
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#a00'],
+			initialCompactColorIndices: [0, 1],
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	component.setColors(new Promise(() => {}))
+	component.setIsCompact(true)
+	await tick()
+
+	expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#a00',
+		index: 0,
+		colors: [{ value: '#0b0' }],
+	})
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#0b0',
+		])
+	)
+})
+
+test('Leaves nothing of a deleted color on screen when the palette expands ahead of the rendered colors', async () => {
+	const onDelete = vi.fn()
+
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#a00'],
+			initialIsCompact: true,
+			initialCompactColorIndices: [0, 1],
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(2)
+
+	component.setColors(new Promise(() => {}))
+	component.setIsCompact(false)
+	await tick()
+
+	expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#a00',
+		index: 0,
+		colors: [{ value: '#0b0' }],
+	})
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#0b0',
+		])
+	)
+})
+
 test('Deletes the mapped color when compactColorIndices are unsorted', async () => {
 	const onDelete = vi.fn()
 	const colors = ['#a00', '#0b0', '#00c', '#dd0', '#0ee']
@@ -2618,6 +3119,36 @@ test('Deletes the mapped color when compactColorIndices are unsorted', async () 
 
 	cells = await screen.findAllByTestId('__palette-cell__')
 	expect(cells).toHaveLength(1)
+})
+
+test('Removes the compact occurrence a nullish slot was painted from', async () => {
+	const onDelete = vi.fn()
+	const colors = [null, '#0b0', null] as unknown as ColorInput[]
+
+	const { user } = setup(Palette, {
+		props: {
+			colors,
+			isCompact: true,
+			compactColorIndices: [2],
+			allowDuplicates: true,
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	const cells = await screen.findAllByTestId('__palette-cell__')
+	expect(cells).toHaveLength(1)
+
+	await user.hover(cells[0])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: null,
+		index: 2,
+		colors: [{ value: null }, { value: '#0b0' }],
+	})
+
+	await waitFor(() => expect(screen.queryAllByTestId('__palette-slot__')).toHaveLength(0))
 })
 
 test('Propagates a compact deletion to the full list when compact is toggled at runtime', async () => {

@@ -34,7 +34,7 @@
 
 	import type { HTMLAttributes } from 'svelte/elements'
 
-	import type { NormalizedColor, NormalizedColorGroup, PickedColor } from '../utils/utils.js'
+	import type { CalculateColorsParams, NormalizedColor, NormalizedColorGroup } from '../utils/utils.js'
 
 	import type {
 		AddEventArgs,
@@ -148,6 +148,7 @@
 	let _focusedIndex = $state<number | null>(null)
 	let _skipColorsSync = $state(false)
 	let _syncedViewParams: ReturnType<typeof _viewParams> | null = null
+	let _resolvedViewParams: ReturnType<typeof _viewParams> | null = null
 	let _syncedColors: NormalizedColor[] | null = null
 	let _syncedColorGroups: NormalizedColorGroup[] | null = null
 	let _colorsGeneration = 0
@@ -289,6 +290,7 @@
 						_sourceColorGroups = results
 						_colors = null
 						_fullColors = null
+						_resolvedViewParams = _params
 					} else {
 						const newColors = calculateColors(results, _params)
 						_colors = newColors
@@ -296,6 +298,7 @@
 						_fullColorGroups = null
 						_sourceColorGroups = []
 						_fullColors = transformColors(Array.isArray(results) ? results : [])
+						_resolvedViewParams = _params
 					}
 				}
 			},
@@ -311,6 +314,7 @@
 				_fullColorGroups = null
 				_sourceColorGroups = []
 				_fullColors = null
+				_resolvedViewParams = null
 				_focusedIndex = null
 				if (!_wasError) {
 					onerror?.({ error: reason })
@@ -367,6 +371,66 @@
 		...(settings ? [SETTINGS] : []),
 	] as PaletteToolName[])
 
+	type PaletteCell = { container: Element | null; position: number; option: HTMLElement | null }
+
+	let _cachedCells = $state.raw<PaletteCell[]>([])
+
+	const _readCells = (): PaletteCell[] => {
+		if (!_listboxEl) {
+			return []
+		}
+		const cells: PaletteCell[] = []
+		let container: Element | null = null
+		let position = 0
+		for (const cell of _listboxEl.querySelectorAll<HTMLElement>('.palette__cells__cell')) {
+			const parent = cell.parentElement
+			position = parent === container ? position + 1 : 0
+			container = parent
+			cells.push({
+				container,
+				position,
+				option:
+					cell.querySelector<HTMLElement>('[role="option"]:not([disabled])') ??
+					cell.querySelector<HTMLElement>('[tabindex]:not([disabled])'),
+			})
+		}
+		return cells
+	}
+
+	const _navigableFrom = (cells: PaletteCell[], from: number, dir: number): number => {
+		for (let index = from; index >= 0 && index < cells.length; index += dir) {
+			if (cells[index].option) {
+				return index
+			}
+		}
+		return -1
+	}
+
+	const _navigableNear = (cells: PaletteCell[], from: number, dir: number): number => {
+		const ahead = _navigableFrom(cells, from, dir)
+		return ahead >= 0 ? ahead : _navigableFrom(cells, from - dir, -dir)
+	}
+
+	const _cellIndexOfElement = (cells: PaletteCell[], element: Element | null): number =>
+		element ? cells.findIndex((cell) => cell.option === element) : -1
+
+	const _syncCells = (): PaletteCell[] => {
+		const cells = _readCells()
+		_cachedCells = cells
+		return cells
+	}
+
+	$effect(() => {
+		void _renderedColors
+		void _colors
+		void _colorGroups
+		void _showsTransparentSlot
+		void presentational
+		void _isCompact
+		void selectedColor
+		_syncCells()
+	})
+
 	const _optionCount = $derived(
 		_renderedGroups
 			? _renderedGroups.reduce((sum, group) => sum + group.colors.length, 0)
@@ -405,8 +469,12 @@
 		return Math.min(Math.max(preferred, 0), Math.max(_optionCount - 1, 0))
 	})
 
-	const _rovingTabindex = (optionIndex: number): number =>
-		presentational ? -1 : optionIndex === _activeIndex ? 0 : -1
+	const _tabbableIndex = $derived.by(() => {
+		const navigable = _navigableNear(_cachedCells, _activeIndex, 1)
+		return navigable >= 0 ? navigable : _activeIndex
+	})
+
+	const _rovingTabindex = (cellIndex: number): number => (presentational ? -1 : cellIndex === _tabbableIndex ? 0 : -1)
 
 	const _optionRole = $derived(presentational ? undefined : 'option')
 
@@ -485,17 +553,19 @@
 			return
 		}
 		_colors = nextColors
+		_resolvedViewParams = _params
 		const nextSourceColors = _syncColors(nextFullColors)
 		onadd?.({ color, colors: nextSourceColors })
 	}
 
 	const _removeColor = (index: number) => {
-		if (_isCompact) {
-			if (_fullColorGroups != null) {
-				_removeCompactGroupColor(index)
-			} else {
-				_removeCompactColor(index)
-			}
+		if (_compactPicked) {
+			_removeCompactGroupColor(index)
+			return
+		}
+		const _params = _resolvedViewParams ?? _viewParams()
+		if (_isCompact && _params.isCompact) {
+			_removeCompactColor(index)
 			return
 		}
 		const rendered = (_colors ?? [])[index]
@@ -503,7 +573,7 @@
 			return
 		}
 		const full = _fullColors ?? []
-		const fullIndex = _resolveFullIndex(full, _picked(), rendered, index)
+		const fullIndex = _resolveFullIndex(full, _params, rendered, index)
 		if (fullIndex < 0) {
 			return
 		}
@@ -511,26 +581,26 @@
 		const dropped = _droppedIndices(full, fullIndex, { allowDuplicates })
 		const nextFullColors = _dropIndices(full, dropped)
 		_syncCompactColorIndices(dropped, full)
-		const nextColors = calculateColors(nextFullColors, _viewParams())
+		const nextViewParams = _viewParams()
+		const nextColors = calculateColors(nextFullColors, nextViewParams)
 		_colors = nextColors
+		_resolvedViewParams = nextViewParams
 		const nextSourceColors = _syncColors(nextFullColors)
 		ondelete?.({ color: removed.value, index: fullIndex, colors: nextSourceColors })
 	}
 
-	const _picked = (): PickedColor[] => pickColors(_fullColors ?? [], _viewParams())
-
 	const _resolveFullIndex = (
 		full: NormalizedColor[],
-		picked: PickedColor[],
+		params: CalculateColorsParams,
 		rendered: NormalizedColor,
 		index: number
 	): number => {
-		const target = picked[index]
+		const target = pickColors(full, params)[index]
 		if (target && isSameColor(target.color.value, rendered.value)) {
 			return target.index
 		}
-		const match = picked.find((item) => isSameColor(item.color.value, rendered.value))
-		return match ? match.index : full.findIndex((color) => isSameColor(color.value, rendered.value))
+		const scope = pickColors(full, { ...params, allowDuplicates: true, maxColors: undefined })
+		return scope.find(({ color }) => isSameColor(color.value, rendered.value))?.index ?? -1
 	}
 
 	const _droppedIndices = (
@@ -591,8 +661,9 @@
 		if (!rendered) {
 			return
 		}
+		const _params = _resolvedViewParams ?? _viewParams()
 		const full = _fullColors ?? []
-		const fullIndex = _resolveFullIndex(full, _picked(), rendered, index)
+		const fullIndex = _resolveFullIndex(full, _params, rendered, index)
 		if (fullIndex < 0) {
 			return
 		}
@@ -600,8 +671,10 @@
 		const dropped = _droppedIndices(full, fullIndex, { allowDuplicates }, compactColorIndices ?? [])
 		const nextFullColors = _dropIndices(full, dropped)
 		_syncCompactColorIndices(dropped, full)
-		const nextColors = calculateColors(nextFullColors, _viewParams())
+		const nextViewParams = _viewParams()
+		const nextColors = calculateColors(nextFullColors, nextViewParams)
 		_colors = nextColors
+		_resolvedViewParams = nextViewParams
 		const nextSourceColors = _syncColors(nextFullColors)
 		ondelete?.({ color: removed.value, index: fullIndex, colors: nextSourceColors })
 	}
@@ -634,6 +707,7 @@
 		const sourceIndices = _sourceGroupIndices(_sourceColorGroups)
 		_syncCompactColorIndices(dropped, full)
 		_colorGroups = calculateColorGroups(nextFullColorGroups, { allowDuplicates, maxColors })
+		_resolvedViewParams = _viewParams()
 		const { colorGroups: nextSourceColorGroups, groupIndices } = _syncColorGroups(
 			nextFullColorGroups,
 			sourceIndices
@@ -653,10 +727,11 @@
 		if (!rendered) {
 			return
 		}
+		const _params = _resolvedViewParams ?? _viewParams()
 		const fullGroupColors = (_fullColorGroups ?? [])[groupIndex]?.colors ?? []
 		const fullIndex = _resolveFullIndex(
 			fullGroupColors,
-			pickColors(fullGroupColors, { allowDuplicates, maxColors }),
+			{ allowDuplicates: _params.allowDuplicates, maxColors: _params.maxColors },
 			rendered,
 			colorIndex
 		)
@@ -676,6 +751,7 @@
 			_compactSource
 		)
 		_colorGroups = nextColorGroups
+		_resolvedViewParams = _viewParams()
 		const { colorGroups: nextSourceColorGroups, groupIndices } = _syncColorGroups(
 			nextFullColorGroups,
 			sourceIndices
@@ -724,154 +800,117 @@
 		_isSettingsOn = false
 	}
 
-	type CellPosition = { container: Element | null; position: number }
-
-	let _cachedOptions: HTMLElement[] | null = null
-	let _cachedCells: CellPosition[] = []
-
-	$effect(() => {
-		void _renderedColors
-		void _colors
-		void _colorGroups
-		void _showsTransparentSlot
-		void presentational
-		void _isCompact
-		void selectedColor
-		_cachedOptions = null
-		_cachedCells = []
-	})
-
-	const _getOptions = (): HTMLElement[] => {
-		if (_cachedOptions) {
-			return _cachedOptions
-		}
-		if (!_listboxEl) {
-			return []
-		}
-		const options: HTMLElement[] = []
-		const cells: CellPosition[] = []
-		let container: Element | null = null
-		let position = 0
-		for (const cell of _listboxEl.querySelectorAll<HTMLElement>('.palette__cells__cell')) {
-			const parent = cell.parentElement
-			position = parent === container ? position + 1 : 0
-			container = parent
-			const option =
-				cell.querySelector<HTMLElement>('[role="option"]:not([disabled])') ??
-				cell.querySelector<HTMLElement>('[tabindex]:not([disabled])')
-			if (option) {
-				options.push(option)
-				cells.push({ container, position })
-			}
-		}
-		_cachedOptions = options
-		_cachedCells = cells
-		return _cachedOptions
-	}
-
-	const _rowStep = (options: HTMLElement[], from: number, dir: number): number => {
+	const _rowStep = (cells: PaletteCell[], from: number, dir: number): number => {
 		const columns = normalizeNumColumns(_numColumns)
 		const rows: { index: number; column: number }[][] = []
 		let lastContainer: Element | null = null
 		let lastRow = -1
-		for (let index = 0; index < options.length; index++) {
-			const cell = _cachedCells[index]
-			const container = cell?.container ?? null
-			const position = cell?.position ?? index
+		let fromRow = -1
+		let fromColumn = 0
+		for (let index = 0; index < cells.length; index++) {
+			const { container, position, option } = cells[index]
 			const row = Math.floor(position / columns)
 			if (container !== lastContainer || row !== lastRow) {
 				rows.push([])
 				lastContainer = container
 				lastRow = row
 			}
-			rows[rows.length - 1].push({ index, column: position % columns })
+			if (index === from) {
+				fromRow = rows.length - 1
+				fromColumn = position % columns
+			}
+			if (option) {
+				rows[rows.length - 1].push({ index, column: position % columns })
+			}
 		}
-		const rowIndex = rows.findIndex((row) => row.some((cell) => cell.index === from))
-		const targetRow = rows[rowIndex + dir]
-		if (rowIndex < 0 || !targetRow) {
-			return from
+		if (fromRow >= 0) {
+			for (let rowIndex = fromRow + dir; rowIndex >= 0 && rowIndex < rows.length; rowIndex += dir) {
+				const targetRow = rows[rowIndex]
+				if (targetRow.length) {
+					return (targetRow.findLast((cell) => cell.column <= fromColumn) ?? targetRow[0]).index
+				}
+			}
 		}
-		const column = rows[rowIndex].find((cell) => cell.index === from)?.column ?? 0
-		const target = targetRow.findLast((cell) => cell.column <= column) ?? targetRow[0]
-		return target.index
+		return _navigableNear(cells, from, dir)
 	}
 
-	const _deleteOption = async (from: number) => {
+	const _deleteCell = async (cellIndex: number) => {
 		if (deletionMode === NONE) {
 			return
 		}
+		if (!_cachedCells[cellIndex]?.option) {
+			return
+		}
 		if (_renderedGroups) {
-			const groupIndex = _groupIndexAt(_groupOffsets, from)
+			const groupIndex = _groupIndexAt(_groupOffsets, cellIndex)
 			if (groupIndex < 0) {
 				return
 			}
-			_removeGroupColor(groupIndex, from - _groupOffsets[groupIndex])
+			_removeGroupColor(groupIndex, cellIndex - _groupOffsets[groupIndex])
 		} else {
-			const colorIndex = from - (_showsTransparentSlot ? 1 : 0)
+			const colorIndex = cellIndex - (_showsTransparentSlot ? 1 : 0)
 			if (colorIndex < 0) {
 				return
 			}
 			_onDelete(colorIndex)
 		}
 		await tick()
-		_cachedOptions = null
-		const options = _getOptions()
-		if (options.length === 0) {
+		const cells = _syncCells()
+		const next = _navigableNear(cells, Math.min(cellIndex, cells.length - 1), -1)
+		if (next < 0) {
 			_focusedIndex = null
 			_listboxEl?.focus()
 			return
 		}
-		const next = Math.min(from, options.length - 1)
 		_focusedIndex = next
-		options[next]?.focus()
+		cells[next].option?.focus()
 	}
 
 	const _onListboxKeydown = (e: KeyboardEvent) => {
-		const options = _getOptions()
-		const count = options.length
-		if (count === 0) {
-			return
-		}
-		const current = options.indexOf(document.activeElement as HTMLElement)
-		const from = current >= 0 ? current : Math.min(_activeIndex, count - 1)
+		const cells = _syncCells()
+		const focused = _cellIndexOfElement(cells, document.activeElement)
 		if (e.key === 'Delete' || e.key === 'Backspace') {
-			if (deletionMode === NONE || current < 0) {
+			if (deletionMode === NONE || focused < 0) {
 				return
 			}
 			e.preventDefault()
-			_deleteOption(current)
+			_deleteCell(focused)
 			return
 		}
+		const from = focused >= 0 ? focused : _activeIndex
 		let next: number
 		switch (e.key) {
 			case 'ArrowRight':
-				next = Math.min(from + 1, count - 1)
+				next = _navigableNear(cells, from + 1, 1)
 				break
 			case 'ArrowLeft':
-				next = Math.max(from - 1, 0)
+				next = _navigableNear(cells, from - 1, -1)
 				break
 			case 'ArrowDown':
-				next = _rowStep(options, from, 1)
+				next = _rowStep(cells, from, 1)
 				break
 			case 'ArrowUp':
-				next = _rowStep(options, from, -1)
+				next = _rowStep(cells, from, -1)
 				break
 			case 'Home':
-				next = 0
+				next = _navigableNear(cells, 0, 1)
 				break
 			case 'End':
-				next = count - 1
+				next = _navigableNear(cells, cells.length - 1, -1)
 				break
 			default:
 				return
 		}
+		if (next < 0) {
+			return
+		}
 		e.preventDefault()
 		_focusedIndex = next
-		options[next]?.focus()
+		cells[next].option?.focus()
 	}
 
 	const _onListboxFocusin = (e: FocusEvent) => {
-		const index = _getOptions().indexOf(e.target as HTMLElement)
+		const index = _cellIndexOfElement(_syncCells(), e.target as Element)
 		if (index >= 0) {
 			_focusedIndex = index
 		}
@@ -911,7 +950,7 @@
 							aria-label={presentational ? undefined : group.name || undefined}
 						>
 							{#each group.colors as color, colorIndex (`${color.value}_${colorIndex}`)}
-								{@const optionIndex = (_groupOffsets[groupIndex] ?? 0) + colorIndex}
+								{@const cellIndex = (_groupOffsets[groupIndex] ?? 0) + colorIndex}
 								<li
 									data-testid="__palette-cell__"
 									class="palette__cells__cell"
@@ -931,11 +970,11 @@
 											colorName: color.name,
 											groupName: group.name,
 											selectedColor,
-											selected: optionIndex === _selectedIndex,
+											selected: cellIndex === _selectedIndex,
 											transition,
 											isCompact: false,
 											index: colorIndex,
-											tabindex: _rovingTabindex(optionIndex),
+											tabindex: _rovingTabindex(cellIndex),
 											ariaKeyShortcuts: _deleteShortcut,
 										})}
 									{:else}
@@ -943,8 +982,8 @@
 											color={color.value}
 											name={color.name}
 											role={_optionRole}
-											selected={optionIndex === _selectedIndex}
-											tabindex={_rovingTabindex(optionIndex)}
+											selected={cellIndex === _selectedIndex}
+											tabindex={_rovingTabindex(cellIndex)}
 											aria-keyshortcuts={_deleteShortcut}
 											{transition}
 											onselect={_onSlotSelect}
@@ -990,7 +1029,7 @@
 						</li>
 					{/if}
 					{#each _renderedColors as color, index (`${color.value}_${index}`)}
-						{@const optionIndex = index + (_showsTransparentSlot ? 1 : 0)}
+						{@const cellIndex = index + (_showsTransparentSlot ? 1 : 0)}
 						<li
 							data-testid="__palette-cell__"
 							class="palette__cells__cell"
@@ -1009,11 +1048,11 @@
 									color: color.value,
 									colorName: color.name,
 									selectedColor,
-									selected: optionIndex === _selectedIndex,
+									selected: cellIndex === _selectedIndex,
 									transition,
 									isCompact: _isCompact,
 									index,
-									tabindex: _rovingTabindex(optionIndex),
+									tabindex: _rovingTabindex(cellIndex),
 									ariaKeyShortcuts: _deleteShortcut,
 								})}
 							{:else}
@@ -1021,8 +1060,8 @@
 									color={color.value}
 									name={color.name}
 									role={_optionRole}
-									selected={optionIndex === _selectedIndex}
-									tabindex={_rovingTabindex(optionIndex)}
+									selected={cellIndex === _selectedIndex}
+									tabindex={_rovingTabindex(cellIndex)}
 									aria-keyshortcuts={_deleteShortcut}
 									{transition}
 									onselect={_onSlotSelect}
