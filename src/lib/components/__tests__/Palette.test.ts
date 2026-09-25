@@ -2463,6 +2463,12 @@ test('Deletes the clicked duplicate when the view params drift ahead of the rend
 		index: 2,
 		colors: [{ value: '#a00' }, { value: '#0b0' }],
 	})
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#a00',
+			'#0b0',
+		])
+	)
 })
 
 test('Reports the clicked duplicate when allowDuplicates drifts ahead of the rendered colors', async () => {
@@ -2492,6 +2498,11 @@ test('Reports the clicked duplicate when allowDuplicates drifts ahead of the ren
 		index: 2,
 		colors: [{ value: '#0b0' }],
 	})
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#0b0',
+		])
+	)
 })
 
 test('Triggers ondelete with the group identity in group mode', async () => {
@@ -2577,6 +2588,12 @@ test('Deletes the clicked group duplicate when the view params drift ahead of th
 		groupName: 'A',
 		colors: [{ name: 'A', colors: [{ value: '#a00' }, { value: '#0b0' }] }],
 	})
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#a00',
+			'#0b0',
+		])
+	)
 })
 
 test('Renders a nullish group entry as an empty slot and deletes it', async () => {
@@ -2958,6 +2975,11 @@ test('Deletes the clicked compact duplicate when the compact indices drift ahead
 		index: 2,
 		colors: [{ value: '#a00' }, { value: '#0b0' }],
 	})
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#a00',
+		])
+	)
 })
 
 test('Drops every occurrence the compact slot stands for when the compact indices drift', async () => {
