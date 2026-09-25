@@ -1,3 +1,10 @@
+# [6.0.0-beta.24](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.23...v6.0.0-beta.24) (2026-09-25)
+
+
+### Bug Fixes
+
+* Resolve a deletion against the rendered view params ([#282](https://github.com/untemps/svelte-palette/issues/282)) ([065d2e0](https://github.com/untemps/svelte-palette/commit/065d2e087ab0a61498321147f0fc1bd03fe59eb3))
+
 # [6.0.0-beta.23](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.22...v6.0.0-beta.23) (2026-09-11)
 
 
