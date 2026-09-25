@@ -373,7 +373,7 @@ test('Scopes the drop deletion area to the owning palette when several are mount
 	expect(cellB).toBeInTheDocument()
 })
 
-test('Deletes a swatch dropped outside its own palette even over another palette', async () => {
+test('Deletes a slot dropped outside its own palette even over another palette', async () => {
 	const colorsA = ['#ff0', '#0ff', '#f0f']
 	const colorsB = ['#111', '#222', '#333']
 
