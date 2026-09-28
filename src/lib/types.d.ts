@@ -282,7 +282,7 @@ export interface ToolsSnippetProps {
 	compactColorIndices: number[]
 	/** Whether the palette is displayed in compact mode. */
 	isCompact: boolean
-	/** Activates a tool by name (use the exported `COMPACT` and `SETTINGS` constants). */
+	/** Activates a tool by name (use the exported `COMPACT` and `SETTINGS` constants). Collapsing and opening the settings panel are ignored while the palette does not offer them; `COMPACT` on a compact palette always enlarges it. */
 	onSelect: (tool: PaletteToolName) => void
 }
 

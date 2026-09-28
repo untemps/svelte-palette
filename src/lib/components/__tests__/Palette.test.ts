@@ -8,7 +8,7 @@ import PaletteReactive from './PaletteReactive.test.svelte'
 
 import { TOOLTIP, DROP } from '../../enums/PaletteDeletionMode'
 
-import type { ColorGroup, ColorInput, DeleteEventArgs } from '../../types'
+import type { ColorGroup, ColorInput, DeleteEventArgs, ToolsSnippetProps } from '../../types'
 
 const setup = (component: Parameters<typeof render>[0], options?: Parameters<typeof render>[1]) => {
 	return {
@@ -3207,7 +3207,7 @@ test('Ignores a compact tool selection from a custom tools snippet while colors 
 	}))
 
 	const { user } = setup(Palette, {
-		props: { colors, tools: toolsSnippet, settings: settingsSnippet },
+		props: { colors, compactColorIndices: [0, 1], tools: toolsSnippet, settings: settingsSnippet },
 	})
 
 	const content = document.querySelector('.palette__content')
@@ -4969,6 +4969,138 @@ test('Hides the compact tool when no supplied index resolves to a color', async 
 	await screen.findAllByTestId('__palette-cell__')
 
 	expect(screen.queryByLabelText('Compact the palette')).toBeNull()
+})
+
+const customToolSnippets = () => ({
+	tools: createRawSnippet<[ToolsSnippetProps]>((getProps) => ({
+		render: () => `<button data-testid="__custom-compact-tool__">Compact</button>`,
+		setup: (element) => {
+			element.addEventListener('click', () => getProps().onSelect('compact'))
+		},
+	})),
+	settings: createRawSnippet(() => ({
+		render: () => `<div data-testid="__custom-settings__"></div>`,
+	})),
+})
+
+test.each([
+	['no compact indices', []],
+	['compact indices wholly out of range', [2, 5]],
+])('Keeps a flat palette expanded when a custom tools snippet selects compact with %s', async (_, indices) => {
+	const { user } = setup(PaletteReactive, {
+		props: { initialColors: ['#a00', '#0b0'], initialCompactColorIndices: indices, ...customToolSnippets() },
+	})
+
+	const tool = await screen.findByTestId('__custom-compact-tool__')
+	expect(slotLabels()).toEqual(['#a00', '#0b0'])
+
+	await user.click(tool)
+	await tick()
+
+	expect(document.querySelector('.palette__content')).not.toHaveClass('palette__content--compact')
+	expect(slotLabels()).toEqual(['#a00', '#0b0'])
+	expectNumColumns(document.querySelector('.palette__content'), 5)
+	expect(screen.queryByLabelText('Enlarge the palette')).toBeNull()
+	expect(document.activeElement).toBe(tool)
+})
+
+test('Collapses a flat palette from a custom tools snippet once a compact index resolves to a color', async () => {
+	const { component, user } = setup(PaletteReactive, {
+		props: { initialColors: ['#a00', '#0b0'], initialCompactColorIndices: [5], ...customToolSnippets() },
+	})
+
+	await user.click(await screen.findByTestId('__custom-compact-tool__'))
+	await tick()
+	expect(document.querySelector('.palette__content')).not.toHaveClass('palette__content--compact')
+
+	component.appendCompactColorIndex(1)
+	await tick()
+	await user.click(screen.getByTestId('__custom-compact-tool__'))
+
+	await waitFor(() => expect(slotLabels()).toEqual(['#0b0']))
+	expect(document.querySelector('.palette__content')).toHaveClass('palette__content--compact')
+	expectNumColumns(document.querySelector('.palette__content'), 1)
+
+	await user.click(screen.getByLabelText('Enlarge the palette'))
+
+	await waitFor(() => expect(slotLabels()).toEqual(['#a00', '#0b0']))
+	expect(document.querySelector('.palette__content')).not.toHaveClass('palette__content--compact')
+	expectNumColumns(document.querySelector('.palette__content'), 5)
+})
+
+test('Collapses a grouped palette from a custom tools snippet only once a compact index resolves to a color', async () => {
+	const { component, user } = setup(PaletteReactive, {
+		props: { initialColors: GROUPED_FIXTURE, ...customToolSnippets() },
+	})
+
+	const tool = await screen.findByTestId('__custom-compact-tool__')
+
+	await user.click(tool)
+	await tick()
+
+	expect(document.querySelector('.palette__content')).not.toHaveClass('palette__content--compact')
+	expect(screen.getAllByTestId('__palette-group__')).toHaveLength(2)
+	expect(slotLabels()).toEqual(['#a00', '#a11', '#b00', '#b11', '#b22'])
+	expectNumColumns(document.querySelector('.palette__content'), 5)
+	expect(screen.queryByLabelText('Enlarge the palette')).toBeNull()
+	expect(document.activeElement).toBe(tool)
+
+	component.setCompactColorIndices([9, 3])
+	await tick()
+	await user.click(screen.getByTestId('__custom-compact-tool__'))
+
+	await waitFor(() => expect(slotLabels()).toEqual(['#b11']))
+	expect(screen.queryAllByTestId('__palette-group__')).toHaveLength(0)
+	expectNumColumns(document.querySelector('.palette__content'), 1)
+
+	await user.click(screen.getByLabelText('Enlarge the palette'))
+
+	await waitFor(() => expect(screen.getAllByTestId('__palette-group__')).toHaveLength(2))
+	expect(slotLabels()).toEqual(['#a00', '#a11', '#b00', '#b11', '#b22'])
+})
+
+test('Keeps the settings panel closed when a custom tools snippet selects settings without a settings snippet', async () => {
+	const tools = createRawSnippet<[ToolsSnippetProps]>((getProps) => ({
+		render: () => `<button data-testid="__custom-settings-tool__">Settings</button>`,
+		setup: (element) => {
+			element.addEventListener('click', () => getProps().onSelect('settings'))
+		},
+	}))
+
+	const { component, user } = setup(PaletteReactive, {
+		props: { initialColors: ['#a00', '#0b0'], initialCompactColorIndices: [0], tools },
+	})
+
+	await user.click(await screen.findByTestId('__custom-settings-tool__'))
+	component.setSettings(customToolSnippets().settings)
+	await tick()
+
+	expect(document.querySelector('.palette__settings__panel--visible')).toBeNull()
+
+	await user.click(screen.getByTestId('__custom-settings-tool__'))
+
+	await waitFor(() => expect(document.querySelector('.palette__settings__panel--visible')).not.toBeNull())
+})
+
+test('Keeps the settings panel closed when its settings snippet is passed again after being removed while open', async () => {
+	const { settings } = customToolSnippets()
+	const { component, user } = setup(PaletteReactive, {
+		props: { initialColors: ['#a00', '#0b0'], settings },
+	})
+
+	await user.click(await screen.findByTestId('__palette-settings-button__'))
+	await waitFor(() => expect(document.querySelector('.palette__settings__panel--visible')).not.toBeNull())
+
+	component.setSettings(undefined)
+	await tick()
+	expect(document.querySelector('.palette__settings__panel')).toBeNull()
+
+	component.setSettings(settings)
+	await tick()
+
+	expect(document.querySelector('.palette__settings__panel--visible')).toBeNull()
+	await user.click(screen.getByTestId('__palette-settings-button__'))
+	await waitFor(() => expect(document.querySelector('.palette__settings__panel--visible')).not.toBeNull())
 })
 
 test('Sizes an unresolved auto-width palette to maxColumns', async () => {
