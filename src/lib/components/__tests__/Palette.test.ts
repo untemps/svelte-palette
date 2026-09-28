@@ -20,6 +20,9 @@ const setup = (component: Parameters<typeof render>[0], options?: Parameters<typ
 const boundingRect = (left: number, top: number, right: number, bottom: number) =>
 	({ left, top, right, bottom, width: right - left, height: bottom - top }) as DOMRect
 
+const expectNumColumns = (element: Element | null | undefined, expected: number) =>
+	expect((element as HTMLElement | null | undefined)?.style.getPropertyValue('--num-columns')).toBe(`${expected}`)
+
 test('Displays as many color slots as set', async () => {
 	let cells = null
 	const colors = ['#ff0', '#0ff', '#f0f']
@@ -488,7 +491,7 @@ test('Expands palette when compact toggle button is clicked', async () => {
 	expect(cells).toHaveLength(2)
 
 	const content = document.querySelector('.palette__content')
-	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 2'))
+	await waitFor(() => expectNumColumns(content, 2))
 
 	const toggleButton = await screen.findByTestId('__palette-compact-toggle-button__')
 	expect(toggleButton).toBeInTheDocument()
@@ -497,7 +500,7 @@ test('Expands palette when compact toggle button is clicked', async () => {
 
 	await waitFor(() => expect(content).not.toHaveClass('palette__content--compact'))
 	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(3))
-	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 5'))
+	await waitFor(() => expectNumColumns(content, 5))
 })
 
 test('Extracts the compact subset when the palette is collapsed at runtime', async () => {
@@ -512,14 +515,14 @@ test('Extracts the compact subset when the palette is collapsed at runtime', asy
 	expect(cells).toHaveLength(3)
 
 	const content = document.querySelector('.palette__content')
-	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 5'))
+	await waitFor(() => expectNumColumns(content, 5))
 
 	const toggleButton = await screen.findByTestId('__palette-compact-toggle-button__')
 	await user.click(toggleButton)
 
 	await waitFor(() => expect(content).toHaveClass('palette__content--compact'))
 	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
-	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 2'))
+	await waitFor(() => expectNumColumns(content, 2))
 })
 
 test('Accounts for the transparent slot in the compact column count when collapsed at runtime', async () => {
@@ -538,7 +541,7 @@ test('Accounts for the transparent slot in the compact column count when collaps
 	const content = document.querySelector('.palette__content')
 	await waitFor(() => expect(content).toHaveClass('palette__content--compact'))
 	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(3))
-	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 3'))
+	await waitFor(() => expectNumColumns(content, 3))
 })
 
 test('Closes settings panel when onClose is called', async () => {
@@ -655,7 +658,7 @@ test.each([
 
 	const content = await screen.findByTestId('__palette__')
 	const section = content.querySelector('.palette__content')
-	await waitFor(() => expect(section.getAttribute('style')).toContain(`--num-columns: ${expected}`))
+	await waitFor(() => expectNumColumns(section, expected))
 })
 
 test('Rounds a fractional numColumns down to a whole column count', async () => {
@@ -667,7 +670,7 @@ test('Rounds a fractional numColumns down to a whole column count', async () => 
 
 	const content = await screen.findByTestId('__palette__')
 	const section = content.querySelector('.palette__content')
-	await waitFor(() => expect(section.getAttribute('style')).toBe('--num-columns: 2;'))
+	await waitFor(() => expectNumColumns(section, 2))
 })
 
 test('Clamps the configured column count before the colors resolve', async () => {
@@ -677,7 +680,7 @@ test('Clamps the configured column count before the colors resolve', async () =>
 
 	const content = await screen.findByTestId('__palette__')
 	const section = content.querySelector('.palette__content')
-	expect(section?.getAttribute('style')).toBe('--num-columns: 2;')
+	expectNumColumns(section, 2)
 })
 
 test('Updates num-columns when numColumns changes to 0', async () => {
@@ -689,11 +692,11 @@ test('Updates num-columns when numColumns changes to 0', async () => {
 
 	const content = await screen.findByTestId('__palette__')
 	const section = content.querySelector('.palette__content')
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 5'))
+	await waitFor(() => expectNumColumns(section, 5))
 
 	rerender({ colors, numColumns: 0 })
 
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 25'))
+	await waitFor(() => expectNumColumns(section, 25))
 })
 
 test('Sets num-columns from the longest group when numColumns is 0 in grouped mode', async () => {
@@ -706,7 +709,7 @@ test('Sets num-columns from the longest group when numColumns is 0 in grouped mo
 
 	const content = await screen.findByTestId('__palette__')
 	const section = content.querySelector('.palette__content')
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 7'))
+	await waitFor(() => expectNumColumns(section, 7))
 })
 
 test('Keeps the minimum column count when every group is shorter in grouped mode', async () => {
@@ -719,7 +722,7 @@ test('Keeps the minimum column count when every group is shorter in grouped mode
 
 	const content = await screen.findByTestId('__palette__')
 	const section = content.querySelector('.palette__content')
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 5'))
+	await waitFor(() => expectNumColumns(section, 5))
 })
 
 test('Caps num-columns with maxColumns in grouped mode', async () => {
@@ -732,7 +735,7 @@ test('Caps num-columns with maxColumns in grouped mode', async () => {
 
 	const content = await screen.findByTestId('__palette__')
 	const section = content.querySelector('.palette__content')
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 4'))
+	await waitFor(() => expectNumColumns(section, 4))
 })
 
 test('Recounts num-columns after a slot deletion when numColumns is 0', async () => {
@@ -742,13 +745,13 @@ test('Recounts num-columns after a slot deletion when numColumns is 0', async ()
 
 	const content = await screen.findByTestId('__palette__')
 	const section = content.querySelector('.palette__content')
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 7'))
+	await waitFor(() => expectNumColumns(section, 7))
 
 	const cells = await screen.findAllByTestId('__palette-cell__')
 	await user.hover(cells[0])
 	await user.click(await screen.findByTestId('__trash-icon__'))
 
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 6'))
+	await waitFor(() => expectNumColumns(section, 6))
 })
 
 test('Recounts num-columns after a slot deletion when numColumns is 0 in grouped mode', async () => {
@@ -761,13 +764,13 @@ test('Recounts num-columns after a slot deletion when numColumns is 0 in grouped
 
 	const content = await screen.findByTestId('__palette__')
 	const section = content.querySelector('.palette__content')
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 7'))
+	await waitFor(() => expectNumColumns(section, 7))
 
 	const cells = await screen.findAllByTestId('__palette-cell__')
 	await user.hover(cells[2])
 	await user.click(await screen.findByTestId('__trash-icon__'))
 
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 6'))
+	await waitFor(() => expectNumColumns(section, 6))
 })
 
 test('Keeps num-columns at the longest group width when a shorter group shrinks', async () => {
@@ -780,14 +783,14 @@ test('Keeps num-columns at the longest group width when a shorter group shrinks'
 
 	const content = await screen.findByTestId('__palette__')
 	const section = content.querySelector('.palette__content')
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 7'))
+	await waitFor(() => expectNumColumns(section, 7))
 
 	const cells = await screen.findAllByTestId('__palette-cell__')
 	await user.hover(cells[0])
 	await user.click(await screen.findByTestId('__trash-icon__'))
 
 	await waitFor(() => expect(screen.queryAllByTestId('__palette-cell__')).toHaveLength(8))
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 7'))
+	await waitFor(() => expectNumColumns(section, 7))
 })
 
 test('Leaves num-columns at the configured width after a slot deletion', async () => {
@@ -797,14 +800,14 @@ test('Leaves num-columns at the configured width after a slot deletion', async (
 
 	const content = await screen.findByTestId('__palette__')
 	const section = content.querySelector('.palette__content')
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 4'))
+	await waitFor(() => expectNumColumns(section, 4))
 
 	const cells = await screen.findAllByTestId('__palette-cell__')
 	await user.hover(cells[0])
 	await user.click(await screen.findByTestId('__trash-icon__'))
 
 	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(6))
-	expect(section.getAttribute('style')).toContain('--num-columns: 4')
+	expectNumColumns(section, 4)
 })
 
 test('Leaves num-columns at the configured width after a grouped slot deletion', async () => {
@@ -817,14 +820,14 @@ test('Leaves num-columns at the configured width after a grouped slot deletion',
 
 	const content = await screen.findByTestId('__palette__')
 	const section = content.querySelector('.palette__content')
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 4'))
+	await waitFor(() => expectNumColumns(section, 4))
 
 	const cells = await screen.findAllByTestId('__palette-cell__')
 	await user.hover(cells[0])
 	await user.click(await screen.findByTestId('__trash-icon__'))
 
 	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(4))
-	expect(section.getAttribute('style')).toContain('--num-columns: 4')
+	expectNumColumns(section, 4)
 })
 
 test('Recounts num-columns from the rendered subset after a compact deletion despite a configured width', async () => {
@@ -836,14 +839,14 @@ test('Recounts num-columns from the rendered subset after a compact deletion des
 
 	const content = await screen.findByTestId('__palette__')
 	const section = content.querySelector('.palette__content')
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 3'))
+	await waitFor(() => expectNumColumns(section, 3))
 
 	const cells = await screen.findAllByTestId('__palette-cell__')
 	await user.hover(cells[0])
 	await user.click(await screen.findByTestId('__trash-icon__'))
 
 	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 2'))
+	await waitFor(() => expectNumColumns(section, 2))
 })
 
 test('Counts the transparent slot in num-columns after a compact slot deletion', async () => {
@@ -862,14 +865,14 @@ test('Counts the transparent slot in num-columns after a compact slot deletion',
 
 	const content = await screen.findByTestId('__palette__')
 	const section = content.querySelector('.palette__content')
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 4'))
+	await waitFor(() => expectNumColumns(section, 4))
 
 	const cells = await screen.findAllByTestId('__palette-cell__')
 	await user.hover(cells[1])
 	await user.click(await screen.findByTestId('__trash-icon__'))
 
 	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(3))
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 3'))
+	await waitFor(() => expectNumColumns(section, 3))
 })
 
 test('Recounts num-columns after a compact slot deletion when the full list holds case-varying duplicates', async () => {
@@ -888,7 +891,7 @@ test('Recounts num-columns after a compact slot deletion when the full list hold
 
 	const content = await screen.findByTestId('__palette__')
 	const section = content.querySelector('.palette__content')
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 7'))
+	await waitFor(() => expectNumColumns(section, 7))
 
 	const cells = await screen.findAllByTestId('__palette-cell__')
 	expect(cells).toHaveLength(7)
@@ -897,7 +900,7 @@ test('Recounts num-columns after a compact slot deletion when the full list hold
 	await user.click(await screen.findByTestId('__trash-icon__'))
 
 	await waitFor(() => expect(screen.queryAllByTestId('__palette-cell__')).toHaveLength(6))
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 6'))
+	await waitFor(() => expectNumColumns(section, 6))
 	expect(onDelete).toHaveBeenCalledWith(expect.objectContaining({ color: '#445566', index: 3 }))
 })
 
@@ -919,7 +922,7 @@ test('Removes the occurrence the rendered subset selected when the compact indic
 	expect(cells).toHaveLength(2)
 
 	const section = document.querySelector('.palette__content')
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 2'))
+	await waitFor(() => expectNumColumns(section, 2))
 
 	component.setColors(new Promise(() => {}))
 	component.setCompactColorIndices([1, 2])
@@ -933,7 +936,7 @@ test('Removes the occurrence the rendered subset selected when the compact indic
 		colors: [{ value: '#0b0' }, { value: '#a00' }],
 	})
 	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 2'))
+	await waitFor(() => expectNumColumns(section, 2))
 })
 
 test('Keeps num-columns at one column when a compact deletion empties the rendered subset', async () => {
@@ -953,7 +956,7 @@ test('Keeps num-columns at one column when a compact deletion empties the render
 	await user.click(await screen.findByTestId('__trash-icon__'))
 
 	await waitFor(() => expect(screen.queryAllByTestId('__palette-cell__')).toHaveLength(0))
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 1'))
+	await waitFor(() => expectNumColumns(section, 1))
 })
 
 test('Removes duplicates when updating allowDuplicates value', async () => {
@@ -1050,12 +1053,12 @@ test('Recomputes the compact column count when showTransparentSlot changes', asy
 	expect(cells).toHaveLength(2)
 
 	const content = document.querySelector('.palette__content')
-	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 2'))
+	await waitFor(() => expectNumColumns(content, 2))
 
 	component.setShowTransparentSlot(true)
 
 	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(3))
-	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 3'))
+	await waitFor(() => expectNumColumns(content, 3))
 })
 
 test('Removes the color by value when the rendered subset drifts from the full list', async () => {
@@ -1075,7 +1078,7 @@ test('Removes the color by value when the rendered subset drifts from the full l
 	expect(cells).toHaveLength(2)
 
 	const section = document.querySelector('.palette__content')
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 2'))
+	await waitFor(() => expectNumColumns(section, 2))
 
 	component.setColors(new Promise(() => {}))
 	component.setCompactColorIndices([2])
@@ -1090,7 +1093,7 @@ test('Removes the color by value when the rendered subset drifts from the full l
 		colors: [{ value: '#0b0' }, { value: '#00c' }],
 	})
 	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(1))
-	await waitFor(() => expect(section.getAttribute('style')).toContain('--num-columns: 1'))
+	await waitFor(() => expectNumColumns(section, 1))
 	await waitFor(() =>
 		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
 			'#00c',
@@ -1122,7 +1125,7 @@ test('Applies an isCompact change made inside ondelete alongside the write-back'
 	const content = document.querySelector('.palette__content')
 	await waitFor(() => expect(content).toHaveClass('palette__content--compact'))
 	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
-	await waitFor(() => expect(content.getAttribute('style')).toContain('--num-columns: 2'))
+	await waitFor(() => expectNumColumns(content, 2))
 })
 
 test('Resolves the list a delete handler assigns instead of the write-back', async () => {
@@ -2862,7 +2865,7 @@ test('Renders an empty compact strip and the enlarge button for a grouped palett
 	await waitFor(() => expect(screen.getByLabelText('Enlarge the palette')).toBeInTheDocument())
 	expect(screen.queryAllByTestId('__palette-cell__')).toHaveLength(0)
 	expect(screen.queryAllByTestId('__palette-group__')).toHaveLength(0)
-	expect(document.querySelector('.palette__content')?.getAttribute('style')).toBe('--num-columns: 1;')
+	expectNumColumns(document.querySelector('.palette__content'), 1)
 
 	await user.click(screen.getByLabelText('Enlarge the palette'))
 	await waitFor(() => expect(screen.getAllByTestId('__palette-group__')).toHaveLength(2))
@@ -4232,9 +4235,7 @@ test('Sets num-columns from the compact strip on a grouped palette', async () =>
 
 	await screen.findAllByTestId('__palette-cell__')
 
-	await waitFor(() =>
-		expect(document.querySelector('.palette__content')?.getAttribute('style')).toBe('--num-columns: 3;')
-	)
+	await waitFor(() => expectNumColumns(document.querySelector('.palette__content'), 3))
 })
 
 test('Caps the compact strip of a grouped palette with maxColors across the flattened list', async () => {
@@ -4302,9 +4303,7 @@ test('Fires ondelete with the group identity for a compact deletion on a grouped
 		],
 	})
 	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(1))
-	await waitFor(() =>
-		expect(document.querySelector('.palette__content')?.getAttribute('style')).toBe('--num-columns: 1;')
-	)
+	await waitFor(() => expectNumColumns(document.querySelector('.palette__content'), 1))
 })
 
 test('Removes every occurrence a deduplicated compact slot stood for across its groups', async () => {
@@ -4543,9 +4542,7 @@ test('Keeps the transparent slot out of a compact grouped strip', async () => {
 
 	expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2)
 	expect(slotLabels()).toEqual(['#a00', '#a11'])
-	await waitFor(() =>
-		expect(document.querySelector('.palette__content')?.getAttribute('style')).toBe('--num-columns: 2;')
-	)
+	await waitFor(() => expectNumColumns(document.querySelector('.palette__content'), 2))
 })
 
 const edgeSnippet = (testid: string) =>
@@ -4637,9 +4634,7 @@ test('Hides the compact tool when no supplied index resolves to a color', async 
 test('Sizes an unresolved auto-width palette to maxColumns', async () => {
 	setup(Palette, { props: { colors: null, numColumns: 0, maxColumns: 3 } })
 
-	await waitFor(() =>
-		expect(document.querySelector('.palette__content')?.getAttribute('style')).toBe('--num-columns: 3;')
-	)
+	await waitFor(() => expectNumColumns(document.querySelector('.palette__content'), 3))
 })
 
 test('Removes the occurrence a compact slot stands for when duplicates are allowed', async () => {
