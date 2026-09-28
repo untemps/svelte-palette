@@ -10,9 +10,6 @@ const setup = (component: Parameters<typeof render>[0], options?: Parameters<typ
 	}
 }
 
-// Each test installs its own EyeDropper stub; the config's `unstubGlobals: true`
-// restores the jsdom baseline (no EyeDropper at all) before every test, so no test
-// depends on the order of the others.
 const stubEyeDropper = (sRGBHex: string) =>
 	vi.stubGlobal(
 		'EyeDropper',
@@ -125,7 +122,6 @@ test('Triggers submit with color when pressing Enter', async () => {
 })
 
 test('Triggers submit with color when pressing Enter on the numeric keypad', async () => {
-	// The numeric-keypad Enter reports key="Enter" but code="NumpadEnter"; the handler must key off `key`.
 	const onAdd = vi.fn(() => 0)
 	const { user } = setup(PaletteInput, { props: { onadd: onAdd } })
 	const input = screen.getByTestId('__palette-input-input__')
@@ -175,30 +171,19 @@ test('Does not display slot if inputType is "color"', async () => {
 })
 
 test('Replaces an unsupported but valid input type with "text"', async () => {
-	// `number` is a real HTML input type, so without sanitization it would reach the DOM
-	// verbatim and render a number spinner. The documented contract only allows text/color.
 	setup(PaletteInput, {
 		color: '#ff0',
 		inputType: 'number',
 	})
 	const input = screen.getByTestId('__palette-input-input__')
 	expect(input).toHaveAttribute('type', 'text')
-	// The preview slot is gated on the text branch, so it must still render.
 	expect(screen.getByTestId('__palette-input-slot__')).toBeInTheDocument()
 })
 
 test('Hides the decorative preview slot from the accessibility tree', async () => {
-	// The preview slot is purely decorative; `role="presentation"` would be ignored because
-	// PaletteSlot always carries a global `aria-label`, so it must use `aria-hidden` to
-	// actually leave the accessibility tree. This attribute is the load-bearing assertion:
-	// it is absent on the old `role="presentation"` markup, so this test fails against it.
 	setup(PaletteInput, { color: '#ff0' })
 	const slot = screen.getByTestId('__palette-input-slot__')
 	expect(slot).toHaveAttribute('aria-hidden', 'true')
-	// Sanity check that the preview is not exposed as a second button beside the submit
-	// control. jsdom already excluded the old presentation-role slot here (it does not
-	// model the browser-only presentational-conflict rule), so this guards the new
-	// behaviour rather than reproducing the original leak.
 	expect(screen.queryAllByRole('button')).toEqual([screen.getByTestId('__palette-input-submit__')])
 })
 

@@ -52,7 +52,7 @@
 	import type { Snippet } from 'svelte'
 
 	interface Props {
-		/** Selector or element the panel is portalled into. */
+		/** Selector of the element the panel is portalled into. */
 		target?: string
 		/** Whether the panel is visible. */
 		isVisible?: boolean

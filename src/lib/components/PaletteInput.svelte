@@ -181,8 +181,7 @@
 	.palette_input__input:focus-visible {
 		outline: 2px solid var(--palette-focus-ring, #1a1a1a);
 		outline-offset: 2px;
-		/* Lift above the adjoining submit button (which is position: relative) so the
-		   ring shows on all four sides instead of being covered at the shared edge. */
+		/* Lift above the position: relative submit button so it can't cover the ring's shared edge. */
 		position: relative;
 		z-index: 1;
 	}

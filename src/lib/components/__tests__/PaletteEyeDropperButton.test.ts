@@ -10,9 +10,6 @@ const setup = (component: Parameters<typeof render>[0], options?: Parameters<typ
 	}
 }
 
-// Each test installs its own EyeDropper stub; the config's `unstubGlobals: true`
-// restores the jsdom baseline (no EyeDropper at all) before every test, so no test
-// depends on the order of the others.
 const stubEyeDropper = (sRGBHex: string) =>
 	vi.stubGlobal(
 		'EyeDropper',
@@ -83,7 +80,6 @@ test('Normalizes rgba color from EyeDropper selection to hex', async () => {
 	await waitFor(() => expect(onAdd).toHaveBeenCalledWith({ color: '#008000' }))
 })
 
-// EyeDropper API is invalid
 test('Throws error', async () => {
 	stubEyeDropperThrowing()
 	const onError = vi.fn(() => 0)
@@ -96,8 +92,6 @@ test('Throws error', async () => {
 	await waitFor(() => expect(onError).toHaveBeenCalled())
 })
 
-// The component only touches the EyeDropper API on click: availability gating
-// lives in PaletteInput, so the button itself renders even without the API.
 test('Renders even when the EyeDropper API is not available', () => {
 	vi.stubGlobal('EyeDropper', undefined)
 	setup(PaletteEyeDropperButton)

@@ -256,7 +256,6 @@ describe('utils', () => {
 			[colorLength, { ...params, numColumns: 0, maxColumns: 30 }, , colorLength],
 			[colorLength, { ...params, numColumns: 0, maxColumns: 0 }, , colorLength],
 			[colorLength, { ...params, numColumns: 5, maxColumns: 3 }, , params.numColumns],
-			// numColumns is returned verbatim and is never clamped to maxColors (README contract, #197)
 			[colorLength, { ...params, numColumns: 30, maxColors: 4 }, , 30],
 			[colorLength, { ...params, numColumns: 0, maxColors: 4 }, , colorLength],
 			[colorLength, { numColumns: 0 }, , colorLength],

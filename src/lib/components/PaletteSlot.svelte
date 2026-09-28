@@ -7,7 +7,7 @@
 	interface Props {
 		/** The color value of the slot. */
 		color?: ColorValue | null
-		/** Human-readable name used as the accessible label and native tooltip; falls back to the color value. */
+		/** Human-readable name used as the native tooltip and as the accessible label, which falls back to the color value. */
 		name?: string | null
 		/** Whether the slot is selected. */
 		selected?: boolean
@@ -85,8 +85,6 @@
 	}
 
 	button.selected {
-		/* Selection ring drawn as a box-shadow; the surface layer keeps a 2px gap
-		   between the slot and the grey ring. */
 		box-shadow:
 			0 0 0 2px var(--palette-surface, #fafafa),
 			0 0 0 4px var(--palette-slot-ring, #9e9e9e);
