@@ -256,6 +256,12 @@
 	})
 
 	$effect(() => {
+		if (!settings) {
+			_isSettingsOn = false
+		}
+	})
+
+	$effect(() => {
 		const _source = colors
 		const _params = _viewParams()
 		const generation = ++_colorsGeneration
@@ -385,8 +391,10 @@
 		}).length
 	})
 
+	const _canCompact = $derived(_isResolved && _compactPickCount > 0)
+
 	let _tools: PaletteToolName[] = $derived([
-		...(_isResolved && _compactPickCount > 0 ? [COMPACT] : []),
+		...(_canCompact ? [COMPACT] : []),
 		...(settings ? [SETTINGS] : []),
 	] as PaletteToolName[])
 
@@ -791,7 +799,7 @@
 			_isCompact = false
 			return
 		}
-		if (!_isResolved) {
+		if (!_canCompact) {
 			return
 		}
 		_isCompact = true
@@ -801,7 +809,9 @@
 		const tool = typeof args === 'string' ? args : args.tool
 		switch (tool) {
 			case SETTINGS:
-				_isSettingsOn = true
+				if (settings) {
+					_isSettingsOn = true
+				}
 				break
 			case COMPACT:
 				_toggleCompact()

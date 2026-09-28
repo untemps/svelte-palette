@@ -5,6 +5,8 @@
 
 	import { NONE } from '../../enums/PaletteDeletionMode'
 
+	import type { Snippet } from 'svelte'
+
 	import type {
 		AddEventArgs,
 		ColorGroup,
@@ -13,6 +15,8 @@
 		DeleteEventArgs,
 		DeletionMode,
 		ErrorEventArgs,
+		SettingsSnippetProps,
+		ToolsSnippetProps,
 	} from '../../types'
 
 	let {
@@ -28,6 +32,8 @@
 		onadd = undefined,
 		ondelete = undefined,
 		onerror = undefined,
+		tools = undefined,
+		settings = undefined,
 	}: {
 		initialColors: ColorsProp
 		initialIsCompact?: boolean
@@ -41,6 +47,8 @@
 		onadd?: (args: AddEventArgs) => void
 		ondelete?: (args: DeleteEventArgs) => void
 		onerror?: (args: ErrorEventArgs) => void
+		tools?: Snippet<[ToolsSnippetProps]>
+		settings?: Snippet<[SettingsSnippetProps]>
 	} = $props()
 
 	let colors = $state<ColorsProp | null>(untrack(() => initialColors))
@@ -51,6 +59,7 @@
 	let showTransparentSlot = $state<boolean>(untrack(() => initialShowTransparentSlot))
 	let numColumns = $state<number>(untrack(() => initialNumColumns))
 	let showInput = $state<boolean>(untrack(() => initialShowInput))
+	let settingsSnippet = $state.raw<Snippet<[SettingsSnippetProps]> | undefined>(untrack(() => settings))
 
 	export const setColors = (value: ColorsProp | null) => (colors = value)
 	export const setGroupColors = (groupIndex: number, value: ColorInput[]) => {
@@ -65,6 +74,7 @@
 	export const setAllowDuplicates = (value: boolean) => (allowDuplicates = value)
 	export const setMaxColors = (value: number) => (maxColors = value)
 	export const setShowTransparentSlot = (value: boolean) => (showTransparentSlot = value)
+	export const setSettings = (value: Snippet<[SettingsSnippetProps]> | undefined) => (settingsSnippet = value)
 </script>
 
 <Palette
@@ -80,4 +90,6 @@
 	{onadd}
 	{ondelete}
 	{onerror}
+	{tools}
+	settings={settingsSnippet}
 />
