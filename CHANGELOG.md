@@ -1,3 +1,10 @@
+# [6.0.0-beta.26](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.25...v6.0.0-beta.26) (2026-09-28)
+
+
+### Bug Fixes
+
+* Ignore a tool selection the palette does not offer ([#287](https://github.com/untemps/svelte-palette/issues/287)) ([71138ac](https://github.com/untemps/svelte-palette/commit/71138ac01798514735b6bf093466e1e924e3eca7))
+
 # [6.0.0-beta.25](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.24...v6.0.0-beta.25) (2026-09-28)
 
 
