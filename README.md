@@ -393,7 +393,7 @@ When groups are used the color input is not available. Compact mode is: collapsi
 
 A promise to be resolved with an array of color strings, objects, or groups can be passed as well (see [Use an API to fill the palette](#use-an-api-to-fill-the-palette))
 
-While the promise is pending, the palette displays the loader and the color-bound footer affordances (the color input and the compact toggle) are not rendered — they appear once the promise has resolved. If the palette already displays a resolved list and `colors` is then replaced by a new pending source, the previous list and its affordances stay displayed and interactive until the new source resolves.
+While the promise is pending, the palette displays the loader and the color-bound footer affordances (the color input and the compact toggle) are not rendered — they appear once the promise has resolved. If the palette already displays a resolved list and `colors` is then replaced by a new pending source, the previous list and its affordances stay displayed and interactive until the new source resolves. A compact strip keeps picking from that previous list meanwhile, so a change to `isCompact`, `compactColorIndices`, `allowDuplicates` or `maxColors` shows in the strip straight away, while the expanded grid keeps the list as it was last resolved.
 
 The same loader is shown whenever `colors` is absent or `null` (its default): there is no resolved source yet, so the palette waits. To render an empty palette instead, pass `colors={[]}` explicitly.
 
