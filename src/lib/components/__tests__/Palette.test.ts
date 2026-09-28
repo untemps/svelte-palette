@@ -904,7 +904,7 @@ test('Recounts num-columns after a compact slot deletion when the full list hold
 	expect(onDelete).toHaveBeenCalledWith(expect.objectContaining({ color: '#445566', index: 3 }))
 })
 
-test('Removes the occurrence the rendered subset selected when the compact indices drift', async () => {
+test('Removes the occurrence a compact slot stands for when the compact indices change while a replacement source is pending', async () => {
 	const onDelete = vi.fn()
 
 	const { component, user } = setup(PaletteReactive, {
@@ -927,16 +927,27 @@ test('Removes the occurrence the rendered subset selected when the compact indic
 	component.setColors(new Promise(() => {}))
 	component.setCompactColorIndices([1, 2])
 
-	await user.hover(cells[0])
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#0b0',
+			'#a00',
+		])
+	)
+
+	await user.hover(screen.getAllByTestId('__palette-cell__')[1])
 	await user.click(await screen.findByTestId('__trash-icon__'))
 
 	expect(onDelete).toHaveBeenCalledWith({
 		color: '#a00',
-		index: 0,
-		colors: [{ value: '#0b0' }, { value: '#a00' }],
+		index: 2,
+		colors: [{ value: '#a00' }, { value: '#0b0' }],
 	})
-	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2))
-	await waitFor(() => expectNumColumns(section, 2))
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#0b0',
+		])
+	)
+	expectNumColumns(section, 1)
 })
 
 test('Keeps num-columns at one column when a compact deletion empties the rendered subset', async () => {
@@ -1061,7 +1072,316 @@ test('Recomputes the compact column count when showTransparentSlot changes', asy
 	await waitFor(() => expectNumColumns(content, 3))
 })
 
-test('Removes the color by value when the rendered subset drifts from the full list', async () => {
+test('Re-extracts the compact subset while a replacement source is pending', async () => {
+	const { component } = setup(PaletteReactive, {
+		props: { initialColors: ['#a00', '#0b0', '#00c'], initialIsCompact: true, initialCompactColorIndices: [0, 1] },
+	})
+
+	expect(await screen.findAllByTestId('__palette-slot__')).toHaveLength(2)
+	const section = document.querySelector('.palette__content')
+
+	component.setColors(new Promise(() => {}))
+	component.setCompactColorIndices([2])
+
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#00c',
+		])
+	)
+	expectNumColumns(section, 1)
+})
+
+test('Keeps ArrowDown and ArrowUp inert on a compact subset re-extracted while a replacement source is pending', async () => {
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#00c'],
+			initialIsCompact: true,
+			initialCompactColorIndices: [0, 1, 2],
+		},
+	})
+
+	expect(await screen.findAllByTestId('__palette-slot__')).toHaveLength(3)
+
+	component.setColors(new Promise(() => {}))
+	component.setCompactColorIndices([1, 2])
+	await tick()
+
+	const slots = screen.getAllByTestId('__palette-slot__')
+	expect(slots.map((slot) => slot.getAttribute('aria-label'))).toEqual(['#0b0', '#00c'])
+	slots[0].focus()
+	await user.keyboard('{ArrowDown}')
+	expect(slots[0]).toHaveFocus()
+
+	slots[slots.length - 1].focus()
+	await user.keyboard('{ArrowUp}')
+	expect(slots[slots.length - 1]).toHaveFocus()
+})
+
+test('Moves the tab stop back to the first slot when the compact subset is re-extracted while a replacement source is pending', async () => {
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#00c', '#dd0', '#0ee', '#f0f'],
+			initialIsCompact: true,
+			initialCompactColorIndices: [0, 1, 2],
+		},
+	})
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(3)
+	slots[0].focus()
+	await user.keyboard('{End}')
+	expect(slots[2]).toHaveAttribute('tabindex', '0')
+
+	component.setColors(new Promise(() => {}))
+	component.setCompactColorIndices([3, 4, 5])
+
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#dd0',
+			'#0ee',
+			'#f0f',
+		])
+	)
+	expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('tabindex'))).toEqual([
+		'0',
+		'-1',
+		'-1',
+	])
+})
+
+test('Moves the tab stop back to the first slot when a grouped compact strip is re-extracted while a replacement source is pending', async () => {
+	const { component, user } = setup(PaletteReactive, {
+		props: { initialColors: GROUPED_FIXTURE, initialIsCompact: true, initialCompactColorIndices: [0, 1, 2] },
+	})
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots.map((slot) => slot.getAttribute('aria-label'))).toEqual(['#a00', '#a11', '#b00'])
+	slots[0].focus()
+	await user.keyboard('{End}')
+	expect(slots[2]).toHaveAttribute('tabindex', '0')
+
+	component.setColors(new Promise(() => {}))
+	component.setCompactColorIndices([2, 3, 4])
+
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#b00',
+			'#b11',
+			'#b22',
+		])
+	)
+	expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('tabindex'))).toEqual([
+		'0',
+		'-1',
+		'-1',
+	])
+})
+
+test('Moves the tab stop back to the first slot of a palette collapsed while a replacement source is pending', async () => {
+	const { component, user } = setup(PaletteReactive, {
+		props: { initialColors: ['#a00', '#0b0', '#00c', '#dd0', '#0ee'], initialCompactColorIndices: [0, 2] },
+	})
+
+	const slots = await screen.findAllByTestId('__palette-slot__')
+	expect(slots).toHaveLength(5)
+	slots[0].focus()
+	await user.keyboard('{End}')
+	expect(slots[4]).toHaveAttribute('tabindex', '0')
+
+	component.setColors(new Promise(() => {}))
+	component.setIsCompact(true)
+
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#a00',
+			'#00c',
+		])
+	)
+	expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('tabindex'))).toEqual(['0', '-1'])
+})
+
+test('Sizes a compact palette that has not resolved yet to its compact indices and the transparent slot', async () => {
+	setup(Palette, {
+		props: {
+			colors: new Promise(() => {}),
+			isCompact: true,
+			compactColorIndices: [0, 2],
+			showTransparentSlot: true,
+		},
+	})
+
+	expect(await screen.findByRole('status')).toBeInTheDocument()
+	const section = document.querySelector('.palette__content')
+	expect(section).toHaveClass('palette__content--compact')
+	expectNumColumns(section, 3)
+})
+
+test('Collapses onto the compact subset of the previous list while a replacement source is pending', async () => {
+	const { component, user } = setup(PaletteReactive, {
+		props: { initialColors: ['#a00', '#0b0', '#00c', '#dd0', '#0ee'], initialCompactColorIndices: [0, 2] },
+	})
+
+	expect(await screen.findAllByTestId('__palette-slot__')).toHaveLength(5)
+	const section = document.querySelector('.palette__content')
+
+	component.setColors(new Promise(() => {}))
+	await user.click(await screen.findByTestId('__palette-compact-toggle-button__'))
+
+	await waitFor(() => expect(section).toHaveClass('palette__content--compact'))
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#a00',
+			'#00c',
+		])
+	)
+	expectNumColumns(section, 2)
+})
+
+test('Keeps ArrowDown and ArrowUp inert on a palette collapsed while a replacement source is pending', async () => {
+	const { component, user } = setup(PaletteReactive, {
+		props: { initialColors: ['#a00', '#0b0', '#00c', '#dd0', '#0ee'], initialCompactColorIndices: [0, 2] },
+	})
+
+	expect(await screen.findAllByTestId('__palette-slot__')).toHaveLength(5)
+
+	component.setColors(new Promise(() => {}))
+	await user.click(await screen.findByTestId('__palette-compact-toggle-button__'))
+	await tick()
+
+	const slots = screen.getAllByTestId('__palette-slot__')
+	slots[0].focus()
+	await user.keyboard('{ArrowDown}')
+	expect(slots[0]).toHaveFocus()
+
+	slots[slots.length - 1].focus()
+	await user.keyboard('{ArrowUp}')
+	expect(slots[slots.length - 1]).toHaveFocus()
+})
+
+test('Enlarges onto the whole previous list while a replacement source is pending', async () => {
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#00c'],
+			initialIsCompact: true,
+			initialCompactColorIndices: [0, 1],
+		},
+	})
+
+	expect(await screen.findAllByTestId('__palette-slot__')).toHaveLength(2)
+	const section = document.querySelector('.palette__content')
+
+	component.setColors(new Promise(() => {}))
+	await user.click(await screen.findByTestId('__palette-compact-toggle-button__'))
+
+	await waitFor(() => expect(section).not.toHaveClass('palette__content--compact'))
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#a00',
+			'#0b0',
+			'#00c',
+		])
+	)
+	expectNumColumns(section, 5)
+})
+
+test('Caps the compact subset with a maxColors change made while a replacement source is pending', async () => {
+	const { component } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#00c'],
+			initialIsCompact: true,
+			initialCompactColorIndices: [0, 1, 2],
+		},
+	})
+
+	expect(await screen.findAllByTestId('__palette-slot__')).toHaveLength(3)
+	const section = document.querySelector('.palette__content')
+
+	component.setColors(new Promise(() => {}))
+	component.setMaxColors(2)
+
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#a00',
+			'#0b0',
+		])
+	)
+	expectNumColumns(section, 2)
+})
+
+test('Removes a slot from a palette collapsed while a replacement source is pending', async () => {
+	const onDelete = vi.fn()
+
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#00c', '#dd0', '#0ee'],
+			initialCompactColorIndices: [0, 2],
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	expect(await screen.findAllByTestId('__palette-slot__')).toHaveLength(5)
+	const section = document.querySelector('.palette__content')
+
+	component.setColors(new Promise(() => {}))
+	await user.click(await screen.findByTestId('__palette-compact-toggle-button__'))
+
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#a00',
+			'#00c',
+		])
+	)
+
+	await user.hover(screen.getAllByTestId('__palette-cell__')[1])
+	await user.click(await screen.findByTestId('__trash-icon__'))
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#00c',
+		index: 2,
+		colors: [{ value: '#a00' }, { value: '#0b0' }, { value: '#dd0' }, { value: '#0ee' }],
+	})
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#a00',
+		])
+	)
+	expectNumColumns(section, 1)
+})
+
+test('Removes the focused slot with Delete from a palette collapsed while a replacement source is pending', async () => {
+	const onDelete = vi.fn()
+
+	const { component, user } = setup(PaletteReactive, {
+		props: {
+			initialColors: ['#a00', '#0b0', '#00c', '#dd0', '#0ee'],
+			initialCompactColorIndices: [0, 2],
+			deletionMode: TOOLTIP,
+			ondelete: onDelete,
+		},
+	})
+
+	expect(await screen.findAllByTestId('__palette-slot__')).toHaveLength(5)
+
+	component.setColors(new Promise(() => {}))
+	await user.click(await screen.findByTestId('__palette-compact-toggle-button__'))
+	await tick()
+
+	let slots = screen.getAllByTestId('__palette-slot__')
+	expect(slots.map((slot) => slot.getAttribute('aria-label'))).toEqual(['#a00', '#00c'])
+
+	slots[1].focus()
+	await user.keyboard('{Delete}')
+
+	expect(onDelete).toHaveBeenCalledWith(expect.objectContaining({ color: '#00c', index: 2 }))
+	await waitFor(() => {
+		slots = screen.getAllByTestId('__palette-slot__')
+		expect(slots.map((slot) => slot.getAttribute('aria-label'))).toEqual(['#a00'])
+	})
+	await waitFor(() => expect(slots[0]).toHaveFocus())
+})
+
+test('Removes the slot a compact subset re-extracted while a replacement source is pending shows', async () => {
 	const onDelete = vi.fn()
 
 	const { component, user } = setup(PaletteReactive, {
@@ -1083,22 +1403,23 @@ test('Removes the color by value when the rendered subset drifts from the full l
 	component.setColors(new Promise(() => {}))
 	component.setCompactColorIndices([2])
 
-	await user.hover(cells[0])
-	const trash = await screen.findByTestId('__trash-icon__')
-	await user.click(trash)
-
-	expect(onDelete).toHaveBeenCalledWith({
-		color: '#a00',
-		index: 0,
-		colors: [{ value: '#0b0' }, { value: '#00c' }],
-	})
-	await waitFor(() => expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(1))
-	await waitFor(() => expectNumColumns(section, 1))
 	await waitFor(() =>
 		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
 			'#00c',
 		])
 	)
+
+	await user.hover(screen.getAllByTestId('__palette-cell__')[0])
+	const trash = await screen.findByTestId('__trash-icon__')
+	await user.click(trash)
+
+	expect(onDelete).toHaveBeenCalledWith({
+		color: '#00c',
+		index: 2,
+		colors: [{ value: '#a00' }, { value: '#0b0' }],
+	})
+	await waitFor(() => expect(screen.queryAllByTestId('__palette-slot__')).toHaveLength(0))
+	expectNumColumns(section, 1)
 })
 
 test('Applies an isCompact change made inside ondelete alongside the write-back', async () => {
@@ -2949,7 +3270,7 @@ test('Fires ondelete and propagates a compact-mode deletion to the full list', a
 	expect(cells).toHaveLength(2)
 })
 
-test('Deletes the clicked compact duplicate when the compact indices drift ahead of the rendered colors', async () => {
+test('Deletes the clicked compact duplicate when the compact indices change while a replacement source is pending', async () => {
 	const onDelete = vi.fn()
 
 	const { component, user } = setup(PaletteReactive, {
@@ -2967,16 +3288,21 @@ test('Deletes the clicked compact duplicate when the compact indices drift ahead
 	expect(cells).toHaveLength(2)
 
 	component.setColors(new Promise(() => {}))
-	component.setCompactColorIndices([0])
+	component.setCompactColorIndices([0, 2])
 	await tick()
 
-	await user.hover(cells[1])
+	expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+		'#a00',
+		'#a00',
+	])
+
+	await user.hover(screen.getAllByTestId('__palette-cell__')[0])
 	await user.click(await screen.findByTestId('__trash-icon__'))
 
 	expect(onDelete).toHaveBeenCalledWith({
 		color: '#a00',
-		index: 2,
-		colors: [{ value: '#a00' }, { value: '#0b0' }],
+		index: 0,
+		colors: [{ value: '#0b0' }, { value: '#a00' }],
 	})
 	await waitFor(() =>
 		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
@@ -2985,7 +3311,7 @@ test('Deletes the clicked compact duplicate when the compact indices drift ahead
 	)
 })
 
-test('Drops every occurrence the compact slot stands for when the compact indices drift', async () => {
+test('Drops every occurrence the compact slot stands for when the compact indices change while a replacement source is pending', async () => {
 	const onDelete = vi.fn()
 
 	const { component, user } = setup(PaletteReactive, {
@@ -3020,7 +3346,7 @@ test('Drops every occurrence the compact slot stands for when the compact indice
 	)
 })
 
-test('Deletes through the full list when the palette collapses ahead of the rendered colors', async () => {
+test('Scopes a deletion to the compact subset when the palette collapses while a replacement source is pending', async () => {
 	const onDelete = vi.fn()
 
 	const { component, user } = setup(PaletteReactive, {
@@ -3039,46 +3365,60 @@ test('Deletes through the full list when the palette collapses ahead of the rend
 	component.setIsCompact(true)
 	await tick()
 
-	expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2)
+	expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+		'#a00',
+		'#0b0',
+	])
 
-	await user.hover(cells[0])
+	await user.hover(screen.getAllByTestId('__palette-cell__')[0])
 	await user.click(await screen.findByTestId('__trash-icon__'))
 
 	expect(onDelete).toHaveBeenCalledWith({
 		color: '#a00',
 		index: 0,
-		colors: [{ value: '#0b0' }],
+		colors: [{ value: '#0b0' }, { value: '#a00' }],
 	})
 	await waitFor(() =>
 		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
 			'#0b0',
 		])
 	)
+
+	component.setIsCompact(false)
+
+	await waitFor(() =>
+		expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+			'#0b0',
+			'#a00',
+		])
+	)
 })
 
-test('Leaves nothing of a deleted color on screen when the palette expands ahead of the rendered colors', async () => {
+test('Leaves nothing of a deleted color on screen when the palette enlarges while a replacement source is pending', async () => {
 	const onDelete = vi.fn()
 
 	const { component, user } = setup(PaletteReactive, {
 		props: {
 			initialColors: ['#a00', '#0b0', '#a00'],
 			initialIsCompact: true,
-			initialCompactColorIndices: [0, 1],
+			initialCompactColorIndices: [0],
 			deletionMode: TOOLTIP,
 			ondelete: onDelete,
 		},
 	})
 
-	const cells = await screen.findAllByTestId('__palette-cell__')
-	expect(cells).toHaveLength(2)
+	expect(await screen.findAllByTestId('__palette-cell__')).toHaveLength(1)
 
 	component.setColors(new Promise(() => {}))
 	component.setIsCompact(false)
 	await tick()
 
-	expect(screen.getAllByTestId('__palette-cell__')).toHaveLength(2)
+	expect(screen.getAllByTestId('__palette-slot__').map((slot) => slot.getAttribute('aria-label'))).toEqual([
+		'#a00',
+		'#0b0',
+	])
 
-	await user.hover(cells[0])
+	await user.hover(screen.getAllByTestId('__palette-cell__')[0])
 	await user.click(await screen.findByTestId('__trash-icon__'))
 
 	expect(onDelete).toHaveBeenCalledWith({

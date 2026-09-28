@@ -169,6 +169,11 @@
 		maxColumns,
 	})
 
+	const _expandedViewParams = (params: ReturnType<typeof _viewParams>): ReturnType<typeof _viewParams> => ({
+		...params,
+		isCompact: false,
+	})
+
 	const _sameIndices = (a: number[], b: number[]): boolean =>
 		a.length === b.length && a.every((index, i) => index === b[i])
 
@@ -292,13 +297,14 @@
 						_fullColors = null
 						_resolvedViewParams = _params
 					} else {
-						const newColors = calculateColors(results, _params)
+						const nextResolvedViewParams = _expandedViewParams(_params)
+						const newColors = calculateColors(results, nextResolvedViewParams)
 						_colors = newColors
 						_colorGroups = null
 						_fullColorGroups = null
 						_sourceColorGroups = []
 						_fullColors = transformColors(Array.isArray(results) ? results : [])
-						_resolvedViewParams = _params
+						_resolvedViewParams = nextResolvedViewParams
 					}
 				}
 			},
@@ -333,11 +339,24 @@
 
 	const _renderedGroups = $derived(_isCompact ? null : _colorGroups)
 
-	const _compactPicked = $derived(
-		_isCompact && _fullColorGroups != null ? pickColors(_compactSource, _viewParams()) : null
-	)
+	const _compactPicked = $derived.by(() => {
+		if (!_isCompact) {
+			return null
+		}
+		if (_isGrouped) {
+			return pickColors(_compactSource, _viewParams())
+		}
+		return _fullColors != null ? pickColors(_fullColors, _viewParams()) : null
+	})
 
 	const _renderedColors = $derived(_compactPicked ? _compactPicked.map(({ color }) => color) : _colors)
+
+	const _compactPickKey = $derived(_compactPicked?.map(({ index }) => index).join(',') ?? null)
+
+	$effect(() => {
+		void _compactPickKey
+		_focusedIndex = null
+	})
 
 	const _isResolved = $derived(_colors != null || _colorGroups != null)
 
@@ -560,14 +579,14 @@
 
 	const _removeColor = (index: number) => {
 		if (_compactPicked) {
-			_removeCompactGroupColor(index)
+			if (_isGrouped) {
+				_removeCompactGroupColor(index)
+			} else {
+				_removeCompactColor(index)
+			}
 			return
 		}
 		const _params = _resolvedViewParams ?? _viewParams()
-		if (_isCompact && _params.isCompact) {
-			_removeCompactColor(index)
-			return
-		}
 		const rendered = (_colors ?? [])[index]
 		if (!rendered) {
 			return
@@ -657,21 +676,17 @@
 	}
 
 	const _removeCompactColor = (index: number) => {
-		const rendered = (_colors ?? [])[index]
-		if (!rendered) {
+		const target = (_compactPicked ?? [])[index]
+		if (!target) {
 			return
 		}
-		const _params = _resolvedViewParams ?? _viewParams()
 		const full = _fullColors ?? []
-		const fullIndex = _resolveFullIndex(full, _params, rendered, index)
-		if (fullIndex < 0) {
-			return
-		}
+		const fullIndex = target.index
 		const removed = full[fullIndex]
 		const dropped = _droppedIndices(full, fullIndex, { allowDuplicates }, compactColorIndices ?? [])
 		const nextFullColors = _dropIndices(full, dropped)
 		_syncCompactColorIndices(dropped, full)
-		const nextViewParams = _viewParams()
+		const nextViewParams = _expandedViewParams(_viewParams())
 		const nextColors = calculateColors(nextFullColors, nextViewParams)
 		_colors = nextColors
 		_resolvedViewParams = nextViewParams
