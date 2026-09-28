@@ -634,14 +634,14 @@
 		full: NormalizedColor[],
 		fullIndex: number,
 		params: Pick<ReturnType<typeof _viewParams>, 'allowDuplicates'>,
-		indices?: number[]
+		indices: number[] | undefined = undefined
 	): Set<number> => {
 		const removed = full[fullIndex]
 		if (params.allowDuplicates || !removed) {
 			return new Set([fullIndex])
 		}
 		const scope = indices ? new Set(indices) : null
-		const dropped = new Set<number>()
+		const dropped: Set<number> = new Set()
 		full.forEach((color, index) => {
 			if ((!scope || scope.has(index)) && isSameColor(color.value, removed.value)) {
 				dropped.add(index)
