@@ -1,3 +1,10 @@
+# [6.0.0-beta.25](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.24...v6.0.0-beta.25) (2026-09-28)
+
+
+### Bug Fixes
+
+* Derive the flat compact strip from the full list and the live view params ([#286](https://github.com/untemps/svelte-palette/issues/286)) ([ae2324d](https://github.com/untemps/svelte-palette/commit/ae2324d7e285cd5e51c41200d074dba589bcc6b2))
+
 # [6.0.0-beta.24](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.23...v6.0.0-beta.24) (2026-09-25)
 
 
