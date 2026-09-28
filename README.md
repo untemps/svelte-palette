@@ -927,7 +927,7 @@ The tools panel is a container for two actions:
 - Display the settings panel (`"settings"`)
 - Toggle the compact mode (`"compact"`)
 
-The compact action is offered as soon as a list has resolved — grouped lists included — and at least one entry of `compactColorIndices` resolves to a color in it, so a selection that is empty or wholly out of range offers no collapse to an empty strip; the settings action only when a `settings` snippet is passed. The panel itself is not rendered while the palette is compact; the built-in enlarge button takes its place.
+The compact action is offered as soon as a list has resolved — grouped lists included — and at least one entry of `compactColorIndices` resolves to a color in it, so a selection that is empty or wholly out of range offers no collapse to an empty strip; the settings action only when a `settings` snippet is passed. The panel itself is not rendered while the palette is compact; the built-in enlarge button takes its place. When neither action is available — no `settings` snippet passed and no entry of `compactColorIndices` resolving to a color — the panel is not rendered at all, and a `tools` snippet goes with it: the snippet replaces the panel's contents, it does not lift the conditions that bring the panel up, so a palette given the snippet alone shows no controls.
 
 For some use cases, you may want to provide your own controls by using the `tools` snippet.
 
@@ -940,14 +940,18 @@ To access each tool behaviours, the Palette component exports a `onSelect` funct
 	import { Palette, SETTINGS, COMPACT } from '@untemps/svelte-palette'
 
 	const colors = ['#865C54', '#8F5447', '#A65846', '#A9715E', '#AD8C72']
+	const compactColorIndices = [0, 2, 4]
 </script>
 
-<Palette {colors}>
+<Palette {colors} {compactColorIndices}>
 	{#snippet tools({ onSelect, isCompact })}
 		<div>
 			<button onclick={() => onSelect(SETTINGS)}>Settings</button>
 			<button onclick={() => onSelect(COMPACT)}>{isCompact ? 'Expand' : 'Compact'}</button>
 		</div>
+	{/snippet}
+	{#snippet settings({ onClose })}
+		<button onclick={onClose}>Close</button>
 	{/snippet}
 </Palette>
 ```
