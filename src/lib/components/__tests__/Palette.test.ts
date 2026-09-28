@@ -20,8 +20,8 @@ const setup = (component: Parameters<typeof render>[0], options?: Parameters<typ
 const boundingRect = (left: number, top: number, right: number, bottom: number) =>
 	({ left, top, right, bottom, width: right - left, height: bottom - top }) as DOMRect
 
-const expectNumColumns = (element: Element | null | undefined, expected: number | string) =>
-	expect(element?.getAttribute('style')).toBe(`--num-columns: ${expected};`)
+const expectNumColumns = (element: Element | null | undefined, expected: number) =>
+	expect((element as HTMLElement | null | undefined)?.style.getPropertyValue('--num-columns')).toBe(`${expected}`)
 
 test('Displays as many color slots as set', async () => {
 	let cells = null
