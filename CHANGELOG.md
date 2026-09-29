@@ -1,3 +1,10 @@
+# [6.0.0-beta.27](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.26...v6.0.0-beta.27) (2026-09-29)
+
+
+### Bug Fixes
+
+* Keep the packaged Palette compiling on every Svelte release the peer range admits ([#288](https://github.com/untemps/svelte-palette/issues/288)) ([c45f787](https://github.com/untemps/svelte-palette/commit/c45f7874d800cdbe287418a877714a587487fa74))
+
 # [6.0.0-beta.26](https://github.com/untemps/svelte-palette/compare/v6.0.0-beta.25...v6.0.0-beta.26) (2026-09-28)
 
 
