@@ -59,13 +59,7 @@ export const transformColors = ($colors: ReadonlyArray<ColorInput | NormalizedCo
 	})
 }
 
-/**
- * Case-insensitive equality for color values. CSS color strings — hex, named and
- * functional notations — are case-insensitive, so `#FF0000` and `#ff0000` are the
- * same color. Comparing case-sensitively would treat a consumer-supplied value and
- * a normalized one (e.g. a color added through the input, which is lower-cased on
- * submit) as distinct. Non-string values fall back to strict equality.
- */
+/** Case-insensitive for strings (CSS color notations are), strict equality otherwise. */
 export const isSameColor = ($a: ColorValue | null, $b: ColorValue | null): boolean =>
 	typeof $a === 'string' && typeof $b === 'string' ? $a.toLowerCase() === $b.toLowerCase() : $a === $b
 
@@ -216,8 +210,6 @@ const splitColorArgs = ($inner: string): string[] | null => {
 		const [main, alpha, ...rest] = inner.split('/').map(($part) => $part.trim())
 		if (rest.length) return null
 		const components = main.split(/\s+/).filter(Boolean)
-		// In space-separated syntax alpha is introduced by `/`; a bare fourth value
-		// (e.g. `rgb(255 0 0 0)`) is not valid alpha, so reject any extra component.
 		if (components.length > 3) return null
 		tokens = alpha !== undefined ? [...components, alpha] : components
 	}
@@ -335,8 +327,7 @@ export const parseColor = ($color: unknown): ParsedColor | null => {
 	if (COLOR_REGEX.test(color)) return parseHex(color)
 	if (/^rgba?\(/i.test(color)) return parseRgb(color)
 	if (/^hsla?\(/i.test(color)) return parseHsl(color)
-	// Guard the lookup against inherited `Object.prototype` keys (`constructor`, `__proto__`, …):
-	// a bare object literal resolves those to functions/objects, which would throw in `parseHex`.
+	// Inherited keys (`constructor`, `__proto__`…) resolve to non-strings on this plain object.
 	const named = CSS_NAMED_COLORS[color.toLowerCase()]
 	return typeof named === 'string' ? parseHex(named) : null
 }
@@ -346,8 +337,6 @@ export const isColorValid = ($color: unknown): boolean => parseColor($color) !==
 export const normalizeColor = ($color: string): string => {
 	if (typeof $color === 'string') {
 		const trimmed = $color.trim()
-		// Lower-case so hex passthrough matches the canonical lower-case output of the
-		// parsed formats below (e.g. `rgb()` → `#ff0000`), rather than echoing input case.
 		if (COLOR_REGEX.test(trimmed)) return trimmed.replace(COLOR_REGEX, '#$1').toLowerCase()
 	}
 	const parsed = parseColor($color)

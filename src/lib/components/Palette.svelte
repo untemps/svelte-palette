@@ -634,14 +634,14 @@
 		full: NormalizedColor[],
 		fullIndex: number,
 		params: Pick<ReturnType<typeof _viewParams>, 'allowDuplicates'>,
-		indices?: number[]
+		indices: number[] | undefined = undefined
 	): Set<number> => {
 		const removed = full[fullIndex]
 		if (params.allowDuplicates || !removed) {
 			return new Set([fullIndex])
 		}
 		const scope = indices ? new Set(indices) : null
-		const dropped = new Set<number>()
+		const dropped: Set<number> = new Set()
 		full.forEach((color, index) => {
 			if ((!scope || scope.has(index)) && isSameColor(color.value, removed.value)) {
 				dropped.add(index)
@@ -1167,14 +1167,6 @@
 		box-sizing: border-box;
 	}
 
-	/*
-	 * Token defaults, declared at zero specificity via :where() so any ordinary
-	 * consumer rule — an inline style, or a class on the root — overrides them
-	 * without !important and without coupling to internal BEM class names. The
-	 * visual properties below stay on `.palette` and read the tokens through var().
-	 * These are also the universal fallback: a browser without light-dark() support
-	 * keeps them (light only) instead of breaking.
-	 */
 	:where(.palette) {
 		--palette-surface: #fafafa;
 		--palette-text: black;
@@ -1211,16 +1203,6 @@
 		background-color: var(--palette-surface, #fafafa);
 	}
 
-	/*
-	 * Dark theme. Where light-dark() is supported, every theme-varying token is
-	 * declared once as light-dark(<light>, <dark>) and resolved from the
-	 * `color-scheme` on the root: `light dark` follows the OS, and data-palette-theme
-	 * forces one scheme. This replaces the previous pair of identical dark
-	 * declaration lists (a @media block and a forced-attribute block) with a single
-	 * source of truth. Browsers without light-dark() keep the light defaults above
-	 * (no dark mode) rather than breaking. The focus-ring dark value stays
-	 * WCAG-contrasting against the dark surface.
-	 */
 	@supports (color: light-dark(#000, #fff)) {
 		:where(.palette) {
 			--palette-surface: light-dark(#fafafa, #1e1e1e);
@@ -1255,13 +1237,7 @@
 		}
 	}
 
-	/*
-	 * Theme-aware deletion tooltip. The default svelte-use-tooltip bubble ships a
-	 * fixed black background; because it renders inline inside the palette
-	 * (portal: false), it inherits the palette tokens, so restyle it to track the
-	 * theme instead of staying black on a dark surface. A custom tooltipClassName
-	 * replaces the default class, opting out of these rules (the consumer owns it).
-	 */
+	/* useDeletion renders the tooltip inline (portal: false), so these rules reach it. */
 	.palette :global(.__tooltip) {
 		background-color: var(--palette-tooltip-surface, black);
 		color: var(--palette-tooltip-text, #fff);

@@ -144,8 +144,8 @@ export interface DeleteEventArgs {
 	/**
 	 * The index of the removed color in the resolved full list, or in its full group on a grouped `colors`
 	 * list — never the index of the rendered slot, and never an index into `compactColorIndices`. With
-	 * `allowDuplicates` off, one deletion drops every occurrence of that color and this reports the first —
-	 * in compact mode, the first of the occurrences the selection holds. A compact strip over grouped colors
+	 * `allowDuplicates` off, one deletion drops every occurrence of that color — only those the selection holds
+	 * in compact mode — and this reports the first of them. A compact strip over grouped colors
 	 * still resolves the deleted slot to its own full group, so this stays group-relative there and
 	 * `groupIndex` names the group it addresses. On a grouped list that is not compact, the occurrences a
 	 * single deletion drops are scoped to that one group; a compact strip flattens the groups first, so there
@@ -246,7 +246,7 @@ export interface SlotSnippetProps {
 	isCompact: boolean
 	/**
 	 * The `aria-keyshortcuts` value announcing keyboard deletion (`"Delete Backspace"` when a `deletionMode`
-	 * is set, `undefined` otherwise). Forward it onto your focusable element (e.g. `aria-keyshortcuts={ariaKeyShortcuts}`)
+	 * is set on a non-presentational palette, `undefined` otherwise). Forward it onto your focusable element (e.g. `aria-keyshortcuts={ariaKeyShortcuts}`)
 	 * so screen readers announce that `Delete`/`Backspace` removes the focused slot.
 	 */
 	ariaKeyShortcuts?: string

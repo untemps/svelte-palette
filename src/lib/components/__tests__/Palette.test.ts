@@ -90,19 +90,15 @@ test('Discards a stale async colors promise that settles after a newer one', asy
 		props: { initialColors: stalePromise },
 	})
 
-	// The first (slow) request is in flight; nothing is painted yet.
 	await tick()
 	expect(screen.queryAllByTestId('__palette-slot__')).toHaveLength(0)
 
-	// A newer request supersedes it before either settles.
 	component.setColors(freshPromise)
 	await tick()
 
-	// The newer request wins the race and paints its colors.
 	resolveFresh(['#111', '#222'])
 	await waitFor(() => expect(screen.getAllByTestId('__palette-slot__')).toHaveLength(2))
 
-	// The stale request settles last; it must not clobber the newer result.
 	resolveStale(['#aaa', '#bbb', '#ccc'])
 	await stalePromise
 	await tick()
@@ -1944,8 +1940,6 @@ test('Keeps deletion cells out of the tab order', async () => {
 
 	const cells = await screen.findAllByTestId('__palette-cell__')
 	expect(cells.length).toBeGreaterThan(0)
-	// The deletion tooltip would otherwise mark each cell tabindex="0"; the explicit
-	// tabindex="-1" keeps the listbox a single tab stop and blocks that.
 	cells.forEach((cell) => {
 		expect(cell).toHaveAttribute('tabindex', '-1')
 		expect(cell).not.toHaveAttribute('tabindex', '0')
